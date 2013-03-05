@@ -1,0 +1,44 @@
+<project name="GriefAlert" default="dist" basedir=".">
+    <description>
+        GriefAlert plugin for CanaryMod
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src"   location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property name="lib"   location="lib"/>
+
+  <target name="init">
+    <!-- Include jars in ${lib} -->
+    <mkdir dir="${lib}"/>
+    <path id="inc">
+      <fileset dir="${lib}" includes="*.jar"/>
+    </path>
+
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}" classpathref="inc"
+          includeantruntime="false"/>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Put everything in ${build} into the GriefAlert.jar file -->
+    <jar jarfile="${dist}/GriefAlert.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean" description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
+<!-- vim: set et si sts=2 sw=2 tw=79: -->
