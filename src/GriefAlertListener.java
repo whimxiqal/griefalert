@@ -377,6 +377,63 @@ public class GriefAlertListener extends PluginListener {
         return false;
     }
 
+    @Override
+    public boolean onHangingEntityDestroyed(HangingEntity entity, DamageSource damageSource) {
+        if (!damageSource.getSourceEntity().isPlayer()) {
+            return false;
+        }
+
+        Player player = (Player) damageSource.getSourceEntity();
+        String action = damageSource.isIndirectDamageSource() ? "indirectly broke" : "broke";
+        int blockID = entity.getEntity() instanceof OEntityPainting ? 321 : 389; // Painting or item frame
+
+        if (GriefAlert.toggleAlertes && GriefAlert.isBreakWatched(blockID)) {
+            String playerName = player.getName();
+            GriefAction data = GriefAlert.onBreakWatchList.get(blockID);
+            int tcoord = main.treatCoordinates(player.getLocation());
+            String message = String.format(" %s %s (%s) in the %s world.",
+                (("aeiou".contains(data.blockName.substring(0, 1).toLowerCase())) ? "an " : "a "),
+                data.blockName, tcoord, getWorldTypeString(player.getWorld()));
+
+            if (!data.stealth && !player.canUseCommand("/doNotTriggerAlerts")) {
+                if (!GriefAlert.lastAction.containsKey(playerName)) {
+                    GriefAlert.lastAction.put(playerName, "");
+                }
+                if (GriefAlert.oldWarnBehavior || !GriefAlert.lastAction.get(playerName).contains("d"+blockID)) {
+                    GriefAlert.lastAction.put(playerName, "d"+blockID);
+                    main.writeToAllGriefcheckers("\u00a7"+data.alertColor + playerName + message);
+                }
+            }
+
+            if (GriefAlert.logToFile) {
+                postGriefAlertToLog(player,
+                        new Block(0, etc.floor(entity.getX()), etc.floor(entity.getY()), etc.floor(entity.getZ())),
+                        data, action, tcoord);
+            }
+
+            if (data.denied && !player.canUseCommand("/ignoreDenies")) {
+                //Always deny
+                if (data.onlyin == 0)
+                    return true;
+                int dim = player.getLocation().dimension;
+                //Only deny it in the End
+                if (data.onlyin == 1 && dim == World.Dimension.END.getId()) {
+                    return true;
+                }
+                //Only in the Nether
+                if (data.onlyin == -1 && dim == World.Dimension.NETHER.getId()) {
+                    return true;
+                }
+                //Nether and End but allow in normal world
+                if (data.onlyin == -2 && dim != World.Dimension.NORMAL.getId()) {
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
+    }
 
     public String getWorldTypeString(World world) {
         try {

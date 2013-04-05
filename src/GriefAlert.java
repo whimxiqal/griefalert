@@ -397,7 +397,7 @@ public class GriefAlert extends Plugin{
 	}
 	
 	public void initialize(){
-		GriefAlertListener listener = new GriefAlertListener();
+		GriefAlertListener listener = new GriefAlertListener(this);
 		etc.getLoader().addListener(PluginLoader.Hook.COMMAND, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_RIGHTCLICKED, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_PLACE, listener, this, PluginListener.Priority.MEDIUM);
