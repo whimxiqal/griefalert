@@ -404,6 +404,7 @@ public class GriefAlert extends Plugin{
 		etc.getLoader().addListener(PluginLoader.Hook.ITEM_USE, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_BROKEN, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.SIGN_CHANGE, listener, this, PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener(PluginLoader.Hook.HANGING_ENTITY_DESTROYED, listener, this, PluginListener.Priority.MEDIUM);
 	}
 	
 	public void writeToAllGriefcheckers(String msg)
