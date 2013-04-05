@@ -384,15 +384,16 @@ public class GriefAlertListener extends PluginListener {
         }
 
         Player player = (Player) damageSource.getSourceEntity();
-        String action = damageSource.isIndirectDamageSource() ? "indirectly broke" : "broke";
+        boolean indirect = damageSource.isIndirectDamageSource();
         int blockID = entity.getEntity() instanceof OEntityPainting ? 321 : 389; // Painting or item frame
 
         if (GriefAlert.toggleAlertes && GriefAlert.isBreakWatched(blockID)) {
             String playerName = player.getName();
             GriefAction data = GriefAlert.onBreakWatchList.get(blockID);
             int tcoord = main.treatCoordinates(player.getLocation());
-            String message = String.format(" %s %s (%s) in the %s world.",
-                (("aeiou".contains(data.blockName.substring(0, 1).toLowerCase())) ? "an " : "a "),
+            String message = String.format(" %s %s %s (%s) in the %s world.",
+                indirect ? "indirectly broke" : "broke",
+                (("aeiou".contains(data.blockName.substring(0, 1).toLowerCase())) ? "an" : "a"),
                 data.blockName, tcoord, getWorldTypeString(player.getWorld()));
 
             if (!data.stealth && !player.canUseCommand("/doNotTriggerAlerts")) {
@@ -408,7 +409,7 @@ public class GriefAlertListener extends PluginListener {
             if (GriefAlert.logToFile) {
                 postGriefAlertToLog(player,
                         new Block(0, etc.floor(entity.getX()), etc.floor(entity.getY()), etc.floor(entity.getZ())),
-                        data, action, tcoord);
+                        data, indirect ? "remote" : "broke", tcoord);
             }
 
             if (data.denied && !player.canUseCommand("/ignoreDenies")) {
