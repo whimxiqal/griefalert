@@ -25,7 +25,7 @@ public class GriefAlertListener extends PluginListener {
                         player.sendMessage(Colors.Rose+"Invalid code");
                     }
                 } else if (GriefAlert.gcheckToCoordinates && split.length==4) {
-                    Location target = new Location();
+                    Location target = player.getLocation();
                     try {
                         target.x = Integer.parseInt(split[1]);
                         target.y = Integer.parseInt(split[2]);
@@ -35,9 +35,6 @@ public class GriefAlertListener extends PluginListener {
                         player.sendMessage(Colors.Rose+"Invalid coordinates");
                         return true;
                     }
-                    target.rotX=player.getRotation();
-                    target.rotY=player.getPitch();
-                    target.dimension = player.getLocation().dimension;
                     player.teleportTo(target);
                     GriefAlert.log.info("GriefAlert:"+player.getName()+
                             ":teleport:"+
@@ -45,7 +42,7 @@ public class GriefAlertListener extends PluginListener {
                             "y="+target.y+":"+
                             "z="+target.z);
                 } else if (GriefAlert.gcheckToCoordinates && split.length==5) {
-                    Location target = new Location();
+                    Location target = player.getLocation();
                     try {
                         target.x = Integer.parseInt(split[1]);
                         target.y = Integer.parseInt(split[2]);
@@ -56,8 +53,6 @@ public class GriefAlertListener extends PluginListener {
                         player.sendMessage(Colors.Rose+"Invalid coordinates");
                         return true;
                     }
-                    target.rotX=player.getRotation();
-                    target.rotY=player.getPitch();
                     player.teleportTo(target);
                     GriefAlert.log.info("GriefAlert:"+player.getName()+
                             ":teleport:"+
@@ -66,7 +61,7 @@ public class GriefAlertListener extends PluginListener {
                             "z="+target.z+":"+
                             "d="+target.dimension);
                 } else if (GriefAlert.gcheckToCoordinates && split.length==6) {
-                    Location target = new Location();
+                    Location target = player.getLocation();
                     try {
                         target.x = Integer.parseInt(split[1]);
                         target.y = Integer.parseInt(split[2]);
@@ -78,7 +73,6 @@ public class GriefAlertListener extends PluginListener {
                         player.sendMessage(Colors.Rose+"Invalid coordinates");
                         return true;
                     }
-                    target.dimension = player.getLocation().dimension;
                     player.teleportTo(target);
                     GriefAlert.log.info("GriefAlert:"+player.getName()+
                             ":teleport:"+
@@ -88,7 +82,7 @@ public class GriefAlertListener extends PluginListener {
                             "r="+target.rotX+":"+
                             "p="+target.rotY);
                 } else if (GriefAlert.gcheckToCoordinates && split.length==7) {
-                    Location target = new Location();
+                    Location target = player.getLocation();
                     try {
                         target.x = Integer.parseInt(split[1]);
                         target.y = Integer.parseInt(split[2]);
@@ -110,6 +104,31 @@ public class GriefAlertListener extends PluginListener {
                             "r="+target.rotX+":"+
                             "p="+target.rotY+":"+
                             "d="+target.dimension);
+                } else if (GriefAlert.gcheckToCoordinates && split.length==8) {
+                    Location target = player.getLocation();
+                    try {
+                        target.x = Integer.parseInt(split[1]);
+                        target.y = Integer.parseInt(split[2]);
+                        target.z = Integer.parseInt(split[3]);
+                        target.rotX = Integer.parseInt(split[4]);
+                        target.rotY = Integer.parseInt(split[5]);
+                        target.dimension = Integer.parseInt(split[6]);
+                        target.world = split[7];
+                    }
+                    catch (NumberFormatException n) {
+                        player.sendMessage(Colors.Rose+"Invalid coordinates");
+                        return true;
+                    }
+                    player.teleportTo(target);
+                    GriefAlert.log.info("GriefAlert:"+player.getName()+
+                            ":teleport:"+
+                            "x="+target.x+":"+
+                            "y="+target.y+":"+
+                            "z="+target.z+":"+
+                            "r="+target.rotX+":"+
+                            "p="+target.rotY+":"+
+                            "d="+target.dimension+":"+
+                            "w="+target.world);
                 } else if (split.length==1) {
                     if (GriefAlert.indexInTab == 0) {
                         main.tpToCode(player, GriefAlert.griefLocations.length-1);
