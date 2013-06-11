@@ -27,9 +27,9 @@ public class GriefAlertListener extends PluginListener {
                 } else if (GriefAlert.gcheckToCoordinates && split.length==4) {
                     Location target = player.getLocation();
                     try {
-                        target.x = Integer.parseInt(split[1]);
-                        target.y = Integer.parseInt(split[2]);
-                        target.z = Integer.parseInt(split[3]);
+                        target.x = Double.parseDouble(split[1]);
+                        target.y = Double.parseDouble(split[2]);
+                        target.z = Double.parseDouble(split[3]);
                     }
                     catch (NumberFormatException n) {
                         player.sendMessage(Colors.Rose+"Invalid coordinates");
@@ -44,9 +44,9 @@ public class GriefAlertListener extends PluginListener {
                 } else if (GriefAlert.gcheckToCoordinates && split.length==5) {
                     Location target = player.getLocation();
                     try {
-                        target.x = Integer.parseInt(split[1]);
-                        target.y = Integer.parseInt(split[2]);
-                        target.z = Integer.parseInt(split[3]);
+                        target.x = Double.parseDouble(split[1]);
+                        target.y = Double.parseDouble(split[2]);
+                        target.z = Double.parseDouble(split[3]);
                         target.dimension = Integer.parseInt(split[4]);
                     }
                     catch (NumberFormatException n) {
@@ -63,11 +63,11 @@ public class GriefAlertListener extends PluginListener {
                 } else if (GriefAlert.gcheckToCoordinates && split.length==6) {
                     Location target = player.getLocation();
                     try {
-                        target.x = Integer.parseInt(split[1]);
-                        target.y = Integer.parseInt(split[2]);
-                        target.z = Integer.parseInt(split[3]);
-                        target.rotX = Integer.parseInt(split[4]);
-                        target.rotY = Integer.parseInt(split[5]);
+                        target.x = Double.parseDouble(split[1]);
+                        target.y = Double.parseDouble(split[2]);
+                        target.z = Double.parseDouble(split[3]);
+                        target.rotX = Float.parseFloat(split[4]);
+                        target.rotY = Float.parseFloat(split[5]);
                     }
                     catch (NumberFormatException n) {
                         player.sendMessage(Colors.Rose+"Invalid coordinates");
@@ -84,11 +84,11 @@ public class GriefAlertListener extends PluginListener {
                 } else if (GriefAlert.gcheckToCoordinates && split.length==7) {
                     Location target = player.getLocation();
                     try {
-                        target.x = Integer.parseInt(split[1]);
-                        target.y = Integer.parseInt(split[2]);
-                        target.z = Integer.parseInt(split[3]);
-                        target.rotX = Integer.parseInt(split[4]);
-                        target.rotY = Integer.parseInt(split[5]);
+                        target.x = Double.parseDouble(split[1]);
+                        target.y = Double.parseDouble(split[2]);
+                        target.z = Double.parseDouble(split[3]);
+                        target.rotX = Float.parseFloat(split[4]);
+                        target.rotY = Float.parseFloat(split[5]);
                         target.dimension = Integer.parseInt(split[6]);
                     }
                     catch (NumberFormatException n) {
@@ -107,11 +107,11 @@ public class GriefAlertListener extends PluginListener {
                 } else if (GriefAlert.gcheckToCoordinates && split.length==8) {
                     Location target = player.getLocation();
                     try {
-                        target.x = Integer.parseInt(split[1]);
-                        target.y = Integer.parseInt(split[2]);
-                        target.z = Integer.parseInt(split[3]);
-                        target.rotX = Integer.parseInt(split[4]);
-                        target.rotY = Integer.parseInt(split[5]);
+                        target.x = Double.parseDouble(split[1]);
+                        target.y = Double.parseDouble(split[2]);
+                        target.z = Double.parseDouble(split[3]);
+                        target.rotX = Float.parseFloat(split[4]);
+                        target.rotY = Float.parseFloat(split[5]);
                         target.dimension = Integer.parseInt(split[6]);
                         target.world = split[7];
                     }
