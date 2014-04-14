@@ -23,7 +23,7 @@
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}" classpathref="inc"
-        includeantruntime="false">
+        includeantruntime="false" debug="true">
       <compilerarg line="-Xlint -Xlint:-path"/>
     </javac>
   </target>
