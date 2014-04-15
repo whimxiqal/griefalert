@@ -49,7 +49,7 @@ public class GriefAlert extends Plugin{
 	public void enable(){
 		loadGriefAlert();
 		loadGriefAlertData();
-		minecraftLog.info("Antigrief : v19.0-custom for MinecraftOnline by BastetFurry and 14mRh4X0r loaded");
+		minecraftLog.info("Antigrief : v19.1-custom for MinecraftOnline by BastetFurry and 14mRh4X0r loaded");
 	}
 	
 	public void disable(){

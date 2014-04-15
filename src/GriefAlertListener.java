@@ -270,7 +270,7 @@ public class GriefAlertListener extends PluginListener {
                     } */
                 }
                 if (GriefAlert.logToFile) {
-                    postGriefAlertToLog(player, blockPlaced, data, "used", tcoord);
+                    postGriefAlertToLog(player, blockPlaced == null ? blockClicked : blockPlaced, data, "used", tcoord);
 /*                      log.info("Antigrief alarm : "+playerName+message+
                             " at x="+blockPlaced.getX()+" y="+blockPlaced.getY()+" z="+blockPlaced.getZ()); */
                 }
