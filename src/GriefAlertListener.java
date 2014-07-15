@@ -142,8 +142,8 @@ public class GriefAlertListener extends PluginListener {
                         player.sendMessage(Colors.Rose+"Usage : /gcheck X Y Z to a specific location");
                 }
                 return true;
-            } else if (split[0].equalsIgnoreCase("/griefalerttoggle")) {
-                if (!player.canUseCommand("/griefalerttoggle")) {
+            } else if (split[0].equalsIgnoreCase("/griefalert")) {
+                if (!player.canUseCommand("/griefalert")) {
                     return false;
                 }
 
