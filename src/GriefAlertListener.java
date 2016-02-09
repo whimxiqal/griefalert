@@ -398,7 +398,7 @@ public class GriefAlertListener extends PluginListener {
 
     @Override
     public boolean onHangingEntityDestroyed(HangingEntity entity, DamageSource damageSource) {
-        if (damageSource == null || !damageSource.getSourceEntity().isPlayer()) {
+        if (damageSource == null || damageSource.getSourceEntity() == null || !damageSource.getSourceEntity().isPlayer()) {
             return false;
         }
 

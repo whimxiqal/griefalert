@@ -1,12 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
@@ -19,8 +14,8 @@ public class GriefAlert extends Plugin{
 	// for servermod 130+
 	
 	public String name = "GriefAlert";
-	
-	static Logger minecraftLog = Logger.getLogger("Minecraft");;
+
+	static Logger minecraftLog = Logger.getLogger("Minecraft");
 	static Logger log;
 	
 	static boolean toggleAlertes = true;
