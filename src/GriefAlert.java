@@ -44,7 +44,7 @@ public class GriefAlert extends Plugin{
 	public void enable(){
 		loadGriefAlert();
 		loadGriefAlertData();
-		minecraftLog.info("Antigrief : v19.1-custom for MinecraftOnline by BastetFurry and 14mRh4X0r loaded");
+		minecraftLog.info("Antigrief : v19.2-custom for MinecraftOnline by BastetFurry, 14mRh4X0r, and DarkDiplomat loaded");
 	}
 	
 	public void disable(){
@@ -401,15 +401,12 @@ public class GriefAlert extends Plugin{
 		etc.getLoader().addListener(PluginLoader.Hook.SIGN_CHANGE, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.HANGING_ENTITY_DESTROYED, listener, this, PluginListener.Priority.MEDIUM);
 	}
-	
-	public void writeToAllGriefcheckers(String msg)
-	{
+
+	public void writeToAllGriefcheckers(String msg) {
 		for  (Player p : etc.getServer().getPlayerList() ) {
 			if (p.canUseCommand("/griefalert")){
 				p.sendMessage(msg);
 			}
 		}	
 	}
-
-	
 }
