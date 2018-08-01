@@ -1,0 +1,27 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+archivesBaseName = 'griefalert' // Project Base Name Here
+group = 'com.minecraftonline' // This is a MinecraftOnline project
+version = '21.0' // Project Version
+
+ext.sponge_version = '7.0.0' // SpongeAPI version
+ext.authors = ['darkdiplomat', 'BastetFurry', '14mRh4X0r'] // Separate with commas (e.g. ['SlowRiot', 'FliPPeh', '14mRh4X0r', 'techkid6'])
+
+dependencies {
+    compileOnly "org.spongepowered:spongeapi:${sponge_version}"
+}
+
+sponge.plugin.meta {
+    authors = ext.authors
+}
+
+jar.manifest {
+    attributes "Implementation-Title": name,
+            "Implementation-Version": version,
+            "Implementation-Vendor": "MinecraftOnline"
+}
