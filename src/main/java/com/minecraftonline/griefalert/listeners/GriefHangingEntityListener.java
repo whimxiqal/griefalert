@@ -14,9 +14,9 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 
 import javax.annotation.Nonnull;
 
-public class GriefHangingEntity extends AlertTracker implements EventListener<InteractEntityEvent> {
+public class GriefHangingEntityListener extends AlertTracker implements EventListener<InteractEntityEvent> {
 
-    public GriefHangingEntity(Logger logger) {
+    public GriefHangingEntityListener(Logger logger) {
         super(logger);
     }
 

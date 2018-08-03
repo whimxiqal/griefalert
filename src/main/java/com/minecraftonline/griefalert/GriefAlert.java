@@ -1,9 +1,7 @@
 package com.minecraftonline.griefalert;
 
 import com.google.inject.Inject;
-import com.minecraftonline.griefalert.listeners.GriefHangingEntity;
-import com.minecraftonline.griefalert.listeners.GriefInteractListener;
-import com.minecraftonline.griefalert.listeners.GriefSign;
+import com.minecraftonline.griefalert.listeners.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -13,6 +11,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
@@ -60,10 +59,11 @@ public class GriefAlert {
         if (!defaultConfig.toFile().exists()) {
             try {
                 rootNode = loader.load();
-                rootNode.getNode("degriefStickID").setValue("stick");
+                rootNode.getNode("degriefStickID").setValue("\"minecraft:stick\"");
                 rootNode.getNode("alertsCodeLimit").setValue(999);
                 rootNode.getNode("logSignsContent").setValue(true);
                 rootNode.getNode("displayPlacedSigns").setValue(true);
+                rootNode.getNode("debugInGameAlerts").setValue(false);
                 loader.save(rootNode);
                 /*
                 writer.write("degriefStickID=280\r\n");
@@ -105,12 +105,13 @@ public class GriefAlert {
     }
 
     private void registerListeners() {
-        // Priority LAST since this is purely a logger of events that actually happen
+        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.POST, new GriefDestroyListener(logger));
+        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.POST, new GriefPlacementListener(logger));
         if (readConfigBool("logSignsContent")) {
-            Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.LAST, new GriefSign(logger));
+            Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.POST, new GriefSignListener(logger));
         }
         Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(logger));
-        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.LAST, new GriefHangingEntity(logger));
+        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.POST, new GriefHangingEntityListener(logger));
     }
 
     public static boolean isUseWatched(String blockName) {
@@ -215,10 +216,10 @@ public class GriefAlert {
                     } else if (splitedLine[0].equalsIgnoreCase("INTERACT")) {
                         interactWatchList.put(blockID, new GriefAction(blockID, colorCode, false, stealth, onlyin, GriefAction.Type.INTERACT));
                     } else {
-                        logger.info("watchedBlocks.txt - unrecognized activator : " + splitedLine[0]);
+                        logger.warn("watchedBlocks.txt - unrecognized activator : " + splitedLine[0]);
                     }
                 } else {
-                    logger.info("watchedBlocks.txt - line skipped (invalid format)");
+                    logger.warn("watchedBlocks.txt - line skipped (invalid format)");
                 }
             }
             scanner.close();
