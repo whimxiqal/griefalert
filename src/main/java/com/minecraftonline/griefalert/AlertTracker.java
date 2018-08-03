@@ -2,6 +2,7 @@ package com.minecraftonline.griefalert;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.block.tileentity.Sign;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
@@ -17,7 +18,7 @@ public abstract class AlertTracker {
     private static HashMap<UUID, String> lastAction = new HashMap<>();
     private static Location[] griefLocations = new Location[GriefAlert.readConfigInt("alertsCodeLimit")];
     private static int indexInTab = 0;
-    private static String msg = "%s %s %s %s (%d) in the %s dimension of %s world.";
+    private static String msg = "%s %s %s %s (%d) in the '%s' dimension of the '%s' world.";
     private static String signmsg = "Sign placed by %s at %d %d %d in %s-%s";
     private final Logger gaLogger;
 
@@ -32,7 +33,7 @@ public abstract class AlertTracker {
         }
         UUID playerID = player.getUniqueId();
         Text alertMessage = alertMessage(player, alertNo, action);
-        if (!player.hasPermission("griefalert.noalert") && !action.stealth && action.type != GriefAction.Type.DEGRIEF) {
+        if ((!player.hasPermission("griefalert.noalert") && !action.stealth && action.type != GriefAction.Type.DEGRIEF) || GriefAlert.readConfigBool("debugInGameAlerts")) {
             String priorAct = actionTrackForm(action);
             if (!lastAction.containsKey(playerID) || !lastAction.get(playerID).contains(priorAct)) {
                 alertStaff(alertMessage);
@@ -78,8 +79,8 @@ public abstract class AlertTracker {
 
     private Text alertMessage(Player player, int alertNo, GriefAction action) {
         return Text.builder(String.format(msg, player.getName(), action.type.name().toLowerCase(),
-                correctGrammar(action.blockName), action.blockName, alertNo, player.getWorld().getDimension().getType().getId(),
-                player.getWorld().getName())).color(action.alertColor).build();
+                                          correctGrammar(action.blockName), entityOrBlockStaff(action), alertNo, player.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""),
+                                          player.getWorld().getName())).color(action.alertColor).build();
     }
 
     private String correctGrammar(String str) {
@@ -90,7 +91,7 @@ public abstract class AlertTracker {
         gaLogger.info(
                 player.getUniqueId().toString() + " (" + player.getName() + "):" +
                         action.type.name().toLowerCase() + ":" +
-                        entityOrBlock(action) + ":" +
+                        entityOrBlockConsole(action) + ":" +
                         "x=" + action.getX() + ":" +
                         "y=" + action.getY() + ":" +
                         "z=" + action.getZ() + ":" +
@@ -98,17 +99,28 @@ public abstract class AlertTracker {
                         "sy=" + player.getLocation().getBlockY() + ":" +
                         "sz=" + player.getLocation().getBlockZ() + ":" +
                         "w=" + player.getWorld().getName() + ":" +
-                        "d=" + player.getWorld().getDimension().getType().getId().replace("minecraft:", "") + ":" +
+                        "d=" + player.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
                         alertNo
         );
     }
 
-    private String entityOrBlock(GriefAction action) {
+    private String entityOrBlockStaff(GriefAction action) {
+        if (action.block != null) {
+            return action.block.getState().getId();
+        }
+        else if (action.entity instanceof Painting) {
+            return "Painting (" + action.entity.get(Keys.ART).get().getId() + ")";
+        }
+        return "N/A";
+    }
+
+    private String entityOrBlockConsole(GriefAction action) {
         if (action.block != null) {
             return action.block.getState().toString().replace(':', '-');
-        } else if (action.entity instanceof Painting) {
+        }
+        else if (action.entity instanceof Painting) {
             Painting painting = (Painting) action.entity;
-            return painting.getArtData().type().toString();
+            return "Painting-" + painting.get(Keys.ART).get().getId();
         }
         return "N/A";
     }

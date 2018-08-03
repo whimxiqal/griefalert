@@ -25,13 +25,16 @@ public class GriefInteractListener extends AlertTracker implements EventListener
         Optional<Player> poption = event.getCause().first(Player.class);
         poption.ifPresent(player -> player.getItemInHand(HandTypes.MAIN_HAND).ifPresent(item -> {
             BlockSnapshot blockTarget = event.getTargetBlock();
-            String blockID = blockTarget.getState().getType().getName();
+            String blockID = blockTarget.getState().getType().getId();
             if (!blockID.equals("minecraft:air")) {
-                if (player.hasPermission("griefalert.degrief") && item.getType().getName().equals("minecraft:" + GriefAlert.readConfigStr("degriefStickID"))) {
+                if (player.hasPermission("griefalert.degrief") && item.getType().getId().equals(GriefAlert.readConfigStr("degriefStickID"))) {
                     log(player, degrief(blockID).assignBlock(blockTarget));
                     player.getWorld().setBlockType(event.getTargetBlock().getPosition(), BlockTypes.AIR);
+                    event.setCancelled(true);
                 } else if (GriefAlert.isInteractWatched(blockID)) {
-                    log(player, GriefAlert.getInteractAction(blockID).copy().assignBlock(blockTarget));
+                    if (GriefAlert.isInteractWatched(blockID)) {
+                        log(player, GriefAlert.getInteractAction(blockID).copy().assignBlock(blockTarget));
+                    }
                 }
             }
         }));
