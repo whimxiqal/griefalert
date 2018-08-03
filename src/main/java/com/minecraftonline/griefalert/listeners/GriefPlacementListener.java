@@ -20,7 +20,7 @@ public class GriefPlacementListener extends AlertTracker implements EventListene
     }
 
     @Override
-    public void handle(@Nonnull ChangeBlockEvent.Place event) throws Exception {
+    public void handle(@Nonnull ChangeBlockEvent.Place event) {
         Optional<Player> poption = event.getCause().first(Player.class);
         if (poption.isPresent()) {
             Player player = poption.get();
@@ -28,7 +28,7 @@ public class GriefPlacementListener extends AlertTracker implements EventListene
             for (Transaction<BlockSnapshot> transaction : transactions) {
                 BlockSnapshot blockSnapshot = transaction.getFinal();
                 String blockID = blockSnapshot.getState().getType().getName();
-                if (GriefAlert.isUseWatched(blockID)) {
+                if (GriefAlert.isUseWatched(blockID) && !GriefAlert.getUseAction(blockID).denied) {
                     log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot));
                 }
             }

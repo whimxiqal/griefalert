@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.minecraftonline.griefalert.listeners.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -17,6 +16,7 @@ import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.io.File;
@@ -53,18 +53,16 @@ public class GriefAlert {
 
     @Listener
     public void initialize(GamePreInitializationEvent event) {
-        ConfigurationLoader<CommentedConfigurationNode> loader =
-                HoconConfigurationLoader.builder().setPath(defaultConfig).build();
 
         if (!defaultConfig.toFile().exists()) {
             try {
-                rootNode = loader.load();
+                rootNode = configManager.load();
                 rootNode.getNode("degriefStickID").setValue("\"minecraft:stick\"");
                 rootNode.getNode("alertsCodeLimit").setValue(999);
                 rootNode.getNode("logSignsContent").setValue(true);
                 rootNode.getNode("displayPlacedSigns").setValue(true);
                 rootNode.getNode("debugInGameAlerts").setValue(false);
-                loader.save(rootNode);
+                configManager.save(rootNode);
                 /*
                 writer.write("degriefStickID=280\r\n");
             	writer.write("separatedLog=false\r\n");
@@ -86,7 +84,7 @@ public class GriefAlert {
             }
         } else {
             try {
-                rootNode = loader.load();
+                rootNode = configManager.load();
             } catch (IOException e) {
                 logger.warn("Exception while reading configuration", e);
             }
@@ -102,6 +100,7 @@ public class GriefAlert {
         interactWatchList.clear();
         destroyWatchList.clear();
         loadGriefAlertData();
+        logger.info("GriefAlert data reloaded!");
     }
 
     private void registerListeners() {
@@ -111,7 +110,8 @@ public class GriefAlert {
             Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.POST, new GriefSignListener(logger));
         }
         Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(logger));
-        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.POST, new GriefHangingEntityListener(logger));
+        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.POST, new GriefEntityListener(logger));
+        Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.POST, new GriefUsedListener(logger));
     }
 
     public static boolean isUseWatched(String blockName) {
@@ -146,7 +146,8 @@ public class GriefAlert {
             try {
                 writer = new FileWriter(dataSource);
                 writer.write("#Add the blocs to be watched here (without the #).\r\n");
-                writer.write("#Fromat is : USE|DESTROY|INTERACT:blockName(without namespace):alertColor\r\n");
+                writer.write("#Fromat is : USE|DESTROY|INTERACT:(namespace-)blockName:alertColor(:stealth[:deny])\r\n");
+                writer.write("#stealth and deny flags are optional");
                 writer.write("#Here are some examples :\r\n");
                 writer.write("#USE:lava_bucket:c\r\n");
                 writer.write("#DESTORY:diamond_block:3\r\n");
@@ -181,7 +182,7 @@ public class GriefAlert {
                 }
                 splitedLine = line.split(":");
                 if (splitedLine.length >= 3) {
-                    // 0: type, 1: ID, 2: color, 3: stealth alarm
+                    // 0: type, 1: ID, 2: color, 3: stealth alarm 4: allow/deny
 
                     blockID = splitedLine[1].replace('-', ':');
                     if (!blockID.contains(":")) {
@@ -192,8 +193,9 @@ public class GriefAlert {
                         logger.info("watchedBlocks.txt - invalid colorCode : " + colorCode + "  Defaulting to 'C'");
                         colorCode = 'C';
                     }
-                    denied = false; //splitedLine[4].equalsIgnoreCase("deny");
+
                     stealth = splitedLine.length > 3 && splitedLine[3].equalsIgnoreCase("stealth");
+                    denied = splitedLine.length > 4 && splitedLine[4].equalsIgnoreCase("deny");
 
                     onlyin = 0;
                     if (splitedLine.length > 6) {
@@ -208,13 +210,12 @@ public class GriefAlert {
                         }
                     }
 
-
                     if (splitedLine[0].equalsIgnoreCase("USE")) {
-                        useWatchList.put(blockID, new GriefAction(blockID, colorCode, false, stealth, onlyin, GriefAction.Type.USE));
+                        useWatchList.put(blockID, new GriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.USED));
                     } else if (splitedLine[0].equalsIgnoreCase("DESTROY")) {
-                        destroyWatchList.put(blockID, new GriefAction(blockID, colorCode, false, stealth, onlyin, GriefAction.Type.DESTORY));
+                        destroyWatchList.put(blockID, new GriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.DESTORYED));
                     } else if (splitedLine[0].equalsIgnoreCase("INTERACT")) {
-                        interactWatchList.put(blockID, new GriefAction(blockID, colorCode, false, stealth, onlyin, GriefAction.Type.INTERACT));
+                        interactWatchList.put(blockID, new GriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.INTERACTED));
                     } else {
                         logger.warn("watchedBlocks.txt - unrecognized activator : " + splitedLine[0]);
                     }

@@ -31,16 +31,14 @@ public class GriefInteractListener extends AlertTracker implements EventListener
                     log(player, degrief(blockID).assignBlock(blockTarget));
                     player.getWorld().setBlockType(event.getTargetBlock().getPosition(), BlockTypes.AIR);
                     event.setCancelled(true);
-                } else if (GriefAlert.isInteractWatched(blockID)) {
-                    if (GriefAlert.isInteractWatched(blockID)) {
-                        log(player, GriefAlert.getInteractAction(blockID).copy().assignBlock(blockTarget));
-                    }
+                } else if (GriefAlert.isInteractWatched(blockID) && !GriefAlert.getInteractAction(blockID).denied) {
+                    log(player, GriefAlert.getInteractAction(blockID).copy().assignBlock(blockTarget));
                 }
             }
         }));
     }
 
     private GriefAction degrief(String blockName) {
-        return new GriefAction(blockName, 'F', false, true, 2, GriefAction.Type.DEGRIEF);
+        return new GriefAction(blockName, 'F', false, true, 2, GriefAction.Type.DEGRIEFED);
     }
 }

@@ -19,16 +19,16 @@ public class GriefDestroyListener extends AlertTracker implements EventListener<
     }
 
     @Override
-    public void handle(ChangeBlockEvent.Break event) throws Exception {
+    public void handle(ChangeBlockEvent.Break event) {
         Optional<Player> poption = event.getCause().first(Player.class);
         if (poption.isPresent()) {
             Player player = poption.get();
             List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
             for (Transaction<BlockSnapshot> transaction : transactions) {
-                BlockSnapshot blockSnapshot = transaction.getFinal();
-                String blockID = blockSnapshot.getState().getType().getName();
-                if (GriefAlert.isDestroyWatched(blockID)) {
-                    log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot));
+                BlockSnapshot blockSnapshot = transaction.getOriginal();
+                String blockID = blockSnapshot.getState().getType().getId();
+                if (GriefAlert.isDestroyWatched(blockID) && !GriefAlert.getDestroyedAction(blockID).denied) {
+                    log(player, GriefAlert.getDestroyedAction(blockID).copy().assignBlock(blockSnapshot));
                 }
             }
         }
