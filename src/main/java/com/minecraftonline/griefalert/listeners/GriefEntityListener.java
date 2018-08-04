@@ -3,8 +3,6 @@ package com.minecraftonline.griefalert.listeners;
 import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAction;
 import com.minecraftonline.griefalert.GriefAlert;
-import org.slf4j.Logger;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
 import org.spongepowered.api.entity.hanging.ItemFrame;
@@ -16,10 +14,11 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 
 import javax.annotation.Nonnull;
 
-public class GriefEntityListener extends AlertTracker implements EventListener<InteractEntityEvent> {
+public class GriefEntityListener implements EventListener<InteractEntityEvent> {
+    private final AlertTracker tracker;
 
-    public GriefEntityListener(Logger logger) {
-        super(logger);
+    public GriefEntityListener(AlertTracker tracker) {
+        this.tracker = tracker;
     }
 
     @Override
@@ -34,17 +33,11 @@ public class GriefEntityListener extends AlertTracker implements EventListener<I
                     if (GriefAlert.isDestroyWatched(blockID)) {
                         GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target);
                         if (!action.denied) {
-                            log(player, action);
-                        } else {
+                            tracker.log(player, action);
+                        }
+                        else {
                             event.setCancelled(true);
                         }
-                    }
-                }
-            } else if (target instanceof ItemFrame) {
-                if (event.getCause().first(Player.class).isPresent()) {
-                    Player player = event.getCause().first(Player.class).get();
-                    if (target.get(Keys.REPRESENTED_ITEM).isPresent()) {
-                        System.out.println(target.get(Keys.REPRESENTED_ITEM).get().getType().getId());
                     }
                 }
             }
@@ -55,7 +48,7 @@ public class GriefEntityListener extends AlertTracker implements EventListener<I
                 if (event.getCause().first(Player.class).isPresent() && GriefAlert.isDestroyWatched(blockID)) {
                     GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target);
                     if (!action.denied) {
-                        log(player, action);
+                        tracker.log(player, action);
                     } else {
                         event.setCancelled(true);
                     }

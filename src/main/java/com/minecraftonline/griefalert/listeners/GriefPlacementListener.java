@@ -2,7 +2,6 @@ package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
-import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
@@ -13,10 +12,11 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
-public class GriefPlacementListener extends AlertTracker implements EventListener<ChangeBlockEvent.Place> {
+public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Place> {
+    private final AlertTracker tracker;
 
-    public GriefPlacementListener(Logger logger) {
-        super(logger);
+    public GriefPlacementListener(AlertTracker tracker) {
+        this.tracker = tracker;
     }
 
     @Override
@@ -28,8 +28,13 @@ public class GriefPlacementListener extends AlertTracker implements EventListene
             for (Transaction<BlockSnapshot> transaction : transactions) {
                 BlockSnapshot blockSnapshot = transaction.getFinal();
                 String blockID = blockSnapshot.getState().getType().getName();
-                if (GriefAlert.isUseWatched(blockID) && !GriefAlert.getUseAction(blockID).denied) {
-                    log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot));
+                if (GriefAlert.isUseWatched(blockID)) {
+                    if (!GriefAlert.getUseAction(blockID).denied) {
+                        tracker.log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot));
+                    }
+                    else {
+                        event.setCancelled(true);
+                    }
                 }
             }
         }

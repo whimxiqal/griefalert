@@ -2,24 +2,25 @@ package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
-import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
-public class GriefDestroyListener extends AlertTracker implements EventListener<ChangeBlockEvent.Break> {
+public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Break> {
+    private final AlertTracker tracker;
 
-    public GriefDestroyListener(Logger logger) {
-        super(logger);
+    public GriefDestroyListener(AlertTracker tracker) {
+        this.tracker = tracker;
     }
 
     @Override
-    public void handle(ChangeBlockEvent.Break event) {
+    public void handle(@Nonnull ChangeBlockEvent.Break event) {
         Optional<Player> poption = event.getCause().first(Player.class);
         if (poption.isPresent()) {
             Player player = poption.get();
@@ -27,8 +28,13 @@ public class GriefDestroyListener extends AlertTracker implements EventListener<
             for (Transaction<BlockSnapshot> transaction : transactions) {
                 BlockSnapshot blockSnapshot = transaction.getOriginal();
                 String blockID = blockSnapshot.getState().getType().getId();
-                if (GriefAlert.isDestroyWatched(blockID) && !GriefAlert.getDestroyedAction(blockID).denied) {
-                    log(player, GriefAlert.getDestroyedAction(blockID).copy().assignBlock(blockSnapshot));
+                if (GriefAlert.isDestroyWatched(blockID)) {
+                    if (!GriefAlert.getDestroyedAction(blockID).denied) {
+                        tracker.log(player, GriefAlert.getDestroyedAction(blockID).copy().assignBlock(blockSnapshot));
+                    }
+                    else {
+                        event.setCancelled(true);
+                    }
                 }
             }
         }

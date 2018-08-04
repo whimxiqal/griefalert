@@ -17,17 +17,19 @@ import org.spongepowered.api.world.World;
 import java.util.HashMap;
 import java.util.UUID;
 
-public abstract class AlertTracker {
+public final class AlertTracker {
     private static HashMap<UUID, String> lastAction = new HashMap<>();
     private static Location[] griefLocations = new Location[GriefAlert.readConfigInt("alertsCodeLimit")];
     private static int indexInTab = 0;
     private final Logger gaLogger;
+    private final GriefLogger gLog;
 
     public AlertTracker(Logger logger) {
         this.gaLogger = logger;
+        this.gLog = new GriefLogger(logger);
     }
 
-    protected final void log(Player player, GriefAction action) {
+    public final void log(Player player, GriefAction action) {
         int alertNo = -1;
         if (action.type != GriefAction.Type.DEGRIEFED) {
             alertNo = getAlertNo(player.getLocation());
@@ -42,10 +44,10 @@ public abstract class AlertTracker {
             lastAction.put(playerID, action.type.name().charAt(0) + action.blockName);
         }
         console(player, action, alertNo);
-        // TODO: Log Storage stuff
+        //gLog.storeAction(player, action);
     }
 
-    protected final void logSign(Player player, Sign sign, SignData signData) {
+    public final void logSign(Player player, Sign sign, SignData signData) {
         if (!player.hasPermission("griefalert.noalert")) {
             String signmsg = "Sign placed by %s at %d %d %d in %s-%s";
             alertStaff(Text.builder(String.format(signmsg, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
@@ -58,8 +60,7 @@ public abstract class AlertTracker {
                 }
             }
         }
-
-        // TODO: Log Storage Stuff
+        //gLog.storeSign(player, sign, signData);
     }
 
     private String actionTrackForm(GriefAction action) {

@@ -60,25 +60,13 @@ public class GriefAlert {
                 rootNode.getNode("degriefStickID").setValue("\"minecraft:stick\"");
                 rootNode.getNode("alertsCodeLimit").setValue(999);
                 rootNode.getNode("logSignsContent").setValue(true);
-                rootNode.getNode("displayPlacedSigns").setValue(true);
                 rootNode.getNode("debugInGameAlerts").setValue(false);
+                rootNode.getNode("showAlertsInConsole").setValue(false);
+
+                rootNode.getNode("SQLusername").setValue("user");
+                rootNode.getNode("SQLpassword").setValue("PA$$word");
+                rootNode.getNode("SQLdb").setValue("\"localhost:3306/minecraft\"");
                 configManager.save(rootNode);
-                /*
-                writer.write("degriefStickID=280\r\n");
-            	writer.write("separatedLog=false\r\n");
-            	writer.write("oldWarnBehavior=false\r\n");
-            	writer.write("gcheckToCoordinates=true\r\n");
-            	writer.write("alertsCodeLimit=30\r\n");
-            	writer.write("logSignsContent=true\r\n");
-            	writer.write("displayPlacedSigns=true\r\n");
-            	writer.write("logToFile=true\r\n");
-            	writer.write("# SQL configuration # \r\n");
-            	writer.write("logToSQL=false\r\n");
-            	writer.write("SQLdriver=com.mysql.jdbc.Driver\r\n");
-            	writer.write("SQLuser=root\r\n");
-            	writer.write("SQLpass=root\r\n");
-            	writer.write("SQLdb=jdbc:mysql://localhost:3306/minecraft\r\n");
-                 */
             } catch (IOException e) {
                 logger.warn("Exception while reading configuration", e);
             }
@@ -104,14 +92,15 @@ public class GriefAlert {
     }
 
     private void registerListeners() {
-        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.POST, new GriefDestroyListener(logger));
-        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.POST, new GriefPlacementListener(logger));
+        AlertTracker tracker = new AlertTracker(logger);
+        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(tracker));
+        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(tracker));
         if (readConfigBool("logSignsContent")) {
-            Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.POST, new GriefSignListener(logger));
+            Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.LAST, new GriefSignListener(tracker));
         }
-        Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(logger));
-        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.POST, new GriefEntityListener(logger));
-        Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.POST, new GriefUsedListener(logger));
+        Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(tracker));
+        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.LAST, new GriefEntityListener(tracker));
+        Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(tracker));
     }
 
     public static boolean isUseWatched(String blockName) {
