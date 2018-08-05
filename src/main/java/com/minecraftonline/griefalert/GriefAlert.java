@@ -7,6 +7,8 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -18,6 +20,7 @@ import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -78,7 +81,15 @@ public class GriefAlert {
             }
         }
         loadGriefAlertData();
-        registerListeners();
+        AlertTracker tracker = new AlertTracker(logger);
+        registerListeners(tracker);
+        CommandSpec gcheckin = CommandSpec.builder().
+                executor(new GriefAlertCommand(tracker)).
+                                                  description(Text.of("Check a GriefAlert Number")).
+                                                  arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
+                                                  permission("griefalert.check").
+                                                  build();
+        Sponge.getCommandManager().register(this, gcheckin, "gcheckin");
     }
 
     @Listener
@@ -91,8 +102,7 @@ public class GriefAlert {
         logger.info("GriefAlert data reloaded!");
     }
 
-    private void registerListeners() {
-        AlertTracker tracker = new AlertTracker(logger);
+    private void registerListeners(AlertTracker tracker) {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(tracker));
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(tracker));
         if (readConfigBool("logSignsContent")) {

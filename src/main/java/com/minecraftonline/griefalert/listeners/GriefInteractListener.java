@@ -35,7 +35,7 @@ public class GriefInteractListener implements EventListener<InteractBlockEvent.S
                 }
                 else if (GriefAlert.isInteractWatched(blockID)) {
                     if (!GriefAlert.getInteractAction(blockID).denied) {
-                        tracker.log(player, GriefAlert.getInteractAction(blockID).copy().assignBlock(blockTarget));
+                        tracker.log(player, GriefAlert.getInteractAction(blockID).copy().assignBlock(blockTarget).assignGriefer(player));
                     }
                     else {
                         event.setCancelled(true);

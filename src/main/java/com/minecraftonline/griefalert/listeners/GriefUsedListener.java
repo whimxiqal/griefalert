@@ -26,7 +26,7 @@ public class GriefUsedListener implements EventListener<UseItemStackEvent.Start>
             String itemID = itemStackSnapshot.getType().getId();
             if (GriefAlert.isUseWatched(itemID)) {
                 if (!GriefAlert.getUseAction(itemID).denied) {
-                    tracker.log(player, GriefAlert.getUseAction(itemID).assignItem(itemStackSnapshot).assignEntity(player));
+                    tracker.log(player, GriefAlert.getUseAction(itemID).assignItem(itemStackSnapshot).assignGriefer(player));
                 }
                 else {
                     event.setCancelled(true);

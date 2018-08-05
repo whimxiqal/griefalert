@@ -31,7 +31,7 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                     String blockID = target instanceof Painting ? "minecraft:painting" : target instanceof ItemFrame ? "minecraft:item_frame" : "minecraft:leash_knot";
 
                     if (GriefAlert.isDestroyWatched(blockID)) {
-                        GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target);
+                        GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target).assignGriefer(player);
                         if (!action.denied) {
                             tracker.log(player, action);
                         }

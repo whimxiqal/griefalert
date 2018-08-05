@@ -11,16 +11,14 @@ import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public final class AlertTracker {
     private static HashMap<UUID, String> lastAction = new HashMap<>();
-    private static Location[] griefLocations = new Location[GriefAlert.readConfigInt("alertsCodeLimit")];
-    private static int indexInTab = 0;
+    private static GriefAction[] griefLocations = new GriefAction[GriefAlert.readConfigInt("alertsCodeLimit") + 1]; // add 1 to replace 0
+    private static int indexInTab = 1;
     private final Logger gaLogger;
     private final GriefLogger gLog;
 
@@ -29,10 +27,14 @@ public final class AlertTracker {
         this.gLog = new GriefLogger(logger);
     }
 
+    public GriefAction get(int code) {
+        return griefLocations[code];
+    }
+
     public final void log(Player player, GriefAction action) {
-        int alertNo = -1;
+        int alertNo = 0;
         if (action.type != GriefAction.Type.DEGRIEFED) {
-            alertNo = getAlertNo(player.getLocation());
+            alertNo = getAlertNo(action);
         }
         UUID playerID = player.getUniqueId();
         Text alertMessage = alertMessage(player, alertNo, action);
@@ -67,15 +69,15 @@ public final class AlertTracker {
         return action.type.name().charAt(0) + action.blockName;
     }
 
-    private int getAlertNo(Location<World> worldLocation) {
-        griefLocations[indexInTab] = worldLocation;
+    private int getAlertNo(GriefAction action) {
+        griefLocations[indexInTab] = action;
         int returnCode = indexInTab;
         if (++indexInTab == griefLocations.length)
-            indexInTab = 0;
+            indexInTab = 1; // skipping 0 cause it annoys me that the first alert is 0
         return returnCode;
     }
 
-    private void alertStaff(Text message) {
+    public void alertStaff(Text message) {
         MessageChannel staffChannel = MessageChannel.permission("griefalert.staff");
         staffChannel.send(message);
     }

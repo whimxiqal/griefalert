@@ -1,7 +1,10 @@
 package com.minecraftonline.griefalert;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
@@ -17,6 +20,8 @@ public class GriefAction {
     public BlockSnapshot block;
     public ItemStackSnapshot item;
     public Entity entity;
+    public EntitySnapshot griefer;
+    public Vector3d rotation;
 
     public enum Type {
         DEGRIEFED,
@@ -59,6 +64,12 @@ public class GriefAction {
 
     public GriefAction assignEntity(Entity entity) {
         this.entity = entity;
+        return this;
+    }
+
+    public GriefAction assignGriefer(Player player) {
+        this.griefer = player.createSnapshot();
+        this.rotation = player.getRotation();
         return this;
     }
 

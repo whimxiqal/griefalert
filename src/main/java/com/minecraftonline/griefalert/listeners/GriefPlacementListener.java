@@ -30,7 +30,7 @@ public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Pl
                 String blockID = blockSnapshot.getState().getType().getName();
                 if (GriefAlert.isUseWatched(blockID)) {
                     if (!GriefAlert.getUseAction(blockID).denied) {
-                        tracker.log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot));
+                        tracker.log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
                     }
                     else {
                         event.setCancelled(true);
