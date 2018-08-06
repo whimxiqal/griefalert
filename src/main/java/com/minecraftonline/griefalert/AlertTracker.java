@@ -37,7 +37,7 @@ public final class AlertTracker {
         }
         UUID playerID = player.getUniqueId();
         Text alertMessage = alertMessage(player, alertNo, action);
-        if ((!player.hasPermission("griefalert.noalert") && !action.isStealth() && action.getType() != GriefAction.Type.DEGRIEFED) || GriefAlert.readConfigBool("debugInGameAlerts")) {
+        if ((!player.hasPermission("griefalert.noalert") && !action.isStealth()) || GriefAlert.readConfigBool("debugInGameAlerts")) {
             String priorAct = actionTrackForm(action);
             if ((!lastAction.containsKey(playerID) || !lastAction.get(playerID).contains(priorAct)) || GriefAlert.readConfigBool("debugInGameAlerts")) {
                 alertStaff(alertMessage);
@@ -83,25 +83,27 @@ public final class AlertTracker {
 
     private Text alertMessage(Player player, int alertNo, GriefAction action) {
         String msg = "%s %s %s (%d) in the %s.";
-        return Text.builder(String.format(msg, player.getName(), action.getType().name().toLowerCase(),
+        return Text.builder(String.format(msg, player.getName(), action.getType(),
                                           blockItemEntityStaff(action), alertNo, action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""))).color(action.getAlertColor()).build();
     }
 
     private void console(Player player, GriefAction action, int alertNo) {
-        gaLogger.info(
-                player.getUniqueId().toString() + " (" + player.getName() + "):" +
-                        action.getType().name().toLowerCase() + ":" +
-                        blockItemEntityConsole(action) + ":" +
-                        "x=" + action.getX() + ":" +
-                        "y=" + action.getY() + ":" +
-                        "z=" + action.getZ() + ":" +
-                        "sx=" + player.getLocation().getBlockX() + ":" +
-                        "sy=" + player.getLocation().getBlockY() + ":" +
-                        "sz=" + player.getLocation().getBlockZ() + ":" +
-                        "w=" + action.getWorld().getUniqueId() + ":" +
-                        "d=" + action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
-                        alertNo
-        );
+        if (GriefAlert.readConfigBool("showAlertsInConsole")) {
+            gaLogger.info(
+                    player.getUniqueId().toString() + " (" + player.getName() + "):" +
+                            action.getType().name().toLowerCase() + ":" +
+                            blockItemEntityConsole(action) + ":" +
+                            "x=" + action.getX() + ":" +
+                            "y=" + action.getY() + ":" +
+                            "z=" + action.getZ() + ":" +
+                            "sx=" + player.getLocation().getBlockX() + ":" +
+                            "sy=" + player.getLocation().getBlockY() + ":" +
+                            "sz=" + player.getLocation().getBlockZ() + ":" +
+                            "w=" + action.getWorld().getUniqueId() + ":" +
+                            "d=" + action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
+                            alertNo
+            );
+        }
     }
 
     private String correctGrammar(String str) {
@@ -135,13 +137,13 @@ public final class AlertTracker {
             return action.getItem().toString().replace(':', '-');
         }
         else if (action.getEntity() instanceof Painting) {
-            return "minecraft:painting[art=" + action.getEntity().get(Keys.ART).get().getId() + "]";
+            return "minecraft-painting[art=" + action.getEntity().get(Keys.ART).get().getId() + "]";
         }
         else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return "minecraft:item_frame[item_id=" + action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
+            return "minecraft-item_frame[item_id=" + action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
         }
         else if (action.getEntity() != null) {
-            return action.getEntity().getType().getId();
+            return action.getEntity().getType().getId().replace(':', '-');
         }
         return action.getBlockName().replace(':', '-');
     }

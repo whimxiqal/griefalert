@@ -1,5 +1,7 @@
 package com.minecraftonline.griefalert;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.minecraftonline.griefalert.listeners.*;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -21,12 +23,12 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.DimensionType;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Scanner;
 
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
@@ -50,17 +52,18 @@ public class GriefAlert {
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
     private static ConfigurationNode rootNode;
 
-    private static HashMap<String, GriefAction> useWatchList = new HashMap<>();
-    private static HashMap<String, GriefAction> interactWatchList = new HashMap<>();
-    private static HashMap<String, GriefAction> destroyWatchList = new HashMap<>();
+    private static Table<String, String, GriefAction> useWatchList = HashBasedTable.create();
+    private static Table<String, String, GriefAction> interactWatchList = HashBasedTable.create();
+    private static Table<String, String, GriefAction> destroyWatchList = HashBasedTable.create();
 
     @Listener
     public void initialize(GamePreInitializationEvent event) {
-
+        logger.info("Initializing GriefAlert...");
         if (!defaultConfig.toFile().exists()) {
+            logger.info("Generating new Configuration File...");
             try {
                 rootNode = configManager.load();
-                rootNode.getNode("degriefStickID").setValue("\"minecraft:stick\"");
+                rootNode.getNode("degriefStickID").setValue("minecraft:stick");
                 rootNode.getNode("alertsCodeLimit").setValue(999);
                 rootNode.getNode("logSignsContent").setValue(true);
                 rootNode.getNode("debugInGameAlerts").setValue(false);
@@ -68,8 +71,9 @@ public class GriefAlert {
 
                 rootNode.getNode("SQLusername").setValue("user");
                 rootNode.getNode("SQLpassword").setValue("PA$$word");
-                rootNode.getNode("SQLdb").setValue("\"localhost:3306/minecraft\"");
+                rootNode.getNode("SQLdb").setValue("localhost:3306/minecraft");
                 configManager.save(rootNode);
+                logger.info("New Configuration File created successfully!");
             } catch (IOException e) {
                 logger.warn("Exception while reading configuration", e);
             }
@@ -95,6 +99,11 @@ public class GriefAlert {
     @Listener
     public void onReload(GameReloadEvent event) {
         logger.info("Reloading GriefAlert data...");
+        try {
+            rootNode = configManager.load();
+        } catch (IOException e) {
+            logger.warn("Exception while reading configuration", e);
+        }
         useWatchList.clear();
         interactWatchList.clear();
         destroyWatchList.clear();
@@ -113,45 +122,51 @@ public class GriefAlert {
         Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(tracker));
     }
 
-    public static boolean isUseWatched(String blockName) {
-        return useWatchList.containsKey(blockName);
+    public static boolean isUseWatched(String blockName, DimensionType dType) {
+        return useWatchList.contains(blockName, dType.getId()) || useWatchList.contains(blockName, "ALL");
     }
 
-    public static boolean isInteractWatched(String blockName) {
-        return interactWatchList.containsKey(blockName);
+    public static boolean isInteractWatched(String blockName, DimensionType dType) {
+        return interactWatchList.contains(blockName, dType.getId()) || interactWatchList.contains(blockName, "ALL");
     }
 
-    public static boolean isDestroyWatched(String blockName) {
-        return destroyWatchList.containsKey(blockName);
+    public static boolean isDestroyWatched(String blockName, DimensionType dType) {
+        return destroyWatchList.contains(blockName, dType.getId()) || destroyWatchList.contains(blockName, "ALL");
     }
 
-    public static GriefAction getUseAction(String blockName) {
-        return useWatchList.get(blockName);
+    public static GriefAction getUseAction(String blockName, DimensionType dType) {
+        return useWatchList.contains(blockName, dType.getId()) ? useWatchList.get(blockName, dType.getId())
+                : useWatchList.get(blockName, "ALL");
     }
 
-    public static GriefAction getInteractAction(String blockName) {
-        return interactWatchList.get(blockName);
+    public static GriefAction getInteractAction(String blockName, DimensionType dType) {
+        return interactWatchList.contains(blockName, dType.getId()) ? interactWatchList.get(blockName, dType.getId())
+                : interactWatchList.get(blockName, "ALL");
     }
 
-    public static GriefAction getDestroyedAction(String blockName) {
-        return destroyWatchList.get(blockName);
+    public static GriefAction getDestroyedAction(String blockName, DimensionType dType) {
+        return destroyWatchList.contains(blockName, dType.getId()) ? destroyWatchList.get(blockName, dType.getId())
+                : destroyWatchList.get(blockName, "ALL");
     }
 
     private void loadGriefAlertData() {
+        logger.info("Loading GriefAlert data...");
         File dataSource = new File("config/griefalert/watchedBlocks.txt");
 
         if (!dataSource.exists()) {
+            logger.info("Watch List file being created...");
             FileWriter writer = null;
             try {
                 writer = new FileWriter(dataSource);
                 writer.write("#Add the blocs to be watched here (without the #).\r\n");
-                writer.write("#Fromat is : USE|DESTROY|INTERACT:(namespace-)blockName:alertColor(:stealth[:deny])\r\n");
-                writer.write("#stealth and deny flags are optional");
+                writer.write("#Fromat is : USE|DESTROY|INTERACT:(namespace-)blockName:alertColor(:stealth[:deny][:onlyInList])\r\n");
+                writer.write("#stealth, deny, and onlyInList flags are optional");
+                writer.write("#onlyInList is a comma separated list of dimensions the alert is for, replacing ':' in namespaces with '-'");
                 writer.write("#Here are some examples :\r\n");
                 writer.write("#USE:lava_bucket:c\r\n");
-                writer.write("#DESTORY:diamond_block:3\r\n");
-                writer.write("#BREAK:diamond_block:3\r\n");
+                writer.write("#DESTROY:diamond_block:3\r\n");
                 writer.write("#INTERACT:chest:3\r\n");
+                writer.write("#DESTROY:netherrack:c:::minecraft-overworld,minecraft-end");
             } catch (Exception e) {
                 logger.warn("Exception while creating watchedBlocks.txt");
             } finally {
@@ -166,13 +181,14 @@ public class GriefAlert {
         }
 
         try {
+            logger.info("Watch List file being loaded...");
             Scanner scanner = new Scanner(dataSource);
             String[] splitedLine;
 
             String blockID;
             boolean denied;
             boolean stealth;
-            int onlyin;
+            String[] onlyin;
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -181,7 +197,7 @@ public class GriefAlert {
                 }
                 splitedLine = line.split(":");
                 if (splitedLine.length >= 3) {
-                    // 0: type, 1: ID, 2: color, 3: stealth alarm 4: allow/deny
+                    // 0: type, 1: ID, 2: color, 3: stealth alarm 4: allow/deny 5: onlyIn list
 
                     blockID = splitedLine[1].replace('-', ':');
                     if (!blockID.contains(":")) {
@@ -189,40 +205,46 @@ public class GriefAlert {
                     }
                     char colorCode = splitedLine[2].charAt(0);
                     if ("123456789abcdef".indexOf(colorCode) == -1) {
-                        logger.info("watchedBlocks.txt - invalid colorCode : " + colorCode + "  Defaulting to 'C'");
+                        logger.info("watchedBlocks.txt - invalid colorCode : " + colorCode + " @ Line: " + line + " - Defaulting to 'C'");
                         colorCode = 'C';
                     }
 
                     stealth = splitedLine.length > 3 && splitedLine[3].equalsIgnoreCase("stealth");
                     denied = splitedLine.length > 4 && splitedLine[4].equalsIgnoreCase("deny");
 
-                    onlyin = 0;
-                    if (splitedLine.length > 6) {
-                        if (splitedLine[6].equalsIgnoreCase("onlyinnether")) {
-                            onlyin = -1;
-                        }
-                        if (splitedLine[6].equalsIgnoreCase("onlyinend")) {
-                            onlyin = 1;
-                        }
-                        if (splitedLine[6].equalsIgnoreCase("onlyinnetherandend")) {
-                            onlyin = -2;
+                    onlyin = new String[]{"ALL"};
+                    if (splitedLine.length > 5) {
+                        onlyin = splitedLine[5].split(",");
+                        for (int index = 0; index < onlyin.length; index++) {
+                            if (onlyin[index].contains("-")) {
+                                onlyin[index] = onlyin[index].replace('-', ':');
+                            } else {
+                                onlyin[index] = "minecraft:" + onlyin[index];
+                            }
                         }
                     }
 
                     if (splitedLine[0].equalsIgnoreCase("USE")) {
-                        useWatchList.put(blockID, new ImmutableGriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.USED));
+                        for (String dim : onlyin) {
+                            useWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.USED));
+                        }
                     } else if (splitedLine[0].equalsIgnoreCase("DESTROY")) {
-                        destroyWatchList.put(blockID, new ImmutableGriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.DESTORYED));
+                        for (String dim : onlyin) {
+                            destroyWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.DESTORYED));
+                        }
                     } else if (splitedLine[0].equalsIgnoreCase("INTERACT")) {
-                        interactWatchList.put(blockID, new ImmutableGriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.INTERACTED));
+                        for (String dim : onlyin) {
+                            interactWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.INTERACTED));
+                        }
                     } else {
-                        logger.warn("watchedBlocks.txt - unrecognized activator : " + splitedLine[0]);
+                        logger.warn("watchedBlocks.txt - unrecognized activator : " + splitedLine[0] + " @ Line: " + line);
                     }
                 } else {
-                    logger.warn("watchedBlocks.txt - line skipped (invalid format)");
+                    logger.warn("watchedBlocks.txt - line skipped (invalid format) : " + line);
                 }
             }
             scanner.close();
+            logger.info("Watch List file loaded!");
         } catch (Exception e) {
             logger.warn("Exception while loading", e);
         }

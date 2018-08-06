@@ -6,6 +6,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -25,9 +26,10 @@ public class GriefUsedListener implements EventListener<UseItemStackEvent.Start>
                 Player player = poption.get();
                 ItemStackSnapshot itemStackSnapshot = event.getItemStackInUse();
                 String itemID = itemStackSnapshot.getType().getId();
-                if (GriefAlert.isUseWatched(itemID)) {
-                    if (!GriefAlert.getUseAction(itemID).isDenied()) {
-                        tracker.log(player, GriefAlert.getUseAction(itemID).assignItem(itemStackSnapshot).assignGriefer(player));
+                DimensionType dType = player.getLocation().getExtent().getDimension().getType();
+                if (GriefAlert.isUseWatched(itemID, dType)) {
+                    if (!GriefAlert.getUseAction(itemID, dType).isDenied()) {
+                        tracker.log(player, GriefAlert.getUseAction(itemID, dType).assignItem(itemStackSnapshot).assignGriefer(player));
                     } else {
                         event.setCancelled(true);
                     }

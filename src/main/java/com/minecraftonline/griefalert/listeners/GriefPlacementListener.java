@@ -7,6 +7,7 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -29,9 +30,10 @@ public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Pl
                 for (Transaction<BlockSnapshot> transaction : transactions) {
                     BlockSnapshot blockSnapshot = transaction.getFinal();
                     String blockID = blockSnapshot.getState().getType().getName();
-                    if (GriefAlert.isUseWatched(blockID)) {
-                        if (!GriefAlert.getUseAction(blockID).isDenied()) {
-                            tracker.log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
+                    DimensionType dType = blockSnapshot.getLocation().get().getExtent().getDimension().getType();
+                    if (GriefAlert.isUseWatched(blockID, dType)) {
+                        if (!GriefAlert.getUseAction(blockID, dType).isDenied()) {
+                            tracker.log(player, GriefAlert.getUseAction(blockID, dType).copy().assignBlock(blockSnapshot).assignGriefer(player));
                         } else {
                             event.setCancelled(true);
                         }

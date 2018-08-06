@@ -16,7 +16,6 @@ public class GriefAction {
     private final TextColor alertColor;
     private final boolean denied;
     private final boolean stealth;
-    private final int onlyin; //TODO: This needs redone
     private final Type type;
     private BlockSnapshot block;
     private ItemStackSnapshot item;
@@ -27,8 +26,18 @@ public class GriefAction {
     public enum Type {
         DEGRIEFED,
         DESTORYED,
-        INTERACTED,
-        USED,
+        INTERACTED {
+            @Override
+            public String toString() {
+                return "interacted with";
+            }
+        },
+        USED;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 
     GriefAction(String name, char color, boolean deny, boolean silent, Type type) {
@@ -36,25 +45,14 @@ public class GriefAction {
         this.alertColor = convertChar(color);
         this.denied = deny;
         this.stealth = silent;
-        this.onlyin = 0;
         this.type = type;
     }
 
-    GriefAction(String name, char color, boolean deny, boolean silent, int onlyin, Type type) {
-        this.blockName = name;
-        this.alertColor = convertChar(color);
-        this.denied = deny;
-        this.stealth = silent;
-        this.onlyin = onlyin;
-        this.type = type;
-    }
-
-    GriefAction(String name, TextColor color, boolean deny, boolean silent, int onlyin, Type type) {
+    GriefAction(String name, TextColor color, boolean deny, boolean silent, Type type) {
         this.blockName = name;
         this.alertColor = color;
         this.denied = deny;
         this.stealth = silent;
-        this.onlyin = onlyin;
         this.type = type;
     }
 
@@ -154,7 +152,7 @@ public class GriefAction {
     }
 
     public GriefAction copy() {
-        return new GriefAction(blockName, alertColor, denied, stealth, onlyin, type);
+        return new GriefAction(blockName, alertColor, denied, stealth, type);
     }
 
     private TextColor convertChar(char color) {
