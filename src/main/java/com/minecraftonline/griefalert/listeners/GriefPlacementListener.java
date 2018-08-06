@@ -21,19 +21,20 @@ public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Pl
 
     @Override
     public void handle(@Nonnull ChangeBlockEvent.Place event) {
-        Optional<Player> poption = event.getCause().first(Player.class);
-        if (poption.isPresent()) {
-            Player player = poption.get();
-            List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
-            for (Transaction<BlockSnapshot> transaction : transactions) {
-                BlockSnapshot blockSnapshot = transaction.getFinal();
-                String blockID = blockSnapshot.getState().getType().getName();
-                if (GriefAlert.isUseWatched(blockID)) {
-                    if (!GriefAlert.getUseAction(blockID).isDenied()) {
-                        tracker.log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
-                    }
-                    else {
-                        event.setCancelled(true);
+        if (event.getCause().root() instanceof Player) {
+            Optional<Player> poption = event.getCause().first(Player.class);
+            if (poption.isPresent()) {
+                Player player = poption.get();
+                List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+                for (Transaction<BlockSnapshot> transaction : transactions) {
+                    BlockSnapshot blockSnapshot = transaction.getFinal();
+                    String blockID = blockSnapshot.getState().getType().getName();
+                    if (GriefAlert.isUseWatched(blockID)) {
+                        if (!GriefAlert.getUseAction(blockID).isDenied()) {
+                            tracker.log(player, GriefAlert.getUseAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
+                        } else {
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }

@@ -21,19 +21,20 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
 
     @Override
     public void handle(@Nonnull ChangeBlockEvent.Break event) {
-        Optional<Player> poption = event.getCause().first(Player.class);
-        if (poption.isPresent()) {
-            Player player = poption.get();
-            List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
-            for (Transaction<BlockSnapshot> transaction : transactions) {
-                BlockSnapshot blockSnapshot = transaction.getOriginal();
-                String blockID = blockSnapshot.getState().getType().getId();
-                if (GriefAlert.isDestroyWatched(blockID)) {
-                    if (!GriefAlert.getDestroyedAction(blockID).isDenied()) {
-                        tracker.log(player, GriefAlert.getDestroyedAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
-                    }
-                    else {
-                        event.setCancelled(true);
+        if (event.getCause().root() instanceof Player) {
+            Optional<Player> poption = event.getCause().first(Player.class);
+            if (poption.isPresent()) {
+                Player player = poption.get();
+                List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+                for (Transaction<BlockSnapshot> transaction : transactions) {
+                    BlockSnapshot blockSnapshot = transaction.getOriginal();
+                    String blockID = blockSnapshot.getState().getType().getId();
+                    if (GriefAlert.isDestroyWatched(blockID)) {
+                        if (!GriefAlert.getDestroyedAction(blockID).isDenied()) {
+                            tracker.log(player, GriefAlert.getDestroyedAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
+                        } else {
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }
