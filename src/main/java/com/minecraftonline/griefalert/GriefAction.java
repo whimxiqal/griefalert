@@ -8,20 +8,21 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.World;
 
 public class GriefAction {
 
-    public final String blockName;
-    public final TextColor alertColor;
-    public final boolean denied;
-    public final boolean stealth;
-    public final int onlyin; //TODO: This needs redone
-    public final Type type;
-    public BlockSnapshot block;
-    public ItemStackSnapshot item;
-    public Entity entity;
-    public EntitySnapshot griefer;
-    public Vector3d rotation;
+    private final String blockName;
+    private final TextColor alertColor;
+    private final boolean denied;
+    private final boolean stealth;
+    private final int onlyin; //TODO: This needs redone
+    private final Type type;
+    private BlockSnapshot block;
+    private ItemStackSnapshot item;
+    private Entity entity;
+    private EntitySnapshot griefer;
+    private Vector3d rotation;
 
     public enum Type {
         DEGRIEFED,
@@ -30,7 +31,7 @@ public class GriefAction {
         USED,
     }
 
-    public GriefAction(String name, char color, boolean deny, boolean silent, Type type) {
+    GriefAction(String name, char color, boolean deny, boolean silent, Type type) {
         this.blockName = name;
         this.alertColor = convertChar(color);
         this.denied = deny;
@@ -39,7 +40,7 @@ public class GriefAction {
         this.type = type;
     }
 
-    public GriefAction(String name, char color, boolean deny, boolean silent, int onlyin, Type type) {
+    GriefAction(String name, char color, boolean deny, boolean silent, int onlyin, Type type) {
         this.blockName = name;
         this.alertColor = convertChar(color);
         this.denied = deny;
@@ -48,7 +49,7 @@ public class GriefAction {
         this.type = type;
     }
 
-    public GriefAction(String name, TextColor color, boolean deny, boolean silent, int onlyin, Type type) {
+    GriefAction(String name, TextColor color, boolean deny, boolean silent, int onlyin, Type type) {
         this.blockName = name;
         this.alertColor = color;
         this.denied = deny;
@@ -78,6 +79,52 @@ public class GriefAction {
         return this;
     }
 
+    public String getBlockName() {
+        if (blockName == null) {
+            if (this.block != null) {
+                return this.block.getState().getType().getId();
+            }
+            return "minecraft:unknown";
+        }
+        return blockName;
+    }
+
+    public TextColor getAlertColor() {
+        return alertColor;
+    }
+
+    public boolean isDenied() {
+        return denied;
+    }
+
+    public boolean isStealth() {
+        return stealth;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public BlockSnapshot getBlock() {
+        return block;
+    }
+
+    public ItemStackSnapshot getItem() {
+        return item;
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public EntitySnapshot getGriefer() {
+        return griefer;
+    }
+
+    public Vector3d getRotation() {
+        return rotation;
+    }
+
     public int getX() {
         if (block != null) {
             return block.getLocation().get().getBlockX();
@@ -100,6 +147,10 @@ public class GriefAction {
         } else {
             return entity.getLocation().getBlockZ();
         }
+    }
+
+    public World getWorld() {
+        return block != null ? block.getLocation().get().getExtent() : entity.getLocation().getExtent();
     }
 
     public GriefAction copy() {

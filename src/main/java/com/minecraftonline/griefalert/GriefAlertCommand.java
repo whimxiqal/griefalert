@@ -46,8 +46,8 @@ public final class GriefAlertCommand implements CommandExecutor {
                     Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
             GriefAction grief = tracker.get(code);
-            checker.setLocationSafely(grief.griefer.getLocation().get());
-            checker.setRotation(grief.rotation);
+            checker.setLocationSafely(grief.getGriefer().getLocation().get());
+            checker.setRotation(grief.getRotation());
             return CommandResult.success();
         }
         throw new CommandException(Text.of("Only in game players can use this command!"));

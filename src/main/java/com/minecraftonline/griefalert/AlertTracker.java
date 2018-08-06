@@ -5,12 +5,11 @@ import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.entity.hanging.ItemFrame;
-import org.spongepowered.api.entity.hanging.LeashHitch;
 import org.spongepowered.api.entity.hanging.Painting;
-import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -33,40 +32,40 @@ public final class AlertTracker {
 
     public final void log(Player player, GriefAction action) {
         int alertNo = 0;
-        if (action.type != GriefAction.Type.DEGRIEFED) {
+        if (action.getType() != GriefAction.Type.DEGRIEFED) {
             alertNo = getAlertNo(action);
         }
         UUID playerID = player.getUniqueId();
         Text alertMessage = alertMessage(player, alertNo, action);
-        if ((!player.hasPermission("griefalert.noalert") && !action.stealth && action.type != GriefAction.Type.DEGRIEFED) || GriefAlert.readConfigBool("debugInGameAlerts")) {
+        if ((!player.hasPermission("griefalert.noalert") && !action.isStealth() && action.getType() != GriefAction.Type.DEGRIEFED) || GriefAlert.readConfigBool("debugInGameAlerts")) {
             String priorAct = actionTrackForm(action);
             if ((!lastAction.containsKey(playerID) || !lastAction.get(playerID).contains(priorAct)) || GriefAlert.readConfigBool("debugInGameAlerts")) {
                 alertStaff(alertMessage);
             }
-            lastAction.put(playerID, action.type.name().charAt(0) + action.blockName);
+            lastAction.put(playerID, action.getType().name().charAt(0) + action.getBlockName());
         }
         console(player, action, alertNo);
-        //gLog.storeAction(player, action);
+        gLog.storeAction(player, action);
     }
 
     public final void logSign(Player player, Sign sign, SignData signData) {
         if (!player.hasPermission("griefalert.noalert")) {
             String signmsg = "Sign placed by %s at %d %d %d in %s-%s";
             alertStaff(Text.builder(String.format(signmsg, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
-                    sign.getLocation().getBlockZ(), player.getWorld().getName(),
-                    player.getWorld().getDimension().getType().getId().replace("minecraft:", ""))).build());
+                                                  sign.getLocation().getBlockZ(), player.getWorld().getName(),
+                                                  player.getWorld().getDimension().getType().getId().replace("minecraft:", ""))).color(TextColors.GRAY).build());
             for (int index = 0; index < 4; index++) {
                 Text signText = signData.lines().get(index);
                 if (!signText.isEmpty()) {
-                    alertStaff(Text.builder("Line " + (index + 1) + ": ").append(signText).build());
+                    alertStaff(Text.builder("Line " + (index + 1) + ": ").append(signText).color(TextColors.GRAY).build());
                 }
             }
         }
-        //gLog.storeSign(player, sign, signData);
+        gLog.storeSign(player, sign, signData);
     }
 
     private String actionTrackForm(GriefAction action) {
-        return action.type.name().charAt(0) + action.blockName;
+        return action.getType().name().charAt(0) + action.getBlockName();
     }
 
     private int getAlertNo(GriefAction action) {
@@ -83,16 +82,15 @@ public final class AlertTracker {
     }
 
     private Text alertMessage(Player player, int alertNo, GriefAction action) {
-        String msg = "%s %s %s (%d) in the %s of %s.";
-        return Text.builder(String.format(msg, player.getName(), action.type.name().toLowerCase(),
-                blockItemEntityStaff(action), alertNo, player.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""),
-                player.getWorld().getName())).color(action.alertColor).build();
+        String msg = "%s %s %s (%d) in the %s.";
+        return Text.builder(String.format(msg, player.getName(), action.getType().name().toLowerCase(),
+                                          blockItemEntityStaff(action), alertNo, action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""))).color(action.getAlertColor()).build();
     }
 
     private void console(Player player, GriefAction action, int alertNo) {
         gaLogger.info(
                 player.getUniqueId().toString() + " (" + player.getName() + "):" +
-                        action.type.name().toLowerCase() + ":" +
+                        action.getType().name().toLowerCase() + ":" +
                         blockItemEntityConsole(action) + ":" +
                         "x=" + action.getX() + ":" +
                         "y=" + action.getY() + ":" +
@@ -100,8 +98,8 @@ public final class AlertTracker {
                         "sx=" + player.getLocation().getBlockX() + ":" +
                         "sy=" + player.getLocation().getBlockY() + ":" +
                         "sz=" + player.getLocation().getBlockZ() + ":" +
-                        "w=" + player.getWorld().getName() + ":" +
-                        "d=" + player.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
+                        "w=" + action.getWorld().getUniqueId() + ":" +
+                        "d=" + action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
                         alertNo
         );
     }
@@ -111,47 +109,40 @@ public final class AlertTracker {
     }
 
     private String blockItemEntityStaff(GriefAction action) {
-        if (action.block != null) {
-            return correctGrammar(action.block.getState().getType().getTranslation().get());
-        } else if (action.item != null) {
-            return correctGrammar(action.item.getTranslation().get());
+        if (action.getBlock() != null) {
+            return correctGrammar(action.getBlock().getState().getType().getTranslation().get());
         }
-        else if (action.entity instanceof Painting) {
-            return "a Painting of " + action.entity.get(Keys.ART).get().getId();
-        } else if (action.entity instanceof ItemFrame) {
-            if (action.entity.get(Keys.REPRESENTED_ITEM).isPresent()) {
-                return correctGrammar(action.entity.get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame");
-            } else {
-                return "an Item Frame";
-            }
-        } else if (action.entity instanceof ArmorStand) {
-            if (action.type == GriefAction.Type.DESTORYED) {
-                return "an Armor Stand";
-            }
+        else if (action.getItem() != null) {
+            return correctGrammar(action.getItem().getTranslation().get());
         }
-        return action.blockName.replace(':', '-');
+        else if (action.getEntity() instanceof Painting) {
+            return "a Painting of " + action.getEntity().get(Keys.ART).get().getId();
+        }
+        else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
+            return correctGrammar(action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame");
+        }
+        else if (action.getEntity() != null) {
+            return correctGrammar(action.getEntity().getType().getTranslation().get());
+        }
+        return action.getBlockName();
     }
 
     private String blockItemEntityConsole(GriefAction action) {
-        if (action.block != null) {
-            return action.block.getState().toString().replace(':', '-');
-        } else if (action.item != null) {
-            return action.item.toString().replace(':', '-');
-        } else if (action.entity instanceof LeashHitch) {
-            return "minecraft-leash_knot";
-        } else if (action.entity instanceof Painting) {
-            return action.entity.get(Keys.ART).get().getId() + " painting";
-        } else if (action.entity instanceof ItemFrame) {
-            if (action.entity.get(Keys.REPRESENTED_ITEM).isPresent()) {
-                return "framed " + action.entity.get(Keys.REPRESENTED_ITEM).get().getTranslation().get();
-            } else {
-                return "minecraft-item_frame";
-            }
-        } else if (action.entity instanceof ArmorStand) {
-            if (action.type == GriefAction.Type.DESTORYED) {
-                return "minecraft-armor_stand";
-            }
+        if (action.getBlock() != null) {
+            return action.getBlock().getState().toString().replace(':', '-');
         }
-        return action.blockName.replace(':', '-');
+        else if (action.getItem() != null) {
+            return action.getItem().toString().replace(':', '-');
+        }
+        else if (action.getEntity() instanceof Painting) {
+            return "minecraft:painting[art=" + action.getEntity().get(Keys.ART).get().getId() + "]";
+        }
+        else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
+            return "minecraft:item_frame[item_id=" + action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
+        }
+        else if (action.getEntity() != null) {
+            return action.getEntity().getType().getId();
+        }
+        return action.getBlockName().replace(':', '-');
     }
 }

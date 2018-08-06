@@ -32,7 +32,7 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
 
                     if (GriefAlert.isDestroyWatched(blockID)) {
                         GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target).assignGriefer(player);
-                        if (!action.denied) {
+                        if (!action.isDenied()) {
                             tracker.log(player, action);
                         }
                         else {
@@ -45,16 +45,14 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
             Player player = event.getCause().first(Player.class).get();
             String blockID = "minecraft:armor_stand";
             if (event instanceof InteractEntityEvent.Primary) {
-                if (event.getCause().first(Player.class).isPresent() && GriefAlert.isDestroyWatched(blockID)) {
-                    GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target);
-                    if (!action.denied) {
+                if (GriefAlert.isDestroyWatched(blockID)) {
+                    GriefAction action = GriefAlert.getDestroyedAction(blockID).copy().assignEntity(target).assignGriefer(player);
+                    if (!action.isDenied()) {
                         tracker.log(player, action);
                     } else {
                         event.setCancelled(true);
                     }
                 }
-            } else if (event.getCause().first(Player.class).isPresent() && GriefAlert.isDestroyWatched(blockID)) {
-                // I have no idea right now
             }
         }
     }

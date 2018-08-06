@@ -29,7 +29,7 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                 BlockSnapshot blockSnapshot = transaction.getOriginal();
                 String blockID = blockSnapshot.getState().getType().getId();
                 if (GriefAlert.isDestroyWatched(blockID)) {
-                    if (!GriefAlert.getDestroyedAction(blockID).denied) {
+                    if (!GriefAlert.getDestroyedAction(blockID).isDenied()) {
                         tracker.log(player, GriefAlert.getDestroyedAction(blockID).copy().assignBlock(blockSnapshot).assignGriefer(player));
                     }
                     else {

@@ -210,11 +210,11 @@ public class GriefAlert {
                     }
 
                     if (splitedLine[0].equalsIgnoreCase("USE")) {
-                        useWatchList.put(blockID, new GriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.USED));
+                        useWatchList.put(blockID, new ImmutableGriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.USED));
                     } else if (splitedLine[0].equalsIgnoreCase("DESTROY")) {
-                        destroyWatchList.put(blockID, new GriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.DESTORYED));
+                        destroyWatchList.put(blockID, new ImmutableGriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.DESTORYED));
                     } else if (splitedLine[0].equalsIgnoreCase("INTERACT")) {
-                        interactWatchList.put(blockID, new GriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.INTERACTED));
+                        interactWatchList.put(blockID, new ImmutableGriefAction(blockID, colorCode, denied, stealth, onlyin, GriefAction.Type.INTERACTED));
                     } else {
                         logger.warn("watchedBlocks.txt - unrecognized activator : " + splitedLine[0]);
                     }
