@@ -65,6 +65,7 @@ public class GriefAlert {
                 rootNode = configManager.load();
                 rootNode.getNode("degriefStickID").setValue("minecraft:stick");
                 rootNode.getNode("alertsCodeLimit").setValue(999);
+                rootNode.getNode("maxHiddenMatchingAlerts").setValue(10);
                 rootNode.getNode("logSignsContent").setValue(true);
                 rootNode.getNode("debugInGameAlerts").setValue(false);
                 rootNode.getNode("showAlertsInConsole").setValue(false);

@@ -1,5 +1,6 @@
 package com.minecraftonline.griefalert;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.key.Keys;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class AlertTracker {
-    private static HashMap<UUID, String> lastAction = new HashMap<>();
+    private static HashMap<UUID, Pair<String, Integer>> lastAction = new HashMap<>();
     private static GriefAction[] griefLocations = new GriefAction[GriefAlert.readConfigInt("alertsCodeLimit") + 1]; // add 1 to replace 0
     private static int indexInTab = 1;
     private final Logger gaLogger;
@@ -37,12 +38,17 @@ public final class AlertTracker {
         }
         UUID playerID = player.getUniqueId();
         Text alertMessage = alertMessage(player, alertNo, action);
-        if ((!player.hasPermission("griefalert.noalert") && !action.isStealth()) || GriefAlert.readConfigBool("debugInGameAlerts")) {
-            String priorAct = actionTrackForm(action);
-            if ((!lastAction.containsKey(playerID) || !lastAction.get(playerID).contains(priorAct)) || GriefAlert.readConfigBool("debugInGameAlerts")) {
+        String priorAct = actionTrackForm(action);
+        if (GriefAlert.readConfigBool("debugInGameAlerts")) {
+            alertStaff(alertMessage);
+        } else if (!player.hasPermission("griefalert.noalert") && !action.isStealth()) {
+            if (!lastAction.containsKey(playerID) || !lastAction.get(playerID).getKey().equals(priorAct) || lastAction.get(playerID).getRight() >= GriefAlert.readConfigInt("maxHiddenMatchingAlerts")) {
                 alertStaff(alertMessage);
+                lastAction.put(playerID, Pair.of(action.getType().name().charAt(0) + action.getBlockName(), 1));
+            } else {
+                int last = lastAction.get(playerID).getRight();
+                lastAction.put(playerID, Pair.of(action.getType().name().charAt(0) + action.getBlockName(), last + 1));
             }
-            lastAction.put(playerID, action.getType().name().charAt(0) + action.getBlockName());
         }
         console(player, action, alertNo);
         gLog.storeAction(player, action);
