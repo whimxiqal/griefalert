@@ -8,6 +8,7 @@ import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.entity.hanging.ItemFrame;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
@@ -118,13 +119,18 @@ public final class AlertTracker {
 
     private String blockItemEntityStaff(GriefAction action) {
         if (action.getBlock() != null) {
+            if (action.getBlock().getState().getType().getItem().isPresent()) {
+                // Work around for BlockType not seeing colored blocks properly and BlockState not being translatable
+                return correctGrammar(ItemStack.builder().fromBlockSnapshot(action.getBlock()).build().getTranslation().get());
+            }
+            // The few blocks that have no ItemType connected (such as Fire)
             return correctGrammar(action.getBlock().getState().getType().getTranslation().get());
         }
         else if (action.getItem() != null) {
             return correctGrammar(action.getItem().getTranslation().get());
         }
         else if (action.getEntity() instanceof Painting) {
-            return "a Painting of " + action.getEntity().get(Keys.ART).get().getId();
+            return "a Painting of " + action.getEntity().get(Keys.ART).get().getName();
         }
         else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
             return correctGrammar(action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame");

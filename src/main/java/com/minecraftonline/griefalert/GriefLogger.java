@@ -94,7 +94,7 @@ final class GriefLogger {
             ps = conn.prepareStatement("INSERT INTO GriefAlert_Log (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, player.getUniqueId().toString());
             ps.setString(2, actionToString(action));
-            ps.setString(3, toJSON(actionToContrainer(action)));
+            ps.setString(3, toJSON(actionToContainer(action)));
             ps.setInt(4, action.getX());
             ps.setInt(5, action.getY());
             ps.setInt(6, action.getZ());
@@ -166,7 +166,7 @@ final class GriefLogger {
         return action.getBlockName();
     }
 
-    private DataContainer actionToContrainer(GriefAction action) {
+    private DataContainer actionToContainer(GriefAction action) {
         if (action.getBlock() != null) {
             return action.getBlock().toContainer();
         }
