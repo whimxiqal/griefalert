@@ -231,7 +231,7 @@ public class GriefAlert {
                         }
                     } else if (splitedLine[0].equalsIgnoreCase("DESTROY")) {
                         for (String dim : onlyin) {
-                            destroyWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.DESTORYED));
+                            destroyWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.DESTROYED));
                         }
                     } else if (splitedLine[0].equalsIgnoreCase("INTERACT")) {
                         for (String dim : onlyin) {

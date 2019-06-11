@@ -25,7 +25,7 @@ public class GriefAction {
 
     public enum Type {
         DEGRIEFED,
-        DESTORYED,
+        DESTROYED,
         INTERACTED {
             @Override
             public String toString() {
