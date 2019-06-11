@@ -160,7 +160,7 @@ public class GriefAlert {
             try {
                 writer = new FileWriter(dataSource);
                 writer.write("#Add the blocks to be watched here (without the #).\r\n");
-                writer.write("#Fromat is : USE|DESTROY|INTERACT:(namespace-)blockName:alertColor(:stealth[:deny][:onlyInList])\r\n");
+                writer.write("#Format is : USE|DESTROY|INTERACT:(namespace-)blockName:alertColor(:stealth[:deny][:onlyInList])\r\n");
                 writer.write("#stealth, deny, and onlyInList flags are optional");
                 writer.write("#onlyInList is a comma separated list of dimensions the alert is for, replacing ':' in namespaces with '-'");
                 writer.write("#Here are some examples :\r\n");
