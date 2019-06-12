@@ -3,7 +3,7 @@ package com.minecraftonline.griefalert.listeners;
 import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAction;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.ImmutableGriefAction;
+import com.minecraftonline.griefalert.GriefInstance;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.type.HandTypes;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class GriefInteractListener implements EventListener<InteractBlockEvent.Secondary> {
     private final AlertTracker tracker;
-    private final ImmutableGriefAction degrief = new ImmutableGriefAction(null, 'F', false, true, GriefAction.Type.DEGRIEFED);
+    private final GriefAction degrief = new GriefAction(null, 'F', false, true, GriefAction.GriefType.DEGRIEFED);
 
     public GriefInteractListener(AlertTracker tracker) {
         this.tracker = tracker;
@@ -34,12 +34,12 @@ public class GriefInteractListener implements EventListener<InteractBlockEvent.S
                 if (!blockID.equals("minecraft:air")) {
                     DimensionType dType = blockTarget.getLocation().get().getExtent().getDimension().getType();
                     if (player.hasPermission("griefalert.degrief") && item.getType().getId().equals(GriefAlert.readConfigStr("degriefStickID"))) {
-                        GriefAction action = degrief.copy().assignBlock(blockTarget).assignGriefer(player);
+                        GriefInstance action = new GriefInstance(degrief).assignBlock(blockTarget).assignGriefer(player);
                         tracker.log(player, action);
                         blockTarget.getLocation().get().getExtent().setBlockType(blockTarget.getPosition(), BlockTypes.AIR);
                     } else if (GriefAlert.isInteractWatched(blockID, dType)) {
                         if (!GriefAlert.getInteractAction(blockID, dType).isDenied()) {
-                            tracker.log(player, GriefAlert.getInteractAction(blockID, dType).copy().assignBlock(blockTarget).assignGriefer(player));
+                            tracker.log(player, new GriefInstance(GriefAlert.getInteractAction(blockID, dType)).assignBlock(blockTarget).assignGriefer(player));
                         } else {
                             event.setCancelled(true);
                         }

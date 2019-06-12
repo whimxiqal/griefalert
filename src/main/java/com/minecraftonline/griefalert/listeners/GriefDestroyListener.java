@@ -2,6 +2,8 @@ package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.GriefInstance;
+
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
@@ -33,7 +35,7 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                     DimensionType dType = blockSnapshot.getLocation().get().getExtent().getDimension().getType();
                     if (GriefAlert.isDestroyWatched(blockID, dType)) {
                         if (!GriefAlert.getDestroyedAction(blockID, dType).isDenied()) {
-                            tracker.log(player, GriefAlert.getDestroyedAction(blockID, dType).copy().assignBlock(blockSnapshot).assignGriefer(player));
+                            tracker.log(player, new GriefInstance(GriefAlert.getDestroyedAction(blockID, dType)).assignBlock(blockSnapshot).assignGriefer(player));
                         } else {
                             event.setCancelled(true);
                         }

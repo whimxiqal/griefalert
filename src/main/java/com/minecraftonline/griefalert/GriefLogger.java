@@ -86,23 +86,23 @@ final class GriefLogger {
         }
     }
 
-    final void storeAction(Player player, GriefAction action) {
+    final void storeAction(Player player, GriefInstance instance) {
         logger.debug("Storing Grief Action data...");
         PreparedStatement ps = null;
         try {
             testConnection();
             ps = conn.prepareStatement("INSERT INTO GriefAlert_Log (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, player.getUniqueId().toString());
-            ps.setString(2, actionToString(action));
-            ps.setString(3, toJSON(actionToContainer(action)));
-            ps.setInt(4, action.getX());
-            ps.setInt(5, action.getY());
-            ps.setInt(6, action.getZ());
-            ps.setInt(7, action.getGriefer().getLocation().get().getBlockX());
-            ps.setInt(8, action.getGriefer().getLocation().get().getBlockY());
-            ps.setInt(9, action.getGriefer().getLocation().get().getBlockZ());
-            ps.setString(10, action.getWorld().getDimension().getType().getId());
-            ps.setString(11, action.getWorld().getUniqueId().toString());
+            ps.setString(2, actionToString(instance));
+            ps.setString(3, toJSON(actionToContainer(instance)));
+            ps.setInt(4, instance.getX());
+            ps.setInt(5, instance.getY());
+            ps.setInt(6, instance.getZ());
+            ps.setInt(7, instance.getGriefer().getLocation().get().getBlockX());
+            ps.setInt(8, instance.getGriefer().getLocation().get().getBlockY());
+            ps.setInt(9, instance.getGriefer().getLocation().get().getBlockZ());
+            ps.setString(10, instance.getWorld().getDimension().getType().getId());
+            ps.setString(11, instance.getWorld().getUniqueId().toString());
             ps.execute();
             logger.debug("Store complete!");
         } catch (SQLException sqlex) {
@@ -147,33 +147,33 @@ final class GriefLogger {
         }
     }
 
-    private String actionToString(GriefAction action) {
-        if (action.getBlock() != null) {
-            return action.getBlock().getState().toString();
+    private String actionToString(GriefInstance instance) {
+        if (instance.getBlock() != null) {
+            return instance.getBlock().getState().toString();
         }
-        else if (action.getItem() != null) {
-            return action.getItem().toString();
+        else if (instance.getItem() != null) {
+            return instance.getItem().toString();
         }
-        else if (action.getEntity() instanceof Painting) {
-            return "minecraft:painting[art=" + action.getEntity().get(Keys.ART).get().getId() + "]";
+        else if (instance.getEntity() instanceof Painting) {
+            return "minecraft:painting[art=" + instance.getEntity().get(Keys.ART).get().getId() + "]";
         }
-        else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return "minecraft:item_frame[item_id=" + action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
+        else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
+            return "minecraft:item_frame[item_id=" + instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
         }
-        else if (action.getEntity() != null) {
-            return action.getEntity().getType().getId();
+        else if (instance.getEntity() != null) {
+            return instance.getEntity().getType().getId();
         }
-        return action.getBlockName();
+        return instance.getBlockId();
     }
 
-    private DataContainer actionToContainer(GriefAction action) {
-        if (action.getBlock() != null) {
-            return action.getBlock().toContainer();
+    private DataContainer actionToContainer(GriefInstance instance) {
+        if (instance.getBlock() != null) {
+            return instance.getBlock().toContainer();
         }
-        if (action.getItem() != null) {
-            return action.getItem().toContainer();
+        if (instance.getItem() != null) {
+            return instance.getItem().toContainer();
         }
-        return action.getEntity().toContainer();
+        return instance.getEntity().toContainer();
     }
 
     private String toJSON(DataView container) {

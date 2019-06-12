@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.minecraftonline.griefalert.listeners.*;
+
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -37,21 +38,34 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
         name = "GriefAlert",
         version = VERSION,
         description = "Grief alert tool")
+/**
+ * The main class for the plugin Grief Alert.
+ * This plugin is made exclusively for MinecraftOnline.com
+ * Do not use this plugin without explicit approval from an administrator of MinecraftOnline.
+ *
+ */
 public class GriefAlert {
     static final String VERSION = "21.0";
 
     @Inject
+    /** General logger. From Sponge API. */
     private Logger logger;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
+    /** Location of the default configuration file for this plugin. From Sponge API. */
     private Path defaultConfig;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
+    /** Configuration manager of the configuration file. From Sponge API. */
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
+    /** The root node of the configuration file, using the configuration manager. */
     private static ConfigurationNode rootNode;
 
+    /** Table housing all information about the actions to be watched by the GriefAlert plugin. */
+    // TODO: Combine these tables into one data structure.
+    // The table should be a wrapper for the google table here.
     private static Table<String, String, GriefAction> useWatchList = HashBasedTable.create();
     private static Table<String, String, GriefAction> interactWatchList = HashBasedTable.create();
     private static Table<String, String, GriefAction> destroyWatchList = HashBasedTable.create();
@@ -227,15 +241,15 @@ public class GriefAlert {
 
                     if (splitedLine[0].equalsIgnoreCase("USE")) {
                         for (String dim : onlyin) {
-                            useWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.USED));
+                            useWatchList.put(blockID, dim, new GriefAction(blockID, colorCode, denied, stealth, GriefAction.GriefType.USED));
                         }
                     } else if (splitedLine[0].equalsIgnoreCase("DESTROY")) {
                         for (String dim : onlyin) {
-                            destroyWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.DESTROYED));
+                            destroyWatchList.put(blockID, dim, new GriefAction(blockID, colorCode, denied, stealth, GriefAction.GriefType.DESTROYED));
                         }
                     } else if (splitedLine[0].equalsIgnoreCase("INTERACT")) {
                         for (String dim : onlyin) {
-                            interactWatchList.put(blockID, dim, new ImmutableGriefAction(blockID, colorCode, denied, stealth, GriefAction.Type.INTERACTED));
+                            interactWatchList.put(blockID, dim, new GriefAction(blockID, colorCode, denied, stealth, GriefAction.GriefType.INTERACTED));
                         }
                     } else {
                         logger.warn("watchedBlocks.txt - unrecognized activator : " + splitedLine[0] + " @ Line: " + line);

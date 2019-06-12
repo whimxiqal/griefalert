@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public final class AlertTracker {
     private static HashMap<UUID, Pair<String, Integer>> lastAction = new HashMap<>();
-    private static GriefAction[] griefLocations = new GriefAction[GriefAlert.readConfigInt("alertsCodeLimit") + 1]; // add 1 to replace 0
+    private static GriefInstance[] griefLocations = new GriefInstance[GriefAlert.readConfigInt("alertsCodeLimit") + 1]; // add 1 to replace 0
     private static int indexInTab = 1;
     private final Logger gaLogger;
     private final GriefLogger gLog;
@@ -28,31 +28,31 @@ public final class AlertTracker {
         this.gLog = new GriefLogger(logger);
     }
 
-    public GriefAction get(int code) {
+    public GriefInstance get(int code) {
         return griefLocations[code];
     }
 
-    public final void log(Player player, GriefAction action) {
+    public final void log(Player player, GriefInstance instance) {
         int alertNo = 0;
-        if (action.getType() != GriefAction.Type.DEGRIEFED) {
-            alertNo = getAlertNo(action);
+        if (instance.getType() != GriefAction.GriefType.DEGRIEFED) {
+            alertNo = getAlertNo(instance);
         }
         UUID playerID = player.getUniqueId();
-        Text alertMessage = alertMessage(player, alertNo, action);
-        String priorAct = actionTrackForm(action);
+        Text alertMessage = alertMessage(player, alertNo, instance);
+        String priorAct = actionTrackForm(instance);
         if (GriefAlert.readConfigBool("debugInGameAlerts")) {
             alertStaff(alertMessage);
-        } else if (!player.hasPermission("griefalert.noalert") && !action.isStealth()) {
+        } else if (!player.hasPermission("griefalert.noalert") && !instance.isStealthyAlert()) {
             if (!lastAction.containsKey(playerID) || !lastAction.get(playerID).getKey().equals(priorAct) || lastAction.get(playerID).getRight() >= GriefAlert.readConfigInt("maxHiddenMatchingAlerts")) {
                 alertStaff(alertMessage);
-                lastAction.put(playerID, Pair.of(action.getType().name().charAt(0) + action.getBlockName(), 1));
+                lastAction.put(playerID, Pair.of(instance.getType().name().charAt(0) + instance.getBlockId(), 1));
             } else {
                 int last = lastAction.get(playerID).getRight();
-                lastAction.put(playerID, Pair.of(action.getType().name().charAt(0) + action.getBlockName(), last + 1));
+                lastAction.put(playerID, Pair.of(instance.getType().name().charAt(0) + instance.getBlockId(), last + 1));
             }
         }
-        console(player, action, alertNo);
-        gLog.storeAction(player, action);
+        console(player, instance, alertNo);
+        gLog.storeAction(player, instance);
     }
 
     public final void logSign(Player player, Sign sign, SignData signData) {
@@ -71,12 +71,12 @@ public final class AlertTracker {
         gLog.storeSign(player, sign, signData);
     }
 
-    private String actionTrackForm(GriefAction action) {
-        return action.getType().name().charAt(0) + action.getBlockName();
+    private String actionTrackForm(GriefInstance instance) {
+        return instance.getType().name().charAt(0) + instance.getBlockId();
     }
 
-    private int getAlertNo(GriefAction action) {
-        griefLocations[indexInTab] = action;
+    private int getAlertNo(GriefInstance instance) {
+        griefLocations[indexInTab] = instance;
         int returnCode = indexInTab;
         if (++indexInTab == griefLocations.length)
             indexInTab = 1; // skipping 0 cause it annoys me that the first alert is 0
@@ -88,26 +88,26 @@ public final class AlertTracker {
         staffChannel.send(message);
     }
 
-    private Text alertMessage(Player player, int alertNo, GriefAction action) {
+    private Text alertMessage(Player player, int alertNo, GriefInstance instance) {
         String msg = "%s %s %s (%d) in the %s.";
-        return Text.builder(String.format(msg, player.getName(), action.getType(),
-                                          blockItemEntityStaff(action), alertNo, action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""))).color(action.getAlertColor()).build();
+        return Text.builder(String.format(msg, player.getName(), instance.getType(),
+                                          blockItemEntityStaff(instance), alertNo, instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""))).color(instance.getAlertColor()).build();
     }
 
-    private void console(Player player, GriefAction action, int alertNo) {
+    private void console(Player player, GriefInstance instance, int alertNo) {
         if (GriefAlert.readConfigBool("showAlertsInConsole")) {
             gaLogger.info(
                     player.getUniqueId().toString() + " (" + player.getName() + "):" +
-                            action.getType().name().toLowerCase() + ":" +
-                            blockItemEntityConsole(action) + ":" +
-                            "x=" + action.getX() + ":" +
-                            "y=" + action.getY() + ":" +
-                            "z=" + action.getZ() + ":" +
+                    		instance.getType().name().toLowerCase() + ":" +
+                            blockItemEntityConsole(instance) + ":" +
+                            "x=" + instance.getX() + ":" +
+                            "y=" + instance.getY() + ":" +
+                            "z=" + instance.getZ() + ":" +
                             "sx=" + player.getLocation().getBlockX() + ":" +
                             "sy=" + player.getLocation().getBlockY() + ":" +
                             "sz=" + player.getLocation().getBlockZ() + ":" +
-                            "w=" + action.getWorld().getUniqueId() + ":" +
-                            "d=" + action.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
+                            "w=" + instance.getWorld().getUniqueId() + ":" +
+                            "d=" + instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
                             alertNo
             );
         }
@@ -117,46 +117,46 @@ public final class AlertTracker {
         return "aeiou".contains(str.substring(0, 1).toLowerCase()) ? "an " + str : "a " + str;
     }
 
-    private String blockItemEntityStaff(GriefAction action) {
-        if (action.getBlock() != null) {
-            if (action.getBlock().getState().getType().getItem().isPresent()) {
+    private String blockItemEntityStaff(GriefInstance instance) {
+        if (instance.getBlock() != null) {
+            if (instance.getBlock().getState().getType().getItem().isPresent()) {
                 // Work around for BlockType not seeing colored blocks properly and BlockState not being translatable
-                return correctGrammar(ItemStack.builder().fromBlockSnapshot(action.getBlock()).build().getTranslation().get());
+                return correctGrammar(ItemStack.builder().fromBlockSnapshot(instance.getBlock()).build().getTranslation().get());
             }
             // The few blocks that have no ItemType connected (such as Fire)
-            return correctGrammar(action.getBlock().getState().getType().getTranslation().get());
+            return correctGrammar(instance.getBlock().getState().getType().getTranslation().get());
         }
-        else if (action.getItem() != null) {
-            return correctGrammar(action.getItem().getTranslation().get());
+        else if (instance.getItem() != null) {
+            return correctGrammar(instance.getItem().getTranslation().get());
         }
-        else if (action.getEntity() instanceof Painting) {
-            return "a Painting of " + action.getEntity().get(Keys.ART).get().getName();
+        else if (instance.getEntity() instanceof Painting) {
+            return "a Painting of " + instance.getEntity().get(Keys.ART).get().getName();
         }
-        else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return correctGrammar(action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame");
+        else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
+            return correctGrammar(instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame");
         }
-        else if (action.getEntity() != null) {
-            return correctGrammar(action.getEntity().getType().getTranslation().get());
+        else if (instance.getEntity() != null) {
+            return correctGrammar(instance.getEntity().getType().getTranslation().get());
         }
-        return action.getBlockName();
+        return instance.getBlockId();
     }
 
-    private String blockItemEntityConsole(GriefAction action) {
-        if (action.getBlock() != null) {
-            return action.getBlock().getState().toString().replace(':', '-');
+    private String blockItemEntityConsole(GriefInstance instance) {
+        if (instance.getBlock() != null) {
+            return instance.getBlock().getState().toString().replace(':', '-');
         }
-        else if (action.getItem() != null) {
-            return action.getItem().toString().replace(':', '-');
+        else if (instance.getItem() != null) {
+            return instance.getItem().toString().replace(':', '-');
         }
-        else if (action.getEntity() instanceof Painting) {
-            return "minecraft-painting[art=" + action.getEntity().get(Keys.ART).get().getId() + "]";
+        else if (instance.getEntity() instanceof Painting) {
+            return "minecraft-painting[art=" + instance.getEntity().get(Keys.ART).get().getId() + "]";
         }
-        else if (action.getEntity() instanceof ItemFrame && action.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return "minecraft-item_frame[item_id=" + action.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
+        else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
+            return "minecraft-item_frame[item_id=" + instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
         }
-        else if (action.getEntity() != null) {
-            return action.getEntity().getType().getId().replace(':', '-');
+        else if (instance.getEntity() != null) {
+            return instance.getEntity().getType().getId().replace(':', '-');
         }
-        return action.getBlockName().replace(':', '-');
+        return instance.getBlockId().replace(':', '-');
     }
 }

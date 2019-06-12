@@ -36,8 +36,8 @@ public final class GriefAlertCommand implements CommandExecutor {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("Check number out of range").color(WHITE).build()).build());
             }
             Player checker = (Player) src;
-            GriefAction action = tracker.get(arg.get());
-            if (action == null) {
+            GriefInstance instance = tracker.get(arg.get());
+            if (instance == null) {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("There is no current alert at that code").color(WHITE).build()).build());
             }
 
@@ -45,7 +45,7 @@ public final class GriefAlertCommand implements CommandExecutor {
                     Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
                     Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
-            GriefAction grief = tracker.get(code);
+            GriefInstance grief = tracker.get(code);
             checker.setLocationSafely(grief.getGriefer().getLocation().get());
             checker.setRotation(grief.getRotation());
             return CommandResult.success();
