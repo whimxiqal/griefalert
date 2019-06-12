@@ -96,5 +96,21 @@ public class GriefAction {
     public GriefType getType() {
         return type;
     }
+    
+	@Override
+	/**
+	 * Returns whether both the types of the grief actions and the blockId's associated with the
+	 * actions are equal.
+	 * @param other Another Grief Action to compare
+	 * @return If these two Grief Actions are considered equal
+	 */
+	public boolean equals(Object otherObject) {
+		if (!(otherObject instanceof GriefInstance)) {
+			return false;
+		}
+		GriefInstance other = (GriefInstance) otherObject;
+		return this.getType() == other.getType() &&
+				this.getBlockId() == other.getBlockId();
+	}
 
 }

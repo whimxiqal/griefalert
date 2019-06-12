@@ -16,72 +16,102 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class AlertTracker {
-    private static HashMap<UUID, Pair<String, Integer>> lastAction = new HashMap<>();
-    private GriefInstance[] griefInstances;
-    private static int indexInTab = 0;
+    private HashMap<UUID, Pair<GriefAction, Integer>> lastGriefActionPlayerMap = new HashMap<>();
+    private RecentGriefInstanceManager griefInstances;
     private final GriefAlert plugin;
 
     public AlertTracker(GriefAlert griefAlert) {
     	this.plugin = griefAlert;
-    	griefInstances = new GriefInstance[plugin.getConfigInt("alertsCodeLimit")];
+    	griefInstances = new RecentGriefInstanceManager(plugin);
     }
 
     public GriefInstance get(int code) {
-        return griefInstances[code];
+        return griefInstances.get(code);
     }
 
     public final void log(Player player, GriefInstance instance) {
-        int alertNo = 0;
+        int alertId;
+        
+        // Log in array of recent grief instances
         if (instance.getType() != GriefAction.GriefType.DEGRIEFED) {
-            alertNo = getAlertNo(instance);
+        	alertId = recordAlertInRecentGriefInstances(instance);
+        } else {
+        	// Do not put it into the recent grief instance structure
+        	alertId = -1;
         }
-        UUID playerID = player.getUniqueId();
-        Text alertMessage = alertMessage(player, alertNo, instance);
-        String priorAct = actionTrackForm(instance);
-        if (plugin.getConfigBoolean("debugInGameAlerts")) {
-            alertStaff(alertMessage);
-        } else if (!player.hasPermission("griefalert.noalert") && !instance.isStealthyAlert()) {
-            if (!lastAction.containsKey(playerID) || !lastAction.get(playerID).getKey().equals(priorAct) || lastAction.get(playerID).getRight() >= plugin.getConfigInt("maxHiddenMatchingAlerts")) {
-                alertStaff(alertMessage);
-                lastAction.put(playerID, Pair.of(instance.getType().name().charAt(0) + instance.getBlockId(), 1));
-            } else {
-                int last = lastAction.get(playerID).getRight();
-                lastAction.put(playerID, Pair.of(instance.getType().name().charAt(0) + instance.getBlockId(), last + 1));
-            }
+        
+        // Print to console
+        if (plugin.getConfigBoolean("showAlertsInConsole")) {
+        	printToConsole(player, instance, alertId);
         }
-        console(player, instance, alertNo);
+        
+        // Log the instance in the grief logger
         plugin.getGriefLogger().storeAction(player, instance);
+        
+        // Tell staff
+        if (plugin.getConfigBoolean("debugInGameAlerts")) {
+        	// Just alert the staff and don't do anything else
+            printToStaff(alertMessage(player, alertId, instance));
+        } else {
+        	alertInGame(player, alertId, instance);
+        }
+    }
+    
+    public final void alertInGame(Player player, int alertId, GriefInstance instance) {
+    	Text alertMessage = alertMessage(player, alertId, instance);
+        if (!player.hasPermission("griefalert.noalert")) {
+        	// Player does not have the permission to mute their own grief instance alerts
+        	if (!instance.isStealthyAlert()) {
+        		// The Grief Instance is not in stealth mode
+        		
+	        	UUID playerId = player.getUniqueId();
+	            
+	        	Pair<GriefAction, Integer> previousGriefAction = lastGriefActionPlayerMap.get(playerId);
+	        	int consecutiveGriefActionCount;
+	            if (previousGriefAction != null && 
+	            		previousGriefAction.getKey().equals(instance.getGriefAction()) &&
+	            		previousGriefAction.getValue() < plugin.getConfigInt("maxHiddenMatchingAlerts")) {
+	            	
+	            	// The same grief action was repeated by the same person
+        			consecutiveGriefActionCount = previousGriefAction.getValue() + 1;
+
+	            } else {
+	            	// This is the first consecutive grief action count
+	            	consecutiveGriefActionCount = 1;
+	            	printToStaff(alertMessage);
+	            }
+	            lastGriefActionPlayerMap.put(
+    					playerId, 
+    					Pair.of(
+    							instance.getGriefAction(), 
+    							consecutiveGriefActionCount));
+        	}
+        } else {
+        	// Right now, nothing happens if a player *does* have the "griefalert.noalert" node.
+        }
     }
 
     public final void logSign(Player player, Sign sign, SignData signData) {
         if (!player.hasPermission("griefalert.noalert")) {
             String signmsg = "Sign placed by %s at %d %d %d in %s-%s";
-            alertStaff(Text.builder(String.format(signmsg, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
+            printToStaff(Text.builder(String.format(signmsg, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
                                                   sign.getLocation().getBlockZ(), player.getWorld().getName(),
                                                   player.getWorld().getDimension().getType().getId().replace("minecraft:", ""))).color(TextColors.GRAY).build());
             for (int index = 0; index < 4; index++) {
                 Text signText = signData.lines().get(index);
                 if (!signText.isEmpty()) {
-                    alertStaff(Text.builder("Line " + (index + 1) + ": ").append(signText).color(TextColors.GRAY).build());
+                	printToStaff(Text.builder("Line " + (index + 1) + ": ").append(signText).color(TextColors.GRAY).build());
                 }
             }
         }
         plugin.getGriefLogger().storeSign(player, sign, signData);
     }
 
-    private String actionTrackForm(GriefInstance instance) {
-        return instance.getType().name().charAt(0) + instance.getBlockId();
+    private int recordAlertInRecentGriefInstances(GriefInstance instance) {
+        return griefInstances.record(instance);
     }
 
-    private int getAlertNo(GriefInstance instance) {
-        griefInstances[indexInTab] = instance;
-        int returnCode = indexInTab;
-        if (++indexInTab >= griefInstances.length)
-            indexInTab = 0;
-        return returnCode;
-    }
-
-    public void alertStaff(Text message) {
+    public void printToStaff(Text message) {
         MessageChannel staffChannel = MessageChannel.permission("griefalert.staff");
         staffChannel.send(message);
     }
@@ -92,23 +122,21 @@ public final class AlertTracker {
                                           blockItemEntityStaff(instance), alertNo, instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""))).color(instance.getAlertColor()).build();
     }
 
-    private void console(Player player, GriefInstance instance, int alertNo) {
-        if (plugin.getConfigBoolean("showAlertsInConsole")) {
-            plugin.getLogger().info(
-                    player.getUniqueId().toString() + " (" + player.getName() + "):" +
-                    		instance.getType().name().toLowerCase() + ":" +
-                            blockItemEntityConsole(instance) + ":" +
-                            "x=" + instance.getX() + ":" +
-                            "y=" + instance.getY() + ":" +
-                            "z=" + instance.getZ() + ":" +
-                            "sx=" + player.getLocation().getBlockX() + ":" +
-                            "sy=" + player.getLocation().getBlockY() + ":" +
-                            "sz=" + player.getLocation().getBlockZ() + ":" +
-                            "w=" + instance.getWorld().getUniqueId() + ":" +
-                            "d=" + instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
-                            alertNo
-            );
-        }
+    private void printToConsole(Player player, GriefInstance instance, int alertNo) {
+        plugin.getLogger().info(
+                player.getUniqueId().toString() + " (" + player.getName() + "):" +
+                		instance.getType().name().toLowerCase() + ":" +
+                        blockItemEntityConsole(instance) + ":" +
+                        "x=" + instance.getX() + ":" +
+                        "y=" + instance.getY() + ":" +
+                        "z=" + instance.getZ() + ":" +
+                        "sx=" + player.getLocation().getBlockX() + ":" +
+                        "sy=" + player.getLocation().getBlockY() + ":" +
+                        "sz=" + player.getLocation().getBlockZ() + ":" +
+                        "w=" + instance.getWorld().getUniqueId() + ":" +
+                        "d=" + instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
+                        alertNo
+        );
     }
 
     private String correctGrammar(String str) {
@@ -157,4 +185,35 @@ public final class AlertTracker {
         }
         return instance.getBlockId().replace(':', '-');
     }
+    
+    public class RecentGriefInstanceManager {
+    	
+    	private GriefInstance[] griefInstanceArray;
+    	private int cursor = 0;
+
+    	public RecentGriefInstanceManager(GriefAlert plugin) {
+    		griefInstanceArray = new GriefInstance[plugin.getConfigInt("alertsCodeLimit")];
+    	}
+
+    	public GriefInstance get(int code) {
+    		return griefInstanceArray[code];
+    	}
+
+    	/**
+    	 * Adds a GriefInstance into the array.
+    	 * Returns the index of the instance put in.
+    	 * Moves the cursor forward.
+    	 * @param instance
+    	 * @return
+    	 */
+    	public int record(GriefInstance instance) {
+    		griefInstanceArray[cursor] = instance;
+    		int instanceIndex = cursor;
+    		if (++cursor >= griefInstanceArray.length) {
+    			cursor = 0;
+    		}
+    		return instanceIndex;
+    	}
+    }
+    
 }
