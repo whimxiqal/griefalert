@@ -1,7 +1,6 @@
 package com.minecraftonline.griefalert;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
@@ -18,21 +17,17 @@ import java.util.UUID;
 
 public final class AlertTracker {
     private static HashMap<UUID, Pair<String, Integer>> lastAction = new HashMap<>();
-    private GriefInstance[] griefLocations; // add 1 to replace 0
-    private static int indexInTab = 1;
+    private GriefInstance[] griefInstances;
+    private static int indexInTab = 0;
     private final GriefAlert plugin;
-    private final Logger gaLogger;
-    private final GriefLogger gLog;
 
     public AlertTracker(GriefAlert griefAlert) {
     	this.plugin = griefAlert;
-    	griefLocations = new GriefInstance[plugin.getConfigInt("alertsCodeLimit") + 1];
-        this.gaLogger = griefAlert.getLogger();
-        this.gLog = new GriefLogger(griefAlert);
+    	griefInstances = new GriefInstance[plugin.getConfigInt("alertsCodeLimit")];
     }
 
     public GriefInstance get(int code) {
-        return griefLocations[code];
+        return griefInstances[code];
     }
 
     public final void log(Player player, GriefInstance instance) {
@@ -55,7 +50,7 @@ public final class AlertTracker {
             }
         }
         console(player, instance, alertNo);
-        gLog.storeAction(player, instance);
+        plugin.getGriefLogger().storeAction(player, instance);
     }
 
     public final void logSign(Player player, Sign sign, SignData signData) {
@@ -71,7 +66,7 @@ public final class AlertTracker {
                 }
             }
         }
-        gLog.storeSign(player, sign, signData);
+        plugin.getGriefLogger().storeSign(player, sign, signData);
     }
 
     private String actionTrackForm(GriefInstance instance) {
@@ -79,10 +74,10 @@ public final class AlertTracker {
     }
 
     private int getAlertNo(GriefInstance instance) {
-        griefLocations[indexInTab] = instance;
+        griefInstances[indexInTab] = instance;
         int returnCode = indexInTab;
-        if (++indexInTab == griefLocations.length)
-            indexInTab = 1; // skipping 0 cause it annoys me that the first alert is 0
+        if (++indexInTab >= griefInstances.length)
+            indexInTab = 0;
         return returnCode;
     }
 
@@ -99,7 +94,7 @@ public final class AlertTracker {
 
     private void console(Player player, GriefInstance instance, int alertNo) {
         if (plugin.getConfigBoolean("showAlertsInConsole")) {
-            gaLogger.info(
+            plugin.getLogger().info(
                     player.getUniqueId().toString() + " (" + player.getName() + "):" +
                     		instance.getType().name().toLowerCase() + ":" +
                             blockItemEntityConsole(instance) + ":" +
