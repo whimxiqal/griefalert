@@ -231,7 +231,7 @@ public class GriefAlert {
     private void registerListeners(AlertTracker tracker) {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this, tracker));
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this, tracker));
-        if (readConfigBool("logSignsContent")) {
+        if (getConfigBoolean("logSignsContent")) {
             Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.LAST, new GriefSignListener(this, tracker));
         }
         Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(this, tracker));
@@ -251,15 +251,15 @@ public class GriefAlert {
     	}
     }
 
-    public static int readConfigInt(String key) {
+    public static int getConfigInt(String key) {
         return rootNode.getNode(key).getInt();
     }
 
-    public static String readConfigStr(String key) {
+    public static String getConfigString(String key) {
         return rootNode.getNode(key).getString();
     }
 
-    public static boolean readConfigBool(String key) {
+    public static boolean getConfigBoolean(String key) {
         return rootNode.getNode(key).getBoolean();
     }
 }

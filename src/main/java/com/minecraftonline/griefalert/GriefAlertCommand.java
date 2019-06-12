@@ -32,7 +32,7 @@ public final class GriefAlertCommand implements CommandExecutor {
                 throw new CommandException(Text.builder("ERROR: ").color(RED).append(Text.builder("Missing check number").color(WHITE).build()).build());
             }
             int code = arg.get();
-            if (code > GriefAlert.readConfigInt("alertsCodeLimit") || code < 1) {
+            if (code > GriefAlert.getConfigInt("alertsCodeLimit") || code < 1) {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("Check number out of range").color(WHITE).build()).build());
             }
             Player checker = (Player) src;

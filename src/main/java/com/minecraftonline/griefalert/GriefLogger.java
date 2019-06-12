@@ -32,9 +32,9 @@ final class GriefLogger {
 
     private static void testConnection() throws SQLException {
         if (conn == null || conn.isClosed() || !conn.isValid(2)) {
-            conn = DriverManager.getConnection("jdbc:mysql://" + GriefAlert.readConfigStr("SQLdb"),
-                                               GriefAlert.readConfigStr("SQLusername"),
-                                               GriefAlert.readConfigStr("SQLpassword"));
+            conn = DriverManager.getConnection("jdbc:mysql://" + GriefAlert.getConfigString("SQLdb"),
+                                               GriefAlert.getConfigString("SQLusername"),
+                                               GriefAlert.getConfigString("SQLpassword"));
         }
     }
 

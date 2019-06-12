@@ -21,7 +21,7 @@ public class GriefSignListener implements EventListener<ChangeSignEvent> {
     @Override
     public void handle(@Nonnull ChangeSignEvent event) {
         if (event.getCause().root() instanceof Player) {
-            if (GriefAlert.readConfigBool("logSignsContent")) {
+            if (GriefAlert.getConfigBoolean("logSignsContent")) {
                 Optional<Player> poption = event.getCause().first(Player.class);
                 poption.ifPresent(player -> tracker.logSign(player, event.getTargetTile(), event.getText()));
             }

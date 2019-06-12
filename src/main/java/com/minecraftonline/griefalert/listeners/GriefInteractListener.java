@@ -37,7 +37,7 @@ public class GriefInteractListener implements EventListener<InteractBlockEvent.S
                 String blockID = blockTarget.getState().getType().getId();
                 if (!blockID.equals("minecraft:air")) {
                     DimensionType dType = blockTarget.getLocation().get().getExtent().getDimension().getType();
-                    if (player.hasPermission("griefalert.degrief") && item.getType().getId().equals(GriefAlert.readConfigStr("degriefStickID"))) {
+                    if (player.hasPermission("griefalert.degrief") && item.getType().getId().equals(GriefAlert.getConfigString("degriefStickID"))) {
                         GriefInstance action = new GriefInstance(degrief).assignBlock(blockTarget).assignGriefer(player);
                         tracker.log(player, action);
                         blockTarget.getLocation().get().getExtent().setBlockType(blockTarget.getPosition(), BlockTypes.AIR);
