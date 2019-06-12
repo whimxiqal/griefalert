@@ -45,23 +45,31 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
  * The main class for the plugin Grief Alert.
  * This plugin is made exclusively for MinecraftOnline.com
  * Do not use this plugin without explicit approval from an administrator of MinecraftOnline.
- *
  */
 public class GriefAlert {
 	
     static final String VERSION = "21.0";
+    
+    /** Item used by staff members to 'degrief' a grief event. This is logged but not acted on by in-game staff. */
     public static final String DEGRIEF_ITEM = "minecraft:stick";
+    /** The maximum number of reports before the code limit is reset. This is for ease of use by in-game staff. */
     public static final int ALERTS_CODE_LIMIT = 999;
+    /** The maximum number of identical reports to hide successively. */
     public static final int MAX_REPEATED_HIDDEN_ALERT = 10;
+    /** Is logging whether someone changes a sign going to be logged? */
     public static final boolean LOG_SIGNS_CONTENT = true;
+    /** Will there be in game alerts to help debug the plugin? */
     public static final boolean DEBUG_IN_GAME_ALERTS = false;
+    /** Will the alerts be shown in the console as well as in game? */
     public static final boolean SHOW_ALERTS_IN_CONSOLE = false;
 
     public static final String SQL_USERNAME = "user";
     public static final String SQL_PASSWORD = "PA$$word";
     public static final String SQL_ADDRESS = "localhost:3306/minecraft";
     
+    /** The file name of the file which holds information about which activities will be watched and logged. */
     public static final String GRIEF_ALERT_FILE_NAME = "watchedBlocks.txt";
+    /** The file path of the grief alert file. */
     public static final String GRIEF_ALERT_FILE_PATH = "config/griefalert/" + GRIEF_ALERT_FILE_NAME;
     
     private GriefActionTableManager griefActions = new GriefActionTableManager();
@@ -91,13 +99,18 @@ public class GriefAlert {
     
 
     @Listener
+    /**
+     * Run initialization sequence before the game starts.
+     * All classes that other classes depend on must be initialized here.
+     * @param event the event run before the game starts
+     */
     public void initialize(GamePreInitializationEvent event) {
         logger.info("Initializing GriefAlert...");
         
         // Load the config from the Sponge API and set the specific node values.
         initializeConfig();
         
-        this.gLogger = new GriefLogger(this);
+        this.setGriefLogger(new GriefLogger(this));
         
         initializeExtras();
         
@@ -113,6 +126,9 @@ public class GriefAlert {
         Sponge.getCommandManager().register(this, gcheckin, "gcheckin");
     }
 
+	/** 
+     * Classes which other classes depend on must be initialized here. 
+     */
     private void initializeExtras() {
     	tracker = new AlertTracker(this);
 	}
@@ -159,6 +175,12 @@ public class GriefAlert {
         }
     }
     
+    /**
+     * Finds the Grief Alert File and returns it.
+     * If no file exists, then generate one based on the default Grief Alert File and writes into
+     * the correct location.
+     * @return The Grief Alert File
+     */
     private File loadGriefAlertFile() {
     	logger.info("Loading GriefAlert file: " + GRIEF_ALERT_FILE_NAME + " ...");
         File griefAlertFile = new File(GRIEF_ALERT_FILE_PATH);
@@ -185,6 +207,10 @@ public class GriefAlert {
 		return griefAlertFile;
     }
     
+    /**
+     * Reads the Grief Alert File and inputs all its data into the Grief Action Table Manager.
+     * @param griefAlertFile The file which has all Grief Actions
+     */
     private void readGriefAlertFile(File griefAlertFile) {
         try {
             logger.info("Watch List file being read and loaded into plugin...");
@@ -283,4 +309,13 @@ public class GriefAlert {
 	public AlertTracker getTracker() {
 		return tracker;
 	}
+	
+    private void setGriefLogger(GriefLogger griefLogger) {
+		this.gLogger = griefLogger;
+		
+	}
+    
+    public GriefLogger getGriefLogger() {
+    	return this.gLogger;
+    }
 }
