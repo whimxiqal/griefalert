@@ -17,10 +17,10 @@ import static org.spongepowered.api.text.format.TextColors.RED;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 public final class GriefAlertCommand implements CommandExecutor {
-    private final AlertTracker tracker;
+    private final GriefAlert plugin;
 
-    public GriefAlertCommand(AlertTracker tracker) {
-        this.tracker = tracker;
+    public GriefAlertCommand(GriefAlert plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -32,20 +32,20 @@ public final class GriefAlertCommand implements CommandExecutor {
                 throw new CommandException(Text.builder("ERROR: ").color(RED).append(Text.builder("Missing check number").color(WHITE).build()).build());
             }
             int code = arg.get();
-            if (code > GriefAlert.getConfigInt("alertsCodeLimit") || code < 1) {
+            if (code > plugin.getConfigInt("alertsCodeLimit") || code < 1) {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("Check number out of range").color(WHITE).build()).build());
             }
             Player checker = (Player) src;
-            GriefInstance instance = tracker.get(arg.get());
+            GriefInstance instance = plugin.getTracker().get(arg.get());
             if (instance == null) {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("There is no current alert at that code").color(WHITE).build()).build());
             }
 
-            tracker.alertStaff(formatPlayerName(checker).toBuilder().append(
+            plugin.getTracker().alertStaff(formatPlayerName(checker).toBuilder().append(
                     Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
                     Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
-            GriefInstance grief = tracker.get(code);
+            GriefInstance grief = plugin.getTracker().get(code);
             checker.setLocationSafely(grief.getGriefer().getLocation().get());
             checker.setRotation(grief.getRotation());
             return CommandResult.success();

@@ -69,6 +69,12 @@ public class GriefAlert {
     @Inject
     /** General logger. From Sponge API. */
     private Logger logger;
+    
+    /** Grief logger. */
+    private GriefLogger gLogger;
+    
+    /** Alert Tracker. */
+    private AlertTracker tracker;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -80,7 +86,7 @@ public class GriefAlert {
     /** Configuration manager of the configuration file. From Sponge API. */
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
     /** The root node of the configuration file, using the configuration manager. */
-    private static ConfigurationNode rootNode;
+    private ConfigurationNode rootNode;
 
     
 
@@ -91,12 +97,15 @@ public class GriefAlert {
         // Load the config from the Sponge API and set the specific node values.
         initializeConfig();
         
+        this.gLogger = new GriefLogger(this);
+        
+        initializeExtras();
+        
         // Read the grief alert file
         readGriefAlertFile(loadGriefAlertFile());
-        AlertTracker tracker = new AlertTracker(logger);
         registerListeners(tracker);
         CommandSpec gcheckin = CommandSpec.builder().
-                executor(new GriefAlertCommand(tracker)).
+                executor(new GriefAlertCommand(this)).
                                                   description(Text.of("Check a GriefAlert Number")).
                                                   arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
                                                   permission("griefalert.check").
@@ -104,7 +113,11 @@ public class GriefAlert {
         Sponge.getCommandManager().register(this, gcheckin, "gcheckin");
     }
 
-    @Listener
+    private void initializeExtras() {
+    	tracker = new AlertTracker(this);
+	}
+
+	@Listener
     public void onReload(GameReloadEvent event) {
         logger.info("Reloading GriefAlert data...");
         try {
@@ -229,14 +242,14 @@ public class GriefAlert {
     }
     
     private void registerListeners(AlertTracker tracker) {
-        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this, tracker));
-        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this, tracker));
+        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this));
+        Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this));
         if (getConfigBoolean("logSignsContent")) {
-            Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.LAST, new GriefSignListener(this, tracker));
+            Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.LAST, new GriefSignListener(this));
         }
-        Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(this, tracker));
-        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.LAST, new GriefEntityListener(this, tracker));
-        Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(this, tracker));
+        Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(this));
+        Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.LAST, new GriefEntityListener(this));
+        Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(this));
     }
     
     public boolean isGriefAction(GriefType type, String blockId, DimensionType dType) {
@@ -251,15 +264,23 @@ public class GriefAlert {
     	}
     }
 
-    public static int getConfigInt(String key) {
+    public int getConfigInt(String key) {
         return rootNode.getNode(key).getInt();
     }
 
-    public static String getConfigString(String key) {
+    public String getConfigString(String key) {
         return rootNode.getNode(key).getString();
     }
 
-    public static boolean getConfigBoolean(String key) {
+    public boolean getConfigBoolean(String key) {
         return rootNode.getNode(key).getBoolean();
     }
+
+	public Logger getLogger() {
+		return logger;
+	}
+	
+	public AlertTracker getTracker() {
+		return tracker;
+	}
 }

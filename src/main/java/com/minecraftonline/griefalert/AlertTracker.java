@@ -18,14 +18,17 @@ import java.util.UUID;
 
 public final class AlertTracker {
     private static HashMap<UUID, Pair<String, Integer>> lastAction = new HashMap<>();
-    private static GriefInstance[] griefLocations = new GriefInstance[GriefAlert.getConfigInt("alertsCodeLimit") + 1]; // add 1 to replace 0
+    private GriefInstance[] griefLocations; // add 1 to replace 0
     private static int indexInTab = 1;
+    private final GriefAlert plugin;
     private final Logger gaLogger;
     private final GriefLogger gLog;
 
-    public AlertTracker(Logger logger) {
-        this.gaLogger = logger;
-        this.gLog = new GriefLogger(logger);
+    public AlertTracker(GriefAlert griefAlert) {
+    	this.plugin = griefAlert;
+    	griefLocations = new GriefInstance[plugin.getConfigInt("alertsCodeLimit") + 1];
+        this.gaLogger = griefAlert.getLogger();
+        this.gLog = new GriefLogger(griefAlert);
     }
 
     public GriefInstance get(int code) {
@@ -40,10 +43,10 @@ public final class AlertTracker {
         UUID playerID = player.getUniqueId();
         Text alertMessage = alertMessage(player, alertNo, instance);
         String priorAct = actionTrackForm(instance);
-        if (GriefAlert.getConfigBoolean("debugInGameAlerts")) {
+        if (plugin.getConfigBoolean("debugInGameAlerts")) {
             alertStaff(alertMessage);
         } else if (!player.hasPermission("griefalert.noalert") && !instance.isStealthyAlert()) {
-            if (!lastAction.containsKey(playerID) || !lastAction.get(playerID).getKey().equals(priorAct) || lastAction.get(playerID).getRight() >= GriefAlert.getConfigInt("maxHiddenMatchingAlerts")) {
+            if (!lastAction.containsKey(playerID) || !lastAction.get(playerID).getKey().equals(priorAct) || lastAction.get(playerID).getRight() >= plugin.getConfigInt("maxHiddenMatchingAlerts")) {
                 alertStaff(alertMessage);
                 lastAction.put(playerID, Pair.of(instance.getType().name().charAt(0) + instance.getBlockId(), 1));
             } else {
@@ -95,7 +98,7 @@ public final class AlertTracker {
     }
 
     private void console(Player player, GriefInstance instance, int alertNo) {
-        if (GriefAlert.getConfigBoolean("showAlertsInConsole")) {
+        if (plugin.getConfigBoolean("showAlertsInConsole")) {
             gaLogger.info(
                     player.getUniqueId().toString() + " (" + player.getName() + "):" +
                     		instance.getType().name().toLowerCase() + ":" +

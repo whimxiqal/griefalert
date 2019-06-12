@@ -1,6 +1,5 @@
 package com.minecraftonline.griefalert.listeners;
 
-import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.GriefInstance;
 import com.minecraftonline.griefalert.GriefAction.GriefType;
@@ -17,12 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Place> {
-    private final AlertTracker tracker;
     private final GriefAlert plugin;
 
-    public GriefPlacementListener(GriefAlert plugin, AlertTracker tracker) {
+    public GriefPlacementListener(GriefAlert plugin) {
     	this.plugin = plugin;
-        this.tracker = tracker;
     }
 
     @Override
@@ -38,7 +35,7 @@ public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Pl
                     DimensionType dType = blockSnapshot.getLocation().get().getExtent().getDimension().getType();
                     if (plugin.isGriefAction(GriefType.USED, blockID, dType)) {
                         if (!plugin.getGriefAction(GriefType.USED, blockID, dType).isDenied()) {
-                            tracker.log(player, new GriefInstance(plugin.getGriefAction(GriefType.USED, blockID, dType)).
+                            plugin.getTracker().log(player, new GriefInstance(plugin.getGriefAction(GriefType.USED, blockID, dType)).
                             		assignBlock(blockSnapshot).assignGriefer(player));
                         } else {
                             event.setCancelled(true);

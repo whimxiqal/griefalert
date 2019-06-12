@@ -1,6 +1,5 @@
 package com.minecraftonline.griefalert.listeners;
 
-import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.GriefInstance;
 import com.minecraftonline.griefalert.GriefAction.GriefType;
@@ -18,12 +17,10 @@ import org.spongepowered.api.world.DimensionType;
 import javax.annotation.Nonnull;
 
 public class GriefEntityListener implements EventListener<InteractEntityEvent> {
-    private final AlertTracker tracker;
     private final GriefAlert plugin;
 
-    public GriefEntityListener(GriefAlert plugin, AlertTracker tracker) {
+    public GriefEntityListener(GriefAlert plugin) {
     	this.plugin = plugin;
-        this.tracker = tracker;
     }
 
     @Override
@@ -40,7 +37,7 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                             GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).
                             		assignEntity(target).assignGriefer(player);
                             if (!instance.isDenied()) {
-                                tracker.log(player, instance);
+                                plugin.getTracker().log(player, instance);
                             } else {
                                 event.setCancelled(true);
                             }
@@ -54,7 +51,7 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                     if (plugin.isGriefAction(GriefType.INTERACTED, blockID, dType)) {
                     	GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).assignEntity(target).assignGriefer(player);
                         if (!instance.isDenied()) {
-                            tracker.log(player, instance);
+                            plugin.getTracker().log(player, instance);
                         } else {
                             event.setCancelled(true);
                         }

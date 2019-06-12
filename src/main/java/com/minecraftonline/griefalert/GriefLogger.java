@@ -22,19 +22,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 final class GriefLogger {
+	private final GriefAlert plugin;
     private final Logger logger;
     private static Connection conn;
 
-    GriefLogger(Logger logger) {
-        this.logger = logger;
+    GriefLogger(GriefAlert griefAlert) {
+    	this.plugin = griefAlert;
+        this.logger = griefAlert.getLogger();
         testTables();
     }
 
-    private static void testConnection() throws SQLException {
+    private void testConnection() throws SQLException {
         if (conn == null || conn.isClosed() || !conn.isValid(2)) {
-            conn = DriverManager.getConnection("jdbc:mysql://" + GriefAlert.getConfigString("SQLdb"),
-                                               GriefAlert.getConfigString("SQLusername"),
-                                               GriefAlert.getConfigString("SQLpassword"));
+            conn = DriverManager.getConnection("jdbc:mysql://" + plugin.getConfigString("SQLdb"),
+                                               plugin.getConfigString("SQLusername"),
+                                               plugin.getConfigString("SQLpassword"));
         }
     }
 
