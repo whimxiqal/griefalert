@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.listeners;
 import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.GriefInstance;
+import com.minecraftonline.griefalert.GriefAction.GriefType;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
@@ -15,8 +16,10 @@ import java.util.Optional;
 
 public class GriefUsedListener implements EventListener<UseItemStackEvent.Start> {
     private final AlertTracker tracker;
+    private final GriefAlert plugin;
 
-    public GriefUsedListener(AlertTracker tracker) {
+    public GriefUsedListener(GriefAlert plugin, AlertTracker tracker) {
+    	this.plugin = plugin;
         this.tracker = tracker;
     }
 
@@ -29,9 +32,10 @@ public class GriefUsedListener implements EventListener<UseItemStackEvent.Start>
                 ItemStackSnapshot itemStackSnapshot = event.getItemStackInUse();
                 String itemID = itemStackSnapshot.getType().getId();
                 DimensionType dType = player.getLocation().getExtent().getDimension().getType();
-                if (GriefAlert.isUseWatched(itemID, dType)) {
-                    if (!GriefAlert.getUseAction(itemID, dType).isDenied()) {
-                        tracker.log(player, new GriefInstance(GriefAlert.getUseAction(itemID, dType)).assignItem(itemStackSnapshot).assignGriefer(player));
+                if (plugin.isGriefAction(GriefType.USED, itemID, dType)) {
+                    if (!plugin.getGriefAction(GriefType.USED, itemID, dType).isDenied()) {
+                        tracker.log(player, new GriefInstance(plugin.getGriefAction(GriefType.USED, itemID, dType)).
+                        		assignItem(itemStackSnapshot).assignGriefer(player));
                     } else {
                         event.setCancelled(true);
                     }

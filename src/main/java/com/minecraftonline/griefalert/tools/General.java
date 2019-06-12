@@ -40,8 +40,15 @@ public class General {
         case 'F':
             return TextColors.WHITE;
         default:
-        	throw new IllegalArgumentException();
+        	throw new IllegalColorCodeException(c);
         }
+	}
+	
+	@SuppressWarnings("serial")
+	public static class IllegalColorCodeException extends IllegalArgumentException {
+		IllegalColorCodeException(char c) {
+			super("This color character is invalid: " + c);
+		}
 	}
 	
 	

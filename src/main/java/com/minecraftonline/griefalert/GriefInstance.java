@@ -47,13 +47,13 @@ public final class GriefInstance {
     }
     
     public String getBlockId() {
-        if (griefAction.blockName == null) {
+        if (griefAction.getBlockId() == null) {
             if (this.block != null) {
                 return this.block.getState().getType().getId();
             }
             return "minecraft:unknown";
         }
-        return griefAction.blockName;
+        return griefAction.getBlockId();
     }
     
     public BlockSnapshot getBlock() {

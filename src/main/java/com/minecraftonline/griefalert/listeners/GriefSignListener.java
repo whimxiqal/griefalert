@@ -11,8 +11,10 @@ import java.util.Optional;
 
 public class GriefSignListener implements EventListener<ChangeSignEvent> {
     private final AlertTracker tracker;
+    private final GriefAlert plugin;
 
-    public GriefSignListener(AlertTracker tracker) {
+    public GriefSignListener(GriefAlert plugin, AlertTracker tracker) {
+    	this.plugin = plugin;
         this.tracker = tracker;
     }
 
