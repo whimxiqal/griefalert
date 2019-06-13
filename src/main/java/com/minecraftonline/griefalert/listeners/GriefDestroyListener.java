@@ -35,7 +35,7 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                     DimensionType dType = blockSnapshot.getLocation().get().getExtent().getDimension().getType();
                     if (plugin.isGriefAction(GriefType.DESTROYED, blockID, dType)) {
                         if (!plugin.getGriefAction(GriefType.DESTROYED, blockID, dType).isDenied()) {
-                            plugin.getTracker().processGriefInstance(new GriefInstance(plugin.getGriefAction(GriefType.DESTROYED, blockID, dType)).
+                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(plugin.getGriefAction(GriefType.DESTROYED, blockID, dType)).
                             		assignBlock(blockSnapshot).assignGriefer(player));
                         } else {
                             event.setCancelled(true);

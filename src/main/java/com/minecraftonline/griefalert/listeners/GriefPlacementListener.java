@@ -35,7 +35,7 @@ public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Pl
                     DimensionType dType = blockSnapshot.getLocation().get().getExtent().getDimension().getType();
                     if (plugin.isGriefAction(GriefType.USED, blockID, dType)) {
                         if (!plugin.getGriefAction(GriefType.USED, blockID, dType).isDenied()) {
-                            plugin.getTracker().processGriefInstance(new GriefInstance(plugin.getGriefAction(GriefType.USED, blockID, dType)).
+                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(plugin.getGriefAction(GriefType.USED, blockID, dType)).
                             		assignBlock(blockSnapshot).assignGriefer(player));
                         } else {
                             event.setCancelled(true);

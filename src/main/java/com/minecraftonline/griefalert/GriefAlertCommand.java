@@ -36,16 +36,16 @@ public final class GriefAlertCommand implements CommandExecutor {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("Check number out of range").color(WHITE).build()).build());
             }
             Player checker = (Player) src;
-            GriefInstance instance = plugin.getTracker().get(arg.get());
+            GriefInstance instance = plugin.getRealtimeGriefInstanceManager().get(arg.get());
             if (instance == null) {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("There is no current alert at that code").color(WHITE).build()).build());
             }
 
-            plugin.getTracker().printToStaff(formatPlayerName(checker).toBuilder().append(
+            plugin.getRealtimeGriefInstanceManager().printToStaff(formatPlayerName(checker).toBuilder().append(
                     Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
                     Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
-            GriefInstance grief = plugin.getTracker().get(code);
+            GriefInstance grief = plugin.getRealtimeGriefInstanceManager().get(code);
             checker.setLocationSafely(grief.getGriefer().getLocation().get());
             checker.setRotation(grief.getRotation());
             return CommandResult.success();

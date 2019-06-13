@@ -283,10 +283,10 @@ public class GriefAlert {
     }
     
     /**'
-     * 
-     * @param tracker
+     * Registers all listeners with Sponge to appropriately read information coming from the server
+     * @param manager the RealtimeGriefInstanceManager to deal with incoming Grief Instances
      */
-    private void registerListeners(RealtimeGriefInstanceManager tracker) {
+    private void registerListeners(RealtimeGriefInstanceManager manager) {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this));
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this));
         if (getConfigBoolean("logSignsContent")) {
@@ -297,10 +297,27 @@ public class GriefAlert {
         Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(this));
     }
     
+    /**
+     * Determines whether a type of grief, a blockId (griefable object), and a specific dimension in which
+     * the grief would occur is a type of grief action.
+     * @param type The GriefType
+     * @param blockId The id for the griefable object
+     * @param dType The type of dimension
+     * @return true if these together are considered a Grief Action
+     */
     public boolean isGriefAction(GriefType type, String blockId, DimensionType dType) {
     	return griefActions.contains(type, blockId, dType.getId());
     }
     
+    /**
+     * Gets the grief action associated with this grief type, this griefable object, and this specific
+     * dimension in which the grief would occur.
+     * @param type The GriefType
+     * @param blockId The id for the griefable object
+     * @param dType The type of dimension
+     * @return Returns the GriefAction in the specified dimension, the grief action designated for all dimensions
+     * or null if none exists.
+     */
     public GriefAction getGriefAction(GriefType type, String blockId, DimensionType dType) {
     	if (griefActions.contains(type, blockId, dType.getId())) {
     		return griefActions.get(type, blockId, dType.getId());
@@ -309,31 +326,62 @@ public class GriefAlert {
     	}
     }
 
+    /**
+     * Gets the integer associated at the specific key in the configuration.
+     * @param key
+     * @return
+     */
     public int getConfigInt(String key) {
         return rootNode.getNode(key).getInt();
     }
 
+    /**
+     * Gets the String associated at the specific key in the configuration.
+     * @param key
+     * @return
+     */
     public String getConfigString(String key) {
         return rootNode.getNode(key).getString();
     }
 
+    /**
+     * Gets the boolean associated at the specific key in the configuration.
+     * @param key
+     * @return
+     */
     public boolean getConfigBoolean(String key) {
         return rootNode.getNode(key).getBoolean();
     }
 
+    /**
+     * Gets the generic logger associated with Sponge.
+     * @return
+     */
 	public Logger getLogger() {
 		return logger;
 	}
 	
-	public RealtimeGriefInstanceManager getTracker() {
+	/**
+	 * Gets the real-time manager of grief instances during game play
+	 * @return This RealtimeGriefInstanceManager
+	 */
+	public RealtimeGriefInstanceManager getRealtimeGriefInstanceManager() {
 		return tracker;
 	}
 	
+	/**
+	 * Sets the GriefLogger for this plugin.
+	 * @param griefLogger
+	 */
     private void setGriefLogger(GriefLogger griefLogger) {
 		this.gLogger = griefLogger;
 		
 	}
     
+    /**
+     * Gets the GriefLogger for this plugin.
+     * @return This GriefLogger
+     */
     public GriefLogger getGriefLogger() {
     	return this.gLogger;
     }
