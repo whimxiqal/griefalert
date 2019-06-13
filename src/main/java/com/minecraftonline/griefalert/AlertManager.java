@@ -20,6 +20,10 @@ import java.util.UUID;
 public final class AlertManager {
 
 	// TODO: Documentation
+	// TODO: Write a better way to input grief alerts
+	// ^^ As in, write a class to update a string with a series of developer-inputted options
+	// enumerated in the class (StringReplace.USERNAME, StringReplace.OBJECT, etc.)
+	// Then assign the appropriate items as Strings and have the class replace them all.
 	
 	public final static String GRIEF_INSTANCE_ALERT_FORMAT = "%s %s a %s (%d) in the %s.";
 	
@@ -139,19 +143,19 @@ public final class AlertManager {
         							String.format(GRIEF_INSTANCE_ALERT_FORMAT, 
         									player.getName(), 
         									instance.getType(),   
-        									blockItemEntityStaff(instance), 
+        									griefedObjectForStaffToString(instance), 
         									alertId, 
         									instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "")))).
         				color(instance.getAlertColor()).
         				build();
     }
 
-    // TODO: Reorganize
-    private void printToConsole(Player player, GriefInstance instance, int alertNo) {
+    // TODO: Set up configurable message at final constant at top of script
+    private void printToConsole(Player player, GriefInstance instance, int alertId) {
         plugin.getLogger().info(
                 player.getUniqueId().toString() + " (" + player.getName() + "):" +
                 		instance.getType().name().toLowerCase() + ":" +
-                        blockItemEntityConsole(instance) + ":" +
+                        griefedObjectForConsoleToString(instance) + ":" +
                         "x=" + instance.getX() + ":" +
                         "y=" + instance.getY() + ":" +
                         "z=" + instance.getZ() + ":" +
@@ -160,12 +164,20 @@ public final class AlertManager {
                         "sz=" + player.getLocation().getBlockZ() + ":" +
                         "w=" + instance.getWorld().getUniqueId() + ":" +
                         "d=" + instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
-                        alertNo
+                        alertId
         );
     }
 
-    // TODO: Rename and reorganize    
-    private String blockItemEntityStaff(GriefInstance instance) {
+    // TODO: Reorganize?
+    private String griefedObjectForStaffToString(GriefInstance instance) {
+    	// Order of preference for printing the griefed object:
+    	// Block Type (checks Type first as a workaround to identify color and BlockState?)
+    	// The Item
+    	// A Painting
+    	// An Item Frame if it has something else in it
+    	// The Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
+    	// The Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
+    	
         if (instance.getBlock() != null) {
             if (instance.getBlock().getState().getType().getItem().isPresent()) {
                 // Work around for BlockType not seeing colored blocks properly and BlockState not being translatable
@@ -189,8 +201,16 @@ public final class AlertManager {
         return instance.getBlockId();
     }
 
-    // TODO: Rename and reorganize
-    private String blockItemEntityConsole(GriefInstance instance) {
+    // TODO: Reorganize?
+    private String griefedObjectForConsoleToString(GriefInstance instance) {
+    	// Order of preference for printing the griefed object:
+    	// Block Type
+    	// The Item
+    	// A Painting
+    	// An Item Frame if it has something else in it
+    	// The Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
+    	// The Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
+    	
         if (instance.getBlock() != null) {
             return instance.getBlock().getState().toString().replace(':', '-');
         }
