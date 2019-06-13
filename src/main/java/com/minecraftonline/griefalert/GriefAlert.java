@@ -82,7 +82,7 @@ public class GriefAlert {
     private GriefLogger gLogger;
     
     /** Alert Tracker. */
-    private RealtimeGriefInstanceManager tracker;
+    private RealtimeGriefInstanceManager realtimeManager;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -112,13 +112,13 @@ public class GriefAlert {
         
         // Classes which other classes depend on must be initialized here. 
         this.setGriefLogger(new GriefLogger(this));
-        this.tracker = new RealtimeGriefInstanceManager(this);
+        this.realtimeManager = new RealtimeGriefInstanceManager(this);
         
         // Read the grief alert file
         readGriefAlertFile(loadGriefAlertFile());
         
         // Register all the listeners with Sponge
-        registerListeners(tracker);
+        registerListeners(realtimeManager);
         
         // Register the command for checking grief alerts
         CommandSpec gcheckin = CommandSpec.builder().
@@ -364,7 +364,7 @@ public class GriefAlert {
 	 * @return This RealtimeGriefInstanceManager
 	 */
 	public RealtimeGriefInstanceManager getRealtimeGriefInstanceManager() {
-		return tracker;
+		return realtimeManager;
 	}
 	
 	/**
