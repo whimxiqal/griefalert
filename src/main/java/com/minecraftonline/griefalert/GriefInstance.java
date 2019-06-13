@@ -19,6 +19,7 @@ public final class GriefInstance {
     private ItemStackSnapshot item;
     private Entity entity;
     private EntitySnapshot griefer;
+    private Player player;
     private Vector3d rotation;
 	
     public GriefInstance(GriefAction griefAction) {
@@ -38,6 +39,7 @@ public final class GriefInstance {
     public GriefInstance assignGriefer(Player player) {
         this.griefer = player.createSnapshot();
         this.rotation = player.getRotation();
+        this.player = player;
         return this;
     }
 
@@ -126,6 +128,10 @@ public final class GriefInstance {
 
 	public TextColor getAlertColor() {
 		return griefAction.getAlertColor();
+	}
+	
+	public Player getGrieferAsPlayer() {
+		return player;
 	}
     
 }

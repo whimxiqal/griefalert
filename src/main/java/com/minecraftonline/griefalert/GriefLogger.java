@@ -88,13 +88,13 @@ final class GriefLogger {
         }
     }
 
-    final void storeAction(Player player, GriefInstance instance) {
+    final void storeAction(GriefInstance instance) {
         logger.debug("Storing Grief Action data...");
         PreparedStatement ps = null;
         try {
             testConnection();
             ps = conn.prepareStatement("INSERT INTO GriefAlert_Log (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
-            ps.setString(1, player.getUniqueId().toString());
+            ps.setString(1, instance.getGrieferAsPlayer().getUniqueId().toString());
             ps.setString(2, actionToString(instance));
             ps.setString(3, toJSON(actionToContainer(instance)));
             ps.setInt(4, instance.getX());

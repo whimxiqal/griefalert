@@ -35,9 +35,10 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                         String blockID = target instanceof Painting ? "minecraft:painting" : target instanceof ItemFrame ? "minecraft:item_frame" : "minecraft:leash_knot";
                         if (plugin.isGriefAction(GriefType.INTERACTED, blockID, dType)) {
                             GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).
-                            		assignEntity(target).assignGriefer(player);
+                            		assignEntity(target).
+                            		assignGriefer(player);
                             if (!instance.isDenied()) {
-                                plugin.getTracker().log(player, instance);
+                                plugin.getTracker().processGriefInstance(instance);
                             } else {
                                 event.setCancelled(true);
                             }
@@ -49,9 +50,11 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                 String blockID = "minecraft:armor_stand";
                 if (event instanceof InteractEntityEvent.Primary) {
                     if (plugin.isGriefAction(GriefType.INTERACTED, blockID, dType)) {
-                    	GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).assignEntity(target).assignGriefer(player);
+                    	GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).
+                    			assignEntity(target).
+                    			assignGriefer(player);
                         if (!instance.isDenied()) {
-                            plugin.getTracker().log(player, instance);
+                            plugin.getTracker().processGriefInstance(instance);
                         } else {
                             event.setCancelled(true);
                         }

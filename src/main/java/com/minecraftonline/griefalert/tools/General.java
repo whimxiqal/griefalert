@@ -4,7 +4,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 public class General {
-
+	
 	public static TextColor charToColor(char c) throws IllegalArgumentException {
         switch (Character.toUpperCase(c)) {
         case '0':
@@ -44,6 +44,13 @@ public class General {
         }
 	}
 	
+	@SuppressWarnings("serial")
+	public static class IllegalColorCodeException extends IllegalArgumentException {
+		IllegalColorCodeException(char c) {
+			super("This color character is invalid: " + c);
+		}
+	}
+	
     public static String correctIndefiniteArticles(String string) {
     	String[] tokens = string.replaceAll(" an ", " a ").split(" a ");
     	String output = tokens[0];
@@ -58,13 +65,5 @@ public class General {
     	System.out.println(output);
         return output;
     }
-	
-	@SuppressWarnings("serial")
-	public static class IllegalColorCodeException extends IllegalArgumentException {
-		IllegalColorCodeException(char c) {
-			super("This color character is invalid: " + c);
-		}
-	}
-	
 	
 }

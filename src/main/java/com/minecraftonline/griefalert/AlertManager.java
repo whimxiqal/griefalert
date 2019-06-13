@@ -17,107 +17,172 @@ import com.minecraftonline.griefalert.tools.General;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * This class has the purpose of handling all occurrences of Grief Instances.
+ * Here, it will be determined if and how staff need to be notified, if and
+ * how the instance should be logged, how to construct messaging about Grief
+ * Instances, and so forth.
+ */
 public final class AlertManager {
 
-	// TODO: Documentation
-	// TODO: Write a better way to input grief alerts
-	// ^^ As in, write a class to update a string with a series of developer-inputted options
-	// enumerated in the class (StringReplace.USERNAME, StringReplace.OBJECT, etc.)
-	// Then assign the appropriate items as Strings and have the class replace them all.
-	
+	/**
+	 * The format for a grief instance alert for staff to read.
+	 * The order of input is:
+	 * Username of player
+	 * Grief Action Type
+	 * Object griefed
+	 * ID for the Grief Instance which is triggering the alert
+	 * The dimension of grief
+	 */
 	public final static String GRIEF_INSTANCE_ALERT_FORMAT = "%s %s a %s (%d) in the %s.";
 	
+	/**
+	 * The format for the header of a grief alert of a sign for staff to read.
+	 * The order of input is:
+	 * Username of player
+	 * X component of location
+	 * Y component of location
+	 * Z component of location
+	 * The world name
+	 * The dimension name
+	 */
 	public final static String SIGN_PLACEMENT_HEADER_ALERT_FORMAT = "Sign placed by %s at %d %d %d in %s-%s";
 	
+	/**
+	 * The format for each line of a grief alert of a sign for staff to read.
+	 * The order of input is:
+	 * Line number
+	 * Line text
+	 */
 	public final static String SIGN_PLACEMENT_LINE_ALERT_FORMAT = "Line %d: %s";
 	
+	/** 
+	 * Houses all data about recent grief actions of each player.
+	 * The player's UUID is held in the Map, which maps to a Pairing of their most recent
+	 * GriefAction and the number of consecutive calls of this Grief Action.
+	 * This is used to see if an alert message needs to be printed to staff for any
+	 * given GriefInstance triggered by a player.
+	 * */
     private HashMap<UUID, Pair<GriefAction, Integer>> lastGriefActionPlayerMap = new HashMap<>();
-    private RecentGriefInstanceManager griefInstances;
+    /** An array of GriefInstances to house grief alerts to which staff can respond. */
+    private final RecentGriefInstanceManager griefInstances;
+    /** The main plugin. */
     private final GriefAlert plugin;
 
-    public AlertManager(GriefAlert griefAlert) {
-    	this.plugin = griefAlert;
+    /**
+     * This constructor saves the plugin and then generates
+     * @param plugin
+     */
+    public AlertManager(final GriefAlert plugin) {
+    	this.plugin = plugin;
     	griefInstances = new RecentGriefInstanceManager(plugin);
     }
 
-    public GriefInstance get(int code) {
+    /**
+     * Gets the grief instance corresponding to the code.
+     * @param code The id of queried Grief Instance
+     * @return The appropriate Grief Instance
+     */
+    public GriefInstance get(final int code) {
         return griefInstances.get(code);
     }
 
-    public final void log(Player player, GriefInstance instance) {
-        int alertId;
-        
-        // Log in array of recent grief instances
+    /**
+     * Handles the grief instance by logging it in the Grief Logger, printing to the
+     * console, notifying staff, and 
+     * @param player
+     * @param instance
+     */
+    public void processGriefInstance(final GriefInstance instance) {
+    	boolean alertInGame = !instance.isStealthyAlert(); // Used to determine if this instance requires in-game alert
+    	int alertId;
+    	
+    	// Was this a staff member degriefing grief?
         if (instance.getType() != GriefAction.GriefType.DEGRIEFED) {
+        	// Log in array of recent grief instances
         	alertId = recordAlertInRecentGriefInstances(instance);
         } else {
         	// Do not put it into the recent grief instance structure
         	alertId = -1;
+        	alertInGame = false;
         }
         
         // Print to console
         if (plugin.getConfigBoolean("showAlertsInConsole")) {
-        	printToConsole(player, instance, alertId);
+        	printToConsole(alertId, instance);
         }
         
         // Log the instance in the grief logger
-        plugin.getGriefLogger().storeAction(player, instance);
+        plugin.getGriefLogger().storeAction(instance);
         
         // Tell staff
         if (plugin.getConfigBoolean("debugInGameAlerts")) {
-        	// Just alert the staff and don't do anything else
-            printToStaff(generateAlertMessage(player, alertId, instance));
-        } else {
-        	alert(player, alertId, instance);
+        	// Just alert the staff and don't do anything else.
+        	// This is what it did before as well, but I'm not sure if this is the
+        	// best way to debug
+            printToStaff(generateAlertMessage(alertId, instance));
+            return;
         }
+        if (alertInGame) alert(alertId, instance);
     }
     
-    public final void alert(Player player, int alertId, GriefInstance instance) {
-    	Text alertMessage = generateAlertMessage(player, alertId, instance);
-        if (!player.hasPermission("griefalert.noalert")) {
+    /**
+     * Takes the id of this specific grief instance and determines whether if staff
+     * need to be notified in game. If they do, then print the message to staff.
+     * @param alertId The ID of the grief instance
+     * @param instance The Grief Instance to which staff should be alerted
+     */
+    public void alert(int alertId, GriefInstance instance) {
+    	Text alertMessage = generateAlertMessage(alertId, instance);
+        if (!instance.getGrieferAsPlayer().hasPermission("griefalert.noalert")) {
         	// Player does not have the permission to mute their own grief instance alerts
-        	if (!instance.isStealthyAlert()) {
-        		// The Grief Instance is not in stealth mode
-        		
-	        	UUID playerId = player.getUniqueId();
-	            
-	        	Pair<GriefAction, Integer> previousGriefAction = lastGriefActionPlayerMap.get(playerId);
-	        	int consecutiveGriefActionCount;
-	            if (previousGriefAction != null && 
-	            		previousGriefAction.getKey().equals(instance.getGriefAction()) &&
-	            		previousGriefAction.getValue() < plugin.getConfigInt("maxHiddenMatchingAlerts")) {
-	            	
-	            	// The same grief action was repeated by the same person
-        			consecutiveGriefActionCount = previousGriefAction.getValue() + 1;
+        	
+        	UUID playerId = instance.getGrieferAsPlayer().getUniqueId();
+        	Pair<GriefAction, Integer> previousGriefAction = lastGriefActionPlayerMap.get(playerId);
+        	int consecutiveGriefActionCount;
+            if (previousGriefAction != null && 
+            		previousGriefAction.getKey().equals(instance.getGriefAction()) &&
+            		previousGriefAction.getValue() < plugin.getConfigInt("maxHiddenMatchingAlerts")) {
+            	
+            	// The same grief action was repeated by the same person
+    			consecutiveGriefActionCount = previousGriefAction.getValue() + 1;
 
-	            } else {
-	            	// This is the first consecutive grief action for this player
-	            	consecutiveGriefActionCount = 1;
-	            	printToStaff(alertMessage);
-	            }
-	            // Replace the last grief action to read next time
-	            lastGriefActionPlayerMap.put(
-    					playerId, 
-    					Pair.of(
-    							instance.getGriefAction(), 
-    							consecutiveGriefActionCount));
-        	}
+            } else {
+            	// This is the first consecutive grief action for this player
+            	consecutiveGriefActionCount = 1;
+            	printToStaff(alertMessage);
+            }
+            // Place this action as the last grief action to read next time
+            lastGriefActionPlayerMap.put(
+					playerId, 
+					Pair.of(
+							instance.getGriefAction(), 
+							consecutiveGriefActionCount));
         } else {
         	// Right now, nothing happens if the griefer *does* have the "griefalert.noalert" node.
         }
     }
 
-    public final void alert(Player player, Sign sign, SignData signData) {
+    /**
+     * Takes information about a player and a sign they just placed and
+     * determines whether staff need to be notified
+     * @param player The player who placed a sign
+     * @param sign The sign object corresponding to the placed sign in game
+     * @param signData The data of the sign corresponding to the placed sign in game
+     */
+    public void alert(Player player, Sign sign, SignData signData) {
         if (!player.hasPermission("griefalert.noalert")) {
         	String toPrint = "";
+        	
         	// Add header to message
             toPrint += String.format(SIGN_PLACEMENT_HEADER_ALERT_FORMAT, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
                                                   sign.getLocation().getBlockZ(), player.getWorld().getName(),
                                                   player.getWorld().getDimension().getType().getId().replace("minecraft:", ""));
+            
             // Add all non-empty lines to message
-            // The empty lines do not show up
             for (int index = 0; index < signData.lines().size(); index++) {
                 Text signText = signData.lines().get(index);
+                // Do not show empty lines
                 if (!signText.isEmpty()) {
                 	toPrint += String.format(SIGN_PLACEMENT_LINE_ALERT_FORMAT, index, signText);
                 }
@@ -129,19 +194,35 @@ public final class AlertManager {
         plugin.getGriefLogger().storeSign(player, sign, signData);
     }
 
+    /**
+     * Put this instance into an array to be accessed by staff in game
+     * @param instance The Instance of Grief to log
+     * @return The ID of the instance to be used by staff in game
+     */
     private int recordAlertInRecentGriefInstances(GriefInstance instance) {
         return griefInstances.record(instance);
     }
 
+    /**
+     * Send a message directly to staff, usually about recent important grief.
+     * @param message The message for staff to see
+     */
     public void printToStaff(Text message) {
         MessageChannel staffChannel = MessageChannel.permission("griefalert.staff");
         staffChannel.send(message);
     }
 
-    private Text generateAlertMessage(Player player, int alertId, GriefInstance instance) {
+    /**
+     * A Text generation method to take information about a specific Grief Instance
+     * and format it into a readable alert message.
+     * @param alertId The ID of the specific grief instance
+     * @param instance The specific grief instance
+     * @return The readable text format of the grief instance
+     */
+    private Text generateAlertMessage(int alertId, GriefInstance instance) {
         return Text.builder(General.correctIndefiniteArticles(
         							String.format(GRIEF_INSTANCE_ALERT_FORMAT, 
-        									player.getName(), 
+        									instance.getGrieferAsPlayer().getName(), 
         									instance.getType(),   
         									griefedObjectForStaffToString(instance), 
         									alertId, 
@@ -150,34 +231,41 @@ public final class AlertManager {
         				build();
     }
 
-    // TODO: Set up configurable message at final constant at top of script
-    private void printToConsole(Player player, GriefInstance instance, int alertId) {
+    /**
+     * Print a message directly to console about the grief instance
+     * @param instance This specific grief instance to print
+     * @param alertId The ID of this specific grief instance
+     */
+    private void printToConsole(int alertId, GriefInstance instance) {
         plugin.getLogger().info(
-                player.getUniqueId().toString() + " (" + player.getName() + "):" +
+                instance.getGrieferAsPlayer().getUniqueId().toString() + " (" + instance.getGrieferAsPlayer().getName() + "):" +
                 		instance.getType().name().toLowerCase() + ":" +
                         griefedObjectForConsoleToString(instance) + ":" +
                         "x=" + instance.getX() + ":" +
                         "y=" + instance.getY() + ":" +
                         "z=" + instance.getZ() + ":" +
-                        "sx=" + player.getLocation().getBlockX() + ":" +
-                        "sy=" + player.getLocation().getBlockY() + ":" +
-                        "sz=" + player.getLocation().getBlockZ() + ":" +
+                        "sx=" + instance.getGrieferAsPlayer().getLocation().getBlockX() + ":" +
+                        "sy=" + instance.getGrieferAsPlayer().getLocation().getBlockY() + ":" +
+                        "sz=" + instance.getGrieferAsPlayer().getLocation().getBlockZ() + ":" +
                         "w=" + instance.getWorld().getUniqueId() + ":" +
                         "d=" + instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
-                        alertId
-        );
+                        alertId);
     }
 
-    // TODO: Reorganize?
+    /**
+     * Returns the string representation of the griefed object for an in-game
+     * audience.
+     * Order of preference for printing the griefed object:
+     * <li>Block Type (checks Type first as a workaround to identify color and BlockState?).
+     * <li>The Item.
+     * <li>A Painting
+     * <li>Item Frame if it has something else in it
+     * <li>Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
+     * <li>Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
+     * @param instance The grief instance housing the griefed object data
+     * @return The String reprentation of the griefed object
+     */
     private String griefedObjectForStaffToString(GriefInstance instance) {
-    	// Order of preference for printing the griefed object:
-    	// Block Type (checks Type first as a workaround to identify color and BlockState?)
-    	// The Item
-    	// A Painting
-    	// An Item Frame if it has something else in it
-    	// The Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
-    	// The Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
-    	
         if (instance.getBlock() != null) {
             if (instance.getBlock().getState().getType().getItem().isPresent()) {
                 // Work around for BlockType not seeing colored blocks properly and BlockState not being translatable
@@ -201,16 +289,19 @@ public final class AlertManager {
         return instance.getBlockId();
     }
 
-    // TODO: Reorganize?
+    /**
+     * Returns the string representation of the griefed object for printing to the console
+     * Order of preference for printing the griefed object:
+     * <li>Block Type
+     * <li>The Item
+     * <li>A Painting
+     * <li>Item Frame if it has something else in it
+     * <li>Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
+     * <li>Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
+     * @param instance The grief instance housing the griefed object data
+     * @return The String reprentation of the griefed object
+     */
     private String griefedObjectForConsoleToString(GriefInstance instance) {
-    	// Order of preference for printing the griefed object:
-    	// Block Type
-    	// The Item
-    	// A Painting
-    	// An Item Frame if it has something else in it
-    	// The Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
-    	// The Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
-    	
         if (instance.getBlock() != null) {
             return instance.getBlock().getState().toString().replace(':', '-');
         }
@@ -229,23 +320,36 @@ public final class AlertManager {
         return instance.getBlockId().replace(':', '-');
     }
     
-    public class RecentGriefInstanceManager {
+    /**
+     * A local class for managing the recent grief instances which are handled by in-game staff.
+     * It contains an array and a cursor which marks where the next instance of grief will
+     * be contained.
+     *
+     */
+    private class RecentGriefInstanceManager {
     	
+    	/** Array to house all recent Grief Instances. */
     	private GriefInstance[] griefInstanceArray;
+    	/** The cursor which marks to place the next grief instance. */
     	private int cursor = 0;
 
+    	/**
+    	 * Constructor which creates the array to house all recent grief instances.
+    	 * The size is dependent on the configured node loaded upon start-up
+    	 * @param plugin The Main instance of the Plugin
+    	 */
     	public RecentGriefInstanceManager(GriefAlert plugin) {
     		griefInstanceArray = new GriefInstance[plugin.getConfigInt("alertsCodeLimit")];
     	}
 
+    	/** Retrieves a specific Grief Instance from the storage array. */
     	public GriefInstance get(int code) {
     		return griefInstanceArray[code];
     	}
 
     	/**
     	 * Adds a GriefInstance into the array.
-    	 * Returns the index of the instance put in.
-    	 * Moves the cursor forward.
+    	 * Returns the index of the instance put in and moves the cursor forward.
     	 * @param instance
     	 * @return
     	 */
@@ -258,5 +362,4 @@ public final class AlertManager {
     		return instanceIndex;
     	}
     }
-    
 }
