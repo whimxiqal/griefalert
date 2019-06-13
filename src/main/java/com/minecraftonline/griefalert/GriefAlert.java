@@ -49,6 +49,7 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
  */
 public class GriefAlert {
 	
+	/** Version of this Plugin. (Should this be final?) */
     static final String VERSION = "21.0";
     
     /** Item used by staff members to 'degrief' a grief event. This is logged but not acted on by in-game staff. */
@@ -83,7 +84,7 @@ public class GriefAlert {
     private GriefLogger gLogger;
     
     /** Alert Tracker. */
-    private AlertManager tracker;
+    private RealtimeGriefInstanceManager tracker;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -111,13 +112,17 @@ public class GriefAlert {
         // Load the config from the Sponge API and set the specific node values.
         initializeConfig();
         
+        // Classes which other classes depend on must be initialized here. 
         this.setGriefLogger(new GriefLogger(this));
-        
-        initializeExtras();
+        this.tracker = new RealtimeGriefInstanceManager(this);
         
         // Read the grief alert file
         readGriefAlertFile(loadGriefAlertFile());
+        
+        // Register all the listeners with Sponge
         registerListeners(tracker);
+        
+        // Register the command for checking grief alerts
         CommandSpec gcheckin = CommandSpec.builder().
                 executor(new GriefAlertCommand(this)).
                                                   description(Text.of("Check a GriefAlert Number")).
@@ -127,14 +132,12 @@ public class GriefAlert {
         Sponge.getCommandManager().register(this, gcheckin, "gcheckin");
     }
 
-	/** 
-     * Classes which other classes depend on must be initialized here. 
+    
+    /**
+     * To be run when the plugin reloads
+     * @param event The GameReloadEvent
      */
-    private void initializeExtras() {
-    	tracker = new AlertManager(this);
-	}
-
-	@Listener
+    @Listener
     public void onReload(GameReloadEvent event) {
         logger.info("Reloading GriefAlert data...");
         try {
@@ -147,6 +150,10 @@ public class GriefAlert {
         logger.info("GriefAlert data reloaded!");
     }
 
+    /**
+     * Initializes the configuration nodes with their appropriate values, designated as
+     * local static variables.
+     */
     public void initializeConfig() {
     	if (!defaultConfig.toFile().exists()) {
             logger.info("Generating new Configuration File...");
@@ -184,15 +191,23 @@ public class GriefAlert {
      */
     private File loadGriefAlertFile() {
     	logger.info("Loading GriefAlert file: " + GRIEF_ALERT_FILE_NAME + " ...");
+    	
+    	// Get the file
         File griefAlertFile = new File(GRIEF_ALERT_FILE_PATH);
         if (!griefAlertFile.exists()) {
+        	// Create the file because it doesn't exist yet
+        	
             logger.info("Watch list file being created...");
             OutputStream outStream = null;
             try {
+            	
+            	// Read the data from a local resource file which has all the default information
             	InputStream initialStream = this.getClass().getResourceAsStream("defaultGriefAlertFile.txt");
 	            byte[] buffer = new byte[initialStream.available()];
 	            initialStream.read(buffer);
 	            outStream = new FileOutputStream(griefAlertFile);
+	            
+	            // Write the default file to the new local file
 				outStream.write(buffer);
 			} catch (IOException e) {
 				logger.warn("Exception thrown while generating " + GRIEF_ALERT_FILE_NAME);
@@ -204,7 +219,6 @@ public class GriefAlert {
 				}
 			}
         }
-        
 		return griefAlertFile;
     }
     
@@ -225,13 +239,13 @@ public class GriefAlert {
                 if (line.startsWith("#") || line.equals("")) {
                     continue;
                 }
-                
                 splitLine = line.split(":");
                 
                 GriefAction griefAction;
                 try {
                 	griefAction = new GriefAction(splitLine);
                 } catch (IllegalColorCodeException e) {
+                	// An invalid color code was inputed
                 	logger.info(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + "| defaulting to: " + GriefAction.DEFAULT_ALERT_COLOR);
                 	splitLine[2] = String.valueOf(GriefAction.DEFAULT_ALERT_COLOR);
                 	griefAction = new GriefAction(splitLine);
@@ -268,7 +282,11 @@ public class GriefAlert {
         }
     }
     
-    private void registerListeners(AlertManager tracker) {
+    /**'
+     * 
+     * @param tracker
+     */
+    private void registerListeners(RealtimeGriefInstanceManager tracker) {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this));
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this));
         if (getConfigBoolean("logSignsContent")) {
@@ -307,7 +325,7 @@ public class GriefAlert {
 		return logger;
 	}
 	
-	public AlertManager getTracker() {
+	public RealtimeGriefInstanceManager getTracker() {
 		return tracker;
 	}
 	

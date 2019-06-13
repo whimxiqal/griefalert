@@ -23,7 +23,7 @@ import java.util.UUID;
  * how the instance should be logged, how to construct messaging about Grief
  * Instances, and so forth.
  */
-public final class AlertManager {
+public final class RealtimeGriefInstanceManager {
 
 	/**
 	 * The format for a grief instance alert for staff to read.
@@ -73,7 +73,7 @@ public final class AlertManager {
      * This constructor saves the plugin and then generates
      * @param plugin
      */
-    public AlertManager(final GriefAlert plugin) {
+    public RealtimeGriefInstanceManager(final GriefAlert plugin) {
     	this.plugin = plugin;
     	griefInstances = new RecentGriefInstanceManager(plugin);
     }
