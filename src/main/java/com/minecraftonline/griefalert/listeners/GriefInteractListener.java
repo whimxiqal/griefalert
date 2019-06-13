@@ -14,7 +14,7 @@ import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-
+//TODO: PietElite: Fix
 public class GriefInteractListener implements EventListener<InteractBlockEvent.Secondary> {
     private final GriefAlert plugin;
     private final GriefAction degrief = new GriefAction(null, 'F', false, true, GriefAction.GriefType.DEGRIEFED);

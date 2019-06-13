@@ -3,7 +3,7 @@ package com.minecraftonline.griefalert;
 import com.minecraftonline.griefalert.tools.General;
 
 import org.spongepowered.api.text.format.TextColor;
-
+//TODO: PietElite: Fix
 public class GriefAction {
 	
 	public static final char DEFAULT_ALERT_COLOR = 'c';

@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+//TODO: PietElite: Fix
 final class GriefLogger {
 	private final GriefAlert plugin;
     private final Logger logger;

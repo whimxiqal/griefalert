@@ -7,7 +7,7 @@ import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-
+//TODO: PietElite: Fix
 public class GriefSignListener implements EventListener<ChangeSignEvent> {
     private final GriefAlert plugin;
 

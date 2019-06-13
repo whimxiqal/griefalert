@@ -12,7 +12,7 @@ import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-
+//TODO: PietElite: Fix
 public class GriefUsedListener implements EventListener<UseItemStackEvent.Start> {
     private final GriefAlert plugin;
 

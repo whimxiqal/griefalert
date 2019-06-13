@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.spongepowered.api.text.format.TextColors.RED;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
-
+//TODO: PietElite: Fix
 public final class GriefAlertCommand implements CommandExecutor {
     private final GriefAlert plugin;
 

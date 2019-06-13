@@ -2,7 +2,7 @@ package com.minecraftonline.griefalert.tools;
 
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-
+//TODO: PietElite: Fix
 public class General {
 	
 	public static TextColor charToColor(char c) throws IllegalArgumentException {

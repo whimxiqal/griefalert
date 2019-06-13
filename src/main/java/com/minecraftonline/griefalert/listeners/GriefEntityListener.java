@@ -15,7 +15,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
-
+//TODO: PietElite: Fix
 public class GriefEntityListener implements EventListener<InteractEntityEvent> {
     private final GriefAlert plugin;
 

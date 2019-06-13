@@ -14,7 +14,7 @@ import org.spongepowered.api.world.DimensionType;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
-
+//TODO: PietElite: Fix
 public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Place> {
     private final GriefAlert plugin;
 

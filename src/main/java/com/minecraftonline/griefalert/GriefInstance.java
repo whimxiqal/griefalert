@@ -10,7 +10,7 @@ import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.minecraftonline.griefalert.GriefAction.GriefType;
-
+//TODO: PietElite: Fix
 /* This is so i don't accidentally assign something to the watch list objects */
 public final class GriefInstance {
 
