@@ -12,15 +12,24 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
+import com.minecraftonline.griefalert.tools.General;
+
 import java.util.HashMap;
 import java.util.UUID;
 
-public final class AlertTracker {
+public final class AlertManager {
+
+	public final static String GRIEF_INSTANCE_ALERT_FORMAT = "%s %s a %s (%d) in the %s.";
+	
+	public final static String SIGN_PLACEMENT_HEADER_ALERT_FORMAT = "Sign placed by %s at %d %d %d in %s-%s";
+	
+	public final static String SIGN_PLACEMENT_LINE_ALERT_FORMAT = "Line %d: %s";
+	
     private HashMap<UUID, Pair<GriefAction, Integer>> lastGriefActionPlayerMap = new HashMap<>();
     private RecentGriefInstanceManager griefInstances;
     private final GriefAlert plugin;
 
-    public AlertTracker(GriefAlert griefAlert) {
+    public AlertManager(GriefAlert griefAlert) {
     	this.plugin = griefAlert;
     	griefInstances = new RecentGriefInstanceManager(plugin);
     }
@@ -51,14 +60,14 @@ public final class AlertTracker {
         // Tell staff
         if (plugin.getConfigBoolean("debugInGameAlerts")) {
         	// Just alert the staff and don't do anything else
-            printToStaff(alertMessage(player, alertId, instance));
+            printToStaff(generateAlertMessage(player, alertId, instance));
         } else {
-        	alertInGame(player, alertId, instance);
+        	alert(player, alertId, instance);
         }
     }
     
-    public final void alertInGame(Player player, int alertId, GriefInstance instance) {
-    	Text alertMessage = alertMessage(player, alertId, instance);
+    public final void alert(Player player, int alertId, GriefInstance instance) {
+    	Text alertMessage = generateAlertMessage(player, alertId, instance);
         if (!player.hasPermission("griefalert.noalert")) {
         	// Player does not have the permission to mute their own grief instance alerts
         	if (!instance.isStealthyAlert()) {
@@ -76,10 +85,11 @@ public final class AlertTracker {
         			consecutiveGriefActionCount = previousGriefAction.getValue() + 1;
 
 	            } else {
-	            	// This is the first consecutive grief action count
+	            	// This is the first consecutive grief action for this player
 	            	consecutiveGriefActionCount = 1;
 	            	printToStaff(alertMessage);
 	            }
+	            // Replace the last grief action to read next time
 	            lastGriefActionPlayerMap.put(
     					playerId, 
     					Pair.of(
@@ -87,22 +97,28 @@ public final class AlertTracker {
     							consecutiveGriefActionCount));
         	}
         } else {
-        	// Right now, nothing happens if a player *does* have the "griefalert.noalert" node.
+        	// Right now, nothing happens if the griefer *does* have the "griefalert.noalert" node.
         }
     }
 
-    public final void logSign(Player player, Sign sign, SignData signData) {
+    public final void alert(Player player, Sign sign, SignData signData) {
         if (!player.hasPermission("griefalert.noalert")) {
-            String signmsg = "Sign placed by %s at %d %d %d in %s-%s";
-            printToStaff(Text.builder(String.format(signmsg, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
+        	String toPrint = "";
+        	// Add header to message
+            toPrint += String.format(SIGN_PLACEMENT_HEADER_ALERT_FORMAT, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
                                                   sign.getLocation().getBlockZ(), player.getWorld().getName(),
-                                                  player.getWorld().getDimension().getType().getId().replace("minecraft:", ""))).color(TextColors.GRAY).build());
-            for (int index = 0; index < 4; index++) {
+                                                  player.getWorld().getDimension().getType().getId().replace("minecraft:", ""));
+            // Add all non-empty lines to message
+            // The empty lines do not show up
+            for (int index = 0; index < signData.lines().size(); index++) {
                 Text signText = signData.lines().get(index);
                 if (!signText.isEmpty()) {
-                	printToStaff(Text.builder("Line " + (index + 1) + ": ").append(signText).color(TextColors.GRAY).build());
+                	toPrint += String.format(SIGN_PLACEMENT_LINE_ALERT_FORMAT, index, signText);
                 }
             }
+            printToStaff(Text.builder(toPrint).color(TextColors.GRAY).build());
+        } else {
+        	// Right now, nothing happens if the griefer *does* have the "griefalert.noalert" node.
         }
         plugin.getGriefLogger().storeSign(player, sign, signData);
     }
@@ -116,10 +132,16 @@ public final class AlertTracker {
         staffChannel.send(message);
     }
 
-    private Text alertMessage(Player player, int alertNo, GriefInstance instance) {
-        String msg = "%s %s %s (%d) in the %s.";
-        return Text.builder(String.format(msg, player.getName(), instance.getType(),
-                                          blockItemEntityStaff(instance), alertNo, instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", ""))).color(instance.getAlertColor()).build();
+    private Text generateAlertMessage(Player player, int alertId, GriefInstance instance) {
+        return Text.builder(General.correctIndefiniteArticles(
+        							String.format(GRIEF_INSTANCE_ALERT_FORMAT, 
+        									player.getName(), 
+        									instance.getType(),   
+        									blockItemEntityStaff(instance), 
+        									alertId, 
+        									instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "")))).
+        				color(instance.getAlertColor()).
+        				build();
     }
 
     private void printToConsole(Player player, GriefInstance instance, int alertNo) {
@@ -139,30 +161,26 @@ public final class AlertTracker {
         );
     }
 
-    private String correctGrammar(String str) {
-        return "aeiou".contains(str.substring(0, 1).toLowerCase()) ? "an " + str : "a " + str;
-    }
-
     private String blockItemEntityStaff(GriefInstance instance) {
         if (instance.getBlock() != null) {
             if (instance.getBlock().getState().getType().getItem().isPresent()) {
                 // Work around for BlockType not seeing colored blocks properly and BlockState not being translatable
-                return correctGrammar(ItemStack.builder().fromBlockSnapshot(instance.getBlock()).build().getTranslation().get());
+                return ItemStack.builder().fromBlockSnapshot(instance.getBlock()).build().getTranslation().get();
             }
             // The few blocks that have no ItemType connected (such as Fire)
-            return correctGrammar(instance.getBlock().getState().getType().getTranslation().get());
+            return instance.getBlock().getState().getType().getTranslation().get();
         }
         else if (instance.getItem() != null) {
-            return correctGrammar(instance.getItem().getTranslation().get());
+            return instance.getItem().getTranslation().get();
         }
         else if (instance.getEntity() instanceof Painting) {
             return "a Painting of " + instance.getEntity().get(Keys.ART).get().getName();
         }
         else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return correctGrammar(instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame");
+            return instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame";
         }
         else if (instance.getEntity() != null) {
-            return correctGrammar(instance.getEntity().getType().getTranslation().get());
+            return instance.getEntity().getType().getTranslation().get();
         }
         return instance.getBlockId();
     }

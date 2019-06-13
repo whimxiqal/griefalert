@@ -20,7 +20,7 @@ public class GriefSignListener implements EventListener<ChangeSignEvent> {
         if (event.getCause().root() instanceof Player) {
             if (plugin.getConfigBoolean("logSignsContent")) {
                 Optional<Player> poption = event.getCause().first(Player.class);
-                poption.ifPresent(player -> plugin.getTracker().logSign(player, event.getTargetTile(), event.getText()));
+                poption.ifPresent(player -> plugin.getTracker().alert(player, event.getTargetTile(), event.getText()));
             }
         }
     }

@@ -41,7 +41,7 @@ public final class GriefAlertCommand implements CommandExecutor {
                 throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("There is no current alert at that code").color(WHITE).build()).build());
             }
 
-            plugin.getTracker().alertStaff(formatPlayerName(checker).toBuilder().append(
+            plugin.getTracker().printToStaff(formatPlayerName(checker).toBuilder().append(
                     Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
                     Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());

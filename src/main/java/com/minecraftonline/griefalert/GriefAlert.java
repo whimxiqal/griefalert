@@ -82,7 +82,7 @@ public class GriefAlert {
     private GriefLogger gLogger;
     
     /** Alert Tracker. */
-    private AlertTracker tracker;
+    private AlertManager tracker;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -130,7 +130,7 @@ public class GriefAlert {
      * Classes which other classes depend on must be initialized here. 
      */
     private void initializeExtras() {
-    	tracker = new AlertTracker(this);
+    	tracker = new AlertManager(this);
 	}
 
 	@Listener
@@ -267,7 +267,7 @@ public class GriefAlert {
         }
     }
     
-    private void registerListeners(AlertTracker tracker) {
+    private void registerListeners(AlertManager tracker) {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this));
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this));
         if (getConfigBoolean("logSignsContent")) {
@@ -306,7 +306,7 @@ public class GriefAlert {
 		return logger;
 	}
 	
-	public AlertTracker getTracker() {
+	public AlertManager getTracker() {
 		return tracker;
 	}
 	

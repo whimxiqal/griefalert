@@ -1,6 +1,5 @@
 package com.minecraftonline.griefalert.listeners;
 
-import com.minecraftonline.griefalert.AlertTracker;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.GriefInstance;
 import com.minecraftonline.griefalert.GriefAction.GriefType;
