@@ -19,6 +19,8 @@ import java.util.UUID;
 
 public final class AlertManager {
 
+	// TODO: Documentation
+	
 	public final static String GRIEF_INSTANCE_ALERT_FORMAT = "%s %s a %s (%d) in the %s.";
 	
 	public final static String SIGN_PLACEMENT_HEADER_ALERT_FORMAT = "Sign placed by %s at %d %d %d in %s-%s";
@@ -144,6 +146,7 @@ public final class AlertManager {
         				build();
     }
 
+    // TODO: Reorganize
     private void printToConsole(Player player, GriefInstance instance, int alertNo) {
         plugin.getLogger().info(
                 player.getUniqueId().toString() + " (" + player.getName() + "):" +
@@ -161,6 +164,7 @@ public final class AlertManager {
         );
     }
 
+    // TODO: Rename and reorganize    
     private String blockItemEntityStaff(GriefInstance instance) {
         if (instance.getBlock() != null) {
             if (instance.getBlock().getState().getType().getItem().isPresent()) {
@@ -185,6 +189,7 @@ public final class AlertManager {
         return instance.getBlockId();
     }
 
+    // TODO: Rename and reorganize
     private String blockItemEntityConsole(GriefInstance instance) {
         if (instance.getBlock() != null) {
             return instance.getBlock().getState().toString().replace(':', '-');
