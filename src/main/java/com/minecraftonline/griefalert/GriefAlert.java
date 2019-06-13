@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.minecraftonline.griefalert.GriefAction.GriefType;
 import com.minecraftonline.griefalert.listeners.*;
 import com.minecraftonline.griefalert.tools.General.IllegalColorCodeException;
-import com.minecraftonline.griefalert.tools.GriefActionTableManager;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -37,7 +36,6 @@ import java.util.Scanner;
 
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
-// TODO: PietElite: Fix
 @Plugin(id = "griefalert",
         name = "GriefAlert",
         version = VERSION,

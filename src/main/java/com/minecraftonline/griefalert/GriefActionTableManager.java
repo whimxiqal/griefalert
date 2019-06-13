@@ -1,8 +1,7 @@
-package com.minecraftonline.griefalert.tools;
+package com.minecraftonline.griefalert;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.minecraftonline.griefalert.GriefAction;
 import com.minecraftonline.griefalert.GriefAction.GriefType;
 //TODO: PietElite: Fix
 public class GriefActionTableManager {
