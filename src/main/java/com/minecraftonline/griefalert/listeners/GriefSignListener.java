@@ -7,16 +7,27 @@ import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-//TODO: PietElite: Fix
+
+/**
+ * Event listener for using items.
+ */
 public class GriefSignListener implements EventListener<ChangeSignEvent> {
+	
+	/** The main plugin object. */
     private final GriefAlert plugin;
 
+    /**
+     * The generic constructor.
+     * @param plugin The main plugin object
+     */
     public GriefSignListener(GriefAlert plugin) {
     	this.plugin = plugin;
     }
 
     @Override
     public void handle(@Nonnull ChangeSignEvent event) {
+    	// Make sure the event was caused by a player
+    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             if (plugin.getConfigBoolean("logSignsContent")) {
                 Optional<Player> poption = event.getCause().first(Player.class);

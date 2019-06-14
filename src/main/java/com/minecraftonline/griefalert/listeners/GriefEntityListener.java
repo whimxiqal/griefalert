@@ -17,14 +17,22 @@ import org.spongepowered.api.world.DimensionType;
 import javax.annotation.Nonnull;
 //TODO: PietElite: Fix
 public class GriefEntityListener implements EventListener<InteractEntityEvent> {
+	
+	/** The main plugin object. */
     private final GriefAlert plugin;
 
+    /**
+     * The generic constructor.
+     * @param plugin The main plugin object
+     */
     public GriefEntityListener(GriefAlert plugin) {
     	this.plugin = plugin;
     }
 
     @Override
     public void handle(@Nonnull InteractEntityEvent event) {
+    	// Make sure the event was caused by a player
+    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             Entity target = event.getTargetEntity();
             DimensionType dType = target.getLocation().getExtent().getDimension().getType();

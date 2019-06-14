@@ -13,6 +13,8 @@ public class GriefAction {
 	
 	/** The default color code for alerts. Must be one of: a,b,c,d,e,f,0,1,2,3,4,5,6,7,8,9 */
 	public static final char DEFAULT_ALERT_COLOR = 'c';
+	/** A grief action corresponding to Degriefing by staff. */
+	public static final GriefAction DEGRIEF_ACTION = new GriefAction(null, 'F', false, true, GriefAction.GriefType.DEGRIEFED);
 	/** String representation of the griefed object. */
     protected final String blockId;
     /** TextColor representation of the color in which an alert will appear. */

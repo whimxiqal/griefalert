@@ -12,16 +12,27 @@ import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-//TODO: PietElite: Fix
+
+/**
+ * Event listener for using items.
+ */
 public class GriefUsedListener implements EventListener<UseItemStackEvent.Start> {
+	
+	/** The main plugin object. */
     private final GriefAlert plugin;
 
+    /**
+     * The generic constructor.
+     * @param plugin The main plugin object
+     */
     public GriefUsedListener(GriefAlert plugin) {
     	this.plugin = plugin;
     }
 
     @Override
     public void handle(@Nonnull UseItemStackEvent.Start event) {
+    	// Make sure the event was caused by a player
+    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             Optional<Player> poption = event.getCause().first(Player.class);
             if (poption.isPresent()) {

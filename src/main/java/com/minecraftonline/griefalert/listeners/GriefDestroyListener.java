@@ -16,14 +16,22 @@ import java.util.List;
 import java.util.Optional;
 //TODO: PietElite: Fix
 public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Break> {
+	
+	/** The main plugin object. */
     private final GriefAlert plugin;
 
+    /**
+     * The generic constructor.
+     * @param plugin The main plugin object
+     */
     public GriefDestroyListener(GriefAlert plugin) {
     	this.plugin = plugin;
     }
 
     @Override
     public void handle(@Nonnull ChangeBlockEvent.Break event) {
+    	// Make sure the event was caused by a player
+    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             Optional<Player> poption = event.getCause().first(Player.class);
             if (poption.isPresent()) {

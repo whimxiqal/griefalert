@@ -14,16 +14,27 @@ import org.spongepowered.api.world.DimensionType;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
-//TODO: PietElite: Fix
+
+/**
+ * Event listener for using items.
+ */
 public class GriefPlacementListener implements EventListener<ChangeBlockEvent.Place> {
+	
+	/** The main plugin object. */
     private final GriefAlert plugin;
 
+    /**
+     * The generic constructor.
+     * @param plugin The main plugin object
+     */
     public GriefPlacementListener(GriefAlert plugin) {
     	this.plugin = plugin;
     }
 
     @Override
     public void handle(@Nonnull ChangeBlockEvent.Place event) {
+    	// Make sure the event was caused by a player
+    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             Optional<Player> poption = event.getCause().first(Player.class);
             if (poption.isPresent()) {
