@@ -342,9 +342,13 @@ public final class RealtimeGriefInstanceManager {
     		griefInstanceArray = new GriefInstance[plugin.getConfigInt("alertsCodeLimit")];
     	}
 
-    	/** Retrieves a specific Grief Instance from the storage array. */
+    	/**
+    	 * Retrieves a specific Grief Instance from the storage array. <b>Indexes from 1</b>
+    	 * @param code Code, starting at 1
+    	 * @return The GriefInstance at that index
+    	 */
     	public GriefInstance get(int code) {
-    		return griefInstanceArray[code];
+    		return griefInstanceArray[code - 1];
     	}
 
     	/**
@@ -359,7 +363,7 @@ public final class RealtimeGriefInstanceManager {
     		if (++cursor >= griefInstanceArray.length) {
     			cursor = 0;
     		}
-    		return instanceIndex;
+    		return instanceIndex + 1;
     	}
     }
 }
