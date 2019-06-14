@@ -46,7 +46,7 @@ public final class RealtimeGriefInstanceManager {
 	 * The world name
 	 * The dimension name
 	 */
-	public final static String SIGN_PLACEMENT_HEADER_ALERT_FORMAT = "Sign placed by %s at %d %d %d in %s-%s";
+	public final static String EDITED_SIGN_HEADER_ALERT_FORMAT = "Sign placed by %s at %d %d %d in %s-%s";
 	
 	/**
 	 * The format for each line of a grief alert of a sign for staff to read.
@@ -54,7 +54,7 @@ public final class RealtimeGriefInstanceManager {
 	 * Line number
 	 * Line text
 	 */
-	public final static String SIGN_PLACEMENT_LINE_ALERT_FORMAT = "Line %d: %s";
+	public final static String EDITED_SIGN_LINE_ALERT_FORMAT = "Line %d: %s";
 	
 	/** 
 	 * Houses all data about recent grief actions of each player.
@@ -113,7 +113,7 @@ public final class RealtimeGriefInstanceManager {
         }
         
         // Log the instance in the grief logger
-        plugin.getGriefLogger().storeAction(instance);
+        plugin.getGriefLogger().storeGriefInstance(instance);
         
         // Tell staff
         if (plugin.getConfigBoolean("debugInGameAlerts")) {
@@ -164,18 +164,18 @@ public final class RealtimeGriefInstanceManager {
     }
 
     /**
-     * Takes information about a player and a sign they just placed and
+     * Takes information about a player and a sign they just edited and
      * determines whether staff need to be notified
-     * @param player The player who placed a sign
-     * @param sign The sign object corresponding to the placed sign in game
-     * @param signData The data of the sign corresponding to the placed sign in game
+     * @param player The player who edited a sign
+     * @param sign The sign object corresponding to the edited sign in game
+     * @param signData The data of the sign corresponding to the edited sign in game
      */
     public void alert(Player player, Sign sign, SignData signData) {
         if (!player.hasPermission("griefalert.noalert")) {
         	String toPrint = "";
         	
         	// Add header to message
-            toPrint += String.format(SIGN_PLACEMENT_HEADER_ALERT_FORMAT, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
+            toPrint += String.format(EDITED_SIGN_HEADER_ALERT_FORMAT, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
                                                   sign.getLocation().getBlockZ(), player.getWorld().getName(),
                                                   player.getWorld().getDimension().getType().getId().replace("minecraft:", ""));
             
@@ -184,14 +184,14 @@ public final class RealtimeGriefInstanceManager {
                 Text signText = signData.lines().get(index);
                 // Do not show empty lines
                 if (!signText.isEmpty()) {
-                	toPrint += String.format(SIGN_PLACEMENT_LINE_ALERT_FORMAT, index, signText);
+                	toPrint += String.format(EDITED_SIGN_LINE_ALERT_FORMAT, index, signText);
                 }
             }
             printToStaff(Text.builder(toPrint).color(TextColors.GRAY).build());
         } else {
         	// Right now, nothing happens if the griefer *does* have the "griefalert.noalert" node.
         }
-        plugin.getGriefLogger().storeSign(player, sign, signData);
+        plugin.getGriefLogger().storeSignEdit(player, sign, signData);
     }
 
     /**

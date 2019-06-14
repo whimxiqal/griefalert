@@ -11,6 +11,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import javax.annotation.Nonnull;
+
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.spongepowered.api.text.format.TextColors.RED;
@@ -47,7 +49,12 @@ public final class GriefAlertCommand implements CommandExecutor {
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
             GriefInstance grief = plugin.getRealtimeGriefInstanceManager().get(code);
             checker.setLocationSafely(grief.getGriefer().getLocation().get());
-            checker.setRotation(grief.getRotation());
+            try {
+            	checker.setRotation(grief.getGriefer().getTransform().get().getRotation());
+            } catch (NoSuchElementException e) {
+            	plugin.getLogger().warn("When checking for grief, player " + checker.getName() + " did not find the transform within"
+            			+ "the snapshot of the griefer.");
+            }
             return CommandResult.success();
         }
         throw new CommandException(Text.of("Only in game players can use this command!"));

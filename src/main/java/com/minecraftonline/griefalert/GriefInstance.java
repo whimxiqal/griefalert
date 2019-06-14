@@ -20,7 +20,6 @@ public final class GriefInstance {
     private Entity entity;
     private EntitySnapshot griefer;
     private Player player;
-    private Vector3d rotation;
 	
     public GriefInstance(GriefAction griefAction) {
     	this.setGriefAction(griefAction);
@@ -38,7 +37,6 @@ public final class GriefInstance {
 
     public GriefInstance assignGriefer(Player player) {
         this.griefer = player.createSnapshot();
-        this.rotation = player.getRotation();
         this.player = player;
         return this;
     }
@@ -72,10 +70,6 @@ public final class GriefInstance {
 
     public EntitySnapshot getGriefer() {
         return griefer;
-    }
-
-    public Vector3d getRotation() {
-        return rotation;
     }
 
     public int getX() {

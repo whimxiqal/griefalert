@@ -21,30 +21,60 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 //TODO: PietElite: Fix
+/**
+ * This class handles remote logging of grief instances to a SQL
+ * database.
+ */
 final class GriefLogger {
+	
+	private static final String GRIEF_INSTANCE_TABLE_NAME = "GriefAlert_Log";
+	
+	private static final String EDITED_SIGN_TABLE_NAME = "GriefAlert_Signs";
+	
+	/** The main plugin class object. */
 	private final GriefAlert plugin;
-    private final Logger logger;
-    private static Connection conn;
+	/** The connection object to reach the SQL database. */
+    private Connection conn;
 
+    /**
+     * The only constructor for a GriefLogger.
+     * @param griefAlert The main plugin class object
+     */
     GriefLogger(GriefAlert griefAlert) {
     	this.plugin = griefAlert;
-        this.logger = griefAlert.getLogger();
-        testTables();
+    	testConnection();
+        prepareTables();
     }
 
-    private void testConnection() throws SQLException {
-        if (conn == null || conn.isClosed() || !conn.isValid(2)) {
-            conn = DriverManager.getConnection("jdbc:mysql://" + plugin.getConfigString("SQLdb"),
-                                               plugin.getConfigString("SQLusername"),
-                                               plugin.getConfigString("SQLpassword"));
-        }
-    }
-
-    private void testTables() {
+    /**
+     * Tests the connection with the SQL database
+     * @throws SQLException Throws most likely if SQP configuration nods are
+     * not set up with the right syntax
+     */
+    private void testConnection() {
         try {
-            testConnection();
-            logger.debug("Testing GriefAlert_Log table and creating if needed...");
-            PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS GriefAlert_Log " + //
+			if (conn == null || conn.isClosed() || !conn.isValid(2)) {
+				String connectionPath = "jdbc:mysql://" + plugin.getConfigString("SQLdb");
+			    conn = DriverManager.getConnection(connectionPath,
+			                                       plugin.getConfigString("SQLusername"),
+			                                       plugin.getConfigString("SQLpassword"));
+			}
+		} catch (SQLException sqlex) {
+			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
+					+ "Connection Path: connectionPath", sqlex);
+		}
+    }
+
+    /**
+     * Generates non-existing tables into which logs are placed:
+     * <li><b>GriefAlert_Log</b>: Contains all grief instances</li>
+     * <li><b>GriefAlert_Signs</b>: Contains all information about signs edited by players</li>
+     */
+    private void prepareTables() {
+        try {
+        	// Generate the Grief Instance table if it doesn't exist
+            plugin.getLogger().debug("Preparing Grief Instance Table ('" + GRIEF_INSTANCE_TABLE_NAME + "') table and creating if needed...");
+            PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS " + GRIEF_INSTANCE_TABLE_NAME + " " + //
                                                                  "(id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT," +
                                                                  "user VARCHAR(36) NOT NULL," +
                                                                  "block_state TEXT NOT NULL," +
@@ -57,17 +87,18 @@ final class GriefLogger {
                                                                  "pz INT(10) NOT NULL, " +
                                                                  "dimension TEXT NOT NULL, " +
                                                                  "world_id VARCHAR(36) NOT NULL, " +
-                                                                 "time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                                                                 "time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + // Why not save with UNIX long?
                                                                  "PRIMARY KEY (id))");
             ps.execute();
             ps.close();
         } catch (SQLException sqlex) {
-            logger.error("SQL Exception while testing GriefAlert_Log table...", sqlex);
+            plugin.getLogger().error("SQL Exception while preparing Grief Instance Table ('" + GRIEF_INSTANCE_TABLE_NAME + "') table...", sqlex);
         }
         try {
+        	// Generate the Sign Edit table if it doesn't exist
             testConnection();
-            logger.debug("Testing GriefAlert_Signs table and creating if needed...");
-            PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS GriefAlert_Signs " + //
+            plugin.getLogger().debug("Preparing Edited Sign Table ('" + EDITED_SIGN_TABLE_NAME + "') table and creating if needed...");
+            PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS " + EDITED_SIGN_TABLE_NAME + " " +
                                                                  "(id BIGINT UNSIGNED AUTO_INCREMENT, " +
                                                                  "user VARCHAR(36) NOT NULL, " +
                                                                  "x INT(10) NOT NULL, " +
@@ -84,16 +115,20 @@ final class GriefLogger {
             ps.execute();
             ps.close();
         } catch (SQLException sqlex) {
-            logger.error("SQL Exception while testing GriefAlert_Signs table...", sqlex);
+            plugin.getLogger().error("SQL Exception while preparing Edited Sign Table ('" + EDITED_SIGN_TABLE_NAME + "') table...", sqlex);
         }
     }
 
-    final void storeAction(GriefInstance instance) {
-        logger.debug("Storing Grief Action data...");
+    /**
+     * Save an instance of grief in the SQL database
+     * @param instance The specific instance of grief to save
+     */
+    final void storeGriefInstance(GriefInstance instance) {
+        plugin.getLogger().debug("Storing Grief Instance data...");
         PreparedStatement ps = null;
         try {
             testConnection();
-            ps = conn.prepareStatement("INSERT INTO GriefAlert_Log (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+            ps = conn.prepareStatement("INSERT INTO " + GRIEF_INSTANCE_TABLE_NAME + " (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, instance.getGrieferAsPlayer().getUniqueId().toString());
             ps.setString(2, actionToString(instance));
             ps.setString(3, toJSON(actionToContainer(instance)));
@@ -106,20 +141,28 @@ final class GriefLogger {
             ps.setString(10, instance.getWorld().getDimension().getType().getId());
             ps.setString(11, instance.getWorld().getUniqueId().toString());
             ps.execute();
-            logger.debug("Store complete!");
+            plugin.getLogger().debug("Store complete!");
         } catch (SQLException sqlex) {
-            logger.error("SQL Exception while inserting into GriefAlert_Signs table...", sqlex);
+            plugin.getLogger().error("SQL Exception while inserting into Grief Instance ('" + GRIEF_INSTANCE_TABLE_NAME + "') table...", sqlex);
+        } catch (NullPointerException nullex) {
+        	plugin.getLogger().error("A field within a grief instance cannot be null when being stored", nullex);
         } finally {
             closeQuietly(ps);
         }
     }
 
-    final void storeSign(Player player, Sign sign, SignData signData) {
-        logger.debug("Storing Sign data...");
+    /**
+     * The storage method for sign editing in game.
+     * @param player The player who edited the sign
+     * @param sign The representation of the sign
+     * @param signData The data held by the new sign
+     */
+    final void storeSignEdit(Player player, Sign sign, SignData signData) {
+        plugin.getLogger().debug("Storing Edited Sign data...");
         PreparedStatement ps = null;
         try {
             testConnection();
-            ps = conn.prepareStatement("INSERT INTO GriefAlert_Signs (user,x,y,z,dimension,world,line1,line2,line3,line4) VALUES(?,?,?,?,?,?,?,?,?,?)");
+            ps = conn.prepareStatement("INSERT INTO " + EDITED_SIGN_TABLE_NAME + " (user,x,y,z,dimension,world,line1,line2,line3,line4) VALUES(?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, player.getUniqueId().toString());
             ps.setInt(2, sign.getLocation().getBlockX());
             ps.setInt(3, sign.getLocation().getBlockY());
@@ -131,9 +174,9 @@ final class GriefLogger {
             ps.setString(7, signData.get(2).isPresent() ? signData.get(2).get().toPlain() : "");
             ps.setString(8, signData.get(3).isPresent() ? signData.get(3).get().toPlain() : "");
             ps.execute();
-            logger.debug("Store complete!");
+            plugin.getLogger().debug("Store complete!");
         } catch (SQLException sqlex) {
-            logger.error("SQL Exception while inserting into GriefAlert_Signs table...", sqlex);
+            plugin.getLogger().error("SQL Exception while inserting into Edited Sign ('" + EDITED_SIGN_TABLE_NAME + "') table...", sqlex);
         } finally {
             closeQuietly(ps);
         }
@@ -185,7 +228,7 @@ final class GriefLogger {
         try {
             GsonConfigurationLoader.builder().build().saveInternal(node, writer);
         } catch (IOException e) {
-            logger.error("Unable to create json block string", e);
+            plugin.getLogger().error("Unable to create json block string", e);
         }
         return writer.toString();
     }
