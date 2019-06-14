@@ -2,10 +2,20 @@ package com.minecraftonline.griefalert.tools;
 
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-//TODO: PietElite: Fix
-public class General {
+
+/**
+ * A General tools class to house static methods for small data manipulations
+ */
+public abstract class General {
 	
-	public static TextColor charToColor(char c) throws IllegalArgumentException {
+	/**
+	 * Return the TextColor Minecraft associated with the input character.
+	 * @param c the input character to convert to TextColor
+	 * @return The desired TextColor
+	 * @throws IllegalColorCodeException Throws a subclass of an IllegalArgumentException 
+	 * if there was an invalid input character
+	 */
+	public static TextColor charToColor(char c) throws IllegalColorCodeException {
         switch (Character.toUpperCase(c)) {
         case '0':
             return TextColors.BLACK;
@@ -43,7 +53,11 @@ public class General {
         	throw new IllegalColorCodeException(c);
         }
 	}
-	
+
+	/**
+	 * An exception to throw if a method tries to convert an invalid character
+	 * to a Minecraft text color.
+	 */
 	@SuppressWarnings("serial")
 	public static class IllegalColorCodeException extends IllegalArgumentException {
 		IllegalColorCodeException(char c) {
@@ -51,6 +65,12 @@ public class General {
 		}
 	}
 	
+	/** 
+	 * Converts all indefinite articles (<b>an, a</b>) to the appropriate version
+	 * in a string by reading whether the next word begins with a vowel.
+	 * @param string The string to read and correct
+	 * @return The corrected string
+	 */
     public static String correctIndefiniteArticles(String string) {
     	String[] tokens = string.replaceAll(" an ", " a ").split(" a ");
     	String output = tokens[0];
