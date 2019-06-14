@@ -2,7 +2,6 @@ package com.minecraftonline.griefalert;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
-import org.slf4j.Logger;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -20,10 +19,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-//TODO: PietElite: Fix
+
 /**
- * This class handles remote logging of grief instances to a SQL
- * database.
+ * This class handles remote logging of grief instances to a SQL database.
  */
 final class GriefLogger {
 	
@@ -130,8 +128,8 @@ final class GriefLogger {
             testConnection();
             ps = conn.prepareStatement("INSERT INTO " + GRIEF_INSTANCE_TABLE_NAME + " (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, instance.getGrieferAsPlayer().getUniqueId().toString());
-            ps.setString(2, actionToString(instance));
-            ps.setString(3, toJSON(actionToContainer(instance)));
+            ps.setString(2, printGriefInstanceObjectForStorage(instance));
+            ps.setString(3, toJSON(generateDataContainer(instance)));
             ps.setInt(4, instance.getX());
             ps.setInt(5, instance.getY());
             ps.setInt(6, instance.getZ());
@@ -182,17 +180,35 @@ final class GriefLogger {
         }
     }
 
+    /**
+     * A helper method to ignore any exceptions thrown when closing an AutoCloseable.
+     * @param closeable An AutoCloseable to close
+     */
     private static void closeQuietly(AutoCloseable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();
             }
         } catch (Exception e) {
-            /* ignored */
+            // ignored
         }
     }
 
-    private String actionToString(GriefInstance instance) {
+    /**
+     * Prints the griefed object in GriefInstance to a readable string to be logged in the database.
+     * The order or preference for griefed object string the first existing object of the following:
+     * <ol>
+     * <li>String representation of the Block State</li>
+     * <li>String representation of the Item</li>
+     * <li>String representation of the Painting</li>
+     * <li>String representation of the ItemFrame</li>
+     * <li>String representation of the ID of the Type of Entity</li>
+     * <li>The BlockId found in the GriefAction (Guaranteed to exist!)</li>
+     * </ol>
+     * @param instance The specific GriefInstance
+     * @return String representation of the GriefInstance
+     */
+    private String printGriefInstanceObjectForStorage(GriefInstance instance) {
         if (instance.getBlock() != null) {
             return instance.getBlock().getState().toString();
         }
@@ -211,7 +227,12 @@ final class GriefLogger {
         return instance.getBlockId();
     }
 
-    private DataContainer actionToContainer(GriefInstance instance) {
+    /**
+     * Unclear purpose.
+     * @param instance
+     * @return
+     */
+    private DataContainer generateDataContainer(GriefInstance instance) {
         if (instance.getBlock() != null) {
             return instance.getBlock().toContainer();
         }
@@ -221,6 +242,11 @@ final class GriefLogger {
         return instance.getEntity().toContainer();
     }
 
+    /**
+     * Unclear purpose.
+     * @param container
+     * @return
+     */
     private String toJSON(DataView container) {
         final DataTranslator<ConfigurationNode> translator = DataTranslators.CONFIGURATION_NODE;
         ConfigurationNode node = translator.translate(container);
