@@ -240,16 +240,21 @@ public class GriefAlert {
                 splitLine = line.split(":");
                 
                 GriefAction griefAction;
+                // Try to generate the griefAction
                 try {
-                	griefAction = new GriefAction(splitLine);
-                } catch (IllegalColorCodeException e) {
-                	// An invalid color code was inputed
-                	logger.info(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + "| defaulting to: " + GriefAction.DEFAULT_ALERT_COLOR);
-                	splitLine[2] = String.valueOf(GriefAction.DEFAULT_ALERT_COLOR);
-                	griefAction = new GriefAction(splitLine);
+                	// Try to generate the griefAction with the appropriate color
+                	try {
+                		griefAction = new GriefAction(splitLine);
+		            } catch (IllegalColorCodeException e) {
+		            	// An invalid color code was inputed
+		            	logger.info(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + "| defaulting to: " + GriefAction.DEFAULT_ALERT_COLOR);
+		            	// Default the color code
+		            	splitLine[2] = String.valueOf(GriefAction.DEFAULT_ALERT_COLOR);
+		            	griefAction = new GriefAction(splitLine);
+		            }
                 } catch (IllegalArgumentException e) {
                 	logger.info(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + line);
-                	// Fatal error occurred with this line. Skipping line.
+                	// Fatal error occurred with this line. Skipping line entirely.
                 	continue;
                 }
                 
