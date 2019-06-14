@@ -133,9 +133,9 @@ final class GriefLogger {
             ps.setInt(4, instance.getX());
             ps.setInt(5, instance.getY());
             ps.setInt(6, instance.getZ());
-            ps.setInt(7, instance.getGriefer().getLocation().get().getBlockX());
-            ps.setInt(8, instance.getGriefer().getLocation().get().getBlockY());
-            ps.setInt(9, instance.getGriefer().getLocation().get().getBlockZ());
+            ps.setInt(7, instance.getGrieferSnapshot().getLocation().get().getBlockX());
+            ps.setInt(8, instance.getGrieferSnapshot().getLocation().get().getBlockY());
+            ps.setInt(9, instance.getGrieferSnapshot().getLocation().get().getBlockZ());
             ps.setString(10, instance.getWorld().getDimension().getType().getId());
             ps.setString(11, instance.getWorld().getUniqueId().toString());
             ps.execute();

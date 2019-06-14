@@ -48,9 +48,9 @@ public final class GriefAlertCommand implements CommandExecutor {
                     Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                     Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
             GriefInstance grief = plugin.getRealtimeGriefInstanceManager().get(code);
-            checker.setLocationSafely(grief.getGriefer().getLocation().get());
+            checker.setLocationSafely(grief.getGrieferSnapshot().getLocation().get());
             try {
-            	checker.setRotation(grief.getGriefer().getTransform().get().getRotation());
+            	checker.setRotation(grief.getGrieferSnapshot().getTransform().get().getRotation());
             } catch (NoSuchElementException e) {
             	plugin.getLogger().warn("When checking for grief, player " + checker.getName() + " did not find the transform within"
             			+ "the snapshot of the griefer.");
