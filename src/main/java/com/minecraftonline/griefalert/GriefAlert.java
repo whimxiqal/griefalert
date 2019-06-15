@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -27,11 +28,17 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionType;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
@@ -68,9 +75,7 @@ public class GriefAlert {
     public static final String SQL_ADDRESS = "localhost:3306/minecraft";
     
     /** The file name of the file which holds information about which activities will be watched and logged. */
-    public static final String GRIEF_ALERT_FILE_NAME = "watchedBlocks.txt";
-    /** The file path of the grief alert file. */
-    public static final String GRIEF_ALERT_FILE_PATH = "config/griefalert/" + GRIEF_ALERT_FILE_NAME;
+    public static final String GRIEF_ALERT_FILE_NAME = "/watchedBlocks.txt";
     
     private GriefActionTableManager griefActions = new GriefActionTableManager();
     
@@ -95,8 +100,10 @@ public class GriefAlert {
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
     /** The root node of the configuration file, using the configuration manager. */
     private ConfigurationNode rootNode;
-
     
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private File configDirectory;
 
     @Listener
     /**
@@ -190,32 +197,40 @@ public class GriefAlert {
     private File loadGriefAlertFile() {
     	logger.info("Loading GriefAlert file: " + GRIEF_ALERT_FILE_NAME + " ...");
     	
+    	if (!(getGriefAlertDirectory().mkdir())) {
+    		getLogger().warn("Did not make the Grief Alert Configuration directory!");
+    	} else {
+    		getLogger().info("Grief Alert Configuration directory created.");
+    	}
+    	
     	// Get the file
-        File griefAlertFile = new File(GRIEF_ALERT_FILE_PATH);
+        File griefAlertFile = new File(getGriefAlertDirectory().getPath() + "/" + GRIEF_ALERT_FILE_NAME);
+        
         if (!griefAlertFile.exists()) {
         	// Create the file because it doesn't exist yet
-        	
-            logger.info("Watch list file being created...");
-            OutputStream outStream = null;
-            try {
-            	
-            	// Read the data from a local resource file which has all the default information
-            	InputStream initialStream = this.getClass().getResourceAsStream("defaultGriefAlertFile.txt");
-	            byte[] buffer = new byte[initialStream.available()];
-	            initialStream.read(buffer);
-	            outStream = new FileOutputStream(griefAlertFile);
-	            
-	            // Write the default file to the new local file
-				outStream.write(buffer);
-			} catch (IOException e) {
-				logger.warn("Exception thrown while generating " + GRIEF_ALERT_FILE_NAME);
-			} finally {
-				try {
-					outStream.close();
-				} catch (IOException e) {
-					logger.warn("Exception thrown while closing OutputStream after attempting to generate " + GRIEF_ALERT_FILE_NAME);
-				}
-			}
+        	getLogger().info("Generating a new default Grief Alert file: " + GRIEF_ALERT_FILE_NAME);
+            try{
+            	URL defaultFileURL = getClass().getResource("grief_alerts.txt");
+            	if (defaultFileURL == null) {
+                	throw new Exception("defaultFileURL is null!");
+                }
+                URI defaultFile = defaultFileURL.toURI();
+                
+                
+                
+                FileSystem filesys = null;
+                try {
+                    filesys = FileSystems.getFileSystem(defaultFile);
+                } catch(FileSystemNotFoundException ex) {
+                    Map<String, String> env = new HashMap<>();
+                    env.put("create","true");
+                    FileSystems.newFileSystem(defaultFile, env);
+                }
+                Files.copy(Paths.get(defaultFile), griefAlertFile.toPath());
+                if(filesys != null) filesys.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 		return griefAlertFile;
     }
@@ -231,8 +246,8 @@ public class GriefAlert {
             
             String[] splitLine;
             String line;
-            while ((line = scanner.nextLine()) != null) {
-                
+            while (scanner.hasNext()) {
+                line = scanner.nextLine();
                 // Skip commented line or empty line
                 if (line.startsWith("#") || line.equals("")) {
                     continue;
@@ -245,6 +260,7 @@ public class GriefAlert {
                 	// Try to generate the griefAction with the appropriate color
                 	try {
                 		griefAction = new GriefAction(splitLine);
+                		getLogger().info("Grief action loaded: " + line);
 		            } catch (IllegalColorCodeException e) {
 		            	// An invalid color code was inputed
 		            	logger.info(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + "| defaulting to: " + GriefAction.DEFAULT_ALERT_COLOR);
@@ -387,5 +403,9 @@ public class GriefAlert {
      */
     public GriefLogger getGriefLogger() {
     	return this.gLogger;
+    }
+    
+    public File getGriefAlertDirectory() {
+    	return configDirectory;
     }
 }

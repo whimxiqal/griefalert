@@ -40,8 +40,13 @@ final class GriefLogger {
      */
     GriefLogger(GriefAlert griefAlert) {
     	this.plugin = griefAlert;
-    	testConnection();
-        prepareTables();
+    	try {
+			testConnection();
+			prepareTables();
+		} catch (SQLException sqlex) {
+			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
+					+ "Connection Path: connectionPath", sqlex);
+		}
     }
 
     /**
@@ -49,17 +54,12 @@ final class GriefLogger {
      * @throws SQLException Throws most likely if SQP configuration nods are
      * not set up with the right syntax
      */
-    private void testConnection() {
-        try {
-			if (conn == null || conn.isClosed() || !conn.isValid(2)) {
-				String connectionPath = "jdbc:mysql://" + plugin.getConfigString("SQLdb");
-			    conn = DriverManager.getConnection(connectionPath,
-			                                       plugin.getConfigString("SQLusername"),
-			                                       plugin.getConfigString("SQLpassword"));
-			}
-		} catch (SQLException sqlex) {
-			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
-					+ "Connection Path: connectionPath", sqlex);
+    private void testConnection() throws SQLException {
+		if (conn == null || conn.isClosed() || !conn.isValid(2)) {
+			String connectionPath = "jdbc:mysql://" + plugin.getConfigString("SQLdb");
+		    conn = DriverManager.getConnection(connectionPath,
+		                                       plugin.getConfigString("SQLusername"),
+		                                       plugin.getConfigString("SQLpassword"));
 		}
     }
 

@@ -8,7 +8,6 @@
 #
 # Here are some examples
 # USE:lava_bucket:c
-# DESTROY:diamond_block:3
+DESTROY:diamond_block:3
 # INTERACT:chest:3
 # DESTROY:netherrack:c:::minecraft-overworld,minecraft-end
-                
