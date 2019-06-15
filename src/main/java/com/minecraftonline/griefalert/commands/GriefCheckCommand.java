@@ -13,9 +13,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.core.GriefInstance;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-
 import javax.annotation.Nonnull;
 
 import java.util.NoSuchElementException;
@@ -28,8 +25,7 @@ import static org.spongepowered.api.text.format.TextColors.YELLOW;
 /**
  * The CommandExecutor for the command to check alerts for GriefInstances in game
  */
-@CommandAlias("gcheck")
-public final class GriefCheckCommand extends BaseCommand {
+public final class GriefCheckCommand implements CommandExecutor {
 	
 	/** The main plugin object. */
     private final GriefAlert plugin;
@@ -42,10 +38,7 @@ public final class GriefCheckCommand extends BaseCommand {
         this.plugin = plugin;
     }
 
-    
-    
-    
-    /*
+
     @Override
     @Nonnull
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
@@ -94,7 +87,6 @@ public final class GriefCheckCommand extends BaseCommand {
         }
         return CommandResult.success();
     }
-    */
 
     /**
      * Format the grief checker's name to include prefix and suffix

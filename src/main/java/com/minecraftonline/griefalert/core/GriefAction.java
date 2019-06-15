@@ -157,12 +157,12 @@ public class GriefAction {
 	 * @return If these two Grief Actions are considered equal
 	 */
 	public boolean equals(Object otherObject) {
-		if (!(otherObject instanceof GriefInstance)) {
+		if (!(otherObject instanceof GriefAction)) {
 			return false;
 		}
-		GriefInstance other = (GriefInstance) otherObject;
-		return this.getType() == other.getType() &&
-				this.getBlockId() == other.getBlockId();
+		GriefAction other = (GriefAction) otherObject;
+		return this.getType().equals(other.getType()) &&
+				this.getBlockId().equals(other.getBlockId());
 	}
 	
 	@Override

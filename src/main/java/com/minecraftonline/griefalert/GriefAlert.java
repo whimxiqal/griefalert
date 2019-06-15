@@ -9,8 +9,6 @@ import com.minecraftonline.griefalert.core.RealtimeGriefInstanceManager;
 import com.minecraftonline.griefalert.listeners.*;
 import com.minecraftonline.griefalert.tools.General.IllegalColorCodeException;
 
-import co.aikar.commands.SpongeCommandManager;
-
 import com.minecraftonline.griefalert.storage.GriefLogger;
 
 import ninja.leaping.configurate.ConfigurationNode;
@@ -52,15 +50,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-@Plugin(id = "griefalert",
-        name = "GriefAlert",
-        version = VERSION,
-        description = "Grief alert tool")
 /**
  * The main class for the plugin Grief Alert.
  * This plugin is made exclusively for MinecraftOnline.com
  * Do not use this plugin without explicit approval from an administrator of MinecraftOnline.
+ * <p>
+ * <b>Permissions</b>
+ * <p>
+ * <li><i>griefalert.check</i>: Allows the use of the /gcheck command</li>
  */
+@Plugin(id = "griefalert",
+		name = "GriefAlert",
+		version = VERSION,
+		description = "Grief alert tool")
 public class GriefAlert implements PluginContainer {
 	
 	/** Version of this Plugin. (Should this be final?) */
@@ -77,7 +79,7 @@ public class GriefAlert implements PluginContainer {
     /** Will there be in game alerts to help debug the plugin? */
     public static final boolean DEBUG_IN_GAME_ALERTS = false;
     /** Will the alerts be shown in the console as well as in game? */
-    public static final boolean SHOW_ALERTS_IN_CONSOLE = false;
+    public static final boolean SHOW_ALERTS_IN_CONSOLE = true;
     /** Get extra messages about the activities occurring within the plugin. */
     public static final boolean GENERAL_DEBUG = true;
     /** An array list all dimensions to use when needing to place Grief Actions into all possible dimensions. */
@@ -331,17 +333,13 @@ public class GriefAlert implements PluginContainer {
     }
     
     private void registerCommands() {
-    	 SpongeCommandManager commandManager = new SpongeCommandManager(this);
-         commandManager.registerCommand(new GriefCheckCommand (this));
-         /*
-         CommandSpec gcheck = CommandSpec.builder().
-                 executor(new GriefAlertCommand(this)).
-                                                   description(Text.of("Check a GriefAlert Number")).
-                                                   arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
-                                                   permission("griefalert.check").
-                                                   build();
-         Sponge.getCommandManager().register(this, gcheck, "gcheck");
-         */
+	     CommandSpec gcheck = CommandSpec.builder().
+	             executor(new GriefCheckCommand(this)).
+	                                               description(Text.of("Check a GriefAlert Number")).
+	                                               arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
+	                                               permission("griefalert.check").
+	                                               build();
+	     Sponge.getCommandManager().register(this, gcheck, "gcheck");
     }
     
     /**

@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.core;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
@@ -57,6 +58,8 @@ public final class RealtimeGriefInstanceManager {
 	 * Line text
 	 */
 	public final static String EDITED_SIGN_LINE_ALERT_FORMAT = "Line %d: %s";
+	
+	public static boolean GRIEFALERT_NOALERT_OVERRIDE = true;
 	
 	/** 
 	 * Houses all data about recent grief actions of each player.
@@ -135,23 +138,26 @@ public final class RealtimeGriefInstanceManager {
      * @param instance The Grief Instance to which staff should be alerted
      */
     public void alert(int alertId, GriefInstance instance) {
-    	Text alertMessage = generateAlertMessage(alertId, instance);
-        if (!instance.getGrieferAsPlayer().hasPermission("griefalert.noalert")) {
+    	plugin.getDebugLogger().log("Handling the most recent instance of grief in game.");
+        if (GRIEFALERT_NOALERT_OVERRIDE || !instance.getGrieferAsPlayer().hasPermission("griefalert.noalert")) {
         	// Player does not have the permission to mute their own grief instance alerts
-        	
+        	Text alertMessage = generateAlertMessage(alertId, instance);
         	UUID playerId = instance.getGrieferAsPlayer().getUniqueId();
         	Pair<GriefAction, Integer> previousGriefAction = lastGriefActionPlayerMap.get(playerId);
         	int consecutiveGriefActionCount;
+        	if (previousGriefAction != null) plugin.getDebugLogger().log("This player's last grief action was: " + previousGriefAction.getKey().toString());
             if (previousGriefAction != null && 
             		previousGriefAction.getKey().equals(instance.getGriefAction()) &&
             		previousGriefAction.getValue() < plugin.getConfigInt("maxHiddenMatchingAlerts")) {
             	
             	// The same grief action was repeated by the same person
+            	plugin.getDebugLogger().log("The same grief action was performed by the same player. No alert sent.");
     			consecutiveGriefActionCount = previousGriefAction.getValue() + 1;
 
             } else {
             	// This is the first consecutive grief action for this player
             	consecutiveGriefActionCount = 1;
+            	plugin.getDebugLogger().log("Alerting staff in game: " + alertMessage.toString());
             	printToStaff(alertMessage);
             }
             // Place this action as the last grief action to read next time
@@ -160,7 +166,10 @@ public final class RealtimeGriefInstanceManager {
 					Pair.of(
 							instance.getGriefAction(), 
 							consecutiveGriefActionCount));
+            plugin.getDebugLogger().log("Player '" + instance.getGrieferAsPlayer().getName() + "' has had "
+            		+ consecutiveGriefActionCount + " consecutive grief actions of the same type since the last alert.");
         } else {
+        	plugin.getDebugLogger().log("This player has the permission 'griefalert.noalert', so no alert sent.");
         	// Right now, nothing happens if the griefer *does* have the "griefalert.noalert" node.
         }
     }
@@ -210,8 +219,13 @@ public final class RealtimeGriefInstanceManager {
      * @param message The message for staff to see
      */
     public void printToStaff(Text message) {
+    	if (Sponge.getServer().getPlayer("PietElite").isPresent()) {
+    		Sponge.getServer().getPlayer("PietElite").get().sendMessage(message);
+    	}
+    	/*
         MessageChannel staffChannel = new PermissionMessageChannel("griefalert.staff");
         staffChannel.send(message);
+        */
     }
 
     /**
@@ -334,6 +348,8 @@ public final class RealtimeGriefInstanceManager {
     	private GriefInstance[] griefInstanceArray;
     	/** The cursor which marks to place the next grief instance. */
     	private int cursor = 0;
+    	
+    	private int savedInstancesCount = 0;
 
     	/**
     	 * Constructor which creates the array to house all recent grief instances.
@@ -365,7 +381,12 @@ public final class RealtimeGriefInstanceManager {
     		if (++cursor >= griefInstanceArray.length) {
     			cursor = 0;
     		}
-    		return instanceIndex + 1;
+    		if (++savedInstancesCount >= griefInstanceArray.length) {
+    			savedInstancesCount = griefInstanceArray.length;
+    		}
+    		plugin.getDebugLogger().log("Instance added to the Recent Grief Instance Manager. "
+    				+ "Id = " + instanceIndex + 1 + ", instance: " + instance.toString());
+    		return instanceIndex + 1; // return "+ 1" so it indexes from 1 instead of 0
     	}
     }
 }

@@ -154,5 +154,10 @@ public final class GriefInstance {
 	public Player getGrieferAsPlayer() {
 		return griefer;
 	}
+	
+	@Override
+	public String toString() {
+		return griefAction.toString() + ", griefer: " + griefer.getName();
+	}
     
 }

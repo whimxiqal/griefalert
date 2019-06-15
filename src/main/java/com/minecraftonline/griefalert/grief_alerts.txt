@@ -11,3 +11,4 @@
 # DESTROY;minecraft:diamond_block;3
 # INTERACT;minecraft:chest;3
 # DESTROY;minecraft:netherrack;c;;;minecraft-overworld,minecraft-end
+DESTROY;minecraft:diamond_block;c

@@ -36,6 +36,8 @@ public final class GriefLogger {
 	private final GriefAlert plugin;
 	/** The connection object to reach the SQL database. */
     private Connection conn;
+    
+    private boolean error;
 
     /**
      * The only constructor for a GriefLogger.
@@ -47,6 +49,7 @@ public final class GriefLogger {
 			testConnection();
 			prepareTables();
 		} catch (SQLException sqlex) {
+			error = true;
 			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
 					+ "Connection Path: connectionPath", sqlex);
 		}
@@ -125,6 +128,10 @@ public final class GriefLogger {
      * @param instance The specific instance of grief to save
      */
     public final void storeGriefInstance(GriefInstance instance) {
+    	if (error) {
+    		plugin.getLogger().warn("Tried to store a grief instance, but there is an error with the SQL database. Instance: " + instance.toString());
+    		return;
+    	}
         plugin.getLogger().debug("Storing Grief Instance data...");
         PreparedStatement ps = null;
         try {
@@ -159,6 +166,10 @@ public final class GriefLogger {
      * @param signData The data held by the new sign
      */
     public final void storeSignEdit(Player player, Sign sign, SignData signData) {
+    	if (error) {
+    		plugin.getLogger().warn("Tried to store a sign grief instance, but there is an error with the SQL database");
+    		return;
+    	}
         plugin.getLogger().debug("Storing Edited Sign data...");
         PreparedStatement ps = null;
         try {
@@ -260,5 +271,9 @@ public final class GriefLogger {
             plugin.getLogger().error("Unable to create json block string", e);
         }
         return writer.toString();
+    }
+    
+    public boolean isError() {
+    	return error;
     }
 }
