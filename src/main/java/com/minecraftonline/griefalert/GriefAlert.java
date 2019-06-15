@@ -2,6 +2,7 @@ package com.minecraftonline.griefalert;
 
 import com.google.inject.Inject;
 import com.minecraftonline.griefalert.commands.GriefCheckCommand;
+import com.minecraftonline.griefalert.commands.GriefRecentCommand;
 import com.minecraftonline.griefalert.core.GriefAction;
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 import com.minecraftonline.griefalert.core.GriefActionTableManager;
@@ -340,6 +341,14 @@ public class GriefAlert implements PluginContainer {
 	                                               permission("griefalert.check").
 	                                               build();
 	     Sponge.getCommandManager().register(this, gcheck, "gcheck");
+	     
+	     CommandSpec grecent = CommandSpec.builder().
+	             executor(new GriefRecentCommand(this)).
+	                                               description(Text.of("Check recent instances of grief")).
+	                                               arguments(GenericArguments.optional(GenericArguments.string(Text.of("username")))).
+	                                               permission("griefalert.recent").
+	                                               build();
+	     Sponge.getCommandManager().register(this, grecent, "grecent");
     }
     
     /**

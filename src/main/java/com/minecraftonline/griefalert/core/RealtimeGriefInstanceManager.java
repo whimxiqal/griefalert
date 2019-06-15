@@ -18,6 +18,8 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.tools.General;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -235,7 +237,7 @@ public final class RealtimeGriefInstanceManager {
      * @param instance The specific grief instance
      * @return The readable text format of the grief instance
      */
-    private Text generateAlertMessage(int alertId, GriefInstance instance) {
+    public Text generateAlertMessage(int alertId, GriefInstance instance) {
         return Text.builder(General.correctIndefiniteArticles(
         							String.format(GRIEF_INSTANCE_ALERT_FORMAT, 
         									instance.getGrieferAsPlayer().getName(), 
@@ -336,6 +338,10 @@ public final class RealtimeGriefInstanceManager {
         return instance.getBlockId().replace(':', '-');
     }
     
+    public List<Pair<Integer,GriefInstance>> getRecentGriefInstances() {
+    	return griefInstances.toList();
+    }
+    
     /**
      * A local class for managing the recent grief instances which are handled by in-game staff.
      * It contains an array and a cursor which marks where the next instance of grief will
@@ -361,6 +367,27 @@ public final class RealtimeGriefInstanceManager {
     	}
 
     	/**
+    	 * Gives the recent grief instances in List form (time-sorted)
+    	 * @return A time-sorted list of all recent grief instances
+    	 */
+    	public List<Pair<Integer, GriefInstance>> toList() {
+			List<Pair<Integer,GriefInstance>> output = new LinkedList<Pair<Integer,GriefInstance>>();
+			for (int i = cursor - 1; i >= 0; i--) {
+				if (griefInstanceArray[i] != null) {
+					output.add(Pair.of(i + 1, griefInstanceArray[i]));
+				}
+			}
+			for (int i = griefInstanceArray.length - 1; i >= cursor; i--) {
+				if (griefInstanceArray[i] == null) {
+					break;
+				} else {
+					output.add(Pair.of(i + 1, griefInstanceArray[i]));
+				}
+			}
+			return output;
+		}
+
+		/**
     	 * Retrieves a specific Grief Instance from the storage array. <b>Indexes from 1</b>
     	 * @param code Code, starting at 1
     	 * @return The GriefInstance at that index

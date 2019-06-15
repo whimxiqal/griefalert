@@ -19,7 +19,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.spongepowered.api.text.format.TextColors.RED;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 /**
@@ -49,7 +48,7 @@ public final class GriefCheckCommand implements CommandExecutor {
         Optional<Integer> arg = args.getOne("code");
         if (!arg.isPresent()) {
         	// Missing the code argument
-            throw new CommandException(Text.builder("ERROR: ").color(RED).append(Text.builder("Missing check number").color(WHITE).build()).build());
+            throw new CommandException(Text.builder("Syntax: /gcheck <id>").color(RED).build());
         }
         
         int code = arg.get();
@@ -60,12 +59,12 @@ public final class GriefCheckCommand implements CommandExecutor {
         	instance = plugin.getRealtimeGriefInstanceManager().get(arg.get());
         } catch (IndexOutOfBoundsException e) {
         	// Code is not within the valid range
-        	throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("Check number out of range").color(WHITE).build()).build());
+        	throw new CommandException(Text.builder("Grief Alert ID " + code + " is out of range.").color(RED).build());
         }
         
         if (instance == null) {
         	// No Grief Instance at that array location
-            throw new CommandException(Text.builder("GriefAlert ERROR: ").color(RED).append(Text.builder("There is no current alert at that code").color(WHITE).build()).build());
+            throw new CommandException(Text.builder("There is no current alert at ID " + code + ".").color(RED).build());
         }
 
         plugin.getRealtimeGriefInstanceManager().printToStaff(formatPlayerName(checker).toBuilder().append(
