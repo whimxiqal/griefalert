@@ -1,13 +1,16 @@
 package com.minecraftonline.griefalert;
 
 import com.google.inject.Inject;
-import com.minecraftonline.griefalert.commands.GriefAlertCommand;
+import com.minecraftonline.griefalert.commands.GriefCheckCommand;
 import com.minecraftonline.griefalert.core.GriefAction;
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 import com.minecraftonline.griefalert.core.GriefActionTableManager;
 import com.minecraftonline.griefalert.core.RealtimeGriefInstanceManager;
 import com.minecraftonline.griefalert.listeners.*;
 import com.minecraftonline.griefalert.tools.General.IllegalColorCodeException;
+
+import co.aikar.commands.SpongeCommandManager;
+
 import com.minecraftonline.griefalert.storage.GriefLogger;
 
 import ninja.leaping.configurate.ConfigurationNode;
@@ -29,6 +32,7 @@ import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionType;
 
@@ -57,7 +61,7 @@ import java.util.Scanner;
  * This plugin is made exclusively for MinecraftOnline.com
  * Do not use this plugin without explicit approval from an administrator of MinecraftOnline.
  */
-public class GriefAlert {
+public class GriefAlert implements PluginContainer {
 	
 	/** Version of this Plugin. (Should this be final?) */
     static final String VERSION = "21.0";
@@ -65,7 +69,7 @@ public class GriefAlert {
     /** Item used by staff members to 'degrief' a grief event. This is logged but not acted on by in-game staff. */
     public static final String DEGRIEF_ITEM = "minecraft:stick";
     /** The maximum number of reports before the code limit is reset. This is for ease of use by in-game staff. */
-    public static final int ALERTS_CODE_LIMIT = 999;
+    public static final int ALERTS_CODE_LIMIT = 9999;
     /** The maximum number of identical reports to hide successively. */
     public static final int MAX_REPEATED_HIDDEN_ALERT = 10;
     /** Is logging whether someone changes a sign going to be logged? */
@@ -78,6 +82,8 @@ public class GriefAlert {
     public static final boolean GENERAL_DEBUG = true;
     /** An array list all dimensions to use when needing to place Grief Actions into all possible dimensions. */
     public static final String[] ALL_DIMENSIONS = new String[] {"minecraft:overworld", "minecraft:nether", "minecraft:the_end"};
+    /** The regex between each component of a Grief Alert in the Grief Alert configuration file. */
+    public static final String GRIEF_ALERT_CONFIG_LINE_REGEX = ";";
     
     public static final String SQL_USERNAME = "user";
     public static final String SQL_PASSWORD = "PA$$word";
@@ -146,14 +152,9 @@ public class GriefAlert {
         // Register all the listeners with Sponge
         registerListeners(realtimeManager);
         
-        // Register the command for checking grief alerts
-        CommandSpec gcheck = CommandSpec.builder().
-                executor(new GriefAlertCommand(this)).
-                                                  description(Text.of("Check a GriefAlert Number")).
-                                                  arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
-                                                  permission("griefalert.check").
-                                                  build();
-        Sponge.getCommandManager().register(this, gcheck, "gcheck");
+        // Register all the commands with Sponge
+        registerCommands();
+       
     }
 
     
@@ -268,7 +269,7 @@ public class GriefAlert {
                 if (line.startsWith("#") || line.equals("")) {
                     continue;
                 }
-                splitLine = line.split(":");
+                splitLine = line.split(GRIEF_ALERT_CONFIG_LINE_REGEX);
                 
                 GriefAction griefAction;
                 // Try to generate the griefAction
@@ -294,13 +295,6 @@ public class GriefAlert {
                 String[] applicableDimensions;
                 if (splitLine.length > 5) {
                 	applicableDimensions = splitLine[5].split(",");
-                    for (String dim : applicableDimensions) {
-                        if (dim.contains("-")) {
-                        	dim = dim.replace('-', ':');
-                        } else {
-                        	dim = "minecraft:" + dim;
-                        }
-                    }
                 } else {
                 	applicableDimensions = ALL_DIMENSIONS;
                 }
@@ -334,6 +328,20 @@ public class GriefAlert {
         Sponge.getEventManager().registerListener(this, InteractBlockEvent.Secondary.class, Order.LAST, new GriefInteractListener(this));
         Sponge.getEventManager().registerListener(this, InteractEntityEvent.class, Order.LAST, new GriefEntityListener(this));
         Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(this));
+    }
+    
+    private void registerCommands() {
+    	 SpongeCommandManager commandManager = new SpongeCommandManager(this);
+         commandManager.registerCommand(new GriefCheckCommand (this));
+         /*
+         CommandSpec gcheck = CommandSpec.builder().
+                 executor(new GriefAlertCommand(this)).
+                                                   description(Text.of("Check a GriefAlert Number")).
+                                                   arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
+                                                   permission("griefalert.check").
+                                                   build();
+         Sponge.getCommandManager().register(this, gcheck, "gcheck");
+         */
     }
     
     /**
@@ -450,4 +458,9 @@ public class GriefAlert {
     	}
     	
     }
+
+	@Override
+	public String getId() {
+		return "griefalert";
+	}
 }

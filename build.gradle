@@ -1,19 +1,37 @@
 plugins {
+	id 'com.github.johnrengelman.shadow' version '4.0.4'
+	id 'java'
     id 'org.spongepowered.plugin' version '0.8.1'
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 
+repositories {
+	maven {url = "https://repo.aikar.co/content/groups/aikar/"}
+	maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
+}
+
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline' // This is a MinecraftOnline project
 version = '21.0' // Project Version
 
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
 ext.sponge_version = '7.0.0' // SpongeAPI version
-ext.authors = ['darkdiplomat', 'BastetFurry', '14mRh4X0r'] // Separate with commas (e.g. ['SlowRiot', 'FliPPeh', '14mRh4X0r', 'techkid6'])
+ext.authors = ['PietElite','darkdiplomat', 'BastetFurry', '14mRh4X0r'] // Separate with commas (e.g. ['SlowRiot', 'FliPPeh', '14mRh4X0r', 'techkid6'])
+
+compileJava {
+    options.compilerArgs += ["-parameters"]
+}
 
 dependencies {
+	compile 'co.aikar:acf-sponge:0.5.0-SNAPSHOT'
     compileOnly "org.spongepowered:spongeapi:${sponge_version}"
+}
+
+shadowJar {
+   relocate 'co.aikar.commands', 'com.minecraftonline.griefalert.acf'
 }
 
 sponge.plugin.meta {
@@ -25,3 +43,5 @@ jar.manifest {
             "Implementation-Version": version,
             "Implementation-Vendor": "MinecraftOnline"
 }
+
+build.dependsOn shadowJar
