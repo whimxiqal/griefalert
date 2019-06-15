@@ -1,9 +1,10 @@
 package com.minecraftonline.griefalert.listeners;
 
-import com.minecraftonline.griefalert.GriefAction;
-import com.minecraftonline.griefalert.GriefAction.GriefType;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.GriefInstance;
+import com.minecraftonline.griefalert.core.GriefAction;
+import com.minecraftonline.griefalert.core.GriefInstance;
+import com.minecraftonline.griefalert.core.GriefAction.GriefType;
+
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.type.HandTypes;

@@ -1,8 +1,11 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.core;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.minecraftonline.griefalert.GriefAction.GriefType;
+import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 
 /**
  * A data managing class to house all tables associated with grief actions.
@@ -84,6 +87,17 @@ public class GriefActionTableManager {
     		return destroyGriefActions.get(blockId, dimension);
     	}
     	return null;
+	}
+
+	public Collection<GriefAction> values() {
+		Collection<GriefAction> useGriefActionValues = useGriefActions.values();
+		Collection<GriefAction> interactGriefActionValues = interactGriefActions.values();
+		Collection<GriefAction> destroyGriefActionValues = destroyGriefActions.values();
+		Collection<GriefAction> output = new LinkedList<GriefAction>();
+		output.addAll(useGriefActionValues);
+		output.addAll(interactGriefActionValues);
+		output.addAll(destroyGriefActionValues);
+		return output;
 	}
     
 }

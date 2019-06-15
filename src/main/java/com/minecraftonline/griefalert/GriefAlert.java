@@ -1,9 +1,14 @@
 package com.minecraftonline.griefalert;
 
 import com.google.inject.Inject;
-import com.minecraftonline.griefalert.GriefAction.GriefType;
+import com.minecraftonline.griefalert.commands.GriefAlertCommand;
+import com.minecraftonline.griefalert.core.GriefAction;
+import com.minecraftonline.griefalert.core.GriefAction.GriefType;
+import com.minecraftonline.griefalert.core.GriefActionTableManager;
+import com.minecraftonline.griefalert.core.RealtimeGriefInstanceManager;
 import com.minecraftonline.griefalert.listeners.*;
 import com.minecraftonline.griefalert.tools.General.IllegalColorCodeException;
+import com.minecraftonline.griefalert.storage.GriefLogger;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -27,6 +32,8 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionType;
 
+import static com.minecraftonline.griefalert.GriefAlert.VERSION;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -40,8 +47,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 @Plugin(id = "griefalert",
         name = "GriefAlert",
@@ -69,7 +74,11 @@ public class GriefAlert {
     public static final boolean DEBUG_IN_GAME_ALERTS = false;
     /** Will the alerts be shown in the console as well as in game? */
     public static final boolean SHOW_ALERTS_IN_CONSOLE = false;
-
+    /** Get extra messages about the activities occurring within the plugin. */
+    public static final boolean GENERAL_DEBUG = true;
+    /** An array list all dimensions to use when needing to place Grief Actions into all possible dimensions. */
+    public static final String[] ALL_DIMENSIONS = new String[] {"minecraft:overworld", "minecraft:nether", "minecraft:the_end"};
+    
     public static final String SQL_USERNAME = "user";
     public static final String SQL_PASSWORD = "PA$$word";
     public static final String SQL_ADDRESS = "localhost:3306/minecraft";
@@ -82,6 +91,9 @@ public class GriefAlert {
     @Inject
     /** General logger. From Sponge API. */
     private Logger logger;
+    
+    /** A logger for only sending messages for debugging the behavior of this plugin. */
+    private DebugLogger dLogger;
     
     /** Grief logger. */
     private GriefLogger gLogger;
@@ -114,6 +126,8 @@ public class GriefAlert {
     public void initialize(GamePreInitializationEvent event) {
         logger.info("Initializing GriefAlert...");
         
+        this.dLogger = new DebugLogger(this.getLogger(), GENERAL_DEBUG);
+        
         // Load the config from the Sponge API and set the specific node values.
         initializeConfig();
         
@@ -124,17 +138,22 @@ public class GriefAlert {
         // Read the grief alert file
         readGriefAlertFile(loadGriefAlertFile());
         
+        dLogger.log("All flagged Grief Actions:");
+        for (GriefAction griefAction : griefActions.values()) {
+        	dLogger.log(griefAction.toString());
+        }
+        
         // Register all the listeners with Sponge
         registerListeners(realtimeManager);
         
         // Register the command for checking grief alerts
-        CommandSpec gcheckin = CommandSpec.builder().
+        CommandSpec gcheck = CommandSpec.builder().
                 executor(new GriefAlertCommand(this)).
                                                   description(Text.of("Check a GriefAlert Number")).
                                                   arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
                                                   permission("griefalert.check").
                                                   build();
-        Sponge.getCommandManager().register(this, gcheckin, "gcheckin");
+        Sponge.getCommandManager().register(this, gcheck, "gcheck");
     }
 
     
@@ -216,8 +235,6 @@ public class GriefAlert {
                 }
                 URI defaultFile = defaultFileURL.toURI();
                 
-                
-                
                 FileSystem filesys = null;
                 try {
                     filesys = FileSystems.getFileSystem(defaultFile);
@@ -243,7 +260,6 @@ public class GriefAlert {
         try {
             logger.info("Watch List file being read and loaded into plugin...");
             Scanner scanner = new Scanner(griefAlertFile);
-            
             String[] splitLine;
             String line;
             while (scanner.hasNext()) {
@@ -278,20 +294,24 @@ public class GriefAlert {
                 String[] applicableDimensions;
                 if (splitLine.length > 5) {
                 	applicableDimensions = splitLine[5].split(",");
-                    for (int index = 0; index < applicableDimensions.length; index++) {
-                        if (applicableDimensions[index].contains("-")) {
-                        	applicableDimensions[index] = applicableDimensions[index].replace('-', ':');
+                    for (String dim : applicableDimensions) {
+                        if (dim.contains("-")) {
+                        	dim = dim.replace('-', ':');
                         } else {
-                        	applicableDimensions[index] = "minecraft:" + applicableDimensions[index];
+                        	dim = "minecraft:" + dim;
                         }
                     }
                 } else {
-                	applicableDimensions = new String[]{"ALL"};
+                	applicableDimensions = ALL_DIMENSIONS;
                 }
                 
                 // Input the grief action into the tables
 	            for (String dim : applicableDimensions) {
 	                griefActions.put(griefAction.getType(), griefAction.getBlockId(), dim, griefAction);
+	                getDebugLogger().log("Grief Action put into Table Manager of Grief Actions. "
+	                		+ "Type: " + griefAction.getType() + " "
+	                		+ "Dimension: " + dim + ", "
+	                		+ "BlockId: " + griefAction.getBlockId());
 	            }
             }
             scanner.close();
@@ -407,5 +427,27 @@ public class GriefAlert {
     
     public File getGriefAlertDirectory() {
     	return configDirectory;
+    }
+    
+    public DebugLogger getDebugLogger() {
+    	return dLogger;
+    }
+    
+    public class DebugLogger {
+    	
+    	static final String DEBUG_TAG = "[DEBUG]";
+    	
+    	final Logger logger;
+    	final boolean debugMode;
+    	
+    	DebugLogger(Logger logger, boolean debugMode) {
+    		this.logger = logger;
+    		this.debugMode = debugMode;
+    	}
+    	
+    	public void log(String message) {
+    		if (debugMode) logger.info(DEBUG_TAG + " " + message);
+    	}
+    	
     }
 }

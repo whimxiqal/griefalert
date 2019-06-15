@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.commands;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -9,6 +9,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
+
+import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.core.GriefInstance;
 
 import javax.annotation.Nonnull;
 

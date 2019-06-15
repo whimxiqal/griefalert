@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.storage;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
@@ -13,6 +13,9 @@ import org.spongepowered.api.entity.hanging.ItemFrame;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
 
+import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.core.GriefInstance;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -23,7 +26,7 @@ import java.sql.SQLException;
 /**
  * This class handles remote logging of grief instances to a SQL database.
  */
-final class GriefLogger {
+public final class GriefLogger {
 	
 	private static final String GRIEF_INSTANCE_TABLE_NAME = "GriefAlert_Log";
 	
@@ -38,7 +41,7 @@ final class GriefLogger {
      * The only constructor for a GriefLogger.
      * @param griefAlert The main plugin class object
      */
-    GriefLogger(GriefAlert griefAlert) {
+    public GriefLogger(GriefAlert griefAlert) {
     	this.plugin = griefAlert;
     	try {
 			testConnection();
@@ -121,7 +124,7 @@ final class GriefLogger {
      * Save an instance of grief in the SQL database
      * @param instance The specific instance of grief to save
      */
-    final void storeGriefInstance(GriefInstance instance) {
+    public final void storeGriefInstance(GriefInstance instance) {
         plugin.getLogger().debug("Storing Grief Instance data...");
         PreparedStatement ps = null;
         try {
@@ -155,7 +158,7 @@ final class GriefLogger {
      * @param sign The representation of the sign
      * @param signData The data held by the new sign
      */
-    final void storeSignEdit(Player player, Sign sign, SignData signData) {
+    public final void storeSignEdit(Player player, Sign sign, SignData signData) {
         plugin.getLogger().debug("Storing Edited Sign data...");
         PreparedStatement ps = null;
         try {

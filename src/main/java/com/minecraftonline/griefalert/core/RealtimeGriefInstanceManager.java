@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.core;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.block.tileentity.Sign;
@@ -10,8 +10,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.channel.type.PermissionMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.tools.General;
 
 import java.util.HashMap;
@@ -208,7 +210,7 @@ public final class RealtimeGriefInstanceManager {
      * @param message The message for staff to see
      */
     public void printToStaff(Text message) {
-        MessageChannel staffChannel = MessageChannel.permission("griefalert.staff");
+        MessageChannel staffChannel = new PermissionMessageChannel("griefalert.staff");
         staffChannel.send(message);
     }
 

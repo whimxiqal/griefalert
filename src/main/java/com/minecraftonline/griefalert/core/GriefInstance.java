@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.core;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
@@ -8,7 +8,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.World;
 
-import com.minecraftonline.griefalert.GriefAction.GriefType;
+import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 
 /**
  * A class to represent any one candidate of an instance of grief in the game. Once a player triggers

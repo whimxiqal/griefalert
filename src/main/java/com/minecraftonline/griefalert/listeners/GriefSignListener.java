@@ -1,9 +1,10 @@
 package com.minecraftonline.griefalert.listeners;
 
-import com.minecraftonline.griefalert.GriefAlert;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
+
+import com.minecraftonline.griefalert.GriefAlert;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;

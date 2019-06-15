@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.core;
 
 import com.minecraftonline.griefalert.tools.General;
 
@@ -163,6 +163,15 @@ public class GriefAction {
 		GriefInstance other = (GriefInstance) otherObject;
 		return this.getType() == other.getType() &&
 				this.getBlockId() == other.getBlockId();
+	}
+	
+	@Override
+	public String toString() {
+		return "BlockID: " + blockId + ", "
+				+ "type: " + this.getType().name() + ", "
+				+ "denied: " + this.denied + ", "
+				+ "stealthy: " + this.stealthyAlert;
+		
 	}
 
 }

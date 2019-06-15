@@ -1,8 +1,8 @@
 package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.GriefInstance;
-import com.minecraftonline.griefalert.GriefAction.GriefType;
+import com.minecraftonline.griefalert.core.GriefInstance;
+import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;

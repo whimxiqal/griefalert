@@ -1,8 +1,8 @@
 package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.GriefInstance;
-import com.minecraftonline.griefalert.GriefAction.GriefType;
+import com.minecraftonline.griefalert.core.GriefInstance;
+import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
@@ -32,6 +32,7 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
     public void handle(@Nonnull ChangeBlockEvent.Break event) {
     	// Make sure the event was caused by a player
     	// TODO Simplify
+    	
         if (event.getCause().root() instanceof Player) {
             Optional<Player> poption = event.getCause().first(Player.class);
             if (poption.isPresent()) {
@@ -40,14 +41,25 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                 for (Transaction<BlockSnapshot> transaction : transactions) {
                     BlockSnapshot blockSnapshot = transaction.getOriginal();
                     String blockID = blockSnapshot.getState().getType().getId();
+                    plugin.getDebugLogger().log(player.getName() + " broke a " + blockID);
                     DimensionType dType = blockSnapshot.getLocation().get().getExtent().getDimension().getType();
+                    plugin.getDebugLogger().log("Checking if this is a registered Grief Action."
+                			+ "Type: " + GriefType.DESTROYED + ", "
+                			+ "BlockID: " + blockID + ", "
+                			+ "Dimension: " + dType);
                     if (plugin.isGriefAction(GriefType.DESTROYED, blockID, dType)) {
+                    	plugin.getDebugLogger().log("This is registered as a Grief Action.");
                         if (!plugin.getGriefAction(GriefType.DESTROYED, blockID, dType).isDenied()) {
+                        	plugin.getDebugLogger().log("This is not a denied Grief Action.");
                             plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(plugin.getGriefAction(GriefType.DESTROYED, blockID, dType)).
                             		assignBlock(blockSnapshot).assignGriefer(player));
+                            plugin.getDebugLogger().log("Grief Instance of this Destroy Grief Action processed.");
                         } else {
                             event.setCancelled(true);
+                            plugin.getDebugLogger().log("this is a denied Grief Action.");
                         }
+                    } else {
+                    	plugin.getDebugLogger().log("This is not registered as a Grief Action.");
                     }
                 }
             }
