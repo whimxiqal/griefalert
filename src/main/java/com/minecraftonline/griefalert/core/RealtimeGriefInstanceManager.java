@@ -1,7 +1,6 @@
 package com.minecraftonline.griefalert.core;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
@@ -60,8 +59,6 @@ public final class RealtimeGriefInstanceManager {
 	 * Line text
 	 */
 	public final static String EDITED_SIGN_LINE_ALERT_FORMAT = "Line %d: %s";
-	
-	public static boolean GRIEFALERT_NOALERT_OVERRIDE = true;
 	
 	/** 
 	 * Houses all data about recent grief actions of each player.
@@ -141,7 +138,7 @@ public final class RealtimeGriefInstanceManager {
      */
     public void alert(int alertId, GriefInstance instance) {
     	plugin.getDebugLogger().log("Handling the most recent instance of grief in game.");
-        if (GRIEFALERT_NOALERT_OVERRIDE || !instance.getGrieferAsPlayer().hasPermission("griefalert.noalert")) {
+        if (!instance.getGrieferAsPlayer().hasPermission("griefalert.noalert")) {
         	// Player does not have the permission to mute their own grief instance alerts
         	Text alertMessage = generateAlertMessage(alertId, instance);
         	UUID playerId = instance.getGrieferAsPlayer().getUniqueId();
@@ -221,13 +218,8 @@ public final class RealtimeGriefInstanceManager {
      * @param message The message for staff to see
      */
     public void printToStaff(Text message) {
-    	if (Sponge.getServer().getPlayer("PietElite").isPresent()) {
-    		Sponge.getServer().getPlayer("PietElite").get().sendMessage(message);
-    	}
-    	/*
-        MessageChannel staffChannel = new PermissionMessageChannel("griefalert.staff");
+        MessageChannel staffChannel = new PermissionMessageChannel("griefalert.staff");	
         staffChannel.send(message);
-        */
     }
 
     /**
