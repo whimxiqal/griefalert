@@ -48,29 +48,25 @@ public final class GriefInstance {
      * General constructor
      * @param griefAction The GriefAction which triggered this GriefInstance.
      */
-    public GriefInstance(GriefAction griefAction) {
+    public GriefInstance(GriefAction griefAction, BlockSnapshot blockSnapshot, Player griefer) {
     	this.griefAction = griefAction;
-    }
-
-    public GriefInstance assignBlock(BlockSnapshot blockSnapshot) {
-        this.griefObject = new GriefTriggerObject(blockSnapshot);
-        return this;
-    }
-
-    public GriefInstance assignEntity(Entity entity) {
-        this.griefObject = new GriefTriggerObject(entity);
-        return this;
-    }
-    
-    public GriefInstance assignItem(ItemStackSnapshot itemStackSnapshot) {
-        this.griefObject = new GriefTriggerObject(itemStackSnapshot);
-        return this;
-    }
-
-    public GriefInstance assignGriefer(Player griefer) {
-        this.grieferSnapshot = griefer.createSnapshot();
+    	this.griefObject = new GriefTriggerObject(blockSnapshot);
+    	this.grieferSnapshot = griefer.createSnapshot();
         this.griefer = griefer;
-        return this;
+    }
+
+    public GriefInstance(GriefAction griefAction, Entity entity, Player griefer) {
+    	this.griefAction = griefAction;
+    	this.griefObject = new GriefTriggerObject(entity);
+    	this.grieferSnapshot = griefer.createSnapshot();
+        this.griefer = griefer;
+    }
+
+    public GriefInstance(GriefAction griefAction, ItemStackSnapshot itemStackSnapshot, Player griefer) {
+    	this.griefAction = griefAction;
+    	this.griefObject = new GriefTriggerObject(itemStackSnapshot);
+    	this.grieferSnapshot = griefer.createSnapshot();
+        this.griefer = griefer;
     }
 
     

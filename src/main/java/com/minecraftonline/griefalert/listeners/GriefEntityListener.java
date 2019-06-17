@@ -42,9 +42,9 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                         Player player = event.getCause().first(Player.class).get();
                         String blockID = target instanceof Painting ? "minecraft:painting" : target instanceof ItemFrame ? "minecraft:item_frame" : "minecraft:leash_knot";
                         if (plugin.isGriefAction(GriefType.INTERACTED, blockID, dType)) {
-                            GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).
-                            		assignEntity(target).
-                            		assignGriefer(player);
+                            GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType),
+                            		target,
+                            		player);
                             if (!instance.isDenied()) {
                                 plugin.getRealtimeGriefInstanceManager().processGriefInstance(instance);
                             } else {
@@ -58,9 +58,9 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                 String blockID = "minecraft:armor_stand";
                 if (event instanceof InteractEntityEvent.Primary) {
                     if (plugin.isGriefAction(GriefType.INTERACTED, blockID, dType)) {
-                    	GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType)).
-                    			assignEntity(target).
-                    			assignGriefer(player);
+                    	GriefInstance instance = new GriefInstance(plugin.getGriefAction(GriefType.INTERACTED, blockID, dType),
+                    			target,
+                    			player);
                         if (!instance.isDenied()) {
                             plugin.getRealtimeGriefInstanceManager().processGriefInstance(instance);
                         } else {

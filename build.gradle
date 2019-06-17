@@ -12,7 +12,7 @@ repositories {
 	maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
 }
 
-archivesBaseName = 'griefalert' // Project Base Name Here
+//archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline' // This is a MinecraftOnline project
 version = '21.0' // Project Version
 

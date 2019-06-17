@@ -9,6 +9,7 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
@@ -51,12 +52,16 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                     	plugin.getDebugLogger().log("This is registered as a Grief Action.");
                         if (!plugin.getGriefAction(GriefType.DESTROYED, blockID, dType).isDenied()) {
                         	plugin.getDebugLogger().log("This is not a denied Grief Action.");
-                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(plugin.getGriefAction(GriefType.DESTROYED, blockID, dType)).
-                            		assignBlock(blockSnapshot).assignGriefer(player));
+                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(
+                            		plugin.getGriefAction(GriefType.DESTROYED, blockID, dType),
+                            		blockSnapshot,
+                            		player));
                             plugin.getDebugLogger().log("Grief Instance of this Destroy Grief Action processed.");
                         } else {
                             event.setCancelled(true);
-                            plugin.getDebugLogger().log("this is a denied Grief Action.");
+                            plugin.getDebugLogger().log("This is a denied Grief Action.");
+                            // TODO fix this message to staff
+                            plugin.getRealtimeGriefInstanceManager().printToStaff(Text.of("Player tried to break something, but it was denied."));
                         }
                     } else {
                     	plugin.getDebugLogger().log("This is not registered as a Grief Action.");
