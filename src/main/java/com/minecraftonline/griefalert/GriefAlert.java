@@ -81,18 +81,23 @@ public class GriefAlert implements PluginContainer {
     public static final int MAX_REPEATED_HIDDEN_ALERT = 10;
     /** Is logging whether someone changes a sign going to be logged? */
     public static final boolean LOG_SIGNS_CONTENT = true;
-    /** Will there be in game alerts to help debug the plugin? */
-    public static final boolean DEBUG_IN_GAME_ALERTS = false;
     /** Will the alerts be shown in the console as well as in game? */
     public static final boolean SHOW_ALERTS_IN_CONSOLE = true;
-    /** Get extra messages about the activities occurring within the plugin. */
-    public static final boolean GENERAL_DEBUG = true;
+    
+    public static final boolean DEBUG_MODE = false;
     /** An array list all dimensions to use when needing to place Grief Actions into all possible dimensions. */
     public static final String[] ALL_DIMENSIONS = new String[] {"minecraft:overworld", "minecraft:nether", "minecraft:the_end"};
     /** The regex between each component of a Grief Alert in the Grief Alert configuration file. */
     public static final String GRIEF_ALERT_CONFIG_LINE_REGEX = ";";
     
-    public static final String DEFAULT_STAFF_ALERT_MESSAGE = "(PLAYER) (GRIEF_VERB) a (GRIEF_OBJECT) ((GRIEF_ID)) in the (LOCATION:DIMENSION)";
+    public static final String DEFAULT_STAFF_ALERT_MESSAGE = 
+    		"(PLAYER) (GRIEF_VERB) a (GRIEF_OBJECT) ((GRIEF_ID)) in the (LOCATION:DIMENSION)";
+    
+    public static final String DEFAULT_STAFF_ALERT_MESSAGE_SIGN_HEADER = 
+    		"Sign placed by (PLAYER) at (LOCATION:COORDINATES) in the (LOCATION:DIMENSION)";
+    
+    public static final String DEFAULT_STAFF_ALERT_MESSAGE_SIGN_LINE = 
+    		"Line (SIGN_LINE_NUMBER): (SIGN_LINE_CONTENT)";
     
     public static final String SQL_USERNAME = "user";
     public static final String SQL_PASSWORD = "PA$$word";
@@ -141,7 +146,7 @@ public class GriefAlert implements PluginContainer {
     public void initialize(GamePreInitializationEvent event) {
         logger.info("Initializing GriefAlert...");
         
-        this.dLogger = new DebugLogger(this.getLogger(), GENERAL_DEBUG);
+        this.dLogger = new DebugLogger(this.getLogger(), DEBUG_MODE);
         
         // Load the config from the Sponge API and set the specific node values.
         initializeConfig();
@@ -197,14 +202,15 @@ public class GriefAlert implements PluginContainer {
                 rootNode.getNode("alertsCodeLimit").setValue(ALERTS_CODE_LIMIT);
                 rootNode.getNode("maxHiddenMatchingAlerts").setValue(MAX_REPEATED_HIDDEN_ALERT);
                 rootNode.getNode("logSignsContent").setValue(LOG_SIGNS_CONTENT);
-                rootNode.getNode("debugInGameAlerts").setValue(DEBUG_IN_GAME_ALERTS);
                 rootNode.getNode("showAlertsInConsole").setValue(SHOW_ALERTS_IN_CONSOLE);
-
+                rootNode.getNode("debugMode").setValue(false);
                 rootNode.getNode("SQLusername").setValue(SQL_USERNAME);
                 rootNode.getNode("SQLpassword").setValue(SQL_PASSWORD);
                 rootNode.getNode("SQLdb").setValue(SQL_ADDRESS);
                 ConfigurationNode messagingNode = rootNode.getNode("messaging");
                 messagingNode.getNode("staff_alert_message").setValue(DEFAULT_STAFF_ALERT_MESSAGE);
+                messagingNode.getNode("staff_alert_message_sign_header").setValue(DEFAULT_STAFF_ALERT_MESSAGE_SIGN_HEADER);
+                messagingNode.getNode("staff_alert_message_sign_line").setValue(DEFAULT_STAFF_ALERT_MESSAGE_SIGN_LINE);
                 configManager.save(rootNode);
                 logger.info("New Configuration File created successfully!");
             } catch (IOException e) {

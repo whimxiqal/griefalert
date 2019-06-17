@@ -13,6 +13,7 @@ import org.spongepowered.api.text.format.TextColors;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.tools.CustomizableString;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,27 +26,6 @@ import java.util.UUID;
  * Instances, and so forth.
  */
 public final class RealtimeGriefInstanceManager {
-
-	
-	/**
-	 * The format for the header of a grief alert of a sign for staff to read.
-	 * The order of input is:
-	 * Username of player
-	 * X component of location
-	 * Y component of location
-	 * Z component of location
-	 * The world name
-	 * The dimension name
-	 */
-	public final static String EDITED_SIGN_HEADER_ALERT_FORMAT = "Sign placed by %s at %d %d %d in %s-%s";
-	
-	/**
-	 * The format for each line of a grief alert of a sign for staff to read.
-	 * The order of input is:
-	 * Line number
-	 * Line text
-	 */
-	public final static String EDITED_SIGN_LINE_ALERT_FORMAT = "Line %d: %s";
 	
 	/** 
 	 * Houses all data about recent grief actions of each player.
@@ -107,13 +87,6 @@ public final class RealtimeGriefInstanceManager {
         plugin.getGriefLogger().storeGriefInstance(instance);
         
         // Tell staff
-        if (plugin.getConfigBoolean("debugInGameAlerts")) {
-        	// Just alert the staff and don't do anything else.
-        	// This is what it did before as well, but I'm not sure if this is the
-        	// best way to debug
-            printToStaff(generateAlertMessage(alertId, instance));
-            return;
-        }
         if (alertInGame) alert(alertId, instance);
     }
     
@@ -172,16 +145,24 @@ public final class RealtimeGriefInstanceManager {
         	String toPrint = "";
         	
         	// Add header to message
-            toPrint += String.format(EDITED_SIGN_HEADER_ALERT_FORMAT, player.getName(), sign.getLocation().getBlockX(), sign.getLocation().getBlockY(),
-                                                  sign.getLocation().getBlockZ(), player.getWorld().getName(),
-                                                  player.getWorld().getDimension().getType().getId().replace("minecraft:", ""));
+            toPrint += new CustomizableString(plugin.getConfigNode("messaging").getNode("staff_alert_message_sign_header").getString())
+            							.replacePlayer(player)
+            							.replaceLocationCoordinates(Arrays.asList(
+            															String.valueOf(sign.getLocation().getBlockX()), 
+            															String.valueOf(sign.getLocation().getBlockY()),
+            															String.valueOf(sign.getLocation().getBlockZ())))
+                                        .replaceLocationDimension(player.getWorld().getDimension().getType())
+                                        .complete();
             
             // Add all non-empty lines to message
             for (int index = 0; index < signData.lines().size(); index++) {
                 Text signText = signData.lines().get(index);
                 // Do not show empty lines
                 if (!signText.isEmpty()) {
-                	toPrint += "\n" + String.format(EDITED_SIGN_LINE_ALERT_FORMAT, index, signText.toPlain());
+                	toPrint += "\n" + new CustomizableString(plugin.getConfigNode("messaging").getNode("staff_alert_message_sign_line").getString())
+                								.replaceSignLineNumber(index + 1)
+                								.replaceSignLineContent(signText.toPlain())
+                								.complete();
                 }
             }
             plugin.getDebugLogger().log("Printing sign log message to staff: " + toPrint);

@@ -1,5 +1,7 @@
 package com.minecraftonline.griefalert.tools;
 
+import java.util.List;
+
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
@@ -10,11 +12,14 @@ public final class CustomizableString {
 	
 	private final static String PLAYER_PLACEHOLDER = "\\(PLAYER\\)";
 	private final static String GRIEF_ID_PLACEHOLDER = "\\(GRIEF_ID\\)";
-	private final static String LOCATION_BLOCK_PLACEHOLDER = "\\(LOCATION:BLOCK\\)";
+	private final static String LOCATION_COORDINATES_PLACEHOLDER = "\\(LOCATION:COORDINATES\\)";
 	private final static String LOCATION_WORLD_PLACEHOLDER = "\\(LOCATION:WORLD\\)";
 	private final static String LOCATION_DIMENSION_PLACEHOLDER = "\\(LOCATION:DIMENSION\\)";
 	private final static String GRIEF_VERB_PLACEHOLDER = "\\(GRIEF_VERB\\)";
 	private final static String GRIEF_OBJECT_PLACEHOLDER = "\\(GRIEF_OBJECT\\)";
+	private final static String GRIEF_ID_LIST_PLACEHOLDER = "\\(GRIEF_ID_LIST\\)";
+	private final static String SIGN_LINE_NUMBER_PLACEHOLDER = "\\(SIGN_LINE_NUMBER\\)";
+	private final static String SIGN_LINE_CONTENT_PLACEHOLDER = "\\(SIGN_LINE_CONTENT\\)";
 	
 	private String string;
 	
@@ -30,11 +35,8 @@ public final class CustomizableString {
 		return replace(GRIEF_ID_PLACEHOLDER, String.valueOf(id));
 	}
 	
-	public CustomizableString replaceLocationBlock(int[] coordinates) {
-		return replace(LOCATION_BLOCK_PLACEHOLDER, "" +
-								coordinates[0] + ", " +
-								coordinates[1] + ", " +
-								coordinates[2]);			
+	public CustomizableString replaceLocationCoordinates(List<String> coordinates) {
+		return replace(LOCATION_COORDINATES_PLACEHOLDER, String.join(", ", coordinates));			
 	}
 	
 	public CustomizableString replaceLocationWorld(World world) {
@@ -51,6 +53,18 @@ public final class CustomizableString {
 	
 	public CustomizableString replaceGriefObject(String object) {
 		return replace(GRIEF_OBJECT_PLACEHOLDER, object);
+	}
+	
+	public CustomizableString replaceGriefIDList(List<String> ids) {
+		return replace(GRIEF_ID_LIST_PLACEHOLDER, String.join(", ", ids));
+	}
+	
+	public CustomizableString replaceSignLineContent(String line) {
+		return replace(SIGN_LINE_CONTENT_PLACEHOLDER, line);
+	}
+	
+	public CustomizableString replaceSignLineNumber(int lineNumber) {
+		return replace(SIGN_LINE_NUMBER_PLACEHOLDER, String.valueOf(lineNumber));
 	}
 	
 	private CustomizableString replace(String placeholder, String object) {
