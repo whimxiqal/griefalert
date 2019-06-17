@@ -10,7 +10,7 @@ import org.spongepowered.api.text.channel.type.PermissionMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.tools.General;
+import com.minecraftonline.griefalert.tools.CustomizableString;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,16 +25,6 @@ import java.util.UUID;
  */
 public final class RealtimeGriefInstanceManager {
 
-	/**
-	 * The format for a grief instance alert for staff to read.
-	 * The order of input is:
-	 * Username of player
-	 * Grief Action Type
-	 * Object griefed
-	 * ID for the Grief Instance which is triggering the alert
-	 * The dimension of grief
-	 */
-	public final static String GRIEF_INSTANCE_ALERT_FORMAT = "%s %s a %s (%d) in the %s.";
 	
 	/**
 	 * The format for the header of a grief alert of a sign for staff to read.
@@ -227,15 +217,26 @@ public final class RealtimeGriefInstanceManager {
      * @return The readable text format of the grief instance
      */
     public Text generateAlertMessage(int alertId, GriefInstance instance) {
-        return Text.builder(General.correctIndefiniteArticles(
-        							String.format(GRIEF_INSTANCE_ALERT_FORMAT, 
-        									instance.getGrieferAsPlayer().getName(), 
-        									instance.getType(),   
-        									instance.getGriefObjectAsString(), 
-        									alertId, 
-        									instance.getLocation().getExtent().getDimension().getType().getName()/*.getId().replaceAll("\\w+:", "")*/))).
-        				color(instance.getAlertColor()).
-        				build();
+    	String defaultAlertMessage;
+    	try {
+	    	defaultAlertMessage = (String) plugin.getConfigNode("messaging").getNode("staff_alert_message").getValue();
+	    	if (defaultAlertMessage == null) throw new NullPointerException();
+    	} catch (ClassCastException castEx) {
+    		plugin.getLogger().warn("Messaging value for node 'staff_alert_message' not a string. Sending basic alert message.");
+    		defaultAlertMessage = "Alert";
+    	} catch (NullPointerException nullEx) {
+    		plugin.getLogger().warn("Messaging value for node 'staff_alert_message' not found. Sending basic alert message.");
+    		defaultAlertMessage = "Alert";
+    	}
+        return Text.builder(new CustomizableString(defaultAlertMessage)
+        									.replacePlayer(instance.getGrieferAsPlayer()) 
+        									.replaceGriefType(instance.getType())
+        									.replaceGriefObject(instance.getGriefObjectAsString())
+        									.replaceGriefID(alertId)
+        									.replaceLocationDimension(instance.getLocation().getExtent().getDimension().getType()/*.getId().replaceAll("\\w+:", "")*/)
+        									.complete())
+        				.color(instance.getAlertColor())
+        				.build();
     }
 
     /**

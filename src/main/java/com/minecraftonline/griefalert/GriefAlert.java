@@ -91,6 +91,8 @@ public class GriefAlert implements PluginContainer {
     /** The regex between each component of a Grief Alert in the Grief Alert configuration file. */
     public static final String GRIEF_ALERT_CONFIG_LINE_REGEX = ";";
     
+    public static final String DEFAULT_STAFF_ALERT_MESSAGE = "(PLAYER) (GRIEF_VERB) a (GRIEF_OBJECT) ((GRIEF_ID)) in the (LOCATION:DIMENSION)";
+    
     public static final String SQL_USERNAME = "user";
     public static final String SQL_PASSWORD = "PA$$word";
     public static final String SQL_ADDRESS = "localhost:3306/minecraft";
@@ -200,6 +202,8 @@ public class GriefAlert implements PluginContainer {
                 rootNode.getNode("SQLusername").setValue(SQL_USERNAME);
                 rootNode.getNode("SQLpassword").setValue(SQL_PASSWORD);
                 rootNode.getNode("SQLdb").setValue(SQL_ADDRESS);
+                ConfigurationNode messagingNode = rootNode.getNode("messaging");
+                messagingNode.getNode("staff_alert_message").setValue(DEFAULT_STAFF_ALERT_MESSAGE);
                 configManager.save(rootNode);
                 logger.info("New Configuration File created successfully!");
             } catch (IOException e) {
@@ -408,6 +412,10 @@ public class GriefAlert implements PluginContainer {
      */
     public boolean getConfigBoolean(String key) {
         return rootNode.getNode(key).getBoolean();
+    }
+    
+    public ConfigurationNode getConfigNode(String key) {
+    	return rootNode.getNode(key);
     }
 
     /**

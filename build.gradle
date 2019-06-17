@@ -19,7 +19,7 @@ version = '21.0' // Project Version
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 ext.sponge_version = '7.0.0' // SpongeAPI version
-ext.authors = ['PietElite','darkdiplomat', 'BastetFurry', '14mRh4X0r'] // Separate with commas (e.g. ['SlowRiot', 'FliPPeh', '14mRh4X0r', 'techkid6'])
+ext.authors = ['PietElite', 'darkdiplomat', 'BastetFurry', '14mRh4X0r'] // Separate with commas (e.g. ['SlowRiot', 'FliPPeh', '14mRh4X0r', 'techkid6'])
 
 compileJava {
     options.compilerArgs += ["-parameters"]
