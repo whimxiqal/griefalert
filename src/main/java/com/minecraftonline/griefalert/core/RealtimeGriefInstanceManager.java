@@ -2,12 +2,8 @@ package com.minecraftonline.griefalert.core;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.block.tileentity.Sign;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
-import org.spongepowered.api.entity.hanging.ItemFrame;
-import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.type.PermissionMessageChannel;
@@ -194,9 +190,10 @@ public final class RealtimeGriefInstanceManager {
                 Text signText = signData.lines().get(index);
                 // Do not show empty lines
                 if (!signText.isEmpty()) {
-                	toPrint += String.format(EDITED_SIGN_LINE_ALERT_FORMAT, index, signText);
+                	toPrint += "\n" + String.format(EDITED_SIGN_LINE_ALERT_FORMAT, index, signText.toPlain());
                 }
             }
+            plugin.getDebugLogger().log("Printing sign log message to staff: " + toPrint);
             printToStaff(Text.builder(toPrint).color(TextColors.GRAY).build());
         } else {
         	// Right now, nothing happens if the griefer *does* have the "griefalert.noalert" node.

@@ -5,12 +5,9 @@ import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataTranslators;
-import org.spongepowered.api.entity.hanging.ItemFrame;
-import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
 
 import com.minecraftonline.griefalert.GriefAlert;
