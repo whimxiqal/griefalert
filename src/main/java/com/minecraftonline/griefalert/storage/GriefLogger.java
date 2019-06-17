@@ -138,16 +138,16 @@ public final class GriefLogger {
             testConnection();
             ps = conn.prepareStatement("INSERT INTO " + GRIEF_INSTANCE_TABLE_NAME + " (user,block_state,block_json,x,y,z,px,py,pz,dimension,world_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, instance.getGrieferAsPlayer().getUniqueId().toString());
-            ps.setString(2, printGriefInstanceObjectForStorage(instance));
+            ps.setString(2, instance.getGriefObjectAsString());
             ps.setString(3, toJSON(generateDataContainer(instance)));
-            ps.setInt(4, instance.getX());
-            ps.setInt(5, instance.getY());
-            ps.setInt(6, instance.getZ());
+            ps.setInt(4, instance.getLocation().getBlockX());
+            ps.setInt(5, instance.getLocation().getBlockY());
+            ps.setInt(6, instance.getLocation().getBlockZ());
             ps.setInt(7, instance.getGrieferSnapshot().getLocation().get().getBlockX());
             ps.setInt(8, instance.getGrieferSnapshot().getLocation().get().getBlockY());
             ps.setInt(9, instance.getGrieferSnapshot().getLocation().get().getBlockZ());
-            ps.setString(10, instance.getWorld().getDimension().getType().getId());
-            ps.setString(11, instance.getWorld().getUniqueId().toString());
+            ps.setString(10, instance.getLocation().getExtent().getDimension().getType().getId());
+            ps.setString(11, instance.getLocation().getExtent().getUniqueId().toString());
             ps.execute();
             plugin.getLogger().debug("Store complete!");
         } catch (SQLException sqlex) {
@@ -222,6 +222,9 @@ public final class GriefLogger {
      * @param instance The specific GriefInstance
      * @return String representation of the GriefInstance
      */
+    
+    // TODO fix storage message
+    /*
     private String printGriefInstanceObjectForStorage(GriefInstance instance) {
         if (instance.getBlock() != null) {
             return instance.getBlock().getState().toString();
@@ -240,6 +243,7 @@ public final class GriefLogger {
         }
         return instance.getBlockId();
     }
+    */
 
     /**
      * Unclear purpose.
@@ -247,13 +251,7 @@ public final class GriefLogger {
      * @return
      */
     private DataContainer generateDataContainer(GriefInstance instance) {
-        if (instance.getBlock() != null) {
-            return instance.getBlock().toContainer();
-        }
-        if (instance.getItem() != null) {
-            return instance.getItem().toContainer();
-        }
-        return instance.getEntity().toContainer();
+        return instance.getGriefObjectToContainer();
     }
 
     /**

@@ -1,11 +1,16 @@
 package com.minecraftonline.griefalert.core;
 
+import java.util.NoSuchElementException;
+
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
+import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;
@@ -33,16 +38,12 @@ public final class GriefInstance {
 
 	/** GriefAction which triggered this GriefInstance. */
 	private final GriefAction griefAction;
-	/** The BlockSnapshot of the griefed block. */
-    private BlockSnapshot block;
-    /** The ItemStackSnapshot of the griefed item. */
-    private ItemStackSnapshot item;
-    /** The Entity of the griefed object. */
-    private Entity entity;
     /** The EntitySnapshot of the griefer at the moment the grief occurred. */
     private EntitySnapshot grieferSnapshot;
     /** The Player representation of the griefer. */
     private Player griefer;
+    /** The general Object for holding the grief related object in this Grief Instance. */
+    private GriefTriggerObject griefObject;
 	
     /**
      * General constructor
@@ -53,12 +54,17 @@ public final class GriefInstance {
     }
 
     public GriefInstance assignBlock(BlockSnapshot blockSnapshot) {
-        this.block = blockSnapshot;
+        this.griefObject = new GriefTriggerObject(blockSnapshot);
         return this;
     }
 
     public GriefInstance assignEntity(Entity entity) {
-        this.entity = entity;
+        this.griefObject = new GriefTriggerObject(entity);
+        return this;
+    }
+    
+    public GriefInstance assignItem(ItemStackSnapshot itemStackSnapshot) {
+        this.griefObject = new GriefTriggerObject(itemStackSnapshot);
         return this;
     }
 
@@ -68,67 +74,21 @@ public final class GriefInstance {
         return this;
     }
 
-    public GriefInstance assignItem(ItemStackSnapshot itemStackSnapshot) {
-        this.item = itemStackSnapshot;
-        return this;
-    }
     
     /**
      * Gets the BlockId from the GriefAction saved in this GriefInstance.
      * @return The String representation of the GriefAction BlockId
      */
     public String getBlockId() {
-        if (griefAction.getBlockId() == null) {
-            if (this.block != null) {
-                return this.block.getState().getType().getId();
-            }
-            return "minecraft:unknown";
-        }
         return griefAction.getBlockId();
     }
     
-    public BlockSnapshot getBlock() {
-        return block;
-    }
-
-    public ItemStackSnapshot getItem() {
-        return item;
-    }
-
-    public Entity getEntity() {
-        return entity;
+    public Location<World> getLocation() {
+    	return griefObject.getLocation();
     }
 
     public EntitySnapshot getGrieferSnapshot() {
         return grieferSnapshot;
-    }
-
-    public int getX() {
-        if (block != null) {
-            return block.getLocation().get().getBlockX();
-        } else {
-            return entity.getLocation().getBlockX();
-        }
-    }
-
-    public int getY() {
-        if (block != null) {
-            return block.getLocation().get().getBlockY();
-        } else {
-            return entity.getLocation().getBlockY();
-        }
-    }
-
-    public int getZ() {
-        if (block != null) {
-            return block.getLocation().get().getBlockZ();
-        } else {
-            return entity.getLocation().getBlockZ();
-        }
-    }
-
-    public World getWorld() {
-        return block != null ? block.getLocation().get().getExtent() : entity.getLocation().getExtent();
     }
 
 	public GriefAction getGriefAction() {
@@ -155,9 +115,102 @@ public final class GriefInstance {
 		return griefer;
 	}
 	
+	public String getGriefObjectAsString() {
+		return griefObject.toString();
+	}
+	
+	public DataContainer getGriefObjectToContainer() {
+		return griefObject.toContainer();
+	}
+	
 	@Override
 	public String toString() {
 		return griefAction.toString() + ", griefer: " + griefer.getName();
+	}
+	
+	private static class GriefTriggerObject {
+		
+		private BlockSnapshot blockSnapshot;
+		
+		private ItemStackSnapshot itemStackSnapshot;
+		
+		private Entity entity;
+		
+		private final GriefTriggerType type;
+		
+		private enum GriefTriggerType {
+			BLOCK,
+			ITEMSTACK,
+			ENTITY;
+		}
+		
+		public GriefTriggerObject(BlockSnapshot blockSnapshot) {
+			this.blockSnapshot = blockSnapshot;
+			this.type = GriefTriggerType.BLOCK;
+		}
+		
+		public GriefTriggerObject(ItemStackSnapshot itemStackSnapshot) {
+			this.itemStackSnapshot = itemStackSnapshot;
+			this.type = GriefTriggerType.ITEMSTACK;
+		}
+		
+		public GriefTriggerObject(Entity entity) {
+			this.entity = entity;
+			this.type = GriefTriggerType.ENTITY;
+		}
+		
+		public Location<World> getLocation() {
+			try {
+				switch (type) {
+				case BLOCK:
+					return blockSnapshot.getLocation().get();
+				case ENTITY:
+					return entity.getLocation();
+				default:
+					return null;
+				}
+			} catch (NullPointerException nullPointer) {
+				nullPointer.printStackTrace();
+			} catch (NoSuchElementException noElement) {
+				noElement.printStackTrace();
+			}
+			return null;
+		}
+		
+		public DataContainer toContainer() {
+			switch (type) {
+			case BLOCK:
+				return blockSnapshot.toContainer();
+			case ENTITY:
+				return entity.toContainer();
+			case ITEMSTACK:
+				return itemStackSnapshot.toContainer();
+			default:
+				return null;
+			}
+		}
+		
+		@Override
+		public String toString() {
+			try {
+				switch (type) {
+				case BLOCK:
+					return blockSnapshot.getState().getType().getTranslation().get();
+				case ENTITY:
+					// TODO Painting implementation
+					// TODO ItemFrame implementation
+					return entity.getType().getTranslation().get();
+				case ITEMSTACK:
+					return itemStackSnapshot.getType().getTranslation().get();
+				}
+			} catch (NullPointerException nullPointer) {
+				nullPointer.printStackTrace();
+			} catch (NoSuchElementException noElement) {
+				noElement.printStackTrace();
+			}
+			return null;
+		}
+		
 	}
     
 }

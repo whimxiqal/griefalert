@@ -234,9 +234,9 @@ public final class RealtimeGriefInstanceManager {
         							String.format(GRIEF_INSTANCE_ALERT_FORMAT, 
         									instance.getGrieferAsPlayer().getName(), 
         									instance.getType(),   
-        									griefedObjectForStaffToString(instance), 
+        									instance.getGriefObjectAsString(), 
         									alertId, 
-        									instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "")))).
+        									instance.getLocation().getExtent().getDimension().getType().getName()/*.getId().replaceAll("\\w+:", "")*/))).
         				color(instance.getAlertColor()).
         				build();
     }
@@ -250,15 +250,15 @@ public final class RealtimeGriefInstanceManager {
         plugin.getLogger().info(
                 instance.getGrieferAsPlayer().getUniqueId().toString() + " (" + instance.getGrieferAsPlayer().getName() + "):" +
                 		instance.getType().name().toLowerCase() + ":" +
-                        griefedObjectForConsoleToString(instance) + ":" +
-                        "x=" + instance.getX() + ":" +
-                        "y=" + instance.getY() + ":" +
-                        "z=" + instance.getZ() + ":" +
+                        instance.getGriefObjectAsString() + ":" +
+                        "x=" + instance.getLocation().getBlockX() + ":" +
+                        "y=" + instance.getLocation().getBlockY() + ":" +
+                        "z=" + instance.getLocation().getBlockZ() + ":" +
                         "sx=" + instance.getGrieferAsPlayer().getLocation().getBlockX() + ":" +
                         "sy=" + instance.getGrieferAsPlayer().getLocation().getBlockY() + ":" +
                         "sz=" + instance.getGrieferAsPlayer().getLocation().getBlockZ() + ":" +
-                        "w=" + instance.getWorld().getUniqueId() + ":" +
-                        "d=" + instance.getWorld().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
+                        "w=" + instance.getLocation().getExtent().getUniqueId() + ":" +
+                        "d=" + instance.getLocation().getExtent().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
                         alertId);
     }
 
@@ -275,6 +275,7 @@ public final class RealtimeGriefInstanceManager {
      * @param instance The grief instance housing the griefed object data
      * @return The String reprentation of the griefed object
      */
+    /*
     private String griefedObjectForStaffToString(GriefInstance instance) {
         if (instance.getBlock() != null) {
             if (instance.getBlock().getState().getType().getItem().isPresent()) {
@@ -298,6 +299,7 @@ public final class RealtimeGriefInstanceManager {
         }
         return instance.getBlockId();
     }
+    */
 
     /**
      * Returns the string representation of the griefed object for printing to the console
@@ -311,6 +313,7 @@ public final class RealtimeGriefInstanceManager {
      * @param instance The grief instance housing the griefed object data
      * @return The String reprentation of the griefed object
      */
+    /*
     private String griefedObjectForConsoleToString(GriefInstance instance) {
         if (instance.getBlock() != null) {
             return instance.getBlock().getState().toString().replace(':', '-');
@@ -329,6 +332,7 @@ public final class RealtimeGriefInstanceManager {
         }
         return instance.getBlockId().replace(':', '-');
     }
+    */
     
     public List<Pair<Integer,GriefInstance>> getRecentGriefInstances() {
     	return griefInstances.toList();
