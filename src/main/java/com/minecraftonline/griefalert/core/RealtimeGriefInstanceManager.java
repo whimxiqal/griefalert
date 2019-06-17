@@ -5,6 +5,7 @@ import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.type.PermissionMessageChannel;
 import org.spongepowered.api.text.format.TextColors;
@@ -228,7 +229,7 @@ public final class RealtimeGriefInstanceManager {
     		plugin.getLogger().warn("Messaging value for node 'staff_alert_message' not found. Sending basic alert message.");
     		defaultAlertMessage = "Alert";
     	}
-        return Text.builder(new CustomizableString(defaultAlertMessage)
+        instance.setAlertText(Text.builder(new CustomizableString(defaultAlertMessage)
         									.replacePlayer(instance.getGrieferAsPlayer()) 
         									.replaceGriefType(instance.getType())
         									.replaceGriefObject(instance.getGriefObjectAsString())
@@ -236,7 +237,10 @@ public final class RealtimeGriefInstanceManager {
         									.replaceLocationDimension(instance.getLocation().getExtent().getDimension().getType()/*.getId().replaceAll("\\w+:", "")*/)
         									.complete())
         				.color(instance.getAlertColor())
-        				.build();
+        				.onClick(TextActions.runCommand("/gcheck " + alertId))
+        				.onHover(TextActions.showText(Text.builder("Check Grief Alert #" + alertId).color(TextColors.LIGHT_PURPLE).build()))
+        				.build());
+        return instance.getAlertText();
     }
 
     /**
@@ -275,27 +279,7 @@ public final class RealtimeGriefInstanceManager {
      */
     /*
     private String griefedObjectForStaffToString(GriefInstance instance) {
-        if (instance.getBlock() != null) {
-            if (instance.getBlock().getState().getType().getItem().isPresent()) {
-                // Work around for BlockType not seeing colored blocks properly and BlockState not being translatable
-                return ItemStack.builder().fromBlockSnapshot(instance.getBlock()).build().getTranslation().get();
-            }
-            // The few blocks that have no ItemType connected (such as Fire)
-            return instance.getBlock().getState().getType().getTranslation().get();
-        }
-        else if (instance.getItem() != null) {
-            return instance.getItem().getTranslation().get();
-        }
-        else if (instance.getEntity() instanceof Painting) {
-            return "a Painting of " + instance.getEntity().get(Keys.ART).get().getName();
-        }
-        else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + " in an Item Frame";
-        }
-        else if (instance.getEntity() != null) {
-            return instance.getEntity().getType().getTranslation().get();
-        }
-        return instance.getBlockId();
+		REMOVED
     }
     */
 
@@ -313,22 +297,7 @@ public final class RealtimeGriefInstanceManager {
      */
     /*
     private String griefedObjectForConsoleToString(GriefInstance instance) {
-        if (instance.getBlock() != null) {
-            return instance.getBlock().getState().toString().replace(':', '-');
-        }
-        else if (instance.getItem() != null) {
-            return instance.getItem().toString().replace(':', '-');
-        }
-        else if (instance.getEntity() instanceof Painting) {
-            return "minecraft-painting[art=" + instance.getEntity().get(Keys.ART).get().getId() + "]";
-        }
-        else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return "minecraft-item_frame[item_id=" + instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
-        }
-        else if (instance.getEntity() != null) {
-            return instance.getEntity().getType().getId().replace(':', '-');
-        }
-        return instance.getBlockId().replace(':', '-');
+		REMOVED
     }
     */
     
@@ -410,4 +379,5 @@ public final class RealtimeGriefInstanceManager {
     		return instanceIndex + 1; // return "+ 1" so it indexes from 1 instead of 0
     	}
     }
+    
 }

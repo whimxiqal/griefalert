@@ -59,6 +59,7 @@ import java.util.Scanner;
  * <b>Permissions</b>
  * <p>
  * <li><i>griefalert.check</i>: Allows the use of the /gcheck command</li>
+ * <li><i>griefalert.recent</i>: Allows the use of the /grecent command</li>
  * <li><i>griefalert.staff</i>: Shows staff messages</li>
  * <li><i>griefalert.noalert</i>: Doesn't trigger an alert</li>
  * <li><i>griefalert.degrief</i>: Allows staff to degrief blocks with the given degrief tool</li>

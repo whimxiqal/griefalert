@@ -8,6 +8,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -43,7 +44,7 @@ public final class GriefInstance {
     private Player griefer;
     /** The general Object for holding the grief related object in this Grief Instance. */
     private GriefTriggerObject griefObject;
-	
+	private Text alertText;
     /**
      * General constructor
      * @param griefAction The GriefAction which triggered this GriefInstance.
@@ -123,6 +124,14 @@ public final class GriefInstance {
 		return griefAction.toString() + ", griefer: " + griefer.getName();
 	}
 	
+	public Text getAlertText() {
+		return alertText;
+	}
+
+	public void setAlertText(Text alertText) {
+		this.alertText = alertText;
+	}
+
 	private static class GriefTriggerObject {
 		
 		private BlockSnapshot blockSnapshot;
