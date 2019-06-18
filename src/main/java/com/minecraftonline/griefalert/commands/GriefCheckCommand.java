@@ -1,10 +1,6 @@
 package com.minecraftonline.griefalert.commands;
 
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -13,10 +9,15 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.core.GriefInstance;
 
-import javax.annotation.Nonnull;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Conditions;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Syntax;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.spongepowered.api.text.format.TextColors.RED;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
@@ -24,7 +25,10 @@ import static org.spongepowered.api.text.format.TextColors.YELLOW;
 /**
  * The CommandExecutor for the command to check alerts for GriefInstances in game
  */
-public final class GriefCheckCommand implements CommandExecutor {
+@CommandPermission("griefalert.command.gcheck")
+@CommandAlias("gcheck")
+@Description("Checks a grief alert")
+public final class GriefCheckCommand extends BaseCommand {
 	
 	/** The main plugin object. */
     private final GriefAlert plugin;
@@ -37,54 +41,44 @@ public final class GriefCheckCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
-
-    @Override
-    @Nonnull
-    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
-        if (!(src instanceof Player)) {  // Check if a non-player is running the command
-        	throw new CommandException(Text.of("Only in game players can use this command!"));
-        }
-        
-        Optional<Integer> arg = args.getOne("code");
-        if (!arg.isPresent()) {
-        	// Missing the code argument
-            throw new CommandException(Text.builder("Syntax: /gcheck <id>").color(RED).build());
-        }
-        
-        int code = arg.get();
-        Player checker = (Player) src;
+    @Default
+    @Syntax("<id>")
+    @Conditions("player")
+    public void onGcheck(CommandSource src, int code) {
+        Player player = (Player) src;
         GriefInstance instance;
         
         try {
-        	instance = plugin.getRealtimeGriefInstanceManager().get(arg.get());
+        	instance = plugin.getRealtimeGriefInstanceManager().get(code);
         } catch (IndexOutOfBoundsException e) {
         	// Code is not within the valid range
-        	throw new CommandException(Text.builder("Grief Alert ID " + code + " is out of range.").color(RED).build());
+        	player.sendMessage(Text.builder("Grief Alert ID " + code + " is out of range.").color(RED).build());
+        	return;
         }
         
         if (instance == null) {
         	// No Grief Instance at that array location
-            throw new CommandException(Text.builder("There is no current alert at ID " + code + ".").color(RED).build());
+            player.sendMessage(Text.builder("There is no current alert at ID " + code + ".").color(RED).build());
+            return;
         }
 
-        plugin.getRealtimeGriefInstanceManager().printToStaff(formatPlayerName(checker).toBuilder().append(
+        plugin.getRealtimeGriefInstanceManager().printToStaff(formatPlayerName(player).toBuilder().append(
                 Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
                 Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                 Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
         GriefInstance grief = plugin.getRealtimeGriefInstanceManager().get(code);
         
         // Teleport checker to a safe location near the grief. If failed, notify the checker
-        if (!checker.setLocationSafely(grief.getGrieferSnapshot().getLocation().get())) {
-        	checker.sendMessage(Text.builder("No safe location was found for teleportation.").color(YELLOW).build());
+        if (!player.setLocationSafely(grief.getGrieferSnapshot().getLocation().get())) {
+        	player.sendMessage(Text.builder("No safe location was found for teleportation.").color(YELLOW).build());
         }
         
         try {
-        	checker.setRotation(grief.getGrieferSnapshot().getTransform().get().getRotation());
+        	player.setRotation(grief.getGrieferSnapshot().getTransform().get().getRotation());
         } catch (NoSuchElementException e) {
-        	plugin.getLogger().warn("When checking for grief, player " + checker.getName() + " did not find the transform within"
+        	plugin.getLogger().warn("When checking for grief, player " + player.getName() + " did not find the transform within"
         			+ "the snapshot of the griefer.");
         }
-        return CommandResult.success();
     }
 
     /**

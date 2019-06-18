@@ -1,6 +1,8 @@
 package com.minecraftonline.griefalert;
 
 import com.google.inject.Inject;
+import com.minecraftonline.griefalert.commands.GriefAlertCommand;
+import com.minecraftonline.griefalert.commands.GriefAlert_Toggle_Command;
 import com.minecraftonline.griefalert.commands.GriefCheckCommand;
 import com.minecraftonline.griefalert.commands.GriefRecentCommand;
 import com.minecraftonline.griefalert.core.GriefAction;
@@ -10,6 +12,10 @@ import com.minecraftonline.griefalert.core.RealtimeGriefInstanceManager;
 import com.minecraftonline.griefalert.listeners.*;
 import com.minecraftonline.griefalert.tools.General.IllegalColorCodeException;
 
+import co.aikar.commands.ConditionFailedException;
+import co.aikar.commands.SpongeCommandIssuer;
+import co.aikar.commands.SpongeCommandManager;
+
 import com.minecraftonline.griefalert.storage.GriefLogger;
 
 import ninja.leaping.configurate.ConfigurationNode;
@@ -17,8 +23,6 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
@@ -32,7 +36,6 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionType;
 
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
@@ -58,8 +61,9 @@ import java.util.Scanner;
  * <p>
  * <b>Permissions</b>
  * <p>
- * <li><i>griefalert.check</i>: Allows the use of the /gcheck command</li>
- * <li><i>griefalert.recent</i>: Allows the use of the /grecent command</li>
+ * <li><i>griefalert.command.gcheck</i>: Allows the use of the /gcheck command</li>
+ * <li><i>griefalert.command.grecent</i>: Allows the use of the /grecent command</li>
+ * <li><i>griefalert.command.toggle</i>: Allows the use of the /griefalert toggle</li>
  * <li><i>griefalert.staff</i>: Shows staff messages</li>
  * <li><i>griefalert.noalert</i>: Doesn't trigger an alert</li>
  * <li><i>griefalert.degrief</i>: Allows staff to degrief blocks with the given degrief tool</li>
@@ -83,8 +87,6 @@ public class GriefAlert implements PluginContainer {
     public static final boolean LOG_SIGNS_CONTENT = true;
     /** Will the alerts be shown in the console as well as in game? */
     public static final boolean SHOW_ALERTS_IN_CONSOLE = true;
-    
-    public static final boolean DEBUG_MODE = false;
     /** An array list all dimensions to use when needing to place Grief Actions into all possible dimensions. */
     public static final String[] ALL_DIMENSIONS = new String[] {"minecraft:overworld", "minecraft:nether", "minecraft:the_end"};
     /** The regex between each component of a Grief Alert in the Grief Alert configuration file. */
@@ -106,6 +108,8 @@ public class GriefAlert implements PluginContainer {
     /** The file name of the file which holds information about which activities will be watched and logged. */
     public static final String GRIEF_ALERT_FILE_NAME = "/watchedBlocks.txt";
     
+    public boolean debugMode = false;
+    
     private GriefActionTableManager griefActions = new GriefActionTableManager();
     
     @Inject
@@ -120,6 +124,8 @@ public class GriefAlert implements PluginContainer {
     
     /** Alert Tracker. */
     private RealtimeGriefInstanceManager realtimeManager;
+    
+    private SpongeCommandManager commandManager;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -136,6 +142,9 @@ public class GriefAlert implements PluginContainer {
     @Inject
     @ConfigDir(sharedRoot = false)
     private File configDirectory;
+    
+    @Inject
+    private PluginContainer container;
 
     @Listener
     /**
@@ -146,7 +155,7 @@ public class GriefAlert implements PluginContainer {
     public void initialize(GamePreInitializationEvent event) {
         logger.info("Initializing GriefAlert...");
         
-        this.dLogger = new DebugLogger(this.getLogger(), DEBUG_MODE);
+        this.dLogger = new DebugLogger(this.getLogger(), debugMode);
         
         // Load the config from the Sponge API and set the specific node values.
         initializeConfig();
@@ -347,25 +356,33 @@ public class GriefAlert implements PluginContainer {
         Sponge.getEventManager().registerListener(this, UseItemStackEvent.Start.class, Order.LAST, new GriefUsedListener(this));
     }
     
-    private void registerCommands() {
-	     CommandSpec gcheck = CommandSpec.builder().
-	             executor(new GriefCheckCommand(this)).
-	                                               description(Text.of("Check a GriefAlert Number")).
-	                                               arguments(GenericArguments.optional(GenericArguments.integer(Text.of("code")))).
-	                                               permission("griefalert.check").
-	                                               build();
-	     Sponge.getCommandManager().register(this, gcheck, "gcheck");
-	     
-	     CommandSpec grecent = CommandSpec.builder().
-	             executor(new GriefRecentCommand(this)).
-	                                               description(Text.of("Check recent instances of grief")).
-	                                               arguments(GenericArguments.optional(GenericArguments.string(Text.of("username")))).
-	                                               permission("griefalert.recent").
-	                                               build();
-	     Sponge.getCommandManager().register(this, grecent, "grecent");
+    @SuppressWarnings("deprecation")
+	private void registerCommands() {
+    	commandManager = new SpongeCommandManager(this.container);
+    	commandManager.enableUnstableAPI("help");
+    	commandManager.createRootCommand("gcheck");
+    	commandManager.createRootCommand("grecent");
+    	commandManager.createRootCommand("griefalert");
+    	commandManager.registerCommand(new GriefAlertCommand(this));
+    	commandManager.registerCommand(new GriefAlert_Toggle_Command(this));
+    	commandManager.registerCommand(new GriefCheckCommand(this));
+    	commandManager.registerCommand(new GriefRecentCommand(this));
+    	registerConditions();
+    	
     }
     
-    /**
+    private void registerConditions() {
+    	// @Condition("player)
+		commandManager.getCommandConditions().addCondition("player", (context) -> {
+			SpongeCommandIssuer issuer = context.getIssuer();
+			if (!(issuer.isPlayer())) {
+				throw new ConditionFailedException("You must be a player to execute this command.");
+			}
+		});
+	}
+
+
+	/**
      * Determines whether a type of grief, a blockId (griefable object), and a specific dimension in which
      * the grief would occur is a type of grief action.
      * @param type The GriefType
@@ -471,11 +488,9 @@ public class GriefAlert implements PluginContainer {
     	static final String DEBUG_TAG = "[DEBUG]";
     	
     	final Logger logger;
-    	final boolean debugMode;
     	
     	DebugLogger(Logger logger, boolean debugMode) {
     		this.logger = logger;
-    		this.debugMode = debugMode;
     	}
     	
     	public void log(String message) {

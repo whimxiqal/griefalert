@@ -48,7 +48,7 @@ public final class GriefLogger {
 		} catch (SQLException sqlex) {
 			error = true;
 			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
-					+ "Connection Path: connectionPath", sqlex);
+					+ "Connection Path: connectionPath");
 		}
     }
 
