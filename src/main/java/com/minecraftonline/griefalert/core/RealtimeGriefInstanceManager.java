@@ -280,18 +280,17 @@ public final class RealtimeGriefInstanceManager {
     	 */
     	public List<Pair<Integer, GriefInstance>> toList() {
 			List<Pair<Integer,GriefInstance>> output = new LinkedList<Pair<Integer,GriefInstance>>();
-			for (int i = cursor - 1; i >= 0; i--) {
+			for (int i = cursor; i < griefInstanceArray.length; i++) {
 				if (griefInstanceArray[i] != null) {
 					output.add(Pair.of(i + 1, griefInstanceArray[i]));
 				}
 			}
-			for (int i = griefInstanceArray.length - 1; i >= cursor; i--) {
-				if (griefInstanceArray[i] == null) {
-					break;
-				} else {
+			for (int i = 0; i < cursor; i++) {
+				if (griefInstanceArray[i] != null) {
 					output.add(Pair.of(i + 1, griefInstanceArray[i]));
 				}
 			}
+			
 			return output;
 		}
 

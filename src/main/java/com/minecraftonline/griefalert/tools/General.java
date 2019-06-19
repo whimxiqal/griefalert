@@ -81,7 +81,6 @@ public abstract class General {
     			output = String.join(" a ", output, tokens[i]);
     		}
     	}
-    	System.out.println(output);
         return output;
     }
 	
