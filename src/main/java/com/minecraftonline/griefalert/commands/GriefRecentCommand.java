@@ -2,8 +2,9 @@ package com.minecraftonline.griefalert.commands;
 
 import static org.spongepowered.api.text.format.TextColors.RED;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.spongepowered.api.command.CommandResult;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -36,15 +37,23 @@ public class GriefRecentCommand extends BaseCommand {
     @Default
     @Syntax("<player>")
     @Conditions("player")
-    public CommandResult onGrecent(CommandSource src, String username) {
+    public void onGrecent(CommandSource src, String username) {
         Player player = (Player) src;
         player.sendMessage(Text.builder("Showing all recent grief alerts from player " + username).color(RED).build());
-        for (Pair<Integer,GriefInstance> griefInstance : plugin.getRealtimeGriefInstanceManager().getRecentGriefInstances()) {
-        	// TODO combine repeated griefalerts into the same line with different clickable numbers representing the specific grief instance ids
-        	if (username.equals(griefInstance.getValue().getGrieferAsPlayer().getName()))
-        		player.sendMessage(plugin.getRealtimeGriefInstanceManager().generateAlertMessage(griefInstance.getKey(), griefInstance.getValue()));
+        List<GriefInstance> repeatedIncidents = new LinkedList<GriefInstance>();
+        for (GriefInstance griefInstance : plugin.getRealtimeGriefInstanceManager().getRecentGriefInstances()) {
+        	if (!username.equals(griefInstance.getGrieferAsPlayer().getName())) 
+        		continue;
+        	if (!repeatedIncidents.isEmpty() && 
+        			!repeatedIncidents.get(0).isAnotherOf(griefInstance)) {
+        		// Only if there is there is something in the repeatedInstance list and an instance in the list does not
+        		// match with the new instance, will the list be cleared and a new one will start
+        		player.sendMessage(plugin.getRealtimeGriefInstanceManager().generateAlertMessage(repeatedIncidents));
+        		repeatedIncidents.clear();
+        	}
+        	repeatedIncidents.add(griefInstance);
         }
-        return CommandResult.success();
+        // We need to send the message one more time in case the last alert is a repeated alert
+        player.sendMessage(plugin.getRealtimeGriefInstanceManager().generateAlertMessage(repeatedIncidents));
     }
-
 }

@@ -9,7 +9,9 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -45,6 +47,8 @@ public final class GriefInstance {
     /** The general Object for holding the grief related object in this Grief Instance. */
     private GriefTriggerObject griefObject;
 	private Text alertText;
+	/** Integer id for this instance's location in the Recent Grief Instances Array. */
+	private int alertID = -1;
     /**
      * General constructor
      * @param griefAction The GriefAction which triggered this GriefInstance.
@@ -130,6 +134,31 @@ public final class GriefInstance {
 
 	public void setAlertText(Text alertText) {
 		this.alertText = alertText;
+	}
+
+	public int getAlertID() {
+		return alertID;
+	}
+
+	public void setAlertID(int alertID) {
+		this.alertID = alertID;
+	}
+	
+	public Text getInteractiveID() {
+		return Text.builder(String.valueOf(this.getAlertID()))
+				.color(TextColors.AQUA)
+				.onClick(TextActions.runCommand("/gcheck " + this.getAlertID()))
+				.onHover(TextActions.showText(Text.builder("Check Grief Alert #" + this.getAlertID()).color(TextColors.LIGHT_PURPLE).build()))
+				.build();
+	}
+	
+	public boolean isAnotherOf(Object other) {
+		if (!(other instanceof GriefInstance)) {
+			return false;
+		}
+		GriefInstance otherGriefInstance = (GriefInstance) other;
+		return this.getGriefAction().equals(otherGriefInstance.getGriefAction()) &&
+				this.getGrieferAsPlayer().getUniqueId().equals(otherGriefInstance.getGrieferAsPlayer().getUniqueId());
 	}
 
 	private static class GriefTriggerObject {

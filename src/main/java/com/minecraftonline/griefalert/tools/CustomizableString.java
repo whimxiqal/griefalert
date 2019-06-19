@@ -32,7 +32,11 @@ public final class CustomizableString {
 	}
 	
 	public CustomizableString replaceGriefID(int id) {
-		return replace(GRIEF_ID_PLACEHOLDER, String.valueOf(id));
+		if (id == 0) {
+			return replace(GRIEF_ID_PLACEHOLDER, "");
+		} else {
+			return replace(GRIEF_ID_PLACEHOLDER, String.valueOf(id));
+		}
 	}
 	
 	public CustomizableString replaceLocationCoordinates(List<String> coordinates) {

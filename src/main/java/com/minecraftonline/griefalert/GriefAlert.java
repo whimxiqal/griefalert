@@ -77,6 +77,7 @@ public class GriefAlert implements PluginContainer {
 	// TODO Test all grief types
 	// TODO Test the recent grief array to ensure that it rewrites old id's correctly
 	// TODO Test alerts_code_limit and log_signs_content config nodes
+	// TODO Test going over the maximum limit of held grief instances
 	
 	/** Version of this Plugin. (Should this be final?) */
     static final String VERSION = "21.0";
@@ -342,7 +343,7 @@ public class GriefAlert implements PluginContainer {
 	                		+ "Dimension: " + dim + ", "
 	                		+ "BlockId: " + griefAction.getBlockId());
 	            }
-	            getLogger().info("Grief action loaded: " + griefAction.toString() + "dimensions: " + splitLine[5]);
+	            getLogger().info("Grief action loaded: " + griefAction.toString() + "dimensions: " + String.join(", ", applicableDimensions));
             }
             scanner.close();
             logger.info("Watch List file loaded!");

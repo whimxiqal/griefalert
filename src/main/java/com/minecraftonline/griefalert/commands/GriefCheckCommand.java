@@ -52,7 +52,13 @@ public final class GriefCheckCommand extends BaseCommand {
         	instance = plugin.getRealtimeGriefInstanceManager().get(code);
         } catch (IndexOutOfBoundsException e) {
         	// Code is not within the valid range
-        	player.sendMessage(Text.builder("Grief Alert ID " + code + " is out of range.").color(RED).build());
+        	if (code == -1) {
+        		// Grief Instances that are no longer in the Recent Grief Instance Array are given alertID -1 so
+        		// to signal that they are no longer on call.
+        		player.sendMessage(Text.builder("That Grief Alert doesn't exist!").color(RED).build());
+        	} else {
+        		player.sendMessage(Text.builder("Grief Alert ID " + code + " is out of range.").color(RED).build());
+        	}
         	return;
         }
         

@@ -67,41 +67,38 @@ public final class RealtimeGriefInstanceManager {
      */
     public void processGriefInstance(final GriefInstance instance) {
     	boolean alertInGame = !instance.isStealthyAlert(); // Used to determine if this instance requires in-game alert
-    	int alertId;
     	
     	// Was this a staff member degriefing grief?
         if (instance.getType() != GriefAction.GriefType.DEGRIEFED) {
         	// Log in array of recent grief instances
-        	alertId = recordAlertInRecentGriefInstances(instance);
+        	recordAlertInRecentGriefInstances(instance);
         } else {
         	// Do not put it into the recent grief instance structure
-        	alertId = -1;
         	alertInGame = false;
         }
         
         // Print to console
         if (plugin.getConfigBoolean("showAlertsInConsole")) {
-        	printToConsole(alertId, instance);
+        	printToConsole(instance);
         }
         
         // Log the instance in the grief logger
         plugin.getGriefLogger().storeGriefInstance(instance);
         
         // Tell staff
-        if (alertInGame) alert(alertId, instance);
+        if (alertInGame) alert(instance);
     }
     
     /**
      * Takes the id of this specific grief instance and determines whether if staff
      * need to be notified in game. If they do, then print the message to staff.
-     * @param alertId The ID of the grief instance
      * @param instance The Grief Instance to which staff should be alerted
      */
-    public void alert(int alertId, GriefInstance instance) {
+    public void alert(GriefInstance instance) {
     	plugin.getDebugLogger().log("Handling the most recent instance of grief in game.");
         if (!instance.getGrieferAsPlayer().hasPermission("griefalert.noalert")) {
         	// Player does not have the permission to mute their own grief instance alerts
-        	Text alertMessage = generateAlertMessage(alertId, instance);
+        	Text alertMessage = generateAlertMessage(instance);
         	UUID playerId = instance.getGrieferAsPlayer().getUniqueId();
         	Pair<GriefAction, Integer> previousGriefAction = lastGriefActionPlayerMap.get(playerId);
         	int consecutiveGriefActionCount;
@@ -179,8 +176,8 @@ public final class RealtimeGriefInstanceManager {
      * @param instance The Instance of Grief to log
      * @return The ID of the instance to be used by staff in game
      */
-    private int recordAlertInRecentGriefInstances(GriefInstance instance) {
-        return griefInstances.record(instance);
+    private void recordAlertInRecentGriefInstances(GriefInstance instance) {
+        griefInstances.record(instance);
     }
 
     /**
@@ -195,12 +192,50 @@ public final class RealtimeGriefInstanceManager {
     /**
      * A Text generation method to take information about a specific Grief Instance
      * and format it into a readable alert message.
-     * @param alertId The ID of the specific grief instance
      * @param instance The specific grief instance
      * @return The readable text format of the grief instance
      */
-    public Text generateAlertMessage(int alertId, GriefInstance instance) {
-    	String defaultAlertMessage;
+    public Text generateAlertMessage(GriefInstance instance) {
+    	String defaultAlertMessage = getConfigStaffAlertMessage();
+        instance.setAlertText(Text.builder(new CustomizableString(defaultAlertMessage)
+        									.replacePlayer(instance.getGrieferAsPlayer()) 
+        									.replaceGriefType(instance.getType())
+        									.replaceGriefObject(instance.getGriefObjectAsString())
+        									.replaceGriefID(instance.getAlertID())
+        									.replaceLocationDimension(instance.getLocation().getExtent().getDimension().getType())
+        									.complete())
+        				.color(instance.getAlertColor())
+        				.onClick(TextActions.runCommand("/gcheck " + instance.getAlertID()))
+        				.onHover(TextActions.showText(Text.builder("Check Grief Alert #" + instance.getAlertID()).color(TextColors.LIGHT_PURPLE).build()))
+        				.build());
+        return instance.getAlertText();
+    }
+    
+	public Text generateAlertMessage(List<GriefInstance> repeatedIncidents) {
+		if (repeatedIncidents.isEmpty()) {
+			return Text.EMPTY;
+		}
+		List<Text> interactiveGriefAlertIDs = new LinkedList<Text>();
+		for (GriefInstance griefInstance : repeatedIncidents) {
+			interactiveGriefAlertIDs.add(griefInstance.getInteractiveID());
+		}
+    	String defaultAlertMessage = getConfigStaffAlertMessage();
+        return Text.builder(new CustomizableString(defaultAlertMessage)
+        									.replacePlayer(repeatedIncidents.get(0).getGrieferAsPlayer()) 
+        									.replaceGriefType(repeatedIncidents.get(0).getType())
+        									.replaceGriefObject(repeatedIncidents.get(0).getGriefObjectAsString())
+        									.replaceGriefID(0)
+        									.replaceLocationDimension(repeatedIncidents.get(0).getLocation().getExtent().getDimension().getType())
+        									.complete())
+        				.color(repeatedIncidents.get(0).getAlertColor())
+        				.append(Text.of(TextColors.RED, "\n["))
+        				.append(Text.joinWith(Text.of(TextColors.RED, ", "), interactiveGriefAlertIDs))
+        				.append(Text.of(TextColors.RED, "]"))
+        				.build();
+	}
+	
+	private String getConfigStaffAlertMessage() {
+		String defaultAlertMessage;
     	try {
 	    	defaultAlertMessage = (String) plugin.getConfigNode("messaging").getNode("staff_alert_message").getValue();
 	    	if (defaultAlertMessage == null) throw new NullPointerException();
@@ -211,26 +246,14 @@ public final class RealtimeGriefInstanceManager {
     		plugin.getLogger().warn("Messaging value for node 'staff_alert_message' not found. Sending basic alert message.");
     		defaultAlertMessage = "Alert";
     	}
-        instance.setAlertText(Text.builder(new CustomizableString(defaultAlertMessage)
-        									.replacePlayer(instance.getGrieferAsPlayer()) 
-        									.replaceGriefType(instance.getType())
-        									.replaceGriefObject(instance.getGriefObjectAsString())
-        									.replaceGriefID(alertId)
-        									.replaceLocationDimension(instance.getLocation().getExtent().getDimension().getType())
-        									.complete())
-        				.color(instance.getAlertColor())
-        				.onClick(TextActions.runCommand("/gcheck " + alertId))
-        				.onHover(TextActions.showText(Text.builder("Check Grief Alert #" + alertId).color(TextColors.LIGHT_PURPLE).build()))
-        				.build());
-        return instance.getAlertText();
-    }
+    	return defaultAlertMessage;
+	}
 
     /**
      * Print a message directly to console about the grief instance
      * @param instance This specific grief instance to print
-     * @param alertId The ID of this specific grief instance
      */
-    private void printToConsole(int alertId, GriefInstance instance) {
+    private void printToConsole(GriefInstance instance) {
         plugin.getLogger().info(
                 instance.getGrieferAsPlayer().getUniqueId().toString() + " (" + instance.getGrieferAsPlayer().getName() + "):" +
                 		instance.getType().name().toLowerCase() + ":" +
@@ -243,10 +266,10 @@ public final class RealtimeGriefInstanceManager {
                         "sz=" + instance.getGrieferAsPlayer().getLocation().getBlockZ() + ":" +
                         "w=" + instance.getLocation().getExtent().getUniqueId() + ":" +
                         "d=" + instance.getLocation().getExtent().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
-                        alertId);
+                        instance.getAlertID());
     }
     
-    public List<Pair<Integer,GriefInstance>> getRecentGriefInstances() {
+    public List<GriefInstance> getRecentGriefInstances() {
     	return griefInstances.toList();
     }
     
@@ -278,16 +301,16 @@ public final class RealtimeGriefInstanceManager {
     	 * Gives the recent grief instances in List form (time-sorted)
     	 * @return A time-sorted list of all recent grief instances
     	 */
-    	public List<Pair<Integer, GriefInstance>> toList() {
-			List<Pair<Integer,GriefInstance>> output = new LinkedList<Pair<Integer,GriefInstance>>();
+    	public List<GriefInstance> toList() {
+			List<GriefInstance> output = new LinkedList<GriefInstance>();
 			for (int i = cursor; i < griefInstanceArray.length; i++) {
 				if (griefInstanceArray[i] != null) {
-					output.add(Pair.of(i + 1, griefInstanceArray[i]));
+					output.add(griefInstanceArray[i]);
 				}
 			}
 			for (int i = 0; i < cursor; i++) {
 				if (griefInstanceArray[i] != null) {
-					output.add(Pair.of(i + 1, griefInstanceArray[i]));
+					output.add(griefInstanceArray[i]);
 				}
 			}
 			
@@ -309,9 +332,11 @@ public final class RealtimeGriefInstanceManager {
     	 * @param instance
     	 * @return
     	 */
-    	public int record(GriefInstance instance) {
+    	public void record(GriefInstance instance) {
+    		// Set the ID to the GriefInstance about to be replaced to -1, signaling that it no longer has an alertID
+    		if (griefInstanceArray[cursor] != null) griefInstanceArray[cursor].setAlertID(-1);
     		griefInstanceArray[cursor] = instance;
-    		int instanceIndex = cursor;
+    		int instanceAlertID = cursor + 1; // return "+ 1" so it indexes from 1 instead of 0
     		if (++cursor >= griefInstanceArray.length) {
     			cursor = 0;
     		}
@@ -319,8 +344,8 @@ public final class RealtimeGriefInstanceManager {
     			savedInstancesCount = griefInstanceArray.length;
     		}
     		plugin.getDebugLogger().log("Instance added to the Recent Grief Instance Manager. "
-    				+ "Id = " + instanceIndex + 1 + ", instance: " + instance.toString());
-    		return instanceIndex + 1; // return "+ 1" so it indexes from 1 instead of 0
+    				+ "Id = " + instance.getAlertID() + 1 + ", instance: " + instance.toString());
+    		instance.setAlertID(instanceAlertID);
     	}
     }
     
