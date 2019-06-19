@@ -1,4 +1,4 @@
-# MCO Grief Alert
+top# MCO Grief Alert
 # 
 # Add the blocks to be watched here (without the #).
 # 
@@ -11,4 +11,129 @@
 # DESTROY;minecraft:diamond_block;3
 # INTERACT;minecraft:chest;3
 # DESTROY;minecraft:netherrack;c;;;minecraft-overworld,minecraft-end
+# -----------------
+# Tested in 1.12.2
+# (Commented lines: @-Untested, $-Unavailable in 1.12.2)
+# -----------------
+# $ DESTROY;minecraft:polished_granite;c
+# $ DESTROY;minecraft:polished_andesite;c
+# $ DESTROY;minecraft:polished_diorite;c
+DESTROY;minecraft:cobblestone;c
+# $ DESTROY;minecraft:oak_planks;c
+# $ DESTROY;minecraft:spruce_planks;c
+# $ DESTROY;minecraft:birch_planks;c
+# $ DESTROY;minecraft:jungle_planks;c
+# $ DESTROY;minecraft:acacia_planks;c
+# $ DESTROY;minecraft:dark_oak_planks;c
+DESTROY;minecraft:bedrock;c;;deny
+DESTROY;minecraft:gold_ore;c
+# $ DESTROY;minecraft:stripped_oak_log;c
+# $ DESTROY;minecraft:stripped_spruce_log;c
+# $ DESTROY;minecraft:stripped_birch_log;c
+# $ DESTROY;minecraft:stripped_jungle_log;c
+# $ DESTROY;minecraft:stripped_acacia_log;c
+# $ DESTROY;minecraft:stripped_dark_oak_log;c
+# $ DESTROY;minecraft:stripped_oak_wood;c
+# $ DESTROY;minecraft:stripped_spruce_wood;c
+# $ DESTROY;minecraft:stripped_birch_wood;c
+# $ DESTROY;minecraft:stripped_jungle_wood;c
+# $ DESTROY;minecraft:stripped_acacia_wood;c
+# $ DESTROY;minecraft:stripped_dark_oak_wood;c
+DESTROY;minecraft:sponge;c
+# % DESTROY;minecraft:wet_sponge;c
+DESTROY;minecraft:glass;c
+DESTROY;minecraft:lapis_ore;c
+DESTROY;minecraft:lapis_block;c
+DESTROY;minecraft:dispenser;c
+DESTROY;minecraft:sandstone;c
+# $ DESTROY;minecraft:chiseled_sandstone;c
+# $ DESTROY;minecraft:cut_sandstone;c
+# $ DESTROY;minecraft:note_block;c
+# $ DESTROY;minecraft:powered_rail;c
+DESTROY;minecraft:detector_rail;c
+DESTROY;minecraft:sticky_piston;c
+# $ DESTROY;minecraft:cobweb;c
+DESTROY;minecraft:piston;c
+# $ DESTROY;minecraft:white_wool;c
+# $ DESTROY;minecraft:orange_wool;c
+# $ DESTROY;minecraft:magenta_wool;c
+# $ DESTROY;minecraft:light_blue_wool;c
+# $ DESTROY;minecraft:yellow_wool;c
+# $ DESTROY;minecraft:lime_wool;c
+# $ DESTROY;minecraft:pink_wool;c
+# $ DESTROY;minecraft:gray_wool;c
+# $ DESTROY;minecraft:light_gray_wool;c
+# $ DESTROY;minecraft:cyan_wool;c
+# $ DESTROY;minecraft:purple_wool;c
+# $ DESTROY;minecraft:blue_wool;c
+# $ DESTROY;minecraft:brown_wool;c
+# $ DESTROY;minecraft:green_wool;c
+# $ DESTROY;minecraft:black_wool;c
+DESTROY;minecraft:gold_block;c
+DESTROY;minecraft:iron_block;c
+# $ DESTROY;minecraft:oak_slab;c
+# $ DESTROY;minecraft:spruce_slab;c
+# $ DESTROY;minecraft:birch_slab;c
+# $ DESTROY;minecraft:jungle_slab;c
+# $ DESTROY;minecraft:acacia_slab;c
+# $ DESTROY;minecraft:dark_oak_slab;c
+DESTROY;minecraft:stone_slab;c
+# $ DESTROY;minecraft:sandstone_slab;c
+# $ cobbDESTROY;minecraft:petrified_oak_slab;c
+# $ DESTROY;minecraft:cobblestone_slab;c
+# $ DESTROY;minecraft:brick_slab;c
+# $ DESTROY;minecraft:stone_brick_slab;c
+# $ DESTROY;minecraft:nether_brick_slab;c
+# $ DESTROY;minecraft:quartz_slab;c
+# $ DESTROY;minecraft:red_sandstone_slab;c
+DESTROY;minecraft:purpur_slab;c
+# $ DESTROY;minecraft:prismarine_slab;c
+# $ DESTROY;minecraft:prismarine_brick_slab;c
+# $ DESTROY;minecraft:dark_prismarine_slab;c
+# $ DESTROY;minecraft:smooth_quartz;c
+# $ DESTROY;minecraft:smooth_red_sandstone;c
+DESTROY;minecraft:smooth_sandstone;c
+DESTROY;minecraft:smooth_stone;c
+# $ DESTROY;minecraft:bricks;c
+DESTROY;minecraft:tnt;c
+DESTROY;minecraft:bookshelf;c
+DESTROY;minecraft:mossy_cobblestone;c
+DESTROY;minecraft:obsidian;c
+DESTROY;minecraft:torch;c
+DESTROY;minecraft:end_rod;c
+DESTROY;minecraft:chorus_plant;c
+DESTROY;minecraft:chorus_flower;c
+# $ DESTROY;minecraft:purpur_block;c
+DESTROY;minecraft:purpur_pillar;c
+DESTROY;minecraft:purpur_stairs;c
+# $ DESTROY;minecraft:spawner;c
+DESTROY;minecraft:oak_stairs;c
+DESTROY;minecraft:chest;c
+DESTROY;minecraft:diamond_ore;c
 DESTROY;minecraft:diamond_block;c
+DESTROY;minecraft:crafting_table;c
+DESTROY;minecraft:farmland;c
+DESTROY;minecraft:furnace;c
+DESTROY;minecraft:ladder;c
+DESTROY;minecraft:rail;c
+# $ DESTROY;minecraft:cobblestone_stairs;c
+DESTROY;minecraft:lever;c
+DESTROY;minecraft:stone_pressure_plate;c
+# $ DESTROY;minecraft:oak_pressure_plate;c
+# $ DESTROY;minecraft:spruce_pressure_plate;c
+# $ DESTROY;minecraft:birch_pressure_plate;c
+# $ DESTROY;minecraft:jungle_pressure_plate;c
+# $ DESTROY;minecraft:acacia_pressure_plate;c
+# $ DESTROY;minecraft:dark_oak_pressure_plate;c
+DESTROY;minecraft:redstone_torch;c
+DESTROY;minecraft:stone_button;c
+# $ DESTROY;minecraft:snow_block;c
+DESTROY;minecraft:jukebox;c
+# $ DESTROY;minecraft:oak_fence;c
+# $ DESTROY;minecraft:spruce_fence;c
+# $ DESTROY;minecraft:birch_fence;c
+# $ DESTROY;minecraft:jungle_fence;c
+# $ DESTROY;minecraft:acacia_fence;c
+# $ DESTROY;minecraft:dark_oak_fence;c
+# $ DESTROY;minecraft:carved_pumpkin;c
+DESTROY;minecraft:netherrack;c;;;minecraft:overworld,minecraft:the_end
