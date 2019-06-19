@@ -40,6 +40,7 @@ public class GriefRecentCommand extends BaseCommand {
         Player player = (Player) src;
         player.sendMessage(Text.builder("Showing all recent grief alerts from player " + username).color(RED).build());
         for (Pair<Integer,GriefInstance> griefInstance : plugin.getRealtimeGriefInstanceManager().getRecentGriefInstances()) {
+        	// TODO combine repeated griefalerts into the same line with different clickable numbers representing the specific grief instance ids
         	if (username.equals(griefInstance.getValue().getGrieferAsPlayer().getName()))
         		player.sendMessage(plugin.getRealtimeGriefInstanceManager().generateAlertMessage(griefInstance.getKey(), griefInstance.getValue()));
         }
