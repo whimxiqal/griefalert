@@ -48,7 +48,7 @@ public final class GriefLogger {
 		} catch (SQLException sqlex) {
 			error = true;
 			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
-					+ "Connection Path: connectionPath");
+					+ "Connection Path: connectionPath", sqlex);
 		}
     }
 
@@ -171,17 +171,17 @@ public final class GriefLogger {
         PreparedStatement ps = null;
         try {
             testConnection();
-            ps = conn.prepareStatement("INSERT INTO " + EDITED_SIGN_TABLE_NAME + " (user,x,y,z,dimension,world,line1,line2,line3,line4) VALUES(?,?,?,?,?,?,?,?,?,?)");
+            ps = conn.prepareStatement("INSERT INTO " + EDITED_SIGN_TABLE_NAME + " (user,x,y,z,dimension,world_id,line1,line2,line3,line4) VALUES(?,?,?,?,?,?,?,?,?,?)");
             ps.setString(1, player.getUniqueId().toString());
             ps.setInt(2, sign.getLocation().getBlockX());
             ps.setInt(3, sign.getLocation().getBlockY());
             ps.setInt(4, sign.getLocation().getBlockZ());
             ps.setString(5, sign.getWorld().getDimension().getType().getId());
             ps.setString(6, sign.getWorld().getUniqueId().toString());
-            ps.setString(5, signData.get(0).isPresent() ? signData.get(0).get().toPlain() : "");
-            ps.setString(6, signData.get(1).isPresent() ? signData.get(1).get().toPlain() : "");
-            ps.setString(7, signData.get(2).isPresent() ? signData.get(2).get().toPlain() : "");
-            ps.setString(8, signData.get(3).isPresent() ? signData.get(3).get().toPlain() : "");
+            ps.setString(7, signData.get(0).isPresent() ? signData.get(0).get().toPlain() : "");
+            ps.setString(8, signData.get(1).isPresent() ? signData.get(1).get().toPlain() : "");
+            ps.setString(9, signData.get(2).isPresent() ? signData.get(2).get().toPlain() : "");
+            ps.setString(10, signData.get(3).isPresent() ? signData.get(3).get().toPlain() : "");
             ps.execute();
             plugin.getLogger().debug("Store complete!");
         } catch (SQLException sqlex) {
@@ -204,43 +204,6 @@ public final class GriefLogger {
             // ignored
         }
     }
-
-    /**
-     * Prints the griefed object in GriefInstance to a readable string to be logged in the database.
-     * The order or preference for griefed object string the first existing object of the following:
-     * <ol>
-     * <li>String representation of the Block State</li>
-     * <li>String representation of the Item</li>
-     * <li>String representation of the Painting</li>
-     * <li>String representation of the ItemFrame</li>
-     * <li>String representation of the ID of the Type of Entity</li>
-     * <li>The BlockId found in the GriefAction (Guaranteed to exist!)</li>
-     * </ol>
-     * @param instance The specific GriefInstance
-     * @return String representation of the GriefInstance
-     */
-    
-    // TODO fix storage message
-    /*
-    private String printGriefInstanceObjectForStorage(GriefInstance instance) {
-        if (instance.getBlock() != null) {
-            return instance.getBlock().getState().toString();
-        }
-        else if (instance.getItem() != null) {
-            return instance.getItem().toString();
-        }
-        else if (instance.getEntity() instanceof Painting) {
-            return "minecraft:painting[art=" + instance.getEntity().get(Keys.ART).get().getId() + "]";
-        }
-        else if (instance.getEntity() instanceof ItemFrame && instance.getEntity().get(Keys.REPRESENTED_ITEM).isPresent()) {
-            return "minecraft:item_frame[item_id=" + instance.getEntity().get(Keys.REPRESENTED_ITEM).get().getTranslation().get() + "]";
-        }
-        else if (instance.getEntity() != null) {
-            return instance.getEntity().getType().getId();
-        }
-        return instance.getBlockId();
-    }
-    */
 
     /**
      * Unclear purpose.

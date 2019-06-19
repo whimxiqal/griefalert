@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.core;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -188,7 +189,7 @@ public final class RealtimeGriefInstanceManager {
      */
     public void printToStaff(Text message) {
         MessageChannel staffChannel = new PermissionMessageChannel("griefalert.staff");	
-        staffChannel.send(message);
+        staffChannel.send(Sponge.getServer().getConsole(), message);
     }
 
     /**
@@ -244,43 +245,6 @@ public final class RealtimeGriefInstanceManager {
                         "d=" + instance.getLocation().getExtent().getDimension().getType().getId().replaceAll("\\w+:", "") + ":" +
                         alertId);
     }
-
-    /**
-     * Returns the string representation of the griefed object for an in-game
-     * audience.
-     * Order of preference for printing the griefed object:
-     * <li>Block Type (checks Type first as a workaround to identify color and BlockState?).
-     * <li>The Item.
-     * <li>A Painting
-     * <li>Item Frame if it has something else in it
-     * <li>Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
-     * <li>Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
-     * @param instance The grief instance housing the griefed object data
-     * @return The String reprentation of the griefed object
-     */
-    /*
-    private String griefedObjectForStaffToString(GriefInstance instance) {
-		REMOVED
-    }
-    */
-
-    /**
-     * Returns the string representation of the griefed object for printing to the console
-     * Order of preference for printing the griefed object:
-     * <li>Block Type
-     * <li>The Item
-     * <li>A Painting
-     * <li>Item Frame if it has something else in it
-     * <li>Entity (which now can't be a Painting or a filled ItemFrame, so it could be, for example, an empty item frame)
-     * <li>Block ID saved in the Grief Action established in configuration text file (guaranteed to exist!)
-     * @param instance The grief instance housing the griefed object data
-     * @return The String reprentation of the griefed object
-     */
-    /*
-    private String griefedObjectForConsoleToString(GriefInstance instance) {
-		REMOVED
-    }
-    */
     
     public List<Pair<Integer,GriefInstance>> getRecentGriefInstances() {
     	return griefInstances.toList();
