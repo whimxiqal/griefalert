@@ -75,7 +75,6 @@ public abstract class General {
     	String[] tokens = string.replaceAll(" an ", " a ").split(" a ");
     	String output = tokens[0];
     	for (int i = 1; i < tokens.length; i++) {
-    		System.out.println(output);
     		if ("aeiou".contains(String.valueOf(tokens[i].charAt(0)).toLowerCase())) {
     			output = String.join(" an ", output, tokens[i]);
     		} else {

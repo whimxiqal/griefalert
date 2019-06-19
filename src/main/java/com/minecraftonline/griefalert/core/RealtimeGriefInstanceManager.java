@@ -216,7 +216,7 @@ public final class RealtimeGriefInstanceManager {
         									.replaceGriefType(instance.getType())
         									.replaceGriefObject(instance.getGriefObjectAsString())
         									.replaceGriefID(alertId)
-        									.replaceLocationDimension(instance.getLocation().getExtent().getDimension().getType()/*.getId().replaceAll("\\w+:", "")*/)
+        									.replaceLocationDimension(instance.getLocation().getExtent().getDimension().getType())
         									.complete())
         				.color(instance.getAlertColor())
         				.onClick(TextActions.runCommand("/gcheck " + alertId))
