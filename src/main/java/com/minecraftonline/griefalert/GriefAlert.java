@@ -80,7 +80,6 @@ public class GriefAlert implements PluginContainer {
 	// TODO try to get floating text to work above grief instance sites
 	// TODO Test all grief types
 	// TODO Test log_signs_content config nodes
-	
 	/** Version of this Plugin. (Should this be final?) */
     static final String VERSION = "22.0";
     
