@@ -15,7 +15,7 @@ import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-//TODO: PietElite: Fix
+//TODO Fix Block Interaction Listener
 public class GriefInteractListener implements EventListener<InteractBlockEvent.Secondary> {
 	
 	/** The main plugin object. */
@@ -33,7 +33,6 @@ public class GriefInteractListener implements EventListener<InteractBlockEvent.S
     @Override
     public void handle(@Nonnull InteractBlockEvent.Secondary event) {
     	// Make sure the event was caused by a player
-    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             Optional<Player> poption = event.getCause().first(Player.class);
             poption.ifPresent(player -> player.getItemInHand(HandTypes.MAIN_HAND).ifPresent(item -> {

@@ -76,11 +76,8 @@ import java.util.Scanner;
 		version = VERSION,
 		description = "Grief alert tool")
 public class GriefAlert implements PluginContainer {
-	// TODO Rewrite the comments in gief_alerts.txt to say that it works but only in 1.14
 	// TODO Test all grief types
-	// TODO Test the recent grief array to ensure that it rewrites old id's correctly
-	// TODO Test alerts_code_limit and log_signs_content config nodes
-	// TODO Test going over the maximum limit of held grief instances
+	// TODO Test log_signs_content config nodes
 	
 	/** Version of this Plugin. (Should this be final?) */
     static final String VERSION = "21.0";

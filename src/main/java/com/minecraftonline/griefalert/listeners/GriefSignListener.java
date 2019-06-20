@@ -28,7 +28,6 @@ public class GriefSignListener implements EventListener<ChangeSignEvent> {
     @Override
     public void handle(@Nonnull ChangeSignEvent event) {
     	// Make sure the event was caused by a player
-    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
         	plugin.getDebugLogger().log("Someone placed a sign. Checking if logging sign content...");
             if (plugin.getConfigBoolean("logSignsContent")) {

@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-//TODO: PietElite: Fix
+
 public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Break> {
 	
 	/** The main plugin object. */
@@ -35,8 +35,6 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
     @Override
     public void handle(@Nonnull ChangeBlockEvent.Break event) {
     	// Make sure the event was caused by a player
-    	// TODO Simplify
-    	
         if (event.getCause().root() instanceof Player) {
             Optional<Player> poption = event.getCause().first(Player.class);
             if (poption.isPresent()) {
@@ -63,7 +61,6 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                         } else {
                             event.setCancelled(true);
                             plugin.getDebugLogger().log("This is a denied Grief Action.");
-                            // TODO fix this message to staff
                             try {
                             plugin.getGriefManager().printToStaff(Text.of(
                             							TextColors.RED, 

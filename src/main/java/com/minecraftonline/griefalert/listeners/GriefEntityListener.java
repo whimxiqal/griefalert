@@ -15,7 +15,14 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
-//TODO: PietElite: Fix
+
+// TODO Fix Entity Listener
+
+/**
+ * Listener for players who might be griefing by interacting with entities.
+ * 
+ * NOT TESTED YET
+ */
 public class GriefEntityListener implements EventListener<InteractEntityEvent> {
 	
 	/** The main plugin object. */
@@ -32,7 +39,6 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
     @Override
     public void handle(@Nonnull InteractEntityEvent event) {
     	// Make sure the event was caused by a player
-    	// TODO Simplify
         if (event.getCause().root() instanceof Player) {
             Entity target = event.getTargetEntity();
             DimensionType dType = target.getLocation().getExtent().getDimension().getType();

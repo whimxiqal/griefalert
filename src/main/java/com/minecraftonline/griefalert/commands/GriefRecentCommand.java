@@ -35,8 +35,6 @@ public class GriefRecentCommand extends BaseCommand {
         this.plugin = plugin;
     }
 
-    
-    // TODO make the username autocomplete
     @Default
     @Syntax("<player>")
     @Conditions("player")
