@@ -77,6 +77,7 @@ import java.util.Scanner;
 		version = VERSION,
 		description = "Grief alert tool")
 public class GriefAlert implements PluginContainer {
+	// TODO try to get floating text to work above grief instance sites
 	// TODO Test all grief types
 	// TODO Test log_signs_content config nodes
 	

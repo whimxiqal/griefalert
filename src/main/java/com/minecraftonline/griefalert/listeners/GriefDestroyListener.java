@@ -32,6 +32,8 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
     	this.plugin = plugin;
     }
 
+    // TODO Add: destroying entities
+    
     @Override
     public void handle(@Nonnull ChangeBlockEvent.Break event) {
     	// Make sure the event was caused by a player

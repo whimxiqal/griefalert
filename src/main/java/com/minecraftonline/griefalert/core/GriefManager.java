@@ -114,7 +114,7 @@ public final class GriefManager {
             } else {
             	// This is the first consecutive grief action for this player
             	consecutiveGriefActionCount = 1;
-            	plugin.getDebugLogger().log("Alerting staff in game: " + alertMessage.toString());
+            	plugin.getDebugLogger().log("Alerting staff in game: " + alertMessage.toPlain());
             	printToStaff(alertMessage);
             }
             // Place this action as the last grief action to read next time

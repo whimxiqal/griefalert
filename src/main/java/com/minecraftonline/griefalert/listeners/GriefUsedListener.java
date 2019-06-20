@@ -13,13 +13,12 @@ import org.spongepowered.api.world.DimensionType;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-// TODO Fix Use ItemStack Listener
-
 /**
  * Event listener for using items.
  */
 public class GriefUsedListener implements EventListener<UseItemStackEvent.Start> {
-	
+	// TODO combine with Placement Listener
+	// TODO Test
 	/** The main plugin object. */
     private final GriefAlert plugin;
 

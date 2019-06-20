@@ -183,6 +183,7 @@ DESTROY;minecraft:spruce_stairs;c
 DESTROY;minecraft:birch_stairs;c
 DESTROY;minecraft:jungle_stairs;c
 DESTROY;minecraft:command_block;5;;deny
+INTERACT;minecraft:command_block;c
 DESTROY;minecraft:beacon;c
 DESTROY;minecraft:cobblestone_wall;c
 DESTROY;minecraft:mossy_cobblestone_wall;c		# Not functional yet in 1.12.2
@@ -247,63 +248,65 @@ DESTROY;minecraft:coal_block;c
 DESTROY;minecraft:packed_ice;c
 DESTROY;minecraft:acacia_stairs;c
 DESTROY;minecraft:dark_oak_stairs;c
-DESTROY;minecraft:slime_block;c
+DESTROY;minecraft:slime_block;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:grass_path;c
-DESTROY;minecraft:white_stained_glass;c
-DESTROY;minecraft:orange_stained_glass;c
-DESTROY;minecraft:magenta_stained_glass;c
-DESTROY;minecraft:light_blue_stained_glass;c
-DESTROY;minecraft:yellow_stained_glass;c
-DESTROY;minecraft:lime_stained_glass;c
-DESTROY;minecraft:pink_stained_glass;c
-DESTROY;minecraft:gray_stained_glass;c
-DESTROY;minecraft:light_gray_stained_glass;c
-DESTROY;minecraft:cyan_stained_glass;c
-DESTROY;minecraft:purple_stained_glass;c
-DESTROY;minecraft:blue_stained_glass;c
-DESTROY;minecraft:brown_stained_glass;c
-DESTROY;minecraft:green_stained_glass;c
-DESTROY;minecraft:red_stained_glass;c
-DESTROY;minecraft:black_stained_glass;c
-DESTROY;minecraft:white_stained_glass_pane;c
-DESTROY;minecraft:orange_stained_glass_pane;c
-DESTROY;minecraft:magenta_stained_glass_pane;c
-DESTROY;minecraft:light_blue_stained_glass_pane;c
-DESTROY;minecraft:yellow_stained_glass_pane;c
-DESTROY;minecraft:lime_stained_glass_pane;c
-DESTROY;minecraft:pink_stained_glass_pane;c
-DESTROY;minecraft:gray_stained_glass_pane;c
-DESTROY;minecraft:light_gray_stained_glass_pane;c
-DESTROY;minecraft:cyan_stained_glass_pane;c
-DESTROY;minecraft:purple_stained_glass_pane;c
-DESTROY;minecraft:blue_stained_glass_pane;c
-DESTROY;minecraft:brown_stained_glass_pane;c
-DESTROY;minecraft:green_stained_glass_pane;c
-DESTROY;minecraft:red_stained_glass_pane;c
-DESTROY;minecraft:black_stained_glass_pane;c
+DESTROY;minecraft:white_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_stained_glass;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_stained_glass;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_stained_glass;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_stained_glass;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_stained_glass;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_stained_glass;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:green_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:black_stained_glass;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:white_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_stained_glass_pane;c	# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_stained_glass_pane;c	# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:green_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:red_stained_glass_pane;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:black_stained_glass_pane;c		# Not functional yet in 1.12.2
 DESTROY;minecraft:prismarine;c
-DESTROY;minecraft:prismarine_bricks;c
-DESTROY;minecraft:dark_prismarine;c
-DESTROY;minecraft:prismarine_stairs;c
-DESTROY;minecraft:prismarine_brick_stairs;c
-DESTROY;minecraft:dark_prismarine_stairs;c
-DESTROY;minecraft:sea_lantern;c
+DESTROY;minecraft:prismarine_bricks;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:dark_prismarine;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:prismarine_stairs;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:prismarine_brick_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:dark_prismarine_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:sea_lantern;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:red_sandstone;c
-DESTROY;minecraft:chiseled_red_sandstone;c
-DESTROY;minecraft:cut_red_sandstone;c
+DESTROY;minecraft:chiseled_red_sandstone;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:cut_red_sandstone;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:red_sandstone_stairs;c
 DESTROY;minecraft:repeating_command_block;5;;deny
+INTERACT;minecraft:repeating_command_block;c
 DESTROY;minecraft:chain_command_block;5;;deny
-DESTROY;minecraft:magma_block;c
+INTERACT;minecraft:chain_command_block;c
+DESTROY;minecraft:magma_block;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:nether_wart_block;c
-DESTROY;minecraft:red_nether_bricks;c
+DESTROY;minecraft:red_nether_bricks;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:bone_block;c
 DESTROY;minecraft:structure_void;5;;deny
 DESTROY;minecraft:observer;c
-DESTROY;minecraft:shulker_box;c
-DESTROY;minecraft:white_chulker_box;c
-DESTROY;minecraft:orange_chulker_box;c
-DESTROY;minecraft:magent_chulker_box;c
+DESTROY;minecraft:shulker_box;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:white_shulker_box;c
+DESTROY;minecraft:orange_shulker_box;c
+DESTROY;minecraft:magenta_shulker_box;c
 DESTROY;minecraft:light_blue_shulker_box;c
 DESTROY;minecraft:yellow_shulker_box;c
 DESTROY;minecraft:lime_shulker_box;c
@@ -325,7 +328,7 @@ DESTROY;minecraft:yellow_glazed_terracotta;c
 DESTROY;minecraft:lime_glazed_terracotta;c
 DESTROY;minecraft:pink_glazed_terracotta;c
 DESTROY;minecraft:gray_glazed_terracotta;c
-DESTROY;minecraft:light_gray_glazed_terracotta;c
+DESTROY;minecraft:light_gray_glazed_terracotta;c	# Not functional yet in 1.12.2
 DESTROY;minecraft:cyan_glazed_terracotta;c
 DESTROY;minecraft:purple_glazed_terracotta;c
 DESTROY;minecraft:blue_glazed_terracotta;c
@@ -333,144 +336,138 @@ DESTROY;minecraft:brown_glazed_terracotta;c
 DESTROY;minecraft:green_glazed_terracotta;c
 DESTROY;minecraft:red_glazed_terracotta;c
 DESTROY;minecraft:black_glazed_terracotta;c
-DESTROY;minecraft:white_concrete;c
-DESTROY;minecraft:orange_concrete;c
-DESTROY;minecraft:magenta_concrete;c
-DESTROY;minecraft:light_blue_concrete;c
-DESTROY;minecraft:yellow_concrete;c
-DESTROY;minecraft:lime_concrete;c
-DESTROY;minecraft:pink_concrete;c
-DESTROY;minecraft:gray_concrete;c
-DESTROY;minecraft:light_gray_concrete;c
-DESTROY;minecraft:cyan_concrete;c
-DESTROY;minecraft:purple_concrete;c
-DESTROY;minecraft:blue_concrete;c
-DESTROY;minecraft:brown_concrete;c
-DESTROY;minecraft:green_concrete;c
-DESTROY;minecraft:red_concrete;c
-DESTROY;minecraft:black_concrete;c
-DESTROY;minecraft:white_concrete_powder;c
-DESTROY;minecraft:orange_concrete_powder;c
-DESTROY;minecraft:magenta_concrete_powder;c
-DESTROY;minecraft:light_blue_concrete_powder;c
-DESTROY;minecraft:yellow_concrete_powder;c
-DESTROY;minecraft:lime_concrete_powder;c
-DESTROY;minecraft:pink_concrete_powder;c
-DESTROY;minecraft:gray_concrete_powder;c
-DESTROY;minecraft:light_gray_concrete_powder;c
-DESTROY;minecraft:cyan_concrete_powder;c
-DESTROY;minecraft:purple_concrete_powder;c
-DESTROY;minecraft:blue_concrete_powder;c
-DESTROY;minecraft:brown_concrete_powder;c
-DESTROY;minecraft:green_concrete_powder;c
-DESTROY;minecraft:red_concrete_powder;c
-DESTROY;minecraft:black_concrete_powder;c
-DESTROY;minecraft:blue_ice;c
-DESTROY;minecraft:conduit;c
+DESTROY;minecraft:white_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:green_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:black_concrete;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:white_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:green_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:red_concrete_powder;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:black_concrete_powder;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_ice;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:conduit;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:iron_door;c
-DESTROY;minecraft:oak_door;c
+DESTROY;minecraft:oak_door;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:spruce_door;c
 DESTROY;minecraft:birch_door;c
 DESTROY;minecraft:jungle_door;c
 DESTROY;minecraft:acacia_door;c
 DESTROY;minecraft:dark_oak_door;c
-DESTROY;minecraft:repeater;c
-DESTROY;minecraft:comparator;c
-DESTROY;minecraft:structure_block;c
-DESTROY;minecraft:painting;c
-DESTROY;minecraft:sign;c
-USE;minecraft:water_bucket;c
-USE;minecraft:lava_bucket;c
-USE;minecraft:pufferfish_bucket;c
-USE;minecraft:salmon_bucket;c
-USE;cod_bucket;c
-USE;tropical_fish_bucket;c
-DESTROY;minecraft:white_bed;c
-DESTROY;minecraft:orange_bed;c
-DESTROY;minecraft:magenta_bed;c
-DESTROY;minecraft:light_blue_bed;c
-DESTROY;minecraft:yellow_bed;c
-DESTROY;minecraft:lime_bed;c
-DESTROY;minecraft:pink_bed;c
-DESTROY;minecraft:gray_bed;c
-DESTROY;minecraft:light_gray_bed;c
-DESTROY;minecraft:cyan_bed;c
-DESTROY;minecraft:purple_bed;c
-DESTROY;minecraft:blue_bed;c
-DESTROY;minecraft:brown_bed;c
-DESTROY;minecraft:green_bed;c
-DESTROY;minecraft:red_bed;c
-DESTROY;minecraft:black_bed;c
-INTERACT;minecraft:item_frame;c
-DESTROY;minecraft:item_frame;c
+DESTROY;minecraft:repeater;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:comparator;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:structure_block;5;;deny
+DESTROY;minecraft:painting;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:sign;c				# Not functional yet in 1.12.2
+USE;minecraft:water_bucket;c				# Not functional yet in 1.12.2
+USE;minecraft:lava_bucket;c				# Not functional yet in 1.12.2
+USE;minecraft:pufferfish_bucket;c			# Not functional yet in 1.12.2
+USE;minecraft:salmon_bucket;c				# Not functional yet in 1.12.2
+USE;cod_bucket;c					# Not functional yet in 1.12.2
+USE;tropical_fish_bucket;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:white_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_bed;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_bed;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:green_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:red_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:black_bed;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:item_frame;c				# Not functional yet in 1.12.2
+INTERACT;minecraft:item_frame;c				# Not functional yet in 1.12.2			
 DESTROY;minecraft:flower_pot;c
 INTERACT;minecraft:flower_pot;c
-DESTROY;minecraft:skeleton_skull;c
-DESTROY;minecraft:wither_skeleton_skull;c
-DESTROY;minecraft:player_head;c
-DESTROY;minecraft:zombie_head;c
-DESTROY;minecraft:creeper_head;c
-DESTROY;minecraft:dragon_head;5;;deny
-USE;minecraft:tnt_minecart;c
-DESTROY;minecraft:command_block_minecart;5;;deny
-DESTROY;minecraft:white_banner;c
-DESTROY;minecraft:orange_banner;c
-DESTROY;minecraft:magenta_banner;c
-DESTROY;minecraft:light_blue_banner;c
-DESTROY;minecraft:yellow_banner;c
-DESTROY;minecraft:lime_banner;c
-DESTROY;minecraft:pink_banner;c
-DESTROY;minecraft:gray_banner;c
-DESTROY;minecraft:light_gray_banner;c
-DESTROY;minecraft:cyan_banner;c
-DESTROY;minecraft:purple_banner;c
-DESTROY;minecraft:blue_banner;c
-DESTROY;minecraft:brown_banner;c
-DESTROY;minecraft:green_banner;c
-DESTROY;minecraft:red_banner;c
-DESTROY;minecraft:black_banner;c
-DESTROY;minecraft:end_crystal;5;;deny
-DESTROY;minecraft:chorus_fruit;c
-DESTROY;minecraft:popped_chorus_fruit;c
-DESTROY;minecraft:shulker_shell;c
-DESTROY;minecraft:piston_head;c
-DESTROY;minecraft:moving_piston;c
-DESTROY;minecraft:wall_torch;c
-DESTROY;minecraft:redstone_wire;c
+DESTROY;minecraft:skeleton_skull;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:wither_skeleton_skull;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:player_head;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:zombie_head;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:creeper_head;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:dragon_head;5;;deny			# Not functional yet in 1.12.2
+USE;minecraft:tnt_minecart;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:command_block_minecart;5;;deny	# Not functional yet in 1.12.2
+DESTROY;minecraft:white_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_banner;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_banner;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_banner;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_banner;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_banner;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:green_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_banner;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:black_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:end_crystal;5;;deny			# Not functional yet in 1.12.2
+DESTROY;minecraft:wall_torch;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:redstone_wire;c			
 DESTROY;minecraft:wall_sign;c
-DESTROY;minecraft:redstone_wall_torch;c
-DESTROY;minecraft:nether_portal;c
-DESTROY;minecraft:attached_pumpkin_stem;c
-DESTROY;minecraft:attached_melon_stem;c
+DESTROY;minecraft:redstone_wall_torch;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:nether_portal;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:attached_pumpkin_stem;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:attached_melon_stem;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:pumpkin_stem;c
 DESTROY;minecraft:melon_stem;c
-DESTROY;minecraft:end_portal;c
+DESTROY;minecraft:end_portal;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:tripwire;c
-INTERACT;minecraft:flower_pot			# TESTING ONLY - DELETE THIS
-INTERACT;minecraft:potted_oak_sapling;c
-INTERACT;minecraft:potted_spruce_sapling;c
-INTERACT;minecraft:potted_birch_sapling;c
-INTERACT;minecraft:potted_jungle_sapling;c
-INTERACT;minecraft:potted_acacia_sapling;c
-INTERACT;minecraft:potted_dark_oak_sapling;c
-INTERACT;minecraft:potted_fern;c
-INTERACT;minecraft:potted_dandelion;c
-INTERACT;minecraft:potted_poppy;c
-INTERACT;minecraft:potted_blue_orchid;c
-INTERACT;minecraft:potted_allium;c
-INTERACT;minecraft:potted_azure_bluet;c
-INTERACT;minecraft:potted_red_tulip;c
-INTERACT;minecraft:potted_orange_tulip;c
-INTERACT;minecraft:potted_white_tulip;c
-INTERACT;minecraft:potted_pink_tulip;c
-INTERACT;minecraft:potted_oxeye_daisy;c
-INTERACT;minecraft:potted_red_mushroom;c
-INTERACT;minecraft:potted_brown_mushroom;c
-INTERACT;minecraft:potted_dead_bush;c
-INTERACT;minecraft:potted_potted_cactus;c
-DESTROY;minecraft:skeleton_wall_skull;c
-DESTROY;minecraft:wither_skeleton_wall_skull;c
-DESTROY;minecraft:zombie_wall_head;c
-DESTROY;minecraft:player_wall_head;c
-DESTROY;minecraft:creeper_wall_head;c
-DESTROY;minecraft:dragon_wall_head;c
+INTERACT;minecraft:potted_oak_sapling;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_spruce_sapling;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_birch_sapling;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_jungle_sapling;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_acacia_sapling;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_dark_oak_sapling;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_fern;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_dandelion;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_poppy;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_blue_orchid;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_allium;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_azure_bluet;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_red_tulip;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_orange_tulip;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_white_tulip;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_pink_tulip;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_oxeye_daisy;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_red_mushroom;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_brown_mushroom;c		# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_dead_bush;c			# Not functional yet in 1.12.2
+INTERACT;minecraft:potted_potted_cactus;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:skeleton_wall_skull;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:wither_skeleton_wall_skull;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:zombie_wall_head;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:player_wall_head;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:creeper_wall_head;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:dragon_wall_head;c			# Not functional yet in 1.12.2

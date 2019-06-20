@@ -15,9 +15,10 @@ import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
-//TODO Fix Block Interaction Listener
+
 public class GriefInteractListener implements EventListener<InteractBlockEvent.Secondary> {
-	
+	// TODO Combine with Entity Listener
+	// TODO Test
 	/** The main plugin object. */
     private final GriefAlert plugin;
 
