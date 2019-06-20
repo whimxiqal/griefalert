@@ -43,18 +43,11 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -251,43 +244,24 @@ public class GriefAlert implements PluginContainer {
     private File loadGriefAlertFile() {
     	logger.info("Loading GriefAlert file: " + GRIEF_ALERT_FILE_NAME + " ...");
     	
-    	if (!(getGriefAlertDirectory().mkdir())) {
-    		getLogger().info("Did not make the Grief Alert Configuration directory! Is it already created?");
-    	} else {
-    		getLogger().info("Grief Alert Configuration directory created.");
-    	}
+    	if (getGriefAlertDirectory().mkdir()) getLogger().info("Grief Alert Configuration directory created.");
     	
     	// Get the file
-    	String griefAlertFileString = getGriefAlertDirectory().getPath() + "\\" + GRIEF_ALERT_FILE_NAME;
-    	getLogger().info("The path where the file is trying to be created: " + griefAlertFileString);
-        File griefAlertFile = new File(griefAlertFileString);
+    	Path griefAlertFilePath = Paths.get(getGriefAlertDirectory().getPath(), GRIEF_ALERT_FILE_NAME);
         
-        if (!griefAlertFile.exists()) {
-        	// Create the file because it doesn't exist yet
-        	getLogger().info("Generating a new default Grief Alert file: " + GRIEF_ALERT_FILE_NAME);
-            try{
-            	URL defaultFileURL = getClass().getClassLoader().getResource("grief_alerts.txt");
-            	if (defaultFileURL == null) {
-                	throw new Exception("defaultFileURL is null!");
-                }
-                URI defaultFile = defaultFileURL.toURI();
-                
-                FileSystem filesys = null;
-                try {
-                    filesys = FileSystems.getFileSystem(defaultFile);
-                } catch(FileSystemNotFoundException ex) {
-                    Map<String, String> env = new HashMap<>();
-                    env.put("create","true");
-                    FileSystems.newFileSystem(defaultFile, env);
-                }
-                Files.copy(Paths.get(defaultFile), griefAlertFile.toPath());
-                getLogger().info(GRIEF_ALERT_FILE_NAME + " supposedly has been created.");
-                if(filesys != null) filesys.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    	getLogger().info("File path: " + griefAlertFilePath.toString());
+        if (Files.notExists(griefAlertFilePath)) {
+        	getLogger().info("File doesn't exist yet! Trying to create as: " + GRIEF_ALERT_FILE_NAME);
+            getAsset("grief_alerts.txt").ifPresent(asset -> {
+				try {
+					asset.copyToFile(griefAlertFilePath, false);
+					getLogger().info(GRIEF_ALERT_FILE_NAME + " created successfully.");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
         }
-		return new File(griefAlertFile.getPath());
+		return griefAlertFilePath.toFile();
     }
     
     /**
