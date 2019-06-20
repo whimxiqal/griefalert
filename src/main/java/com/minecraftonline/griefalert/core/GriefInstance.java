@@ -54,27 +54,26 @@ public final class GriefInstance {
      * @param griefAction The GriefAction which triggered this GriefInstance.
      */
     public GriefInstance(GriefAction griefAction, BlockSnapshot blockSnapshot, Player griefer) {
-    	this.griefAction = griefAction;
+    	this(griefAction, griefer);
     	this.griefObject = new GriefTriggerObject(blockSnapshot);
-    	this.grieferSnapshot = griefer.createSnapshot();
-        this.griefer = griefer;
     }
 
     public GriefInstance(GriefAction griefAction, Entity entity, Player griefer) {
-    	this.griefAction = griefAction;
+    	this(griefAction, griefer);
     	this.griefObject = new GriefTriggerObject(entity);
-    	this.grieferSnapshot = griefer.createSnapshot();
-        this.griefer = griefer;
     }
 
     public GriefInstance(GriefAction griefAction, ItemStackSnapshot itemStackSnapshot, Player griefer) {
-    	this.griefAction = griefAction;
+    	this(griefAction, griefer);
     	this.griefObject = new GriefTriggerObject(itemStackSnapshot);
+    }
+    
+    private GriefInstance(GriefAction griefAction, Player griefer) {
+    	this.griefAction = griefAction;
     	this.grieferSnapshot = griefer.createSnapshot();
         this.griefer = griefer;
     }
 
-    
     /**
      * Gets the BlockId from the GriefAction saved in this GriefInstance.
      * @return The String representation of the GriefAction BlockId

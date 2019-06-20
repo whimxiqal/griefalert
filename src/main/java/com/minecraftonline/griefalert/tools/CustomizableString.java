@@ -31,7 +31,7 @@ public final class CustomizableString {
 		return replace(PLAYER_PLACEHOLDER, player.getName());
 	}
 	
-	public CustomizableString replaceGriefID(int id) {
+	public CustomizableString replaceAlertID(int id) {
 		if (id == 0) {
 			return replace(GRIEF_ID_PLACEHOLDER, "");
 		} else {
