@@ -35,7 +35,7 @@ public class GriefSignListener implements EventListener<ChangeSignEvent> {
                 Optional<Player> poption = event.getCause().first(Player.class);
                 if (poption.isPresent()) {
                 	plugin.getDebugLogger().log("Logging sign content.");
-                	plugin.getRealtimeGriefInstanceManager().alert(poption.get(), event.getTargetTile(), event.getText());
+                	plugin.getGriefManager().alert(poption.get(), event.getTargetTile(), event.getText());
                 	return;
                 } else {
                 	plugin.getDebugLogger().log("Player who placed the sign not found. Ignored.");

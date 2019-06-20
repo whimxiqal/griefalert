@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.listeners;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.core.GriefInstance;
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;
+import com.minecraftonline.griefalert.tools.General;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
@@ -10,10 +11,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 //TODO: PietElite: Fix
 public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Break> {
@@ -52,7 +55,7 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                     	plugin.getDebugLogger().log("This is registered as a Grief Action.");
                         if (!plugin.getGriefAction(GriefType.DESTROYED, blockID, dType).isDenied()) {
                         	plugin.getDebugLogger().log("This is not a denied Grief Action.");
-                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(
+                            plugin.getGriefManager().processGriefInstance(new GriefInstance(
                             		plugin.getGriefAction(GriefType.DESTROYED, blockID, dType),
                             		blockSnapshot,
                             		player));
@@ -61,7 +64,17 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                             event.setCancelled(true);
                             plugin.getDebugLogger().log("This is a denied Grief Action.");
                             // TODO fix this message to staff
-                            plugin.getRealtimeGriefInstanceManager().printToStaff(Text.of("Player tried to break something, but it was denied."));
+                            try {
+                            plugin.getGriefManager().printToStaff(Text.of(
+                            							TextColors.RED, 
+                            							General.correctIndefiniteArticles(
+                            									player.getName() + 
+                            									" tried to break a " + 
+                            									blockSnapshot.getState().getType().getTranslation().get() + 
+                            									", but it was denied.")));
+                            } catch (NoSuchElementException e) {
+                            	e.printStackTrace();
+                            }
                         }
                     } else {
                     	plugin.getDebugLogger().log("This is not registered as a Grief Action.");

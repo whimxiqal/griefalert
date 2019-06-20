@@ -26,7 +26,7 @@ import java.util.UUID;
  * how the instance should be logged, how to construct messaging about Grief
  * Instances, and so forth.
  */
-public final class RealtimeGriefInstanceManager {
+public final class GriefManager {
 	
 	/** 
 	 * Houses all data about recent grief actions of each player.
@@ -45,7 +45,7 @@ public final class RealtimeGriefInstanceManager {
      * This constructor saves the plugin and then generates
      * @param plugin
      */
-    public RealtimeGriefInstanceManager(final GriefAlert plugin) {
+    public GriefManager(final GriefAlert plugin) {
     	this.plugin = plugin;
     	griefInstances = new RecentGriefInstanceManager(plugin);
     }
@@ -213,7 +213,7 @@ public final class RealtimeGriefInstanceManager {
     
 	public Text generateAlertMessage(List<GriefInstance> repeatedIncidents) {
 		if (repeatedIncidents.isEmpty()) {
-			return Text.EMPTY;
+			return Text.of(TextColors.RED, "There are no recent grief alerts logged under that player.");
 		}
 		List<Text> interactiveGriefAlertIDs = new LinkedList<Text>();
 		for (GriefInstance griefInstance : repeatedIncidents) {

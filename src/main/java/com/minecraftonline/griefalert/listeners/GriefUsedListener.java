@@ -42,7 +42,7 @@ public class GriefUsedListener implements EventListener<UseItemStackEvent.Start>
                 DimensionType dType = player.getLocation().getExtent().getDimension().getType();
                 if (plugin.isGriefAction(GriefType.USED, itemID, dType)) {
                     if (!plugin.getGriefAction(GriefType.USED, itemID, dType).isDenied()) {
-                        plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(
+                        plugin.getGriefManager().processGriefInstance(new GriefInstance(
                         		plugin.getGriefAction(GriefType.USED, itemID, dType),
                         		itemStackSnapshot,
                         		player));

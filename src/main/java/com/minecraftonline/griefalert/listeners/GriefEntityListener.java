@@ -46,7 +46,7 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                             		target,
                             		player);
                             if (!instance.isDenied()) {
-                                plugin.getRealtimeGriefInstanceManager().processGriefInstance(instance);
+                                plugin.getGriefManager().processGriefInstance(instance);
                             } else {
                                 event.setCancelled(true);
                             }
@@ -62,7 +62,7 @@ public class GriefEntityListener implements EventListener<InteractEntityEvent> {
                     			target,
                     			player);
                         if (!instance.isDenied()) {
-                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(instance);
+                            plugin.getGriefManager().processGriefInstance(instance);
                         } else {
                             event.setCancelled(true);
                         }

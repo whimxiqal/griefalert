@@ -49,7 +49,7 @@ public final class GriefCheckCommand extends BaseCommand {
         GriefInstance instance;
         
         try {
-        	instance = plugin.getRealtimeGriefInstanceManager().get(code);
+        	instance = plugin.getGriefManager().get(code);
         } catch (IndexOutOfBoundsException e) {
         	// Code is not within the valid range
         	if (code == -1) {
@@ -68,11 +68,11 @@ public final class GriefCheckCommand extends BaseCommand {
             return;
         }
 
-        plugin.getRealtimeGriefInstanceManager().printToStaff(formatPlayerName(player).toBuilder().append(
+        plugin.getGriefManager().printToStaff(formatPlayerName(player).toBuilder().append(
                 Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
                 Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                 Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
-        GriefInstance grief = plugin.getRealtimeGriefInstanceManager().get(code);
+        GriefInstance grief = plugin.getGriefManager().get(code);
         
         // Teleport checker to a safe location near the grief. If failed, notify the checker
         if (!player.setLocationSafely(grief.getGrieferSnapshot().getLocation().get())) {

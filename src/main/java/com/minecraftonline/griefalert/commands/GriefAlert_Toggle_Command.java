@@ -30,8 +30,9 @@ public class GriefAlert_Toggle_Command extends GriefAlertCommand {
     @Syntax("/griefalert toggle <debugmode>")
     public void onHelp(CommandSource source, CommandHelp help) {
     	Player player = (Player) source;
-    	player.sendMessage(Text.of(TextColors.GREEN, "Toggling!"));
-    	// TODO finish help message
+    	player.sendMessage(Text.of(TextColors.GOLD, "Help: /griefalert toggle"));
+    	player.sendMessage(Text.of(TextColors.GOLD, "-------------"));
+    	player.sendMessage(Text.of(TextColors.AQUA, "/griefalert toggle <debugmode> <true|false>"));
     }
     
     @Subcommand("debugmode")

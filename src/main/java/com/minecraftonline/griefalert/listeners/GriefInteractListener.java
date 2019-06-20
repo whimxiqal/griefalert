@@ -43,11 +43,11 @@ public class GriefInteractListener implements EventListener<InteractBlockEvent.S
                     DimensionType dType = blockTarget.getLocation().get().getExtent().getDimension().getType();
                     if (player.hasPermission("griefalert.degrief") && item.getType().getId().equals(plugin.getConfigString("degriefStickID"))) {
                         GriefInstance instance = new GriefInstance(GriefAction.DEGRIEF_ACTION,blockTarget,player);
-                        plugin.getRealtimeGriefInstanceManager().processGriefInstance(instance);
+                        plugin.getGriefManager().processGriefInstance(instance);
                         blockTarget.getLocation().get().getExtent().setBlockType(blockTarget.getPosition(), BlockTypes.AIR);
                     } else if (plugin.isGriefAction(GriefType.INTERACTED, blockID, dType)) {
                         if (!plugin.getGriefAction(GriefType.INTERACTED, blockID, dType).isDenied()) {
-                            plugin.getRealtimeGriefInstanceManager().processGriefInstance(new GriefInstance(
+                            plugin.getGriefManager().processGriefInstance(new GriefInstance(
                             		plugin.getGriefAction(GriefType.INTERACTED, blockID, dType),
                             		blockTarget,
                             		player));

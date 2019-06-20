@@ -8,7 +8,7 @@ import com.minecraftonline.griefalert.commands.GriefRecentCommand;
 import com.minecraftonline.griefalert.core.GriefAction;
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 import com.minecraftonline.griefalert.core.GriefActionTableManager;
-import com.minecraftonline.griefalert.core.RealtimeGriefInstanceManager;
+import com.minecraftonline.griefalert.core.GriefManager;
 import com.minecraftonline.griefalert.listeners.*;
 import com.minecraftonline.griefalert.tools.General.IllegalColorCodeException;
 
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -50,7 +51,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -128,7 +131,7 @@ public class GriefAlert implements PluginContainer {
     private GriefLogger gLogger;
     
     /** Alert Tracker. */
-    private RealtimeGriefInstanceManager realtimeManager;
+    private GriefManager griefManager;
     
     private SpongeCommandManager commandManager;
 
@@ -167,7 +170,7 @@ public class GriefAlert implements PluginContainer {
         
         // Classes which other classes depend on must be initialized here. 
         this.setGriefLogger(new GriefLogger(this));
-        this.realtimeManager = new RealtimeGriefInstanceManager(this);
+        this.griefManager = new GriefManager(this);
         
         // Read the grief alert file
         readGriefAlertFile(loadGriefAlertFile());
@@ -178,7 +181,7 @@ public class GriefAlert implements PluginContainer {
         }
         
         // Register all the listeners with Sponge
-        registerListeners(realtimeManager);
+        registerListeners(griefManager);
         
         // Register all the commands with Sponge
         registerCommands();
@@ -356,7 +359,7 @@ public class GriefAlert implements PluginContainer {
      * Registers all listeners with Sponge to appropriately read information coming from the server
      * @param manager the RealtimeGriefInstanceManager to deal with incoming Grief Instances
      */
-    private void registerListeners(RealtimeGriefInstanceManager manager) {
+    private void registerListeners(GriefManager manager) {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this));
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Place.class, Order.LAST, new GriefPlacementListener(this));
         if (getConfigBoolean("logSignsContent")) {
@@ -379,6 +382,7 @@ public class GriefAlert implements PluginContainer {
     	commandManager.registerCommand(new GriefCheckCommand(this));
     	commandManager.registerCommand(new GriefRecentCommand(this));
     	registerConditions();
+    	registerCompletions();
     	
     }
     
@@ -391,6 +395,16 @@ public class GriefAlert implements PluginContainer {
 			}
 		});
 	}
+    
+    private void registerCompletions() {
+    	commandManager.getCommandCompletions().registerCompletion("players", c -> {
+    			List<String> onlinePlayerNames = new ArrayList<String>();
+    			for (Player player : Sponge.getServer().getOnlinePlayers()) {
+    				onlinePlayerNames.add(player.getName());
+    			}
+    			return onlinePlayerNames;
+    		});
+    }
 
 
 	/**
@@ -465,8 +479,8 @@ public class GriefAlert implements PluginContainer {
 	 * Gets the real-time manager of grief instances during game play
 	 * @return This RealtimeGriefInstanceManager
 	 */
-	public RealtimeGriefInstanceManager getRealtimeGriefInstanceManager() {
-		return realtimeManager;
+	public GriefManager getGriefManager() {
+		return griefManager;
 	}
 	
 	/**
