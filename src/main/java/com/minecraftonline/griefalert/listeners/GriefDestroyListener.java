@@ -63,7 +63,7 @@ public class GriefDestroyListener implements EventListener<ChangeBlockEvent.Brea
                             plugin.getDebugLogger().log("This is a denied Grief Action.");
                             try {
                             plugin.getGriefManager().printToStaff(Text.of(
-                            							TextColors.RED, 
+                            							plugin.getGriefAction(GriefType.DESTROYED, blockID, dType).getAlertColor(), 
                             							General.correctIndefiniteArticles(
                             									player.getName() + 
                             									" tried to break a " + 

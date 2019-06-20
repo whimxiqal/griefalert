@@ -81,7 +81,7 @@ public class GriefAlert implements PluginContainer {
 	// TODO Test log_signs_content config nodes
 	
 	/** Version of this Plugin. (Should this be final?) */
-    static final String VERSION = "21.0";
+    static final String VERSION = "22.0";
     
     /** Item used by staff members to 'degrief' a grief event. This is logged but not acted on by in-game staff. */
     public static final String DEGRIEF_ITEM = "minecraft:stick";
@@ -112,7 +112,7 @@ public class GriefAlert implements PluginContainer {
     public static final String SQL_ADDRESS = "localhost:3306/minecraft";
     
     /** The file name of the file which holds information about which activities will be watched and logged. */
-    public static final String GRIEF_ALERT_FILE_NAME = "watchedBlocks.txt";
+    public static final String GRIEF_ALERT_FILE_NAME = "grief_alert_list.txt";
     
     public boolean debugMode = false;
     
@@ -328,7 +328,7 @@ public class GriefAlert implements PluginContainer {
 		            	griefAction = new GriefAction(splitLine);
 		            }
                 } catch (IllegalArgumentException e) {
-                	logger.info(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + line);
+                	logger.warn(GRIEF_ALERT_FILE_NAME + " - " + e.getMessage() + " @ Line: " + line);
                 	// Fatal error occurred with this line. Skipping line entirely.
                 	continue;
                 }
@@ -349,7 +349,7 @@ public class GriefAlert implements PluginContainer {
 	                		+ "Dimension: " + dim + ", "
 	                		+ "BlockId: " + griefAction.getBlockId());
 	            }
-	            getLogger().info("Grief action loaded: " + griefAction.toString() + "dimensions: " + String.join(", ", applicableDimensions));
+	            getDebugLogger().log("Grief action loaded: " + griefAction.toString() + "dimensions: " + String.join(", ", applicableDimensions));
             }
             scanner.close();
             logger.info("Watch List file loaded!");
