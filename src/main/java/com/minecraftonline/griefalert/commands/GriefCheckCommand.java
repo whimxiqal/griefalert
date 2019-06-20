@@ -4,10 +4,10 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.core.GriefInstance;
+import com.minecraftonline.griefalert.tools.General;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -67,32 +67,22 @@ public final class GriefCheckCommand extends BaseCommand {
             player.sendMessage(Text.builder("There is no current alert at ID " + code + ".").color(RED).build());
             return;
         }
-
-        plugin.getGriefManager().printToStaff(formatPlayerName(player).toBuilder().append(
-                Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
-                Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
-                Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
-        GriefInstance grief = plugin.getGriefManager().get(code);
         
         // Teleport checker to a safe location near the grief. If failed, notify the checker
-        if (!player.setLocationSafely(grief.getGrieferSnapshot().getLocation().get())) {
+        if (player.setLocationSafely(instance.getGrieferSnapshot().getLocation().get())) {
+            try {
+            	player.setRotation(instance.getGrieferSnapshot().getTransform().get().getRotation());
+            	plugin.getGriefManager().printToStaff(General.formatPlayerName(player).toBuilder().append(
+                        Text.builder(" is checking ").color(TextColors.YELLOW).build()).append(
+                        Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
+                        Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
+            	plugin.getGriefInfoCommand().onGinfo(player, code);
+            } catch (NoSuchElementException e) {
+            	plugin.getLogger().warn("When checking for grief, player " + player.getName() + " did not find the transform within"
+            			+ "the snapshot of the griefer.");
+            }
+        } else {
         	player.sendMessage(Text.builder("No safe location was found for teleportation.").color(YELLOW).build());
         }
-        
-        try {
-        	player.setRotation(grief.getGrieferSnapshot().getTransform().get().getRotation());
-        } catch (NoSuchElementException e) {
-        	plugin.getLogger().warn("When checking for grief, player " + player.getName() + " did not find the transform within"
-        			+ "the snapshot of the griefer.");
-        }
-    }
-
-    /**
-     * Format the grief checker's name to include prefix and suffix
-     * @param player The grief checker
-     * @return The Text form of the grief checker's name
-     */
-    private Text formatPlayerName(Player player) {
-        return TextSerializers.FORMATTING_CODE.deserialize(player.getOption("prefix").orElse("") + player.getName() + player.getOption("suffix").orElse(""));
     }
 }

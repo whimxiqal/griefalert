@@ -66,7 +66,8 @@ import java.util.Scanner;
  * <p>
  * <li><i>griefalert.command.gcheck</i>: Allows the use of the /gcheck command</li>
  * <li><i>griefalert.command.grecent</i>: Allows the use of the /grecent command</li>
- * <li><i>griefalert.command.toggle</i>: Allows the use of the /griefalert toggle</li>
+ * <li><i>griefalert.command.toggle</i>: Allows the use of the /griefalert toggle command</li>
+ * <li><i>griefalert.command.ginfo</i>: Allows the use of the /ginfo command</li>
  * <li><i>griefalert.staff</i>: Shows staff messages</li>
  * <li><i>griefalert.noalert</i>: Doesn't trigger an alert</li>
  * <li><i>griefalert.degrief</i>: Allows staff to degrief blocks with the given degrief tool</li>
@@ -111,7 +112,7 @@ public class GriefAlert implements PluginContainer {
     public static final String SQL_ADDRESS = "localhost:3306/minecraft";
     
     /** The file name of the file which holds information about which activities will be watched and logged. */
-    public static final String GRIEF_ALERT_FILE_NAME = "/watchedBlocks.txt";
+    public static final String GRIEF_ALERT_FILE_NAME = "watchedBlocks.txt";
     
     public boolean debugMode = false;
     
@@ -132,6 +133,8 @@ public class GriefAlert implements PluginContainer {
     
     private SpongeCommandManager commandManager;
 
+    private GriefInfoCommand griefInfoCommand;
+    
     @Inject
     @DefaultConfig(sharedRoot = false)
     /** Location of the default configuration file for this plugin. From Sponge API. */
@@ -249,19 +252,21 @@ public class GriefAlert implements PluginContainer {
     	logger.info("Loading GriefAlert file: " + GRIEF_ALERT_FILE_NAME + " ...");
     	
     	if (!(getGriefAlertDirectory().mkdir())) {
-    		getLogger().warn("Did not make the Grief Alert Configuration directory!");
+    		getLogger().info("Did not make the Grief Alert Configuration directory! Is it already created?");
     	} else {
     		getLogger().info("Grief Alert Configuration directory created.");
     	}
     	
     	// Get the file
-        File griefAlertFile = new File(getGriefAlertDirectory().getPath() + "/" + GRIEF_ALERT_FILE_NAME);
+    	String griefAlertFileString = getGriefAlertDirectory().getPath() + "\\" + GRIEF_ALERT_FILE_NAME;
+    	getLogger().info("The path where the file is trying to be created: " + griefAlertFileString);
+        File griefAlertFile = new File(griefAlertFileString);
         
         if (!griefAlertFile.exists()) {
         	// Create the file because it doesn't exist yet
         	getLogger().info("Generating a new default Grief Alert file: " + GRIEF_ALERT_FILE_NAME);
             try{
-            	URL defaultFileURL = getClass().getResource("grief_alerts.txt");
+            	URL defaultFileURL = getClass().getClassLoader().getResource("grief_alerts.txt");
             	if (defaultFileURL == null) {
                 	throw new Exception("defaultFileURL is null!");
                 }
@@ -276,12 +281,13 @@ public class GriefAlert implements PluginContainer {
                     FileSystems.newFileSystem(defaultFile, env);
                 }
                 Files.copy(Paths.get(defaultFile), griefAlertFile.toPath());
+                getLogger().info(GRIEF_ALERT_FILE_NAME + " supposedly has been created.");
                 if(filesys != null) filesys.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-		return griefAlertFile;
+		return new File(griefAlertFile.getPath());
     }
     
     /**
@@ -374,10 +380,12 @@ public class GriefAlert implements PluginContainer {
     	commandManager.createRootCommand("gcheck");
     	commandManager.createRootCommand("grecent");
     	commandManager.createRootCommand("griefalert");
+    	commandManager.createRootCommand("ginfo");
     	commandManager.registerCommand(new GriefAlertCommand(this));
     	commandManager.registerCommand(new GriefAlert_Toggle_Command(this));
     	commandManager.registerCommand(new GriefCheckCommand(this));
     	commandManager.registerCommand(new GriefRecentCommand(this));
+    	commandManager.registerCommand(griefInfoCommand = new GriefInfoCommand(this));
     	registerConditions();
     	registerCompletions();
     	
@@ -503,6 +511,14 @@ public class GriefAlert implements PluginContainer {
     
     public DebugLogger getDebugLogger() {
     	return dLogger;
+    }
+    
+    public SpongeCommandManager getCommandManager() {
+    	return commandManager;
+    }
+    
+    public GriefInfoCommand getGriefInfoCommand() {
+    	return this.griefInfoCommand;
     }
     
     public class DebugLogger {

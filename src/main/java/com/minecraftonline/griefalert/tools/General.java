@@ -1,7 +1,10 @@
 package com.minecraftonline.griefalert.tools;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 /**
  * A General tools class to house static methods for small data manipulations
@@ -82,6 +85,15 @@ public abstract class General {
     		}
     	}
         return output;
+    }
+    
+    /**
+     * Format the grief checker's name to include prefix and suffix
+     * @param player The grief checker
+     * @return The Text form of the grief checker's name
+     */
+    public static Text formatPlayerName(Player player) {
+        return TextSerializers.FORMATTING_CODE.deserialize(player.getOption("prefix").orElse("") + player.getName() + player.getOption("suffix").orElse(""));
     }
 	
 }

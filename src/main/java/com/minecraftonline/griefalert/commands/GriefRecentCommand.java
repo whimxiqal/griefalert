@@ -40,7 +40,6 @@ public class GriefRecentCommand extends BaseCommand {
     @Conditions("player")
     @CommandCompletion("@players")
     public void onGrecent(CommandSource src, String username) {
-    	
         Player player = (Player) src;
         player.sendMessage(Text.builder("Showing all recent grief alerts from player " + username).color(RED).build());
         List<GriefInstance> repeatedIncidents = new LinkedList<GriefInstance>();

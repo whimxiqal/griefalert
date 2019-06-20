@@ -78,7 +78,7 @@ DESTROY;minecraft:acacia_slab;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:dark_oak_slab;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:stone_slab;c
 DESTROY;minecraft:sandstone_slab;c			# Not functional yet in 1.12.2
-cobbDESTROY;minecraft:petrified_oak_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:petrified_oak_slab;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:cobblestone_slab;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:brick_slab;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:stone_brick_slab;c			# Not functional yet in 1.12.2

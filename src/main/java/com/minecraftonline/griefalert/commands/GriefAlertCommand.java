@@ -37,6 +37,8 @@ public class GriefAlertCommand extends BaseCommand {
     	Player player = (Player) source;
     	player.sendMessage(Text.of(TextColors.GOLD, "Help: /griefalert"));
     	player.sendMessage(Text.of(TextColors.GOLD, "-------------"));
-    	player.sendMessage(Text.of(TextColors.AQUA, "/griefalert toggle <debugmode> <true|false>"));
+    	if (player.hasPermission("griefalert.command.toggle")) {
+    		player.sendMessage(Text.of(TextColors.AQUA, "/griefalert toggle <debugmode> <true|false>"));
+    	}
     }
 }
