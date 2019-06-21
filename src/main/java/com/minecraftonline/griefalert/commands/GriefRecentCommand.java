@@ -1,13 +1,12 @@
 package com.minecraftonline.griefalert.commands;
 
-import static org.spongepowered.api.text.format.TextColors.RED;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.core.GriefInstance;
@@ -41,7 +40,7 @@ public class GriefRecentCommand extends BaseCommand {
     @CommandCompletion("@players")
     public void onGrecent(CommandSource src, String username) {
         Player player = (Player) src;
-        player.sendMessage(Text.builder("Showing all recent grief alerts from player " + username).color(RED).build());
+        player.sendMessage(Text.builder("Recent Grief Alerts: " + username).color(TextColors.GOLD).build());
         List<GriefInstance> repeatedIncidents = new LinkedList<GriefInstance>();
         for (GriefInstance griefInstance : plugin.getGriefManager().getRecentGriefInstances()) {
         	if (!username.equalsIgnoreCase(griefInstance.getGrieferAsPlayer().getName())) 
