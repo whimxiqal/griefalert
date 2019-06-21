@@ -196,8 +196,8 @@ public final class GriefManager {
      * @return The readable text format of the grief instance
      */
     public Text generateAlertMessage(GriefInstance instance) {
-    	String defaultAlertMessage = getConfigStaffAlertMessage();
-        instance.setAlertText(Text.builder(new CustomizableString(defaultAlertMessage)
+    	String defaultMessage = getConfigMessage("staff_alert_message");
+        instance.setAlertText(Text.builder(new CustomizableString(defaultMessage)
         									.replacePlayer(instance.getGrieferAsPlayer()) 
         									.replaceGriefType(instance.getType())
         									.replaceGriefObject(instance.getGriefObjectAsString())
@@ -219,34 +219,33 @@ public final class GriefManager {
 		for (GriefInstance griefInstance : repeatedIncidents) {
 			interactiveGriefAlertIDs.add(griefInstance.getInteractiveID());
 		}
-    	String defaultAlertMessage = getConfigStaffAlertMessage();
-        return Text.builder(new CustomizableString(defaultAlertMessage)
+    	String defaultMessage = getConfigMessage("staff_grecent_message");
+        return Text.builder(new CustomizableString(defaultMessage)
         									.replacePlayer(repeatedIncidents.get(0).getGrieferAsPlayer()) 
         									.replaceGriefType(repeatedIncidents.get(0).getType())
         									.replaceGriefObject(repeatedIncidents.get(0).getGriefObjectAsString())
-        									.replaceAlertID(0)
         									.replaceLocationDimension(repeatedIncidents.get(0).getLocation().getExtent().getDimension().getType())
         									.complete())
         				.color(repeatedIncidents.get(0).getAlertColor())
-        				.append(Text.of(TextColors.RED, "\n["))
+        				.append(Text.of(TextColors.RED, " ["))
         				.append(Text.joinWith(Text.of(TextColors.RED, ", "), interactiveGriefAlertIDs))
         				.append(Text.of(TextColors.RED, "]"))
         				.build();
 	}
 	
-	private String getConfigStaffAlertMessage() {
-		String defaultAlertMessage;
+	private String getConfigMessage(String node) {
+		String message;
     	try {
-	    	defaultAlertMessage = (String) plugin.getConfigNode("messaging").getNode("staff_alert_message").getValue();
-	    	if (defaultAlertMessage == null) throw new NullPointerException();
+	    	message = (String) plugin.getConfigNode("messaging").getNode(node).getValue();
+	    	if (message == null) throw new NullPointerException();
     	} catch (ClassCastException castEx) {
-    		plugin.getLogger().warn("Messaging value for node 'staff_alert_message' not a string. Sending basic alert message.");
-    		defaultAlertMessage = "Alert";
+    		plugin.getLogger().warn("Messaging value for node " + node + " is not a string. Sending basic alert message.");
+    		message = "Alert";
     	} catch (NullPointerException nullEx) {
-    		plugin.getLogger().warn("Messaging value for node 'staff_alert_message' not found. Sending basic alert message.");
-    		defaultAlertMessage = "Alert";
+    		plugin.getLogger().warn("Messaging value for node " + node + " was not found. Sending basic alert message.");
+    		message = "Alert";
     	}
-    	return defaultAlertMessage;
+    	return message;
 	}
 
     /**

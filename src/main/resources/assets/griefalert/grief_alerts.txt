@@ -243,7 +243,6 @@ DESTROY;minecraft:green_carpet;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:red_carpet;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:black_carpet;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:terracotta;c				# Not functional yet in 1.12.2
-
 DESTROY;minecraft:coal_block;c
 DESTROY;minecraft:packed_ice;c
 DESTROY;minecraft:acacia_stairs;c
@@ -404,8 +403,8 @@ DESTROY;minecraft:brown_bed;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:green_bed;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:red_bed;c				# Not functional yet in 1.12.2
 DESTROY;minecraft:black_bed;c				# Not functional yet in 1.12.2
-DESTROY;minecraft:item_frame;c				# Not functional yet in 1.12.2
-INTERACT;minecraft:item_frame;c				# Not functional yet in 1.12.2			
+DESTROY;minecraft:item_frame;c
+INTERACT;minecraft:item_frame;c			
 DESTROY;minecraft:flower_pot;c
 INTERACT;minecraft:flower_pot;c
 DESTROY;minecraft:skeleton_skull;c			# Not functional yet in 1.12.2
@@ -471,3 +470,115 @@ DESTROY;minecraft:zombie_wall_head;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:player_wall_head;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:creeper_wall_head;c			# Not functional yet in 1.12.2
 DESTROY;minecraft:dragon_wall_head;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:white_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:orange_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:magenta_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:light_blue_wall_banner;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:yellow_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:lime_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:pink_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:gray_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:light_gray_wall_banner;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:cyan_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:purple_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:blue_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:brown_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:green_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:black_wall_banner;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:end_gateway;5;;deny			# Not functional yet in 1.12.2
+DESTROY;minecraft:frosted_ice;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"creeper"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"skeleton"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"spider"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"giant"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"zombie"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"slime"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"ghast"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"zombie_pigman"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"enderman"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"cave_spider"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"silverfish"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"blaze"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"magma_cube"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"ender_dragon"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"wither"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"bat"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"witch"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"pig"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"sheep"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"cow"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"chicken"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"squid"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"mooshroom"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"snow_golem"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"ocelot"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"iron_golem"}}};c	# Not functional yet in 1.12.2
+DESTROY;minecraft:spawner{BlockEntityTag:{SpawnData:{id:"horse"}}};c		# Not functional yet in 1.12.2
+DESTROY;minecraft:wither_rose;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_stone_slab;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:cut_sandstone_slab;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:cut_red_sandstone_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:brick_wall;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:prismarine_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_sandstone_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:mossy_stone_brick_wall;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:granite_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:stone_brick_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:nether_brick_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:andesite_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_nether_brick_wall;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:sandstone_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:end_stone_brick_wall;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:diorite_wall;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:polished_granite_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_red_sandstone_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:mossy_stone_brick_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:polished_diorite_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:mossy_cobblestone_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:end_stone_brick_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:stone_stairs;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_sandstone_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_quartz_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:granite_stairs;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:andesite_stairs;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_nether_brick_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:polished_andesite_stairs;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:diorite_stairs;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:polished_granite_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_red_sandstone_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:mossy_stone_brick_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:polished_diorite_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:mossy_cobblestone_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:end_stone_brick_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_sandstone_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:smooth_quartz_slab;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:granite_slab;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:andesite_slab;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:red_nether_brick_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:polished_andesite_slab;c		# Not functional yet in 1.12.2
+DESTROY;minecraft:diorite_slab;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:scaffolding;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:jigsaw;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:composter;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:oak_sign;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:spruce_sign;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:birch_sign;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:jungle_sign;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:acacia_sign;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:dark_oak_sign;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:loom;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:barrel;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:smoker;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:blast_furnace;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:cartography_table;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:fletching_table;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:grindstone;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:lectern;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:smithing_table;c			# Not functional yet in 1.12.2
+DESTROY;minecraft:stonecutter;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:bell;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:lantern;c				# Not functional yet in 1.12.2
+DESTROY;minecraft:campfire;c				# Not functional yet in 1.12.2
+
+

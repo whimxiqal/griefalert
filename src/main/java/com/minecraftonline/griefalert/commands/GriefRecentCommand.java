@@ -44,7 +44,7 @@ public class GriefRecentCommand extends BaseCommand {
         player.sendMessage(Text.builder("Showing all recent grief alerts from player " + username).color(RED).build());
         List<GriefInstance> repeatedIncidents = new LinkedList<GriefInstance>();
         for (GriefInstance griefInstance : plugin.getGriefManager().getRecentGriefInstances()) {
-        	if (!username.equals(griefInstance.getGrieferAsPlayer().getName())) 
+        	if (!username.equalsIgnoreCase(griefInstance.getGrieferAsPlayer().getName())) 
         		continue;
         	if (!repeatedIncidents.isEmpty() && 
         			!repeatedIncidents.get(0).isAnotherOf(griefInstance)) {

@@ -93,6 +93,9 @@ public class GriefAlert implements PluginContainer {
     public static final String DEFAULT_STAFF_ALERT_MESSAGE = 
     		"(PLAYER) (GRIEF_VERB) a (GRIEF_OBJECT) ((GRIEF_ID)) in the (LOCATION:DIMENSION)";
     
+    public static final String DEFAULT_STAFF_GRECENT_MESSAGE =
+    		"(GRIEF_VERB): (GRIEF_OBJECT) in (LOCATION:DIMENSION)";
+    
     public static final String DEFAULT_STAFF_ALERT_MESSAGE_SIGN_HEADER = 
     		"Sign placed by (PLAYER) at (LOCATION:COORDINATES) in the (LOCATION:DIMENSION)";
     
@@ -218,6 +221,7 @@ public class GriefAlert implements PluginContainer {
                 rootNode.getNode("SQLdb").setValue(SQL_ADDRESS);
                 ConfigurationNode messagingNode = rootNode.getNode("messaging");
                 messagingNode.getNode("staff_alert_message").setValue(DEFAULT_STAFF_ALERT_MESSAGE);
+                messagingNode.getNode("staff_grecent_message").setValue(DEFAULT_STAFF_GRECENT_MESSAGE);
                 messagingNode.getNode("staff_alert_message_sign_header").setValue(DEFAULT_STAFF_ALERT_MESSAGE_SIGN_HEADER);
                 messagingNode.getNode("staff_alert_message_sign_line").setValue(DEFAULT_STAFF_ALERT_MESSAGE_SIGN_LINE);
                 configManager.save(rootNode);
