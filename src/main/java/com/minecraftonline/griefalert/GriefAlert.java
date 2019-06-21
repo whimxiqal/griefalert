@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.commands.GriefAlert_Toggle_Command;
 import com.minecraftonline.griefalert.commands.GriefCheckCommand;
+import com.minecraftonline.griefalert.commands.GriefInfoCommand;
 import com.minecraftonline.griefalert.commands.GriefRecentCommand;
 import com.minecraftonline.griefalert.core.GriefAction;
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;

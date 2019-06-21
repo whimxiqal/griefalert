@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert;
+package com.minecraftonline.griefalert.commands;
 
 import java.util.Arrays;
 
@@ -7,6 +7,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.core.GriefInstance;
 
 import co.aikar.commands.BaseCommand;
