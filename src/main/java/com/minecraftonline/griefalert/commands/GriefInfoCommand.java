@@ -63,8 +63,9 @@ public final class GriefInfoCommand extends BaseCommand {
             player.sendMessage(Text.builder("There is no current alert at ID " + code + ".").color(TextColors.RED).build());
             return;
         }
-        player.sendMessage(Text.of(TextColors.GOLD, "Grief Alert Information - ")
-        		.concat(Text.of(TextColors.RED, String.valueOf(code))));
+        player.sendMessage(Text.of(TextColors.GOLD, "Grief Alert Information (")
+        		.concat(Text.of(TextColors.RED, String.valueOf(code)))
+        		.concat(Text.of(TextColors.GOLD, ")")));
         player.sendMessage(generateInfoLine("Player", instance.getGrieferAsPlayer().getName()));
         player.sendMessage(generateInfoLine("Action", instance.getType().toString()));
         player.sendMessage(generateInfoLine("Object", instance.getGriefObjectAsString()));
