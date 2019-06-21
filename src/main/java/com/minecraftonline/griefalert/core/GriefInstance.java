@@ -2,6 +2,7 @@ package com.minecraftonline.griefalert.core;
 
 import java.util.NoSuchElementException;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Entity;
@@ -46,6 +47,7 @@ public final class GriefInstance {
     private Player griefer;
     /** The general Object for holding the grief related object in this Grief Instance. */
     private GriefTriggerObject griefObject;
+    /** The text sent to alert staff members about this instance. */
 	private Text alertText;
 	/** Integer id for this instance's location in the Recent Grief Instances Array. */
 	private int alertID = -1;
@@ -83,7 +85,16 @@ public final class GriefInstance {
     }
     
     public Location<World> getLocation() {
-    	return griefObject.getLocation();
+    	if (griefObject.getLocation() != null) {
+    		return griefObject.getLocation();
+    	} else {
+    		try {
+    			return grieferSnapshot.getLocation().get();
+    		} catch (NoSuchElementException e) {
+    			e.printStackTrace();
+    			return new Location<World>((World) Sponge.getServer().getWorlds().toArray()[0], 0, 0, 0);
+    		}
+    	}
     }
 
     public EntitySnapshot getGrieferSnapshot() {
@@ -180,7 +191,7 @@ public final class GriefInstance {
 			this.blockSnapshot = blockSnapshot;
 			this.type = GriefTriggerType.BLOCK;
 		}
-		
+
 		public GriefTriggerObject(ItemStackSnapshot itemStackSnapshot) {
 			this.itemStackSnapshot = itemStackSnapshot;
 			this.type = GriefTriggerType.ITEMSTACK;

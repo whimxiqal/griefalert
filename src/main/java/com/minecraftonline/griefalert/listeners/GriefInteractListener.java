@@ -9,15 +9,12 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.hanging.Hanging;
-import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.world.DimensionType;
 
 import javax.annotation.Nonnull;
@@ -74,7 +71,6 @@ public class GriefInteractListener implements EventListener<Event> {
 	}
 	
 	public void handleInteractEntityEvent(InteractEntityEvent event) {
-		plugin.getDebugLogger().log("InteractEntityEvent called.");
         if (event.getCause().root() instanceof Player) {
             Entity target = event.getTargetEntity();
             DimensionType dType = target.getLocation().getExtent().getDimension().getType();
