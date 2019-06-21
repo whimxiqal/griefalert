@@ -34,6 +34,7 @@ public final class GriefLogger {
 	/** The connection object to reach the SQL database. */
     private Connection conn;
     
+    /** True if there exists an error which would prevent complete functionality of this logger. */
     private boolean error;
 
     /**
@@ -48,7 +49,7 @@ public final class GriefLogger {
 		} catch (SQLException sqlex) {
 			error = true;
 			plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
-					+ "Connection Path: connectionPath");
+					+ "Is your information correct in the configuration file?");
 		}
     }
 
