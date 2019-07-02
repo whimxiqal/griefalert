@@ -1,5 +1,6 @@
 package com.minecraftonline.griefalert.core;
 
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import org.spongepowered.api.Sponge;
@@ -45,6 +46,8 @@ public final class GriefInstance {
     private EntitySnapshot grieferSnapshot;
     /** The Player representation of the griefer. */
     private Player griefer;
+    /** The list of staff members who have checked this grief instance. */
+    private HashMap<Player, EntitySnapshot> checkerMap = new HashMap<Player, EntitySnapshot>();
     /** The general Object for holding the grief related object in this Grief Instance. */
     private GriefTriggerObject griefObject;
     /** The text sent to alert staff members about this instance. */
@@ -160,6 +163,14 @@ public final class GriefInstance {
 				.onClick(TextActions.runCommand("/gcheck " + this.getAlertID()))
 				.onHover(TextActions.showText(Text.builder("Check Grief Alert #" + this.getAlertID()).color(TextColors.LIGHT_PURPLE).build()))
 				.build();
+	}
+	
+	public HashMap<Player, EntitySnapshot> getCheckers() {
+		return checkerMap;
+	}
+	
+	public void addChecker(Player player, EntitySnapshot snapshot) {
+		checkerMap.put(player, snapshot);
 	}
 	
 	public boolean isAnotherOf(Object other) {

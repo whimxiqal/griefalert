@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.commands;
 
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -23,7 +24,7 @@ import static org.spongepowered.api.text.format.TextColors.RED;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 /**
- * The CommandExecutor for the command to check alerts for GriefInstances in game
+ * The CommandExecutor for the command to check alerts for GriefInstances in game.
  */
 @CommandPermission("griefalert.command.gcheck")
 @CommandAlias("gcheck")
@@ -69,6 +70,7 @@ public final class GriefCheckCommand extends BaseCommand {
         }
         
         // Teleport checker to a safe location near the grief. If failed, notify the checker
+        EntitySnapshot checkerPriorSnapshot = player.createSnapshot();
         if (player.setLocationSafely(instance.getGrieferSnapshot().getLocation().get())) {
             try {
             	player.setRotation(instance.getGrieferSnapshot().getTransform().get().getRotation());
@@ -77,6 +79,7 @@ public final class GriefCheckCommand extends BaseCommand {
                         Text.builder(Integer.toString(code)).color(TextColors.WHITE).build()).append(
                         Text.builder(" for grief.").color(TextColors.YELLOW).build()).build());
             	plugin.getGriefInfoCommand().onGinfo(player, code);
+            	instance.addChecker(player, checkerPriorSnapshot);
             } catch (NoSuchElementException e) {
             	plugin.getLogger().warn("When checking for grief, player " + player.getName() + " did not find the transform within"
             			+ "the snapshot of the griefer.");

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -15,6 +16,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.tools.CustomizableString;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -271,6 +273,17 @@ public final class GriefManager {
     public List<GriefInstance> getRecentGriefInstances() {
     	return griefInstances.toList();
     }
+    
+	public EntitySnapshot getGriefCheckerPriorSnapshot(Player player) {
+		List<GriefInstance> recentGriefInstances = griefInstances.toList();
+		Collections.reverse(recentGriefInstances);
+		for (GriefInstance instance : recentGriefInstances) {
+			if (instance.getCheckers().containsKey(player)) {
+				return instance.getCheckers().get(player);
+			}
+		}
+		return null;
+	}
     
     /**
      * A local class for managing the recent grief instances which are handled by in-game staff.

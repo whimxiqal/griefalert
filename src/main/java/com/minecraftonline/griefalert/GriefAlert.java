@@ -6,6 +6,7 @@ import com.minecraftonline.griefalert.commands.GriefAlert_Toggle_Command;
 import com.minecraftonline.griefalert.commands.GriefCheckCommand;
 import com.minecraftonline.griefalert.commands.GriefInfoCommand;
 import com.minecraftonline.griefalert.commands.GriefRecentCommand;
+import com.minecraftonline.griefalert.commands.GriefReturnCommand;
 import com.minecraftonline.griefalert.core.GriefAction;
 import com.minecraftonline.griefalert.core.GriefAction.GriefType;
 import com.minecraftonline.griefalert.core.GriefActionTableManager;
@@ -60,6 +61,7 @@ import java.util.Scanner;
  * <li><i>griefalert.command.grecent</i>: Allows the use of the /grecent command</li>
  * <li><i>griefalert.command.toggle</i>: Allows the use of the /griefalert toggle command</li>
  * <li><i>griefalert.command.ginfo</i>: Allows the use of the /ginfo command</li>
+ * <li><i>griefalert.command.greturn</i>: Allows the use of the /greturn command</li>
  * <li><i>griefalert.staff</i>: Shows staff messages</li>
  * <li><i>griefalert.noalert</i>: Doesn't trigger an alert</li>
  * <li><i>griefalert.degrief</i>: Allows staff to degrief blocks with the given degrief tool</li>
@@ -73,7 +75,7 @@ public class GriefAlert implements PluginContainer {
 	// TODO Test all grief types
 	// TODO Test log_signs_content config nodes
 	/** Version of this Plugin. (Should this be final?) */
-    static final String VERSION = "22.0";
+    static final String VERSION = "22.1";
     
     /** Item used by staff members to 'degrief' a grief event. This is logged but not acted on by in-game staff. */
     public static final String DEGRIEF_ITEM = "minecraft:stick";
@@ -176,7 +178,7 @@ public class GriefAlert implements PluginContainer {
         }
         
         // Register all the listeners with Sponge
-        registerListeners(griefManager);
+        registerListeners();
         
         // Register all the commands with Sponge
         registerCommands();
@@ -339,7 +341,7 @@ public class GriefAlert implements PluginContainer {
      * Registers all listeners with Sponge to appropriately read information coming from the server
      * @param manager the RealtimeGriefInstanceManager to deal with incoming Grief Instances
      */
-    private void registerListeners(GriefManager manager) {
+    private void registerListeners() {
         Sponge.getEventManager().registerListener(this, ChangeBlockEvent.Break.class, Order.LAST, new GriefDestroyListener(this));
         if (getConfigBoolean("logSignsContent")) {
             Sponge.getEventManager().registerListener(this, ChangeSignEvent.class, Order.LAST, new GriefSignListener(this));
@@ -360,6 +362,7 @@ public class GriefAlert implements PluginContainer {
     	commandManager.registerCommand(new GriefAlert_Toggle_Command(this));
     	commandManager.registerCommand(new GriefCheckCommand(this));
     	commandManager.registerCommand(new GriefRecentCommand(this));
+    	commandManager.registerCommand(new GriefReturnCommand(this));
     	commandManager.registerCommand(griefInfoCommand = new GriefInfoCommand(this));
     	registerConditions();
     	registerCompletions();
