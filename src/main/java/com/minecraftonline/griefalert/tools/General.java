@@ -1,5 +1,8 @@
 package com.minecraftonline.griefalert.tools;
 
+import com.minecraftonline.griefalert.GriefAlert;
+import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -57,7 +60,63 @@ public abstract class General {
         }
 	}
 
-	/**
+  /**
+   * Return the TextColor Minecraft associated with the input character.
+   * @param s the input string to convert to TextColor
+   * @return The desired TextColor
+   * @throws IllegalColorCodeException Throws a subclass of an IllegalArgumentException
+   * if there was an invalid input character
+   */
+  public static TextColor stringToColor(String s) throws IllegalColorCodeException {
+    switch (s.toLowerCase()) {
+      case "black":
+        return TextColors.BLACK;
+      case "dark_blue":
+        return TextColors.DARK_BLUE;
+      case "dark_green":
+        return TextColors.DARK_GREEN;
+      case "dark_aqua":
+        return TextColors.DARK_AQUA;
+      case "dark_red":
+        return TextColors.DARK_RED;
+      case "dark_purple":
+        return TextColors.DARK_PURPLE;
+      case "gold":
+        return TextColors.GOLD;
+      case "gray":
+        return TextColors.GRAY;
+      case "dark_gray":
+        return TextColors.DARK_GRAY;
+      case "blue":
+        return TextColors.BLUE;
+      case "green":
+        return TextColors.GREEN;
+      case "aqua":
+        return TextColors.AQUA;
+      case "red":
+        return TextColors.RED;
+      case "light_purple":
+        return TextColors.LIGHT_PURPLE;
+      case "yellow":
+        return TextColors.YELLOW;
+      case "white":
+        return TextColors.WHITE;
+      default:
+        throw new IllegalColorCodeException(s);
+    }
+  }
+
+  public static void stampConsole() {
+    Sponge.getServer().getConsole().sendMessage(Text.of(
+        "\n",
+        TextColors.DARK_PURPLE, "     ____          " + "\n",
+        TextColors.DARK_PURPLE, "   //         //\\     ", TextColors.GOLD, "GriefAlert ", TextColors.DARK_GRAY, "v." + GriefAlert.VERSION + "\n",
+        TextColors.DARK_PURPLE, "  ||    ===  //__\\    ", TextColors.DARK_AQUA, "Built for MinecraftOnline" + "\n",
+        TextColors.DARK_PURPLE, "   \\\\____/  //    \\ " + "\n"
+    ));
+  }
+
+  /**
 	 * An exception to throw if a method tries to convert an invalid character
 	 * to a Minecraft text color.
 	 */
@@ -66,6 +125,9 @@ public abstract class General {
 		IllegalColorCodeException(char c) {
 			super("This color character is invalid: " + c);
 		}
+    IllegalColorCodeException(String s) {
+      super("This color name is invalid: " + s);
+    }
 	}
 	
 	/** 

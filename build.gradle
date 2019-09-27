@@ -9,14 +9,13 @@ apply plugin: 'idea'
 
 repositories {
 	mavenCentral()
-	maven {url = "https://repo.aikar.co/content/groups/aikar/"}
     jcenter()
     google()
 }
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '22.1' // Project Version
+version = '23' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -28,7 +27,6 @@ compileJava {
 }
 
 dependencies {
-	compile 'co.aikar:acf-sponge:0.5.0-SNAPSHOT'
     compileOnly "org.spongepowered:spongeapi:${sponge_version}"
 }
 
