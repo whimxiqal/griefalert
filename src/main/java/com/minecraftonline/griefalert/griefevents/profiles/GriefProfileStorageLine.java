@@ -70,7 +70,7 @@ public class GriefProfileStorageLine {
 
     private List<String> items;
 
-    private Builder() {
+    Builder() {
       items = new LinkedList<>();
     }
 

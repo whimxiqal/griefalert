@@ -6,6 +6,9 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class GriefProfile {
 
   /**
@@ -92,6 +95,19 @@ public class GriefProfile {
     specialtyBehavior.accept(plugin);
   }
 
+  public GriefProfileStorageLine toStorageLine() {
+    GriefProfileStorageLine.Builder builder = new GriefProfileStorageLine.Builder()
+        .addItem(getGriefType().getName())
+        .addItem(getGriefedId())
+        .addItem(alertColor.getName());
+    if (denied) builder.addItem("-d");
+    if (stealthy) builder.addItem("-s");
+    if (dimensionParameterArray.isIgnored(DimensionTypes.OVERWORLD)) builder.addItem("--ignore-overworld");
+    if (dimensionParameterArray.isIgnored(DimensionTypes.NETHER)) builder.addItem("--ignore-nether");
+    if (dimensionParameterArray.isIgnored(DimensionTypes.THE_END)) builder.addItem("--ignore-the-end");
+    return builder.build();
+  }
+
   public static class DimensionParameterArray {
 
     /**
@@ -115,7 +131,7 @@ public class GriefProfile {
       }
     }
 
-    void setIgnored(DimensionType dimensionType, boolean isIgnored) {
+    public void setIgnored(DimensionType dimensionType, boolean isIgnored) {
       switch(dimensionType.getName().toLowerCase()) {
         case "overworld":
           array[0] = isIgnored;
@@ -131,6 +147,13 @@ public class GriefProfile {
       }
     }
 
+    public List<String> getIgnoredList() {
+      List<String> toReturn = new LinkedList<>();
+      if (array[0]) toReturn.add("Overworld");
+      if (array[1]) toReturn.add("Nether");
+      if (array[2]) toReturn.add("The End");
+      return toReturn;
+    }
   }
 
   public boolean isDenied() {

@@ -1,13 +1,7 @@
 package com.minecraftonline.griefalert;
 
 import com.google.inject.Inject;
-//import com.minecraftonline.griefalert.commands.GriefAlert_Toggle_Command;
-//import com.minecraftonline.griefalert.commands.GriefCheckCommand;
-//import com.minecraftonline.griefalert.commands.GriefInfoCommand;
-//import com.minecraftonline.griefalert.commands.GriefRecentCommand;
-//import com.minecraftonline.griefalert.commands.GriefReturnCommand;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
-import com.minecraftonline.griefalert.commands.GriefAlertSaveprofileCommand;
 import com.minecraftonline.griefalert.griefevents.GriefEventCache;
 import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfileMuseum;
@@ -25,7 +19,6 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -39,7 +32,6 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
 
 /**
  * The main class for the plugin Grief Alert.
@@ -77,7 +69,7 @@ public class GriefAlert implements PluginContainer {
     public static final Permission GRIEFALERT_COMMAND_RECENT = new Permission("griefalert.command.recent");
     public static final Permission GRIEFALERT_COMMAND_LOGS = new Permission("griefalert.command.logs");
     public static final Permission GRIEFALERT_COMMAND_ROLLBACK = new Permission("griefalert.command.rollback");
-    public static final Permission GRIEFALERT_COMMAND_ADDPROFILE = new Permission("griefalert.command.addprofile");
+    public static final Permission GRIEFALERT_COMMAND_BUILD = new Permission("griefalert.command.build");
     public static final Permission GRIEFALERT_MESSAGING = new Permission("griefalert.messaging");
     public static final Permission GRIEFALERT_SILENT = new Permission("griefalert.silent");
     public static final Permission GRIEFALERT_DEGRIEF = new Permission("griefalert.degrief");
@@ -156,8 +148,6 @@ public class GriefAlert implements PluginContainer {
    * An array list all dimensions to use when needing to place Grief Actions into all possible dimensions.
    */
   public static final String[] ALL_DIMENSIONS = new String[]{"overworld", "nether", "the_end"};
-
-  private final HashMap<UUID, GriefAlertSaveprofileCommand.GriefProfileBuilder> profileBuilderMap = new HashMap<>();
 
   @Inject
   /** General logger. From Sponge API. */
@@ -364,22 +354,6 @@ public class GriefAlert implements PluginContainer {
 
   public GriefEventCache getGriefEventCache() {
     return griefEventCache;
-  }
-
-  public Optional<GriefAlertSaveprofileCommand.GriefProfileBuilder> putProfileBuilder(Player player, GriefAlertSaveprofileCommand.GriefProfileBuilder builder) {
-    if (!player.hasPermission(Permission.GRIEFALERT_COMMAND_ADDPROFILE.toString())) {
-      return Optional.empty();
-    } else {
-      return Optional.ofNullable(profileBuilderMap.put(player.getUniqueId(), builder));
-    }
-  }
-
-  public Optional<GriefAlertSaveprofileCommand.GriefProfileBuilder> getProfileBuilder(Player player) {
-    return Optional.ofNullable(profileBuilderMap.get(player.getUniqueId()));
-  }
-
-  public GriefAlertSaveprofileCommand.GriefProfileBuilder removeProfileBuilder(Player player) {
-    return profileBuilderMap.remove(player.getUniqueId());
   }
 
   @Override

@@ -21,7 +21,7 @@ public class GriefAlertCommand extends AbstractCommand {
     addChild(new GriefAlertRecentCommand(plugin));
     addChild(new GriefAlertReturnCommand(plugin));
     addChild(new GriefAlertRollbackCommand(plugin));
-    addChild(new GriefAlertToggleCommand(plugin));
+    addChild(new GriefAlertBuilderCommand(plugin));
     addChild(new GriefAlertReloadCommand(plugin));
 
   }

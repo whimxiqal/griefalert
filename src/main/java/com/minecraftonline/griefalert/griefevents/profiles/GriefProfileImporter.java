@@ -39,6 +39,7 @@ public class GriefProfileImporter {
     List<GriefProfile> griefEvents = new LinkedList<>();
     try {
       if (plugin.getDataDirectory().mkdirs() || getFile().createNewFile()){
+        plugin.getLogger().info("New Grief Profiles file created");
         return new LinkedList<>();
       }
       Scanner scanner = new Scanner(getFile());

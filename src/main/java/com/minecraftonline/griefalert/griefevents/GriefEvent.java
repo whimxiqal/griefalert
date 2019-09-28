@@ -67,4 +67,8 @@ public class GriefEvent extends GriefProfile {
         ).build().toText();
     StaffMessenger.getStaffBroadcastChannel().send(message);
   }
+
+  public int getCacheCode() {
+    return cacheCode;
+  }
 }

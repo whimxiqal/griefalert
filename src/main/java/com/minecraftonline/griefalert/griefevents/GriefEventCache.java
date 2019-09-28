@@ -15,11 +15,11 @@ public class GriefEventCache {
 
   public GriefEventCache(GriefAlert plugin) {
     cache = new LinkedList<>();
-    maxCode = plugin.getRootNode().getNode("alertsCodeLimit").getInt();
+    maxCode = 5; // plugin.getRootNode().getNode("alertsCodeLimit").getInt();
   }
 
   public int offer(GriefEvent griefEvent) {
-    cache.add(cursor, griefEvent);
+    cache.add(cursor % maxCode, griefEvent);
     return cursor++;
   }
 
@@ -36,5 +36,19 @@ public class GriefEventCache {
 
   public Optional<EntitySnapshot> getSnapshot(Player staff) {
     return Optional.ofNullable(checkerMap.get(staff.getUniqueId()));
+  }
+
+  public List<GriefEvent> getListByNumber() {
+    return cache;
+  }
+
+  public List<GriefEvent> getListByTime() {
+    LinkedList<GriefEvent> toSort = new LinkedList<>(cache);
+    toSort.sort((first, second) -> {
+      int firstPosition = ((first.getCacheCode() - cursor) + toSort.size()) % toSort.size();
+      int secondPosition = ((second.getCacheCode() - cursor) + toSort.size()) % toSort.size();
+      return -Integer.compare(firstPosition, secondPosition); // Negated because we want the most recent first
+    });
+    return toSort;
   }
 }

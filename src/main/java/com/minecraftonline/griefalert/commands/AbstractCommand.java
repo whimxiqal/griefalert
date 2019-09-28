@@ -29,6 +29,11 @@ public abstract class AbstractCommand implements CommandExecutor {
     }
   }
 
+  public AbstractCommand(GriefAlert plugin, GriefAlert.Permission permission, Text description, String primaryAlias) {
+    this(plugin, permission, description);
+    addAlias(primaryAlias);
+  }
+
   protected boolean addAlias(String alias) {
     return this.aliases.add(alias);
   }

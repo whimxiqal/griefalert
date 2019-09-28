@@ -24,15 +24,24 @@ public class GlobalListener implements EventListener<Event> {
         ChangeBlockEvent.Break.class,
         (changeBlockEventBreak) -> {
           if (changeBlockEventBreak.getCause().root() instanceof Player) {
+            Player root = (Player) changeBlockEventBreak.getCause().root();
+            String blockName = changeBlockEventBreak.getTransactions().get(0).getOriginal().getState().getType().getName();
             EventWrapper eventWrapper = new EventWrapper(
                 changeBlockEventBreak,
                 GriefAlert.GriefType.DESTROY,
-                ((Player) changeBlockEventBreak.getCause().root()).createSnapshot(),
-                (Player) changeBlockEventBreak.getCause().root(),
-                changeBlockEventBreak.getTransactions().get(0).getOriginal().getState().getType().getName()
+                root.createSnapshot(),
+                root,
+                blockName
             );
             if (changeBlockEventBreak.getTransactions().get(0).getOriginal().getLocation().isPresent()) {
               eventWrapper.setGriefedLocation(changeBlockEventBreak.getTransactions().get(0).getOriginal().getLocation().get());
+            }
+            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
+              plugin.getMuseum().getProfileBuilder(root).get().setType(GriefAlert.GriefType.DESTROY);
+              plugin.getMuseum().getProfileBuilder(root).get().setGriefedId(blockName);
+              root.sendMessage(plugin.getMuseum().getProfileBuilder(root).get().print());
+              changeBlockEventBreak.setCancelled(true);
+              return;
             }
             plugin.handleGriefEvent(eventWrapper);
           }
