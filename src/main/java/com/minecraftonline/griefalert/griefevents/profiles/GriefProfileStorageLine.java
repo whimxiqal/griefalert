@@ -24,7 +24,7 @@ public class GriefProfileStorageLine {
   }
 
   public String toString() {
-    return line + (comment.isEmpty() ? "" : (COMMENT_DELIMITER + comment));
+    return line + (comment.isEmpty() ? "" : ("  " + COMMENT_DELIMITER + comment));
   }
 
   /**
@@ -62,7 +62,7 @@ public class GriefProfileStorageLine {
     return false;
   }
 
-  void setComment(@Nonnull String comment) {
+  public void setComment(@Nonnull String comment) {
     this.comment = comment;
   }
 

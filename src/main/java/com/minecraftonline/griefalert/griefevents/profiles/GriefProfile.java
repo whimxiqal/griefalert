@@ -6,13 +6,14 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
 public class GriefProfile {
 
   /**
-   * String representation of the griefed object.
+   * String representation of the griefed object. There is no 'minecraft:' prefix to this value.
    */
   protected final String griefedId;
   /**
@@ -26,7 +27,7 @@ public class GriefProfile {
   /**
    * Denotes whether this is muted from alerting.
    */
-  protected final boolean stealthy;
+  protected boolean stealthy;
   /**
    * The type of grief.
    */
@@ -59,7 +60,11 @@ public class GriefProfile {
       throw new IllegalArgumentException("Not enough arguments. Use format <TYPE> <OBJECT_ID> <COLOR> [FLAGS]");
     }
     this.type = GriefAlert.GriefType.from(tokens[0]);
-    this.griefedId = "minecraft:" + tokens[1].replaceAll("minecraft:", "");
+    if (tokens[1].contains("[a-zA-Z]:")) {
+      this.griefedId = tokens[1];
+    } else {
+      this.griefedId = "minecraft:" + tokens[1];
+    }
     this.alertColor = General.stringToColor(tokens[2]);
     DimensionParameterArray toDimensionParameterArray = new DimensionParameterArray();
     boolean toDenied = false;
@@ -98,7 +103,7 @@ public class GriefProfile {
   public GriefProfileStorageLine toStorageLine() {
     GriefProfileStorageLine.Builder builder = new GriefProfileStorageLine.Builder()
         .addItem(getGriefType().getName())
-        .addItem(getGriefedId())
+        .addItem(getGriefedId().replaceAll("minecraft:", ""))
         .addItem(alertColor.getName());
     if (denied) builder.addItem("-d");
     if (stealthy) builder.addItem("-s");
@@ -106,6 +111,10 @@ public class GriefProfile {
     if (dimensionParameterArray.isIgnored(DimensionTypes.NETHER)) builder.addItem("--ignore-nether");
     if (dimensionParameterArray.isIgnored(DimensionTypes.THE_END)) builder.addItem("--ignore-the-end");
     return builder.build();
+  }
+
+  public DimensionParameterArray getDimensionStructure() {
+    return dimensionParameterArray;
   }
 
   public static class DimensionParameterArray {
@@ -118,40 +127,40 @@ public class GriefProfile {
      */
     private final boolean[] array = {false, false, false};
 
-    boolean isIgnored(DimensionType dimensionType) {
-      switch(dimensionType.getName().toLowerCase()) {
-        case "overworld":
-          return array[0];
-        case "nether":
-          return array[1];
-        case "the_end":
-          return array[2];
-        default:
-          throw new IllegalArgumentException();
+    boolean isIgnored(@Nonnull DimensionType dimensionType) {
+      if (DimensionTypes.OVERWORLD.equals(dimensionType)) {
+        return array[0];
+      } else if (DimensionTypes.NETHER.equals(dimensionType)) {
+        return array[1];
+      } else if (DimensionTypes.THE_END.equals(dimensionType)) {
+        return array[2];
       }
+      throw new IllegalArgumentException(dimensionType.getName().toLowerCase() + " is not a valid dimension dimension type.");
     }
 
     public void setIgnored(DimensionType dimensionType, boolean isIgnored) {
-      switch(dimensionType.getName().toLowerCase()) {
-        case "overworld":
-          array[0] = isIgnored;
-          return;
-        case "nether":
-          array[1] = isIgnored;
-          return;
-        case "the_end":
-          array[2] = isIgnored;
-          return;
-        default:
-          throw new IllegalArgumentException();
+      if (DimensionTypes.OVERWORLD.equals(dimensionType)) {
+        array[0] = isIgnored;
+        return;
+      } else if (DimensionTypes.NETHER.equals(dimensionType)) {
+        array[1] = isIgnored;
+        return;
+      } else if (DimensionTypes.THE_END.equals(dimensionType)) {
+        array[2] = isIgnored;
+        return;
       }
+      throw new IllegalArgumentException(dimensionType.getName().toLowerCase() + " is not a valid dimension dimension type.");
+    }
+
+    public void toggleIgnored(DimensionType type) {
+      setIgnored(type, !isIgnored(type));
     }
 
     public List<String> getIgnoredList() {
       List<String> toReturn = new LinkedList<>();
-      if (array[0]) toReturn.add("Overworld");
-      if (array[1]) toReturn.add("Nether");
-      if (array[2]) toReturn.add("The End");
+      if (array[0]) toReturn.add(DimensionTypes.OVERWORLD.getName());
+      if (array[1]) toReturn.add(DimensionTypes.NETHER.getName());
+      if (array[2]) toReturn.add(DimensionTypes.THE_END.getName());
       return toReturn;
     }
   }

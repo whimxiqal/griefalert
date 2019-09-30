@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.griefevents.logging;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -59,10 +60,10 @@ public final class GriefEventLogger {
    */
   private void testConnection() throws SQLException {
     if (conn == null || conn.isClosed() || !conn.isValid(2)) {
-      String connectionPath = "jdbc:mysql://" + plugin.getConfigString("SQLdb");
+      String connectionPath = "jdbc:mysql://" + plugin.getConfigHelper().getSqlDatabaseAddress();
       conn = DriverManager.getConnection(connectionPath,
-          plugin.getConfigString("SQLusername"),
-          plugin.getConfigString("SQLpassword"));
+          plugin.getConfigHelper().getSqlUsername(),
+          plugin.getConfigHelper().getSqlPassword());
     }
   }
 
@@ -111,7 +112,7 @@ public final class GriefEventLogger {
       );
       ps.execute();
       ps.close();
-      plugin.getLogger().info(Text.of(TextColors.GREEN, "Prepared Log Database").toString());
+      plugin.getLogger().info("Prepared Grief Alert Log Database");
     } catch (SQLException sqlex) {
       plugin.getLogger().error("SQL Exception while preparing Grief Instance Table ('" + GRIEF_TABLE_NAME + "') table...", sqlex);
     }

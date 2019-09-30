@@ -18,7 +18,6 @@ public class StaffMessenger {
         staff.add(player);
       }
     }
-    staff.add(Sponge.getServer().getConsole());
     return staff;
   };
 

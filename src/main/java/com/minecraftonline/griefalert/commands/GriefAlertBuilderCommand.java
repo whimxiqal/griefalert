@@ -1,7 +1,9 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfile;
+import com.minecraftonline.griefalert.tools.General;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -11,7 +13,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.DimensionTypes;
 
 import java.io.IOException;
@@ -69,6 +71,7 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
         .flag("-ignore-overworld")
         .flag("-ignore-nether")
         .flag("-ignore-the-end")
+        .valueFlag(GenericArguments.string(Text.of("color")), "c")
         .buildWith(GenericArguments.none())
     );
   }
@@ -77,50 +80,34 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
   public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
     if (src instanceof Player) {
       Player player = (Player) src;
-      if ((args.hasAny("d")) || (args.hasAny("-deny"))) {
-        if (plugin.getMuseum().setBuildingState(player, true)) {
-          player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
-          if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
-            plugin.getMuseum().getProfileBuilder(player).get().setDenied(true);
-            player.sendMessage(plugin.getMuseum().getProfileBuilder(player).get().print());
+      if (plugin.getMuseum().setBuildingState(player, true)) {
+        player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
+      }
+      if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
+        GriefProfileBuilder builder = plugin.getMuseum().getProfileBuilder(player).get();
+        if (args.hasAny("d") || args.<String>getOne("deny").isPresent()) {
+          builder.setDenied(!builder.denied);
+        }
+        if (args.hasAny("s") || args.<String>getOne("stealthy").isPresent()) {
+          builder.setStealthy(!builder.stealthy);
+        }
+        if (args.<String>getOne("color").isPresent()) {
+          try {
+            builder.setAlertColor(General.stringToColor(args.<String>getOne("color").get()));
+          } catch (General.IllegalColorCodeException e) {
+            player.sendMessage(Text.of(TextColors.RED, args.<String>getOne("color").get() + " is not a valid color"));
           }
         }
-      }
-      if ((args.hasAny("s")) || (args.hasAny("-stealthy"))) {
-        if (plugin.getMuseum().setBuildingState(player, true)) {
-          player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
+        if (args.<String>getOne("ignore-overworld").isPresent()) {
+          builder.getDimensionParameterArray().toggleIgnored(DimensionTypes.OVERWORLD);
         }
-        if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
-          plugin.getMuseum().getProfileBuilder(player).get().setStealthy(true);
-          player.sendMessage(plugin.getMuseum().getProfileBuilder(player).get().print());
+        if (args.<String>getOne("ignore-nether").isPresent()) {
+          builder.getDimensionParameterArray().toggleIgnored(DimensionTypes.NETHER);
         }
-      }
-      if (args.hasAny("-ignore-overworld")) {
-        if (plugin.getMuseum().setBuildingState(player, true)) {
-          player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
+        if (args.<String>getOne("ignore-the-end").isPresent()) {
+          builder.getDimensionParameterArray().toggleIgnored(DimensionTypes.THE_END);
         }
-        if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
-          plugin.getMuseum().getProfileBuilder(player).get().getDimensionParameterArray().setIgnored(DimensionTypes.OVERWORLD, true);
-          player.sendMessage(plugin.getMuseum().getProfileBuilder(player).get().print());
-        }
-      }
-      if (args.hasAny("-ignore-nether")) {
-        if (plugin.getMuseum().setBuildingState(player, true)) {
-          player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
-        }
-        if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
-          plugin.getMuseum().getProfileBuilder(player).get().getDimensionParameterArray().setIgnored(DimensionTypes.NETHER, true);
-          player.sendMessage(plugin.getMuseum().getProfileBuilder(player).get().print());
-        }
-      }
-      if (args.hasAny("-ignore-the-end")) {
-        if (plugin.getMuseum().setBuildingState(player, true)) {
-          player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
-        }
-        if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
-          plugin.getMuseum().getProfileBuilder(player).get().getDimensionParameterArray().setIgnored(DimensionTypes.THE_END, true);
-          player.sendMessage(plugin.getMuseum().getProfileBuilder(player).get().print());
-        }
+        player.sendMessage(builder.print());
       }
     }
     return CommandResult.success();
@@ -197,9 +184,9 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
 
     public Text print() {
       return Text.of(
-          TextColors.YELLOW, "Grief Profile Builder",
+          TextColors.GOLD, TextStyles.ITALIC, "Grief Profile Builder",
           TextColors.AQUA, "\nGrief Type: ", TextColors.WHITE, type.getName(),
-          TextColors.AQUA, "\nObject: ", TextColors.WHITE, griefedId,
+          TextColors.AQUA, "\nObject: ", TextColors.WHITE, griefedId.replaceAll("[a-zA-Z]*:", ""),
           TextColors.AQUA, "\nAlert Color: ", TextColors.WHITE, alertColor.getName(),
           TextColors.AQUA, "\nIgnored Dimensions: ", TextColors.WHITE, String.join(", ", dimensionParameterArray.getIgnoredList()),
           TextColors.AQUA, "\nIs Denied? ", TextColors.WHITE, denied,
@@ -207,5 +194,19 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
       );
     }
 
+    public void attach(EventWrapper eventWrapper, Player player) {
+      boolean changed = false;
+      if (!this.type.equals(eventWrapper.getType())) {
+        this.type = eventWrapper.getType();
+        changed = true;
+      }
+      if (!this.griefedId.equals(eventWrapper.getGriefedId())) {
+        this.griefedId = eventWrapper.getGriefedId();
+        changed = true;
+      }
+      if (changed) {
+        player.sendMessage(print());
+      }
+    }
   }
 }

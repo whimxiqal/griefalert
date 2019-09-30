@@ -46,7 +46,9 @@ public class GriefProfileExporter {
     OutputStream outputStream = null;
     try {
       outputStream = new FileOutputStream(filePath.toFile(), true);
-      String line = "\n".concat(profile.toStorageLine().toString());
+      GriefProfileStorageLine storageLine = profile.toStorageLine();
+      storageLine.setComment("Added from in-game builder");
+      String line = "\n".concat(storageLine.toString());
       outputStream.write(line.getBytes(), 0, line.length());
     } catch (IOException e) {
       e.printStackTrace();

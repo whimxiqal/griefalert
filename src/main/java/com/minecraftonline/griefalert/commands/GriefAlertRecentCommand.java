@@ -32,12 +32,12 @@ public class GriefAlertRecentCommand extends AbstractCommand {
       ClickableMessage.Builder messageBuilder = ClickableMessage.builder(Text.of(
           TextColors.GRAY, "Alerts: ",
           TextColors.LIGHT_PURPLE, player.getName(), "\n"));
-      for (GriefEvent event : plugin.getGriefEventCache().getListByTime()) {
+      for (GriefEvent event : plugin.getGriefEventCache().getListChronologically(true)) {
         if (event.getEvent().getGriefer().equals(player)) {
           messageBuilder.addClickableCommand(
               String.valueOf(event.getCacheCode()),
               "/griefalert check " + event.getCacheCode(),
-              Text.of("Check griefalert number " + event.getCacheCode())
+              Text.of("Teleport here.\n", event.getSummary())
           );
         }
       }

@@ -37,7 +37,7 @@ public class GriefAlertCheckCommand extends AbstractCommand {
           if (grieferTransform.isPresent()) {
             plugin.getGriefEventCache().putSnapshot(player);
             player.setTransformSafely(grieferTransform.get());
-            player.sendMessage(Text.of(TextColors.GREEN, "Teleported"));
+            player.sendMessage(event.get().getSummary());
           } else {
             player.sendMessage(Text.of(TextColors.RED, "The location of the offending player could not be found."));
           }
@@ -47,6 +47,8 @@ public class GriefAlertCheckCommand extends AbstractCommand {
       } else {
         player.sendMessage(Text.of(TextColors.RED, "The queried Grief Event code could not be parsed."));
       }
+    } else {
+      src.sendMessage(Text.of(TextColors.RED, "Only players may execute this command"));
     }
     return CommandResult.success();
   }

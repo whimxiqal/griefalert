@@ -1,35 +1,23 @@
 package com.minecraftonline.griefalert.listeners;
 
+import java.util.function.Consumer;
 import org.spongepowered.api.event.Event;
 
-import java.util.function.Consumer;
+class EventClassWrapper<T extends Event> {
 
-public class EventClassWrapper<T extends Event> {
-
-  private final Consumer<T> consumer;
+  private final Consumer<T> behavior;
   private final Class<T> eventClass;
 
   EventClassWrapper(Class<T> eventClass, Consumer<T> consumer) {
     this.eventClass = eventClass;
-    this.consumer = consumer;
+    this.behavior = consumer;
   }
 
-  public boolean isEvent(Event event) {
-    return (event.getClass().isInstance(eventClass));
-  }
-
-  public void handle(T event) {
-    consumer.accept(event);
-  }
-
-  public Class<T> getEventClass() {
-    return eventClass;
-  }
-
-  public void ifEventThenHandle(Event event) {
+  @SuppressWarnings("unchecked")
+  void ifEventThenHandle(Event event) {
     try {
       if (eventClass.isInstance(event)) {
-        handle((T) event);
+        behavior.accept((T) event);
       }
     } catch (ClassCastException e) {
       e.printStackTrace();

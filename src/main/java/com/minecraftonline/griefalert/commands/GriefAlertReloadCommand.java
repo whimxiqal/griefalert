@@ -19,7 +19,7 @@ public class GriefAlertReloadCommand extends AbstractCommand {
   @NonnullByDefault
   @Override
   public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-    this.plugin.getMuseum().reload();
+    plugin.getMuseum().reload();
     src.sendMessage(Text.of(TextColors.GREEN, "Profiles reloaded"));
     return CommandResult.success();
   }

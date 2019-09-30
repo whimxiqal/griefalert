@@ -107,13 +107,11 @@ public abstract class General {
   }
 
   public static void stampConsole() {
-    Sponge.getServer().getConsole().sendMessage(Text.of(
-        "\n",
-        TextColors.DARK_PURPLE, "     ____          " + "\n",
-        TextColors.DARK_PURPLE, "   //         //\\     ", TextColors.GOLD, "GriefAlert ", TextColors.DARK_GRAY, "v." + GriefAlert.VERSION + "\n",
-        TextColors.DARK_PURPLE, "  ||    ===  //__\\    ", TextColors.DARK_AQUA, "Built for MinecraftOnline" + "\n",
-        TextColors.DARK_PURPLE, "   \\\\____/  //    \\ " + "\n"
-    ));
+    Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.DARK_PURPLE, "     ____          "));
+    Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.DARK_PURPLE, "   //         //\\     ", TextColors.GOLD, "GriefAlert ", TextColors.DARK_GRAY, "v." + GriefAlert.VERSION));
+    Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.DARK_PURPLE, "  ||    ===  //__\\    ", TextColors.DARK_AQUA, "Built for MinecraftOnline"));
+    Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.DARK_PURPLE, "   \\\\____/  //    \\    "));
+    Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.DARK_PURPLE, "                   "));
   }
 
   /**

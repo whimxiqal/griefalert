@@ -24,14 +24,17 @@ public class EventWrapper {
 
   private final String griefedId;
 
+  public final String griefedName;
+
   private Location<World> griefedLocation = null;
 
-  public EventWrapper(Event event, GriefAlert.GriefType type, EntitySnapshot grieferSnapshot, Player griefer, String griefedId) {
+  public EventWrapper(Event event, GriefAlert.GriefType type, EntitySnapshot grieferSnapshot, Player griefer, String griefedId, String griefedName) {
     this.event = event;
     this.type = type;
     this.grieferSnapshot = grieferSnapshot;
     this.griefer = griefer;
     this.griefedId = griefedId;
+    this.griefedName = griefedName;
   }
 
   public Event getEvent() {
@@ -59,10 +62,10 @@ public class EventWrapper {
   }
 
   public Optional<Location<World>> getGriefedLocation() {
-    return Optional.of(griefedLocation);
+    return Optional.ofNullable(griefedLocation);
   }
 
   public String getGriefedName() {
-    return griefedId.replaceAll("minecraft:", "");
+    return this.griefedName;
   }
 }
