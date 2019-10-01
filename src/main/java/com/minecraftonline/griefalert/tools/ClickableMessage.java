@@ -1,10 +1,10 @@
 package com.minecraftonline.griefalert.tools;
 
+import com.minecraftonline.griefalert.GriefAlert;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.minecraftonline.griefalert.GriefAlert;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;

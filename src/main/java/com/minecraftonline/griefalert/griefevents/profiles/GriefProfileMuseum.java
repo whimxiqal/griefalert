@@ -86,8 +86,7 @@ public class GriefProfileMuseum {
    * @param player The player
    * @param state  True if the player will be put into build mode, false if the player
    *               will not be in build mode.
-   * @return True if the player changed states. False if the player did not change
-   * states after applying the given input state.
+   * @return True if the player changed states. False if the player did not change states.
    */
   public boolean setBuildingState(final Player player, final boolean state) {
     if (getProfileBuilder(player).isPresent()) {
@@ -97,7 +96,10 @@ public class GriefProfileMuseum {
       }
     } else {
       if (state) {
-        profileBuilderMap.put(player.getUniqueId(), new GriefAlertBuilderCommand.GriefProfileBuilder());
+        profileBuilderMap.put(
+            player.getUniqueId(),
+            new GriefAlertBuilderCommand.GriefProfileBuilder()
+        );
         return true;
       }
     }
@@ -112,10 +114,17 @@ public class GriefProfileMuseum {
     profileBuilderMap.remove(player.getUniqueId());
   }
 
-  public boolean contains(GriefProfile candidate) {
+  /**
+   * Determines if the given Grief Profile is similar enough to one already existing in the museum.
+   *
+   * @param candidate The profile to check against the museum
+   * @return true if the museum contains a similar profile
+   * @see com.minecraftonline.griefalert.griefevents.profiles.GriefProfile#isSimilar
+   */
+  public boolean containsSimilar(GriefProfile candidate) {
     for (GriefAlert.GriefType type : warehouse.keySet()) {
       for (String griefedId : warehouse.get(type).keySet()) {
-        if (type.equals(candidate.getGriefType()) && griefedId.equalsIgnoreCase(candidate.getGriefedId())) {
+        if (warehouse.get(type).get(griefedId).isSimilar(candidate)) {
           return true;
         }
       }
@@ -123,9 +132,17 @@ public class GriefProfileMuseum {
     return false;
   }
 
+  /**
+   * Add a new Grief Profile to the museum. This will not check if a similar one already exists,
+   * so check that it does not before calling this method. An info alert will be sent to the
+   * console.
+   *
+   * @param profile The profile to add
+   */
   public void add(GriefProfile profile) {
     warehouse.get(profile.getGriefType()).put(profile.getGriefedId(), profile);
-    plugin.getLogger().info("A grief profile has been added to the museum: " + profile.getGriefType().getName() + ", " + profile.getGriefedId());
+    plugin.getLogger().info("A grief profile has been added to the museum: "
+        + profile.getGriefType().getName() + ", " + profile.getGriefedId());
   }
 
   public void store(GriefProfile profile) throws IOException {

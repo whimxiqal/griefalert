@@ -2,45 +2,45 @@ package com.minecraftonline.griefalert.griefevents.profiles;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.tools.General;
+
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
-
 public class GriefProfile {
 
-  /**
-   * String representation of the griefed object. There is no 'minecraft:' prefix to this value.
-   */
-  protected final String griefedId;
-  /**
-   * TextColor representation of the color in which an alert will appear.
-   */
-  protected final TextColor alertColor;
-  /**
-   * Denotes whether this action will be cancelled upon triggering.
-   */
-  protected final boolean denied;
-  /**
-   * Denotes whether this is muted from alerting.
-   */
+  private final String griefedId;
+  private final TextColor alertColor;
+  private final boolean denied;
   protected boolean stealthy;
-  /**
-   * The type of grief.
-   */
-  protected final GriefAlert.GriefType type;
-
+  private final GriefAlert.GriefType type;
   protected final GriefProfileSpecialtyBehavior specialtyBehavior;
+  private final DimensionParameterArray dimensionParameterArray;
 
   /**
-   * The wrapper for information regarding whether a dimension is marked for this grief event.
+   * Constructor for a new Grief Profile.
+   *
+   * @param type                    The general type of grief
+   * @param griefedId               The id of the griefed object (saved here as 1.12.2 id)
+   * @param alertColor              The color of the alert (usually red)
+   * @param denied                  The state of whether events based on this profile should be
+   *                                entirely denied to all players
+   * @param stealthy                The state of whether staff members are alerted of events
+   *                                based on this profile
+   * @param dimensionParameterArray The custom array object which houses information about whether
+   *                                events based on this profile should be ignored entirely
    */
-  protected final DimensionParameterArray dimensionParameterArray;
-
-  public GriefProfile(GriefAlert.GriefType type, String griefedId, TextColor alertColor, boolean denied, boolean stealthy, DimensionParameterArray dimensionParameterArray) {
+  public GriefProfile(
+      GriefAlert.GriefType type,
+      String griefedId,
+      TextColor alertColor,
+      boolean denied,
+      boolean stealthy,
+      DimensionParameterArray dimensionParameterArray) {
     this.type = type;
     this.griefedId = griefedId;
     this.alertColor = alertColor;
@@ -50,14 +50,23 @@ public class GriefProfile {
     this.specialtyBehavior = findSpecialtyBehavior();
   }
 
+  @SuppressWarnings("all")
   public GriefProfile(GriefProfile other) {
-    this(other.type, other.griefedId, other.alertColor, other.denied, other.stealthy, other.dimensionParameterArray);
+    this(
+        other.type,
+        other.griefedId,
+        other.alertColor,
+        other.denied,
+        other.stealthy,
+        other.dimensionParameterArray
+    );
   }
 
   GriefProfile(GriefProfileStorageLine line) throws IllegalArgumentException {
     String[] tokens = line.getTokens();
     if (tokens.length < 3) {
-      throw new IllegalArgumentException("Not enough arguments. Use format <TYPE> <OBJECT_ID> <COLOR> [FLAGS]");
+      throw new IllegalArgumentException("Not enough arguments. "
+          + "Use format <TYPE> <OBJECT_ID> <COLOR> [FLAGS]");
     }
     this.type = GriefAlert.GriefType.from(tokens[0]);
     if (tokens[1].contains("[a-zA-Z]:")) {
@@ -100,31 +109,57 @@ public class GriefProfile {
     specialtyBehavior.accept(plugin);
   }
 
-  public GriefProfileStorageLine toStorageLine() {
-    GriefProfileStorageLine.Builder builder = new GriefProfileStorageLine.Builder()
+  GriefProfileStorageLine toStorageLine() {
+    GriefProfileStorageLine.Builder builder = GriefProfileStorageLine.builder()
         .addItem(getGriefType().getName())
         .addItem(getGriefedId().replaceAll("minecraft:", ""))
         .addItem(alertColor.getName());
-    if (denied) builder.addItem("-d");
-    if (stealthy) builder.addItem("-s");
-    if (dimensionParameterArray.isIgnored(DimensionTypes.OVERWORLD)) builder.addItem("--ignore-overworld");
-    if (dimensionParameterArray.isIgnored(DimensionTypes.NETHER)) builder.addItem("--ignore-nether");
-    if (dimensionParameterArray.isIgnored(DimensionTypes.THE_END)) builder.addItem("--ignore-the-end");
+    if (denied) {
+      builder.addItem("-d");
+    }
+    if (stealthy) {
+      builder.addItem("-s");
+    }
+    if (dimensionParameterArray.isIgnored(DimensionTypes.OVERWORLD)) {
+      builder.addItem("--ignore-overworld");
+    }
+    if (dimensionParameterArray.isIgnored(DimensionTypes.NETHER)) {
+      builder.addItem("--ignore-nether");
+    }
+    if (dimensionParameterArray.isIgnored(DimensionTypes.THE_END)) {
+      builder.addItem("--ignore-the-end");
+    }
     return builder.build();
   }
 
-  public DimensionParameterArray getDimensionStructure() {
+  DimensionParameterArray getDimensionStructure() {
     return dimensionParameterArray;
+  }
+
+  public boolean isDenied() {
+    return denied;
+  }
+
+  public GriefAlert.GriefType getGriefType() {
+    return type;
+  }
+
+  public String getGriefedId() {
+    return griefedId;
+  }
+
+  protected TextColor getAlertColor() {
+    return alertColor;
+  }
+
+  protected boolean isSimilar(GriefProfile other) {
+    return this.getGriefType().equals(other.getGriefType())
+        && this.getGriefedId().equalsIgnoreCase(other.getGriefedId());
   }
 
   public static class DimensionParameterArray {
 
-    /**
-     * Each term is true if the dimension type corresponding to that index is encompassed by
-     * this event.
-     *
-     * overworld, nether, the_end
-     */
+    // If each of the following is ignored: Overworld, Nether, The End
     private final boolean[] array = {false, false, false};
 
     boolean isIgnored(@Nonnull DimensionType dimensionType) {
@@ -135,10 +170,11 @@ public class GriefProfile {
       } else if (DimensionTypes.THE_END.equals(dimensionType)) {
         return array[2];
       }
-      throw new IllegalArgumentException(dimensionType.getName().toLowerCase() + " is not a valid dimension dimension type.");
+      throw new IllegalArgumentException(dimensionType.getName().toLowerCase()
+          + " is not a valid dimension dimension type.");
     }
 
-    public void setIgnored(DimensionType dimensionType, boolean isIgnored) {
+    void setIgnored(DimensionType dimensionType, boolean isIgnored) {
       if (DimensionTypes.OVERWORLD.equals(dimensionType)) {
         array[0] = isIgnored;
         return;
@@ -149,36 +185,32 @@ public class GriefProfile {
         array[2] = isIgnored;
         return;
       }
-      throw new IllegalArgumentException(dimensionType.getName().toLowerCase() + " is not a valid dimension dimension type.");
+      throw new IllegalArgumentException(dimensionType.getName().toLowerCase()
+          + " is not a valid dimension dimension type.");
     }
 
     public void toggleIgnored(DimensionType type) {
       setIgnored(type, !isIgnored(type));
     }
 
+    /**
+     * Return a Linked List of all dimensions which are marked as 'ignored'.
+     *
+     * @return A Linked List of names of dimensions
+     */
     public List<String> getIgnoredList() {
       List<String> toReturn = new LinkedList<>();
-      if (array[0]) toReturn.add(DimensionTypes.OVERWORLD.getName());
-      if (array[1]) toReturn.add(DimensionTypes.NETHER.getName());
-      if (array[2]) toReturn.add(DimensionTypes.THE_END.getName());
+      if (array[0]) {
+        toReturn.add(DimensionTypes.OVERWORLD.getName());
+      }
+      if (array[1]) {
+        toReturn.add(DimensionTypes.NETHER.getName());
+      }
+      if (array[2]) {
+        toReturn.add(DimensionTypes.THE_END.getName());
+      }
       return toReturn;
     }
-  }
-
-  public boolean isDenied() {
-    return denied;
-  }
-
-  public boolean isStealthy() {
-    return stealthy;
-  }
-
-  public GriefAlert.GriefType getGriefType() {
-    return type;
-  }
-
-  public String getGriefedId() {
-    return griefedId;
   }
 
 }

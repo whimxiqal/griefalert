@@ -1,6 +1,5 @@
 package com.minecraftonline.griefalert.griefevents.profiles;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class GriefProfileStorageLine {
    *
    * @return An array of String-type objects from the storage line
    */
-  public String[] getTokens() {
+  String[] getTokens() {
     String[] macroTokens = line.split(COMMENT_DELIMITER);
     String data = macroTokens[0];
     return data.split(DATA_DELIMITER);
@@ -44,7 +43,7 @@ public class GriefProfileStorageLine {
    * @return The comment of the line
    */
   @SuppressWarnings("unused")
-  public String getComment() {
+String getComment() {
     String[] tokens = line.split(COMMENT_DELIMITER, 2);
     if (tokens.length == 2) {
       return tokens[1];
@@ -62,29 +61,21 @@ public class GriefProfileStorageLine {
     return false;
   }
 
-  public void setComment(@Nonnull String comment) {
-    this.comment = comment;
+  void addBuilderStamp() {
+    this.comment = "Added from in-game builder";
   }
 
   public static class Builder {
 
     private List<String> items;
 
-    Builder() {
+    private Builder() {
       items = new LinkedList<>();
     }
 
-    public GriefProfileStorageLine.Builder addItem(String item) {
+    GriefProfileStorageLine.Builder addItem(String item) {
       items.add(removeDelimiters(item));
       return this;
-    }
-
-    public GriefProfileStorageLine.Builder addItem(double item) {
-      return addItem(String.valueOf(item));
-    }
-
-    public GriefProfileStorageLine.Builder addItem(boolean item) {
-      return addItem(String.valueOf(item));
     }
 
     public GriefProfileStorageLine build() {

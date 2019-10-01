@@ -173,7 +173,7 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
           stealthy,
           dimensionParameterArray
       );
-      if (!plugin.getMuseum().contains(candidate)) {
+      if (!plugin.getMuseum().containsSimilar(candidate)) {
         plugin.getMuseum().add(candidate);
         plugin.getMuseum().store(candidate);
         return true;

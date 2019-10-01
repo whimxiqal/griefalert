@@ -1,9 +1,23 @@
 package com.minecraftonline.griefalert.griefevents.logging;
 
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.DIMENSION;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_ID;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_TRANSFORM_X;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_TRANSFORM_Y;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_TRANSFORM_Z;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEF_TYPE;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.MC_VERSION;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_ROTATION_PITCH;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_ROTATION_ROLL;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_ROTATION_YAW;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_TRANSFORM_X;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_TRANSFORM_Y;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_TRANSFORM_Z;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_UUID;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.SPECIALTY;
+import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.WORLD_ID;
+
 import com.minecraftonline.griefalert.GriefAlert;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +26,6 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.*;
 
 /**
  * This class handles remote logging of grief instances to a SQL database.
@@ -45,7 +58,8 @@ public final class GriefEventLogger {
     try {
       testConnection();
       prepareTable();
-    } catch (SQLException sqlex) {
+      error = false;
+    } catch (SQLException e) {
       error = true;
       this.plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
           + "Is your information correct in the configuration file?");
@@ -53,7 +67,23 @@ public final class GriefEventLogger {
   }
 
   /**
-   * Tests the connection with the SQL database
+   * Test the connection with the SQL database and prepare the table.
+   */
+  public void reload() {
+    plugin.getLogger().info("Reloading Grief Event SQL Logger");
+    try {
+      testConnection();
+      prepareTable();
+      error = false;
+    } catch (SQLException e) {
+      error = true;
+      this.plugin.getLogger().error("SQL Exception while testing connecting with SQL database.\n"
+          + "Is your information correct in the configuration file?");
+    }
+  }
+
+  /**
+   * Tests the connection with the SQL database.
    *
    * @throws SQLException Throws most likely if SQP configuration nods are
    *                      not set up with the right syntax
@@ -68,63 +98,56 @@ public final class GriefEventLogger {
   }
 
   /**
-   * Generates non-existing tables into which logs are placed:
+   * Generates non-existing tables into which logs are placed.
    * <li><b>GriefAlert_Log</b>: Contains all grief instances</li>
    * <li><b>GriefAlert_Signs</b>: Contains all information about signs edited by players</li>
    */
   private void prepareTable() {
     try {
       // Generate the Grief Instance table if it doesn't exist
-      plugin.getLogger().info("Preparing Grief Event Table ('" + GRIEF_TABLE_NAME + "') table and creating if needed...");
-      PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS " + GRIEF_TABLE_NAME + " " + //
-          "(id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT," +
-          "timestamp_ TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-          GRIEF_TYPE.name().toLowerCase() + " VARCHAR(10) NOT NULL," +
-          PLAYER_UUID.name().toLowerCase() + " VARCHAR(64) NOT NULL," +
-          PLAYER_ROTATION_PITCH.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          PLAYER_ROTATION_YAW.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          PLAYER_ROTATION_ROLL.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          PLAYER_TRANSFORM_X.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          PLAYER_TRANSFORM_Y.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          PLAYER_TRANSFORM_Z.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          DIMENSION.name().toLowerCase() + " VARCHAR(10) NOT NULL," +
-          WORLD_ID.name().toLowerCase() + " VARCHAR(64) NOT NULL," +
-          GRIEFED_ID.name().toLowerCase() + " VARCHAR(64) NOT NULL," +
-          GRIEFED_TRANSFORM_X.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          GRIEFED_TRANSFORM_Y.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          GRIEFED_TRANSFORM_Z.name().toLowerCase() + " DOUBLE(11,3) NOT NULL," +
-          SPECIALTY.name().toLowerCase() + " VARCHAR(100) NOT NULL," +
-          MC_VERSION.name().toLowerCase() + " VARCHAR(8) NOT NULL," +
-          "PRIMARY KEY (id))"
-//          "user VARCHAR(36) NOT NULL," +
-//          "block_state TEXT NOT NULL," +
-//          "block_json TEXT NOT NULL, " +
-//          "x INT(10) NOT NULL, " +
-//          "y INT(10) NOT NULL, " +
-//          "z INT(10) NOT NULL, " +
-//          "px INT(10) NOT NULL, " +
-//          "py INT(10) NOT NULL, " +
-//          "pz INT(10) NOT NULL, " +
-//          "dimension TEXT NOT NULL, " +
-//          "world_id VARCHAR(36) NOT NULL, " +
-//          "time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + // Why not save with UNIX long?
-//          "PRIMARY KEY (id))"
+      plugin.getLogger().info("Preparing Grief Event Table ('"
+          + GRIEF_TABLE_NAME + "') table and creating if needed...");
+      PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS "
+          + GRIEF_TABLE_NAME + " "
+          + "(id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,"
+          + "timestamp_ TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+          + GRIEF_TYPE.name().toLowerCase() + " VARCHAR(10) NOT NULL,"
+          + PLAYER_UUID.name().toLowerCase() + " VARCHAR(64) NOT NULL,"
+          + PLAYER_ROTATION_PITCH.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_ROTATION_YAW.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_ROTATION_ROLL.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_TRANSFORM_X.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_TRANSFORM_Y.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_TRANSFORM_Z.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + DIMENSION.name().toLowerCase() + " VARCHAR(10) NOT NULL,"
+          + WORLD_ID.name().toLowerCase() + " VARCHAR(64) NOT NULL,"
+          + GRIEFED_ID.name().toLowerCase() + " VARCHAR(64) NOT NULL,"
+          + GRIEFED_TRANSFORM_X.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + GRIEFED_TRANSFORM_Y.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + GRIEFED_TRANSFORM_Z.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
+          + SPECIALTY.name().toLowerCase() + " VARCHAR(100) NOT NULL,"
+          + MC_VERSION.name().toLowerCase() + " VARCHAR(8) NOT NULL,"
+          + "PRIMARY KEY (id))"
       );
       ps.execute();
       ps.close();
       plugin.getLogger().info("Prepared Grief Alert Log Database");
     } catch (SQLException sqlex) {
-      plugin.getLogger().error("SQL Exception while preparing Grief Instance Table ('" + GRIEF_TABLE_NAME + "') table...", sqlex);
+      error = true;
+      plugin.getLogger().error("SQL Exception while preparing Grief Instance Table ('"
+          + GRIEF_TABLE_NAME + "') table...", sqlex);
     }
   }
 
-  public boolean isError() {
-    return error;
-  }
-
+  /**
+   * Logs the given Grief Event to the SQL database, if there is a valid connection with it.
+   *
+   * @param griefEvent The Grief Event to log
+   */
   public void log(LoggedGriefEvent griefEvent) {
     if (error) {
-      plugin.getLogger().warn("Tried to store a grief instance, but there is an error with the SQL database. Instance: " + griefEvent.toString());
+      plugin.getLogger().error("Tried to store a grief instance, but there is an error with the "
+          + "connection to the SQL database. Instance: " + griefEvent.toString());
       return;
     }
     plugin.getLogger().debug("Storing Grief Instance data...");
@@ -142,13 +165,18 @@ public final class GriefEventLogger {
           values.add(value.toString());
         }
       }
-      ps = conn.prepareStatement("INSERT INTO " + GRIEF_TABLE_NAME + " (" + String.join(",", columns) + ") VALUES (" + String.join(",", values) + ")");
+      ps = conn.prepareStatement("INSERT INTO "
+          + GRIEF_TABLE_NAME
+          + " (" + String.join(",", columns) + ") VALUES"
+          + " (" + String.join(",", values) + ")");
       ps.execute();
       plugin.getLogger().debug("Store complete!");
     } catch (SQLException sqlex) {
-      plugin.getLogger().error("SQL Exception while inserting into Grief Instance ('" + GRIEF_TABLE_NAME + "') table...", sqlex);
+      plugin.getLogger().error("SQL Exception while inserting into Grief Instance ('"
+          + GRIEF_TABLE_NAME + "') table...", sqlex);
     } catch (NullPointerException nullex) {
-      plugin.getLogger().error("A field within a grief instance cannot be null when being stored", nullex);
+      plugin.getLogger().error("A field within a grief instance cannot be null when being stored",
+          nullex);
     } finally {
       closeQuietly(ps);
     }

@@ -118,6 +118,8 @@ public class GriefAlert implements PluginContainer {
   public void onReload(GameReloadEvent event) {
     configHelper.load(rootNode);
     museum.reload();
+    // Must reload grief event logger after config
+    griefEventLogger.reload();
   }
 
   /**
