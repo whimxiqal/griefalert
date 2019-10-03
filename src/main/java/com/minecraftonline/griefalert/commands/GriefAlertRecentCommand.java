@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.commands;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.griefevents.GriefEvent;
 import com.minecraftonline.griefalert.tools.ClickableMessage;
+import java.util.HashMap;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -11,13 +12,16 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-
-import java.util.*;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public class GriefAlertRecentCommand extends AbstractCommand {
 
-  public GriefAlertRecentCommand(GriefAlert plugin) {
-    super(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_RECENT, Text.of("Get information regarding recent cached grief alerts"));
+  GriefAlertRecentCommand(GriefAlert plugin) {
+    super(
+        plugin,
+        GriefAlert.Permission.GRIEFALERT_COMMAND_RECENT,
+        Text.of("Get information regarding recent cached grief alerts")
+    );
     addAlias("recent");
     addAlias("n");
     HashMap<String, ?> filterMap = new HashMap<>();
@@ -26,7 +30,9 @@ public class GriefAlertRecentCommand extends AbstractCommand {
   }
 
   @Override
-  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @NonnullByDefault
+  public CommandResult execute(@NonnullByDefault CommandSource src,
+                               @NonnullByDefault CommandContext args) throws CommandException {
     if (args.getOne("player").isPresent()) {
       Player player = (Player) args.getOne("player").get();
       ClickableMessage.Builder messageBuilder = ClickableMessage.builder(Text.of(

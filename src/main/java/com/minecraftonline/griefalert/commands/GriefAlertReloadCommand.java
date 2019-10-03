@@ -12,13 +12,16 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 public class GriefAlertReloadCommand extends AbstractCommand {
 
   public GriefAlertReloadCommand(GriefAlert plugin) {
-    super(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_RELOAD, Text.of("Reload all Grief Profiles from host"));
+    super(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_RELOAD, Text.of(
+        "Reload all Grief Profiles from host"
+    ));
     addAlias("reload");
   }
 
   @NonnullByDefault
   @Override
-  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  public CommandResult execute(@NonnullByDefault CommandSource src,
+                               @NonnullByDefault CommandContext args) throws CommandException {
     plugin.getMuseum().reload();
     src.sendMessage(Text.of(TextColors.GREEN, "Profiles reloaded"));
     return CommandResult.success();

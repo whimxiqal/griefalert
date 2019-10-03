@@ -1,15 +1,17 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import org.spongepowered.api.command.*;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.LinkedList;
-import java.util.List;
 
 public abstract class AbstractCommand implements CommandExecutor {
 
@@ -20,7 +22,16 @@ public abstract class AbstractCommand implements CommandExecutor {
   private List<String> aliases = new LinkedList<>();
   private List<CommandElement> commandElements = new LinkedList<>();
 
-  public AbstractCommand(GriefAlert plugin, GriefAlert.Permission permission, Text description) {
+  /**
+   * A general Grief Alert command object.
+   *
+   * @param plugin      The main instance of Grief Alert
+   * @param permission  The permission which is required for this command
+   * @param description The general description of this command functionality
+   */
+  public AbstractCommand(GriefAlert plugin,
+                         GriefAlert.Permission permission,
+                         Text description) {
     this.plugin = plugin;
     this.permission = permission;
     this.description = description;
@@ -29,7 +40,10 @@ public abstract class AbstractCommand implements CommandExecutor {
     }
   }
 
-  public AbstractCommand(GriefAlert plugin, GriefAlert.Permission permission, Text description, String primaryAlias) {
+  public AbstractCommand(GriefAlert plugin,
+                         GriefAlert.Permission permission,
+                         Text description,
+                         String primaryAlias) {
     this(plugin, permission, description);
     addAlias(primaryAlias);
   }
@@ -38,15 +52,15 @@ public abstract class AbstractCommand implements CommandExecutor {
     return this.aliases.add(alias);
   }
 
-  protected void addChild(AbstractCommand abstractCommand) {
+  void addChild(AbstractCommand abstractCommand) {
     this.commandChildren.add(abstractCommand);
   }
 
-  protected void addCommandElement(CommandElement commandElement) {
+  void addCommandElement(CommandElement commandElement) {
     this.commandElements.add(commandElement);
   }
 
-  public List<AbstractCommand> getChildren() {
+  private List<AbstractCommand> getChildren() {
     return this.commandChildren;
   }
 
@@ -58,15 +72,23 @@ public abstract class AbstractCommand implements CommandExecutor {
     return this.commandElements;
   }
 
-  protected void sendHelp(CommandSource source) {
+  void sendHelp(CommandSource source) {
     source.sendMessage(Text.of(TextColors.GOLD, "==============="));
     source.sendMessage(Text.of(TextColors.GOLD, getAliases().get(0) + " : Command Help"));
     source.sendMessage(Text.of(TextColors.YELLOW, getDescription()));
     for (AbstractCommand command : getChildren()) {
-      source.sendMessage(Text.of(TextColors.AQUA, command.getAliases().get(0), TextColors.GRAY, ": ", command.getDescription()));
+      source.sendMessage(Text.of(
+          TextColors.AQUA,
+          command.getAliases().get(0),
+          TextColors.GRAY, ": ", command.getDescription()));
     }
   }
 
+  /**
+   * Build the Command Spec required by the Sponge command registrar.
+   *
+   * @return
+   */
   public CommandSpec buildCommandSpec() {
     CommandSpec.Builder commandSpecBuilder = CommandSpec.builder()
         .description(this.description)
@@ -81,7 +103,7 @@ public abstract class AbstractCommand implements CommandExecutor {
     return commandSpecBuilder.build();
   }
 
-  public Text getDescription() {
+  private Text getDescription() {
     return description;
   }
 }

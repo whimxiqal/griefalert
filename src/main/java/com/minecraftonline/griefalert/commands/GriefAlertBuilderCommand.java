@@ -4,6 +4,9 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfile;
 import com.minecraftonline.griefalert.tools.General;
+
+import java.io.IOException;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -14,21 +17,24 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionTypes;
-
-import java.io.IOException;
 
 public class GriefAlertBuilderCommand extends AbstractCommand {
 
-
-  public GriefAlertBuilderCommand(GriefAlert plugin) {
+  GriefAlertBuilderCommand(GriefAlert plugin) {
     super(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD, Text.of("Build a grief profile"));
     addAlias("build");
 
     // Add 'Save'
-    addChild(new AbstractCommand(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD, Text.of("Save your alert profile"), "save") {
+    addChild(new AbstractCommand(
+        plugin,
+        GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD,
+        Text.of("Save your alert profile"), "save") {
       @Override
-      public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+      @NonnullByDefault
+      public CommandResult execute(@NonnullByDefault CommandSource src,
+                                   @NonnullByDefault CommandContext args) throws CommandException {
         if (src instanceof Player) {
           Player player = (Player) src;
           if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
@@ -36,26 +42,44 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
               if (plugin.getMuseum().getProfileBuilder(player).get().solidify(plugin)) {
                 player.sendMessage(Text.of(TextColors.GREEN, "Your profile has been added"));
               } else {
-                player.sendMessage(Text.of(TextColors.RED, "Your profile was not added. There seems to be a profile similar to this one already saved."));
+                player.sendMessage(Text.of(
+                    TextColors.RED,
+                    "Your profile was not added. "
+                        + "There seems to be a profile similar to this one already saved.")
+                );
               }
             } catch (IOException e) {
-              player.sendMessage(Text.of(TextColors.RED, "Your profile could not be saved to storage"));
+              player.sendMessage(Text.of(
+                  TextColors.RED,
+                  "Your profile could not be saved to storage")
+              );
               e.printStackTrace();
             }
           } else {
-            player.sendMessage(Text.of(TextColors.RED, "You must be in builder mode to save a profile."));
+            player.sendMessage(Text.of(
+                TextColors.RED,
+                "You must be in builder mode to save a profile.")
+            );
           }
         }
         return CommandResult.success();
       }
     });
     // Add 'Toggle'
-    addChild(new AbstractCommand(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD, Text.of("Toogle build mode"), "toggle") {
+    addChild(new AbstractCommand(
+        plugin,
+        GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD,
+        Text.of("Toogle build mode"), "toggle") {
       @Override
-      public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+      @NonnullByDefault
+      public CommandResult execute(@NonnullByDefault CommandSource src,
+                                   @NonnullByDefault CommandContext args) throws CommandException {
         if (src instanceof Player) {
           Player player = (Player) src;
-          plugin.getMuseum().setBuildingState(player, !plugin.getMuseum().getProfileBuilder(player).isPresent());
+          plugin.getMuseum().setBuildingState(
+              player,
+              !plugin.getMuseum().getProfileBuilder(player).isPresent()
+          );
           if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
             player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
           } else {
@@ -77,7 +101,9 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
   }
 
   @Override
-  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  @NonnullByDefault
+  public CommandResult execute(@NonnullByDefault CommandSource src,
+                               @NonnullByDefault CommandContext args) throws CommandException {
     if (src instanceof Player) {
       Player player = (Player) src;
       if (plugin.getMuseum().setBuildingState(player, true)) {
@@ -95,7 +121,8 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
           try {
             builder.setAlertColor(General.stringToColor(args.<String>getOne("color").get()));
           } catch (General.IllegalColorCodeException e) {
-            player.sendMessage(Text.of(TextColors.RED, args.<String>getOne("color").get() + " is not a valid color"));
+            player.sendMessage(Text.of(TextColors.RED, args.<String>getOne("color").get()
+                + " is not a valid color"));
           }
         }
         if (args.<String>getOne("ignore-overworld").isPresent()) {
@@ -138,17 +165,18 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
     /**
      * The wrapper for information regarding whether a dimension is marked for this grief event.
      */
-    private GriefProfile.DimensionParameterArray dimensionParameterArray = new GriefProfile.DimensionParameterArray();
+    private GriefProfile.DimensionParameterArray dimensionParameterArray =
+        new GriefProfile.DimensionParameterArray();
 
-    public void setAlertColor(TextColor alertColor) {
+    void setAlertColor(TextColor alertColor) {
       this.alertColor = alertColor;
     }
 
-    public void setDenied(boolean denied) {
+    void setDenied(boolean denied) {
       this.denied = denied;
     }
 
-    public GriefProfile.DimensionParameterArray getDimensionParameterArray() {
+    GriefProfile.DimensionParameterArray getDimensionParameterArray() {
       return this.dimensionParameterArray;
     }
 
@@ -156,7 +184,7 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
       this.griefedId = griefedId;
     }
 
-    public void setStealthy(boolean stealthy) {
+    void setStealthy(boolean stealthy) {
       this.stealthy = stealthy;
     }
 
@@ -164,7 +192,7 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
       this.type = type;
     }
 
-    public boolean solidify(GriefAlert plugin) throws IOException {
+    boolean solidify(GriefAlert plugin) throws IOException {
       GriefProfile candidate = new GriefProfile(
           type,
           griefedId,
@@ -182,19 +210,29 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
       }
     }
 
-    public Text print() {
+    Text print() {
       return Text.of(
           TextColors.GOLD, TextStyles.ITALIC, "Grief Profile Builder",
           TextColors.AQUA, "\nGrief Type: ", TextColors.WHITE, type.getName(),
           TextColors.AQUA, "\nObject: ", TextColors.WHITE, griefedId.replaceAll("[a-zA-Z]*:", ""),
           TextColors.AQUA, "\nAlert Color: ", TextColors.WHITE, alertColor.getName(),
-          TextColors.AQUA, "\nIgnored Dimensions: ", TextColors.WHITE, String.join(", ", dimensionParameterArray.getIgnoredList()),
+          TextColors.AQUA, "\nIgnored Dimensions: ", TextColors.WHITE, String.join(
+              ", ",
+              dimensionParameterArray.getIgnoredList()
+          ),
           TextColors.AQUA, "\nIs Denied? ", TextColors.WHITE, denied,
           TextColors.AQUA, "\nIs Stealthy?", TextColors.WHITE, stealthy
       );
     }
 
-    public void attach(EventWrapper eventWrapper, Player player) {
+    /**
+     * Use all useful information from the Event Wrapper to build a more
+     * accurate Grief Profile.
+     *
+     * @param eventWrapper The wrapper for the Sponge event
+     * @param player       The player building a Grief Profile
+     */
+    public void incorporate(EventWrapper eventWrapper, Player player) {
       boolean changed = false;
       if (!this.type.equals(eventWrapper.getType())) {
         this.type = eventWrapper.getType();

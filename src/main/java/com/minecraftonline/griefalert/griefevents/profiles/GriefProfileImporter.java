@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-public class GriefProfileImporter {
+class GriefProfileImporter {
 
   private final GriefAlert plugin;
   private final Path filePath;
@@ -21,7 +21,7 @@ public class GriefProfileImporter {
    * @param plugin   The instance of the current plugin
    * @param fileName The name of the file in which the data is saved
    */
-  public GriefProfileImporter(GriefAlert plugin, String fileName) {
+  GriefProfileImporter(GriefAlert plugin, String fileName) {
     this.plugin = plugin;
     this.filePath = Paths.get(plugin.getDataDirectory().getPath(), fileName);
   }
@@ -35,10 +35,10 @@ public class GriefProfileImporter {
    *
    * @return A list of the saved objects
    */
-  public List<GriefProfile> retrieve() {
+  List<GriefProfile> retrieve() {
     List<GriefProfile> griefEvents = new LinkedList<>();
     try {
-      if (plugin.getDataDirectory().mkdirs() || getFile().createNewFile()){
+      if (plugin.getDataDirectory().mkdirs() || getFile().createNewFile()) {
         plugin.getLogger().info("New Grief Profiles file created");
         return new LinkedList<>();
       }
@@ -50,7 +50,8 @@ public class GriefProfileImporter {
             griefEvents.add(new GriefProfile(line));
             plugin.getLogger().info("A new Grief Profile has been added: " + line);
           } catch (IllegalArgumentException e) {
-            plugin.getLogger().error("An error occurred while reading this line. Line skipped: " + line.toString());
+            plugin.getLogger().error("An error occurred while reading this line. Line skipped: "
+                + line.toString());
             plugin.getLogger().error(e.getMessage());
           }
         }

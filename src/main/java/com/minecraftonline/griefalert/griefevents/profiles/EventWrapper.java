@@ -1,16 +1,14 @@
 package com.minecraftonline.griefalert.griefevents.profiles;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import org.spongepowered.api.Sponge;
+
+import java.util.Optional;
+
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.Optional;
 
 public class EventWrapper {
 
@@ -24,11 +22,27 @@ public class EventWrapper {
 
   private final String griefedId;
 
-  public final String griefedName;
+  private final String griefedName;
 
   private Location<World> griefedLocation = null;
 
-  public EventWrapper(Event event, GriefAlert.GriefType type, EntitySnapshot grieferSnapshot, Player griefer, String griefedId, String griefedName) {
+  /**
+   * A wrapper for a Sponge event.
+   *
+   * @param event           The Sponge event
+   * @param type            The type of grief
+   * @param grieferSnapshot A snapshot of the griefer at the time of the event
+   * @param griefer         The griefer
+   * @param griefedId       The id of the griefed object
+   * @param griefedName     The readable name of the griefed object
+   */
+  public EventWrapper(
+      Event event,
+      GriefAlert.GriefType type,
+      EntitySnapshot grieferSnapshot,
+      Player griefer,
+      String griefedId,
+      String griefedName) {
     this.event = event;
     this.type = type;
     this.grieferSnapshot = grieferSnapshot;

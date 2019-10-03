@@ -1,13 +1,12 @@
 package com.minecraftonline.griefalert.griefevents;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.griefevents.comms.StaffMessenger;
+import com.minecraftonline.griefalert.griefevents.comms.Messenger;
 import com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent;
 import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfile;
 import com.minecraftonline.griefalert.tools.ClickableMessage;
 import com.minecraftonline.griefalert.tools.General;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -87,7 +86,7 @@ public class GriefEvent extends GriefProfile {
         event.getType().toPreteritVerb(),
         "a",
         event.getGriefedName(),
-        "in ",
+        "in",
         (event.getGriefedLocation().isPresent()
             ?
             "the " + event.getGriefedLocation().get().getExtent()
@@ -100,14 +99,14 @@ public class GriefEvent extends GriefProfile {
             "/griefalert check " + cacheCode,
             Text.of("Teleport here.\n", getSummary())
         ).build().toText();
+    // Make sure the Grief Event isn't stealthy before sending it out too all staff.
     if (!stealthy) {
-      MessageChannel staffChannel = StaffMessenger.getStaffBroadcastChannel();
-      if (plugin.getConfigHelper().isAlertEventsToConsole()) {
-        staffChannel.asMutable().addMember(Sponge.getServer().getConsole());
-      }
+      MessageChannel staffChannel = Messenger.getStaffBroadcastChannel();
       staffChannel.send(message);
-    } else {
-      plugin.getLogger().info("Stealthy Alert: " + message.toPlain());
+    }
+    // Whether or not the Grief Event is stealthy, show the alert to console if its enabled.
+    if (plugin.getConfigHelper().isAlertEventsToConsole()) {
+      plugin.getLogger().info(message.toPlain());
     }
   }
 

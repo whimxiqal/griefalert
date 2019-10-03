@@ -19,7 +19,8 @@ public class HelpCommand extends AbstractCommand {
 
   @Override
   @NonnullByDefault
-  public CommandResult execute(@NonnullByDefault CommandSource src, @NonnullByDefault CommandContext args) throws CommandException {
+  public CommandResult execute(@NonnullByDefault CommandSource src,
+                               @NonnullByDefault CommandContext args) throws CommandException {
     parentCommand.sendHelp(src);
     return CommandResult.success();
   }

@@ -12,6 +12,7 @@ import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.tools.General;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 import ninja.leaping.configurate.ConfigurationNode;
@@ -50,26 +51,27 @@ public class GriefAlert implements PluginContainer {
   @SuppressWarnings("UnusedDeclaration")
   private Logger logger;
 
-  @Inject
-  @DefaultConfig(sharedRoot = false)
-  @SuppressWarnings("UnusedDeclaration")
-  private Path defaultConfig;
 
   @Inject
+  @DefaultConfig(sharedRoot = false)
   @SuppressWarnings("UnusedDeclaration")
   private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
   /**
    * The root node of the configuration file, using the configuration manager.
    */
-  @Inject
-  @DefaultConfig(sharedRoot = false)
+
   private ConfigurationNode rootNode;
 
   @Inject
   @ConfigDir(sharedRoot = false)
   @SuppressWarnings("UnusedDeclaration")
   private File configDirectory;
+
+  @Inject
+  @DefaultConfig(sharedRoot = false)
+  @SuppressWarnings("unused")
+  private Path defaultConfig;
 
   @Inject
   @SuppressWarnings("UnusedDeclaration")
@@ -91,8 +93,11 @@ public class GriefAlert implements PluginContainer {
   @Listener
   public void initialize(GamePreInitializationEvent event) {
     General.stampConsole();
-
-
+    try {
+      rootNode = configManager.load();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     // Load the config from the Sponge API and set the specific node values.
     this.configHelper = new ConfigHelper(this, defaultConfig, rootNode);
     museum = new GriefProfileMuseum(this);
@@ -116,6 +121,12 @@ public class GriefAlert implements PluginContainer {
    */
   @Listener
   public void onReload(GameReloadEvent event) {
+    getLogger().info("Reloading plugin");
+    try {
+      rootNode = configManager.load();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     configHelper.load(rootNode);
     museum.reload();
     // Must reload grief event logger after config
@@ -163,10 +174,6 @@ public class GriefAlert implements PluginContainer {
 
   public ConfigurationLoader<CommentedConfigurationNode> getConfigManager() {
     return configManager;
-  }
-
-  public void setRootNode(ConfigurationNode rootNode) {
-    this.rootNode = rootNode;
   }
 
   public GriefEventCache getGriefEventCache() {
