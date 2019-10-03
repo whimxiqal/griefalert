@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -81,5 +82,16 @@ public class EventWrapper {
 
   public String getGriefedName() {
     return this.griefedName;
+  }
+
+  /**
+   * Cancel the event saved in this wrapper.
+   */
+  public void cancelEvent() {
+    try {
+      ((Cancellable) event).setCancelled(true);
+    } catch (Exception e) {
+      // ignore
+    }
   }
 }

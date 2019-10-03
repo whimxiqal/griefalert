@@ -7,21 +7,25 @@ import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.item.inventory.UseItemStackEvent;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public class GlobalListener implements EventListener<Event> {
+public class GlobalListener {
 
-  private List<EventClassWrapper<? extends Event>> eventStack = new ArrayList<>();
+  private List<GriefAlertListener<? extends Event>> eventStack = new ArrayList<>();
+
+  public List<GriefAlertListener<? extends Event>> getEventStack() {
+    return eventStack;
+  }
 
   /**
    * The listener for GriefAlert which listens to every event passed through the game.
@@ -35,9 +39,11 @@ public class GlobalListener implements EventListener<Event> {
    */
   public GlobalListener(GriefAlert plugin) {
 
-    eventStack.add(new EventClassWrapper<>(
-        ChangeBlockEvent.Break.class,
-        (changeBlockEventBreak) -> {
+    // TODO Make all listeners a GriefAlertListener
+
+    eventStack.add(new GriefAlertListener<ChangeBlockEvent.Break>(
+        // Converter
+        changeBlockEventBreak -> {
           if (changeBlockEventBreak.getCause().root() instanceof Player) {
             Player root = (Player) changeBlockEventBreak.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
@@ -56,24 +62,33 @@ public class GlobalListener implements EventListener<Event> {
                   changeBlockEventBreak.getTransactions().get(0).getOriginal().getLocation().get()
               );
             }
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-              changeBlockEventBreak.setCancelled(true);
-              return;
-            }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
+            return eventWrapper;
+          } else {
+            return null;
           }
-        })
-    );
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+            eventWrapper.cancelEvent();
+            return;
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, ChangeBlockEvent.Break.class, listener)
+    ));
 
-    eventStack.add(new EventClassWrapper<>(
-        ChangeBlockEvent.Place.class,
-        (changeBlockEventPlace) -> {
+
+    eventStack.add(new GriefAlertListener<ChangeBlockEvent.Place>(
+        // Converter
+        changeBlockEventPlace -> {
           if (changeBlockEventPlace.getCause().root() instanceof Player) {
             Player root = (Player) changeBlockEventPlace.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
@@ -92,24 +107,32 @@ public class GlobalListener implements EventListener<Event> {
                   changeBlockEventPlace.getTransactions().get(0).getFinal().getLocation().get()
               );
             }
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-              changeBlockEventPlace.setCancelled(true);
-              return;
-            }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
+            return eventWrapper;
+          } else {
+            return null;
           }
-        })
-    );
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+            eventWrapper.cancelEvent();
+            return;
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, ChangeBlockEvent.Place.class, listener)
+    ));
 
-    eventStack.add(new EventClassWrapper<>(
-        ChangeBlockEvent.Modify.class,
-        (changeBlockEventModify) -> {
+    eventStack.add(new GriefAlertListener<ChangeBlockEvent.Modify>(
+        // Converter
+        changeBlockEventModify -> {
           if (changeBlockEventModify.getCause().root() instanceof Player) {
             Player root = (Player) changeBlockEventModify.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
@@ -128,24 +151,32 @@ public class GlobalListener implements EventListener<Event> {
                   changeBlockEventModify.getTransactions().get(0).getOriginal().getLocation().get()
               );
             }
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-              changeBlockEventModify.setCancelled(true);
-              return;
-            }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
+            return eventWrapper;
+          } else {
+            return null;
           }
-        }
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+            eventWrapper.cancelEvent();
+            return;
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, ChangeBlockEvent.Modify.class, listener)
     ));
 
-    eventStack.add(new EventClassWrapper<>(
-        UseItemStackEvent.Finish.class,
-        (useItemStackEventFinish -> {
+    eventStack.add(new GriefAlertListener<UseItemStackEvent.Finish>(
+        // Converter
+        useItemStackEventFinish -> {
           if (useItemStackEventFinish.getCause().root() instanceof Player) {
             Player root = (Player) useItemStackEventFinish.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
@@ -157,23 +188,31 @@ public class GlobalListener implements EventListener<Event> {
                 useItemStackEventFinish.getItemStackInUse().getType().getTranslation().get()
             );
             eventWrapper.setGriefedLocation(root.getLocation());
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-              return;
-            }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
+            return eventWrapper;
+          } else {
+            return null;
           }
-        })
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+            return;
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, UseItemStackEvent.Finish.class, listener)
     ));
 
-    eventStack.add(new EventClassWrapper<>(
-        InteractEntityEvent.Primary.class,
-        (interactEntityEventPrimary) -> {
+    eventStack.add(new GriefAlertListener<InteractEntityEvent.Primary>(
+        // Converter
+        interactEntityEventPrimary -> {
           if (interactEntityEventPrimary.getCause().root() instanceof Player) {
             Player root = (Player) interactEntityEventPrimary.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
@@ -186,54 +225,70 @@ public class GlobalListener implements EventListener<Event> {
             );
             eventWrapper.setGriefedLocation(interactEntityEventPrimary.getTargetEntity()
                 .getLocation());
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-              interactEntityEventPrimary.setCancelled(true);
-              return;
-            }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
+            return eventWrapper;
+          } else {
+            return null;
           }
-        }
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+            eventWrapper.cancelEvent();
+            return;
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, InteractEntityEvent.Primary.class, listener)
     ));
 
-    eventStack.add(new EventClassWrapper<>(
-        InteractEntityEvent.Secondary.class,
-        (interactEntityEventSecondary) -> {
-          if (interactEntityEventSecondary.getCause().root() instanceof Player) {
-            Player root = (Player) interactEntityEventSecondary.getCause().root();
+    eventStack.add(new GriefAlertListener<InteractEntityEvent.Secondary>(
+        // Converter
+        interactEntityEventPrimary -> {
+          if (interactEntityEventPrimary.getCause().root() instanceof Player) {
+            Player root = (Player) interactEntityEventPrimary.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
-                interactEntityEventSecondary,
+                interactEntityEventPrimary,
                 GriefAlert.GriefType.INTERACT,
                 root.createSnapshot(),
                 root,
-                interactEntityEventSecondary.getTargetEntity().getType().getId(),
-                interactEntityEventSecondary.getTargetEntity().getType().getTranslation().get()
+                interactEntityEventPrimary.getTargetEntity().getType().getId(),
+                interactEntityEventPrimary.getTargetEntity().getType().getTranslation().get()
             );
-            eventWrapper.setGriefedLocation(interactEntityEventSecondary.getTargetEntity()
+            eventWrapper.setGriefedLocation(interactEntityEventPrimary.getTargetEntity()
                 .getLocation());
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-              interactEntityEventSecondary.setCancelled(true);
-              return;
-            }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
+            return eventWrapper;
+          } else {
+            return null;
           }
-        }
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+            eventWrapper.cancelEvent();
+            return;
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, InteractEntityEvent.Secondary.class, listener)
     ));
 
-    eventStack.add(new EventClassWrapper<>(
-        InteractBlockEvent.Secondary.class,
-        (interactBlockEventSecondary) -> {
+    eventStack.add(new GriefAlertListener<InteractBlockEvent.Secondary>(
+        // Converter
+        interactBlockEventSecondary -> {
           if (interactBlockEventSecondary.getCause().root() instanceof Player) {
             Player root = (Player) interactBlockEventSecondary.getCause().root();
             EventWrapper eventWrapper = new EventWrapper(
@@ -249,32 +304,74 @@ public class GlobalListener implements EventListener<Event> {
               eventWrapper.setGriefedLocation(interactBlockEventSecondary.getTargetBlock()
                   .getLocation().get());
             }
-            if (plugin.getMuseum().getProfileBuilder(root).isPresent()) {
-              // We only want the Grief Profile building to work with empty hands
-              if (!root.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-                plugin.getMuseum().getProfileBuilder(root).get().incorporate(eventWrapper, root);
-                interactBlockEventSecondary.setCancelled(true);
+            return eventWrapper;
+          } else {
+            return null;
+          }
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            // We only want the Grief Profile building to work with empty hands
+            if (eventWrapper.getGriefer().getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
+              if (eventWrapper.getGriefer().getItemInHand(HandTypes.MAIN_HAND).get().equals(ItemStack.empty())) {
+                plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+                eventWrapper.cancelEvent();
                 return;
               }
             }
-            if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
-              GriefEvent.throwGriefEvent(
-                  plugin,
-                  plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
-                  eventWrapper);
-            }
           }
-        }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, InteractBlockEvent.Secondary.class, listener)
     ));
 
-
+    eventStack.add(new GriefAlertListener<InteractItemEvent.Secondary>(
+        // Converter
+        interactBlockEventSecondary -> {
+          if (interactBlockEventSecondary.getCause().root() instanceof Player) {
+            Player root = (Player) interactBlockEventSecondary.getCause().root();
+            EventWrapper eventWrapper = new EventWrapper(
+                interactBlockEventSecondary,
+                GriefAlert.GriefType.USE,
+                root.createSnapshot(),
+                root,
+                interactBlockEventSecondary.getItemStack().getType().getId(),
+                interactBlockEventSecondary.getItemStack().getType().getTranslation().get()
+            );
+              eventWrapper.setGriefedLocation(root.getLocation());
+            return eventWrapper;
+          } else {
+            return null;
+          }
+        },
+        // Behavior
+        eventWrapper -> {
+          if (plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).isPresent()) {
+            // We only want the Grief Profile building to work with empty hands
+            if (eventWrapper.getGriefer().getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
+              if (!eventWrapper.getGriefer().getItemInHand(HandTypes.MAIN_HAND).get().equals(ItemStack.empty())) {
+                plugin.getMuseum().getProfileBuilder(eventWrapper.getGriefer()).get().incorporate(eventWrapper, eventWrapper.getGriefer());
+                eventWrapper.cancelEvent();
+                return;
+              }
+            }
+          }
+          if (plugin.getMuseum().getMatchingProfile(eventWrapper).isPresent()) {
+            GriefEvent.throwGriefEvent(
+                plugin,
+                plugin.getMuseum().getMatchingProfile(eventWrapper).get(),
+                eventWrapper);
+          }
+        },
+        // Registrar
+        listener -> Sponge.getEventManager().registerListener(plugin, InteractItemEvent.Secondary.class, listener)
+    ));
   }
-
-  @Override
-  public void handle(@NonnullByDefault Event event) throws Exception {
-    for (EventClassWrapper eventClassWrapper : eventStack) {
-      eventClassWrapper.ifEventThenHandle(event);
-    }
-  }
-
 }

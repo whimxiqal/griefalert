@@ -8,6 +8,7 @@ import com.minecraftonline.griefalert.griefevents.GriefEventCache;
 import com.minecraftonline.griefalert.griefevents.logging.GriefEventLogger;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfileMuseum;
 import com.minecraftonline.griefalert.listeners.GlobalListener;
+import com.minecraftonline.griefalert.listeners.GriefAlertListener;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.tools.General;
 
@@ -24,7 +25,6 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -139,11 +139,10 @@ public class GriefAlert implements PluginContainer {
    * listener, which determines which events are valuable.
    */
   private void registerListeners() {
-    Sponge.getEventManager().registerListener(
-        this,
-        Event.class,
-        Order.FIRST,
-        new GlobalListener(this));
+    for (GriefAlertListener<? extends Event> listener : (new GlobalListener(this))
+        .getEventStack()) {
+      listener.register();
+    }
   }
 
   private void registerCommands() {
