@@ -2,6 +2,7 @@ package com.minecraftonline.griefalert;
 
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
+import com.doublehelix.utils.NotSoClassicLoader;
 import com.google.inject.Inject;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.griefevents.GriefEventCache;
@@ -15,7 +16,10 @@ import com.minecraftonline.griefalert.tools.General;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.typesafe.config.ConfigException;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -23,12 +27,16 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
@@ -40,10 +48,13 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @Plugin(id = "griefalert",
     name = "GriefAlert",
     version = VERSION,
-    description = "Grief alert tool")
+    description = "Grief alert tool",
+    dependencies = {@Dependency(id = "nscl"), @Dependency(id = "worldedit")})
 public class GriefAlert implements PluginContainer {
 
   public static final String VERSION = "23.0";
+
+  public static final String MC_VERSION = "1.12.2";
 
   // Injected features directly from Sponge
 
@@ -84,6 +95,8 @@ public class GriefAlert implements PluginContainer {
   private GriefEventLogger griefEventLogger;
   private ConfigHelper configHelper;
 
+  // Foreign Plugins
+
   /**
    * Run initialization sequence before the game starts.
    * All classes that other classes depend on must be initialized here.
@@ -121,6 +134,10 @@ public class GriefAlert implements PluginContainer {
    */
   @Listener
   public void onReload(GameReloadEvent event) {
+    reload();
+  }
+
+  public void reload() {
     getLogger().info("Reloading plugin");
     try {
       rootNode = configManager.load();
@@ -135,12 +152,10 @@ public class GriefAlert implements PluginContainer {
 
   /**
    * Registers all listeners with Sponge to appropriately read information coming from the server.
-   * Only one listener is registered here: the Global Listener. All events pass through this
-   * listener, which determines which events are valuable.
    */
   private void registerListeners() {
     for (GriefAlertListener<? extends Event> listener : (new GlobalListener(this))
-        .getEventStack()) {
+        .getListenerStack()) {
       listener.register();
     }
   }
@@ -181,6 +196,33 @@ public class GriefAlert implements PluginContainer {
 
   public ConfigHelper getConfigHelper() {
     return configHelper;
+  }
+
+  public NotSoClassicLoader getNotSoClassicLoaderInstance() {
+    return NotSoClassicLoader.getInstance();
+  }
+
+  public WorldEdit getWorldEditInstance() {
+    return WorldEdit.getInstance();
+  }
+
+  public String formatFlattenedId(Player player, String preFlattenedId) {
+    player.sendMessage(Text.of(TextColors.GRAY, "Pre-flattened Id: ", TextColors.GREEN, preFlattenedId));
+    try {
+      int[] legacyArray = getNotSoClassicLoaderInstance().getLegacyFromFlattened(preFlattenedId);
+      String legacyArrayString = "";
+      for (int i : legacyArray) legacyArrayString += String.valueOf(i) + ", ";
+      player.sendMessage(Text.of(TextColors.GRAY, "Legacy id: ", TextColors.GREEN, legacyArrayString));
+      int legacy = Objects.requireNonNull(legacyArray)[0];
+      String postFlattenedId = getNotSoClassicLoaderInstance().getFlattenedIDFromLegacy(legacy);
+      player.sendMessage(Text.of(TextColors.GRAY, "Post-flattened Id: ", TextColors.GREEN, postFlattenedId));
+      return postFlattenedId;
+    } catch (NullPointerException e) {
+      player.sendMessage(Text.of(TextColors.RED, "Doh! The damn legacy integer array is null! Silly NSCL!"));
+      e.printStackTrace();
+      return preFlattenedId;
+    }
+
   }
 
   @Override
@@ -287,13 +329,18 @@ public class GriefAlert implements PluginContainer {
         case "degrief":
           return DEGRIEF;
         default:
-          throw new IllegalArgumentException("Illegal GriefType name. Options are 'destroy', "
-              + "'interact', 'use', or 'degrief'");
+          throw new IllegalArgumentException(name + ": Illegal GriefType name. Options are"
+              + " 'destroy', 'interact', 'use', or 'degrief'");
       }
     }
 
     public String getName() {
       return name;
+    }
+
+    @Override
+    public String toString() {
+      return getName();
     }
 
     public String toPreteritVerb() {

@@ -42,7 +42,12 @@ public class GriefAlertCheckCommand extends AbstractCommand {
               .getGrieferSnapshot().getTransform();
           if (grieferTransform.isPresent()) {
             plugin.getGriefEventCache().putSnapshot(player);
-            player.setTransformSafely(grieferTransform.get());
+            if (!player.setTransformSafely(grieferTransform.get())) {
+              player.sendMessage(Text.of(
+                  TextColors.YELLOW,
+                  "A safe place to teleport could not be identified.")
+              );
+            }
             player.sendMessage(event.get().getSummary());
           } else {
             player.sendMessage(Text.of(

@@ -10,9 +10,18 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.format.TextColors;
 
 public class GriefProfileMuseum {
 
+  public static final GriefProfile DEGRIEF_PROFILE = new GriefProfile(
+      GriefAlert.GriefType.DEGRIEF,
+      "",
+      TextColors.DARK_AQUA,
+      false,
+      false,
+      new GriefProfile.DimensionParameterArray()
+  );
   private static final String GRIEF_PROFILES_FILE_NAME = "grief_profiles.txt";
 
   private final GriefAlert plugin;

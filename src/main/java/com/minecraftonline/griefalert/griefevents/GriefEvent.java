@@ -2,9 +2,9 @@ package com.minecraftonline.griefalert.griefevents;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.griefevents.comms.Messenger;
-import com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent;
 import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfile;
+import com.minecraftonline.griefalert.griefevents.profiles.SpecialtyBehavior;
 import com.minecraftonline.griefalert.tools.ClickableMessage;
 import com.minecraftonline.griefalert.tools.General;
 import org.spongepowered.api.event.Cancellable;
@@ -18,6 +18,7 @@ import org.spongepowered.api.world.World;
 public class GriefEvent extends GriefProfile {
 
   private final EventWrapper event;
+  private final SpecialtyBehavior specialty;
   private final GriefAlert plugin;
   private int cacheCode;
 
@@ -37,17 +38,21 @@ public class GriefEvent extends GriefProfile {
    * @param event   The wrapper for the actual Sponge event which caused this chain of events
    */
   public static void throwGriefEvent(GriefAlert plugin, GriefProfile profile, EventWrapper event) {
-    GriefEvent generated = new GriefEvent(plugin, profile, event);
+    throwGriefEvent(plugin, profile, event, SpecialtyBehavior.NONE);
+  }
+
+  public static void throwGriefEvent(GriefAlert plugin, GriefProfile profile, EventWrapper event, SpecialtyBehavior specialty) {
+    GriefEvent generated = new GriefEvent(plugin, profile, event, specialty);
     if (plugin.getGriefEventCache().isStealthyFromRepetition(generated)) {
       generated.stealthy = true;
     }
     if (event.getGriefer().hasPermission(GriefAlert.Permission.GRIEFALERT_SILENT.toString())) {
       generated.stealthy = true;
     }
+    generated.runSpecialBehavior(plugin);   // Execute the special behavior this event may have
     generated.cache();                      // Save the data in the cache store for access in-game
     generated.broadcast();                  // Tell all staff members
     generated.log();                        // Log this event with the database
-    generated.runSpecialBehavior(plugin);   // Execute the special behavior this event may have
     try {
       if (generated.isDenied()) {
         ((Cancellable) generated.getEvent().getEvent()).setCancelled(true);
@@ -62,10 +67,11 @@ public class GriefEvent extends GriefProfile {
     cacheCode = plugin.getGriefEventCache().offer(this);
   }
 
-  private GriefEvent(GriefAlert plugin, GriefProfile profile, EventWrapper event) {
+  private GriefEvent(GriefAlert plugin, GriefProfile profile, EventWrapper event, SpecialtyBehavior specialty) {
     super(profile);
     this.plugin = plugin;
     this.event = event;
+    this.specialty = specialty;
   }
 
   public EventWrapper getEvent() {
@@ -73,40 +79,46 @@ public class GriefEvent extends GriefProfile {
   }
 
   private void log() {
-    plugin.getGriefLogger().log(LoggedGriefEvent.fromGriefEvent(this));
+    plugin.getGriefLogger().log(this);
   }
 
   public String getSpecialLogString() {
-    return specialtyBehavior.getSpecialLogString(this);
+    return specialty.getSpecialLogString(this);
+  }
+
+  private void runSpecialBehavior(GriefAlert plugin) {
+    specialty.accept(plugin, this);
   }
 
   private void broadcast() {
-    String[] messageList = {
-        event.getGriefer().getName(),
-        event.getType().toPreteritVerb(),
-        "a",
-        event.getGriefedName(),
-        "in",
-        (event.getGriefedLocation().isPresent()
-            ?
-            "the " + event.getGriefedLocation().get().getExtent()
-                .getDimension().getType().getName() :
-            "an unknown dimension")
-    };
-    Text message = ClickableMessage.builder(Text.of(getAlertColor(), String.join(" ", messageList)))
-        .addClickableCommand(
-            String.valueOf(cacheCode),
-            "/griefalert check " + cacheCode,
-            Text.of("Teleport here.\n", getSummary())
-        ).build().toText();
+    ClickableMessage.Builder builder = ClickableMessage.builder(Text.builder()
+        .color(getAlertColor())
+        .append(Text.of(
+            General.formatPlayerName(event.getGriefer()),
+            " ",
+            event.getType().toPreteritVerb(),
+            General.correctIndefiniteArticles(" a " + event.getGriefedName()),
+            " in "
+        )));
+    if (event.getGriefedLocation().isPresent()) {
+      builder.append(Text.of("the " + event.getGriefedLocation().get().getExtent().getDimension().getType().getName() + " "));
+    } else {
+      builder.append(Text.of("an unknown dimension"));
+    }
+    builder.addClickableCommand(
+        String.valueOf(cacheCode),
+        "/griefalert check " + cacheCode,
+        Text.of("Teleport here.\n", getSummary())
+    );
+    ClickableMessage message = builder.build();
     // Make sure the Grief Event isn't stealthy before sending it out too all staff.
     if (!stealthy) {
       MessageChannel staffChannel = Messenger.getStaffBroadcastChannel();
-      staffChannel.send(message);
+      staffChannel.send(message.toText());
     }
     // Whether or not the Grief Event is stealthy, show the alert to console if its enabled.
     if (plugin.getConfigHelper().isAlertEventsToConsole()) {
-      plugin.getLogger().info(message.toPlain());
+      plugin.getLogger().info(message.toText().toPlain());
     }
   }
 
@@ -120,9 +132,9 @@ public class GriefEvent extends GriefProfile {
         .color(TextColors.GRAY)
         .append(Text.of(TextColors.GOLD, "==== Grief Alert " + cacheCode + " ====\n"))
         .append(General.formatPlayerName(event.getGriefer()))
-        .append(Text.of(TextColors.AQUA, TextStyles.BOLD, " " + event.getType().toPreteritVerb()
+        .append(Text.of(TextColors.LIGHT_PURPLE, TextStyles.BOLD, " " + event.getType().toPreteritVerb()
             .toLowerCase()))
-        .append(Text.of(TextStyles.BOLD, TextColors.GREEN,
+        .append(Text.of(TextColors.RED,
             General.correctIndefiniteArticles(" a " + event.getGriefedName())));
     if (event.getGriefedLocation().isPresent()) {
       Location<World> location = event.getGriefedLocation().get();
@@ -135,9 +147,18 @@ public class GriefEvent extends GriefProfile {
     return builder.build();
   }
 
-  boolean isSimilar(GriefEvent other) {
+  public boolean isSimilar(GriefEvent other) {
     return this.getEvent().getGriefer().equals(other.getEvent().getGriefer())
         && super.isSimilar(other);
+  }
+
+  @Override
+  public String getGriefedId() {
+    if (this.getEvent() != null) {
+      return this.getEvent().getGriefedId();
+    } else {
+      return super.getGriefedId();
+    }
   }
 
   public int getCacheCode() {

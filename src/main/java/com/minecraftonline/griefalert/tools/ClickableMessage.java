@@ -29,6 +29,10 @@ public class ClickableMessage {
     return new Builder(messageBody);
   }
 
+  public static Builder builder(Text.Builder messageBodyBuilder) {
+    return new Builder(messageBodyBuilder);
+  }
+
   public static Builder builder(String messageBodyRaw) {
     return builder(Text.of(TextColors.YELLOW, messageBodyRaw));
   }
@@ -45,8 +49,17 @@ public class ClickableMessage {
       builder = Text.builder().append(messageBody).append(Text.of(" "));
     }
 
+    private Builder(Text.Builder messageBodyBuilder) {
+      builder = messageBodyBuilder;
+    }
+
     private Builder() {
       builder = Text.builder();
+    }
+
+    public Builder append(Text text) {
+      builder.append(text);
+      return this;
     }
 
     /**

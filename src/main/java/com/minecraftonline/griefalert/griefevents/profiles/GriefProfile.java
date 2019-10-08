@@ -18,7 +18,6 @@ public class GriefProfile {
   private final boolean denied;
   protected boolean stealthy;
   private final GriefAlert.GriefType type;
-  protected final GriefProfileSpecialtyBehavior specialtyBehavior;
   private final DimensionParameterArray dimensionParameterArray;
 
   /**
@@ -47,7 +46,6 @@ public class GriefProfile {
     this.denied = denied;
     this.stealthy = stealthy;
     this.dimensionParameterArray = dimensionParameterArray;
-    this.specialtyBehavior = findSpecialtyBehavior();
   }
 
   @SuppressWarnings("all")
@@ -98,16 +96,9 @@ public class GriefProfile {
     this.denied = toDenied;
     this.stealthy = toStealthy;
     this.dimensionParameterArray = toDimensionParameterArray;
-    this.specialtyBehavior = findSpecialtyBehavior();
   }
 
-  private GriefProfileSpecialtyBehavior findSpecialtyBehavior() {
-    return GriefProfileSpecialtyBehavior.getMatching(this);
-  }
 
-  protected void runSpecialBehavior(GriefAlert plugin) {
-    specialtyBehavior.accept(plugin);
-  }
 
   GriefProfileStorageLine toStorageLine() {
     GriefProfileStorageLine.Builder builder = GriefProfileStorageLine.builder()

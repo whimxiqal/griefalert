@@ -1,28 +1,28 @@
 package com.minecraftonline.griefalert.griefevents.logging;
 
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.DIMENSION;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_ID;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_TRANSFORM_X;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_TRANSFORM_Y;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEFED_TRANSFORM_Z;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.GRIEF_TYPE;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.MC_VERSION;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_ROTATION_PITCH;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_ROTATION_ROLL;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_ROTATION_YAW;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_TRANSFORM_X;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_TRANSFORM_Y;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_TRANSFORM_Z;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.PLAYER_UUID;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.SPECIALTY;
-import static com.minecraftonline.griefalert.griefevents.logging.LoggedGriefEvent.ComponentType.WORLD_ID;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.DIMENSION;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.GRIEFED_ID;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.GRIEFED_TRANSFORM_X;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.GRIEFED_TRANSFORM_Y;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.GRIEFED_TRANSFORM_Z;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.GRIEF_TYPE;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.MC_VERSION;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_ROTATION_PITCH;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_ROTATION_ROLL;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_ROTATION_YAW;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_TRANSFORM_X;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_TRANSFORM_Y;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_TRANSFORM_Z;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.PLAYER_UUID;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.SPECIALTY;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.TIMESTAMP_;
+import static com.minecraftonline.griefalert.griefevents.logging.Factory.ComponentType.WORLD_ID;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.griefevents.GriefEvent;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,12 +32,13 @@ import java.util.List;
  */
 public final class GriefEventLogger {
 
-  private static final String GRIEF_TABLE_NAME = "GriefEvent_Log";
+  static final String GRIEF_TABLE_NAME = "GriefEvent_Log";
 
   /**
    * The main plugin class object.
    */
   private final GriefAlert plugin;
+  private final Factory factory;
   /**
    * The connection object to reach the SQL database.
    */
@@ -55,6 +56,7 @@ public final class GriefEventLogger {
    */
   public GriefEventLogger(GriefAlert plugin) {
     this.plugin = plugin;
+    this.factory = new Factory();
     try {
       testConnection();
       prepareTable();
@@ -110,23 +112,23 @@ public final class GriefEventLogger {
       PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS "
           + GRIEF_TABLE_NAME + " "
           + "(id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,"
-          + "timestamp_ TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-          + GRIEF_TYPE.name().toLowerCase() + " VARCHAR(10) NOT NULL,"
-          + PLAYER_UUID.name().toLowerCase() + " VARCHAR(64) NOT NULL,"
-          + PLAYER_ROTATION_PITCH.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + PLAYER_ROTATION_YAW.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + PLAYER_ROTATION_ROLL.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + PLAYER_TRANSFORM_X.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + PLAYER_TRANSFORM_Y.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + PLAYER_TRANSFORM_Z.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + DIMENSION.name().toLowerCase() + " VARCHAR(10) NOT NULL,"
-          + WORLD_ID.name().toLowerCase() + " VARCHAR(64) NOT NULL,"
-          + GRIEFED_ID.name().toLowerCase() + " VARCHAR(64) NOT NULL,"
-          + GRIEFED_TRANSFORM_X.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + GRIEFED_TRANSFORM_Y.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + GRIEFED_TRANSFORM_Z.name().toLowerCase() + " DOUBLE(11,3) NOT NULL,"
-          + SPECIALTY.name().toLowerCase() + " VARCHAR(100) NOT NULL,"
-          + MC_VERSION.name().toLowerCase() + " VARCHAR(8) NOT NULL,"
+          + TIMESTAMP_.name() + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+          + GRIEF_TYPE.name() + " VARCHAR(10) NOT NULL,"
+          + PLAYER_UUID.name() + " VARCHAR(64) NOT NULL,"
+          + PLAYER_ROTATION_PITCH.name() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_ROTATION_YAW.name() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_ROTATION_ROLL.name() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_TRANSFORM_X.name() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_TRANSFORM_Y.name() + " DOUBLE(11,3) NOT NULL,"
+          + PLAYER_TRANSFORM_Z.name() + " DOUBLE(11,3) NOT NULL,"
+          + DIMENSION.name() + " VARCHAR(10) NOT NULL,"
+          + WORLD_ID.name() + " VARCHAR(64) NOT NULL,"
+          + GRIEFED_ID.name() + " VARCHAR(64) NOT NULL,"
+          + GRIEFED_TRANSFORM_X.name() + " DOUBLE(11,3) NOT NULL,"
+          + GRIEFED_TRANSFORM_Y.name() + " DOUBLE(11,3) NOT NULL,"
+          + GRIEFED_TRANSFORM_Z.name() + " DOUBLE(11,3) NOT NULL,"
+          + SPECIALTY.name() + " VARCHAR(100) NOT NULL,"
+          + MC_VERSION.name() + " VARCHAR(8) NOT NULL,"
           + "PRIMARY KEY (id))"
       );
       ps.execute();
@@ -144,7 +146,7 @@ public final class GriefEventLogger {
    *
    * @param griefEvent The Grief Event to log
    */
-  public void log(LoggedGriefEvent griefEvent) {
+  public void log(GriefEvent griefEvent) {
     if (error) {
       plugin.getLogger().error("Tried to store a grief instance, but there is an error with the "
           + "connection to the SQL database. Instance: " + griefEvent.toString());
@@ -156,13 +158,10 @@ public final class GriefEventLogger {
       testConnection();
       List<String> columns = new LinkedList<>();
       List<String> values = new LinkedList<>();
-      for (LoggedGriefEvent.ComponentType type : griefEvent.componentMap.keySet()) {
-        columns.add(type.name().toLowerCase());
-        Object value = griefEvent.componentMap.get(type);
-        if (value instanceof String) {
-          values.add("\"" + value + "\"");
-        } else {
-          values.add(value.toString());
+      for (Factory.LogComponent component : factory.getLogComponents()) {
+        if (component.forSql()) {  // Used to check if this is supposed to be logged
+          columns.add(component.getType().name());
+          values.add(component.toSql(griefEvent));
         }
       }
       ps = conn.prepareStatement("INSERT INTO "
@@ -180,6 +179,32 @@ public final class GriefEventLogger {
     } finally {
       closeQuietly(ps);
     }
+  }
+
+  public List<LogMessage> getLogs(LogQuery query) {
+    List<LogMessage> output = new LinkedList<>();
+    try {
+      PreparedStatement ps = conn.prepareStatement(query.getSQLCommand());
+      ResultSet results = ps.executeQuery();
+      while (results.next()) {
+        LogMessage logMessage = new LogMessage();
+        for (Factory.LogComponent component : factory.getLogComponents()) {
+          if (component.forRetrieval()) {
+            logMessage.putDetail(component.getType(), component.fromSql(results).toString());
+            if (component.getType().equals(TIMESTAMP_)) {
+              logMessage.setDate((Date) component.fromSql(results));
+            }
+          }
+        }
+        output.add(logMessage);
+      }
+      ps.close();
+    } catch (SQLException sqlex) {
+      error = true;
+      plugin.getLogger().error("SQL Exception while reading data from Grief Instance Table ('"
+          + GRIEF_TABLE_NAME + "') table...", sqlex);
+    }
+    return output;
   }
 
   /**
