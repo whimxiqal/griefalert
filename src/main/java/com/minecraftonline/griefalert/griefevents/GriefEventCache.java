@@ -17,7 +17,7 @@ public class GriefEventCache {
   private ArrayList<GriefEvent> cache = new ArrayList<>();
   private final HashMap<UUID, EntitySnapshot> checkerMap = new HashMap<>();
   private int cursor = 0;
-  private int maxCacheSize;
+  private final int maxCacheSize;
   private int maxRepeatedProfiles;
 
   public GriefEventCache(GriefAlert plugin) {
