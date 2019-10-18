@@ -13,25 +13,20 @@ public class GriefAlertCommand extends AbstractCommand {
 
   /**
    * The base command for all Grief Alert subcommands.
-   *
-   * @param plugin The main Grief Alert instance
    */
-  public GriefAlertCommand(GriefAlert plugin) {
+  public GriefAlertCommand() {
     super(
-        plugin,
         GriefAlert.Permission.GRIEFALERT_COMMAND,
         Text.of("The root command for all Grief Alert commands")
     );
     addAlias("griefalert");
     addAlias("ga");
-    addChild(new GriefAlertCheckCommand(plugin));
-    addChild(new GriefAlertInfoCommand(plugin));
-    addChild(new GriefAlertLogsCommand(plugin));
-    addChild(new GriefAlertRecentCommand(plugin));
-    addChild(new GriefAlertReturnCommand(plugin));
-    addChild(new GriefAlertRollbackCommand(plugin));
-    addChild(new GriefAlertBuilderCommand(plugin));
-    addChild(new GriefAlertReloadCommand(plugin));
+    addChild(new GriefAlertCheckCommand());
+    addChild(new GriefAlertInfoCommand());
+    addChild(new GriefAlertRecentCommand());
+    addChild(new GriefAlertReturnCommand());
+    addChild(new GriefAlertBuilderCommand());
+    addChild(new GriefAlertReloadCommand());
 
   }
 

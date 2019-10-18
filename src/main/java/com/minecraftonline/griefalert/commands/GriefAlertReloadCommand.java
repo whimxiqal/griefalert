@@ -11,8 +11,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public class GriefAlertReloadCommand extends AbstractCommand {
 
-  public GriefAlertReloadCommand(GriefAlert plugin) {
-    super(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_RELOAD, Text.of(
+  public GriefAlertReloadCommand() {
+    super(GriefAlert.Permission.GRIEFALERT_COMMAND_RELOAD, Text.of(
         "Reload all Grief Profiles from host"
     ));
     addAlias("reload");
@@ -22,7 +22,7 @@ public class GriefAlertReloadCommand extends AbstractCommand {
   @Override
   public CommandResult execute(@NonnullByDefault CommandSource src,
                                @NonnullByDefault CommandContext args) throws CommandException {
-    plugin.reload();
+    GriefAlert.getInstance().reload();
     src.sendMessage(Text.of(TextColors.GREEN, "Grief Alert reloaded!"));
     return CommandResult.success();
   }

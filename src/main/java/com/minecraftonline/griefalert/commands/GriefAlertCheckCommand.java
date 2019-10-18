@@ -17,9 +17,8 @@ import org.spongepowered.api.world.World;
 
 public class GriefAlertCheckCommand extends AbstractCommand {
 
-  GriefAlertCheckCommand(GriefAlert plugin) {
+  GriefAlertCheckCommand() {
     super(
-        plugin,
         GriefAlert.Permission.GRIEFALERT_COMMAND_CHECK,
         Text.of("Check the grief alert with the given id")
     );
@@ -35,13 +34,13 @@ public class GriefAlertCheckCommand extends AbstractCommand {
     if (src instanceof Player) {
       Player player = (Player) src;
       if (args.<Integer>getOne("alert code").isPresent()) {
-        Optional<GriefEvent> event = plugin.getGriefEventCache()
+        Optional<GriefEvent> event = GriefAlert.getInstance().getGriefEventCache()
             .get(args.<Integer>getOne("alert code").get());
         if (event.isPresent()) {
           Optional<Transform<World>> grieferTransform = event.get().getEvent()
               .getGrieferSnapshot().getTransform();
           if (grieferTransform.isPresent()) {
-            plugin.getGriefEventCache().putSnapshot(player);
+            GriefAlert.getInstance().getGriefEventCache().putSnapshot(player);
             if (!player.setTransformSafely(grieferTransform.get())) {
               player.sendMessage(Text.of(
                   TextColors.YELLOW,

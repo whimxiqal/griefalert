@@ -15,9 +15,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 public class GriefAlertReturnCommand extends AbstractCommand {
 
 
-  GriefAlertReturnCommand(GriefAlert plugin) {
+  GriefAlertReturnCommand() {
     super(
-        plugin,
         GriefAlert.Permission.GRIEFALERT_COMMAND_CHECK,
         Text.of("Return to your previous location prior to a grief alert check")
     );
@@ -32,7 +31,7 @@ public class GriefAlertReturnCommand extends AbstractCommand {
     if (src instanceof Player) {
       Player player = (Player) src;
       Optional<EntitySnapshot> optionalEntitySnapshot =
-          plugin.getGriefEventCache().getSnapshot(player);
+          GriefAlert.getInstance().getGriefEventCache().getSnapshot(player);
       if (optionalEntitySnapshot.isPresent()
           && optionalEntitySnapshot.get().getTransform().isPresent()) {
         if (player.setTransformSafely(optionalEntitySnapshot.get().getTransform().get())) {

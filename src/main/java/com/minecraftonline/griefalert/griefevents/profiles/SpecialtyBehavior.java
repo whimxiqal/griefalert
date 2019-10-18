@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import com.minecraftonline.griefalert.griefevents.comms.Messenger;
-import com.minecraftonline.griefalert.tools.General;
+import com.minecraftonline.griefalert.util.General;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;

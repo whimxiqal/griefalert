@@ -1,7 +1,7 @@
 package com.minecraftonline.griefalert.griefevents.profiles;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.tools.General;
+import com.minecraftonline.griefalert.util.General;
 
 import java.util.LinkedList;
 import java.util.List;

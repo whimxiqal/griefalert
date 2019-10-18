@@ -2,16 +2,12 @@ package com.minecraftonline.griefalert;
 
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
-import com.doublehelix.utils.NotSoClassicLoader;
 import com.google.inject.Inject;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.griefevents.GriefEventCache;
-import com.minecraftonline.griefalert.griefevents.logging.GriefEventLogger;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfileMuseum;
-import com.minecraftonline.griefalert.listeners.GlobalListener;
-import com.minecraftonline.griefalert.listeners.GriefAlertListener;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
-import com.minecraftonline.griefalert.tools.General;
+import com.minecraftonline.griefalert.util.General;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +15,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.typesafe.config.ConfigException;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -28,32 +23,30 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * The main class for the plugin Grief Alert.
  * This plugin is made exclusively for MinecraftOnline.com
  * Do not use this plugin without explicit approval from the administration team of MinecraftOnline.
  */
-@SuppressWarnings("checkstyle:SummaryJavadoc")
 @Plugin(id = "griefalert",
     name = "GriefAlert",
     version = VERSION,
     description = "Grief alert tool",
-    dependencies = {@Dependency(id = "nscl"), @Dependency(id = "worldedit")})
-public class GriefAlert implements PluginContainer {
+    dependencies = {@Dependency(id = "prism"), @Dependency(id = "worldedit")})
+public final class GriefAlert {
 
   public static final String VERSION = "23.0";
-
+  private static GriefAlert instance;
   public static final String MC_VERSION = "1.12.2";
 
   // Injected features directly from Sponge
@@ -62,6 +55,8 @@ public class GriefAlert implements PluginContainer {
   @SuppressWarnings("UnusedDeclaration")
   private Logger logger;
 
+  @Inject
+  private PluginContainer pluginContainer;
 
   @Inject
   @DefaultConfig(sharedRoot = false)
@@ -92,10 +87,12 @@ public class GriefAlert implements PluginContainer {
   // Custom classes to help manage plugin
   private GriefProfileMuseum museum;
   private GriefEventCache griefEventCache;
-  private GriefEventLogger griefEventLogger;
   private ConfigHelper configHelper;
 
-  // Foreign Plugins
+  @Listener
+  public void onConstruction(GameConstructionEvent event) {
+    instance = this;
+  }
 
   /**
    * Run initialization sequence before the game starts.
@@ -112,15 +109,9 @@ public class GriefAlert implements PluginContainer {
       e.printStackTrace();
     }
     // Load the config from the Sponge API and set the specific node values.
-    this.configHelper = new ConfigHelper(this, defaultConfig, rootNode);
+    this.configHelper = new ConfigHelper(defaultConfig, rootNode);
     museum = new GriefProfileMuseum(this);
     griefEventCache = new GriefEventCache(this);
-
-    // Classes which other classes depend on must be initialized here.
-    this.setGriefLogger(new GriefEventLogger(this));
-
-    // Register all the listeners with Sponge
-    registerListeners();
 
     // Register all the commands with Sponge
     registerCommands();
@@ -138,7 +129,7 @@ public class GriefAlert implements PluginContainer {
   }
 
   public void reload() {
-    getLogger().info("Reloading plugin");
+    logger.info("Reloading plugin");
     try {
       rootNode = configManager.load();
     } catch (IOException e) {
@@ -147,21 +138,11 @@ public class GriefAlert implements PluginContainer {
     configHelper.load(rootNode);
     museum.reload();
     // Must reload grief event logger after config
-    griefEventLogger.reload();
   }
 
-  /**
-   * Registers all listeners with Sponge to appropriately read information coming from the server.
-   */
-  private void registerListeners() {
-    for (GriefAlertListener<? extends Event> listener : (new GlobalListener(this))
-        .getListenerStack()) {
-      listener.register();
-    }
-  }
 
   private void registerCommands() {
-    GriefAlertCommand griefAlertCommand = new GriefAlertCommand(this);
+    GriefAlertCommand griefAlertCommand = new GriefAlertCommand();
     Sponge.getCommandManager().register(
         this,
         griefAlertCommand.buildCommandSpec(),
@@ -171,15 +152,6 @@ public class GriefAlert implements PluginContainer {
 
   public File getDataDirectory() {
     return new File(configDirectory.getParentFile().getParentFile().getPath() + "/" + "griefalert");
-  }
-
-  public GriefEventLogger getGriefLogger() {
-    return this.griefEventLogger;
-  }
-
-  private void setGriefLogger(GriefEventLogger griefLogger) {
-    this.griefEventLogger = griefLogger;
-
   }
 
   public GriefProfileMuseum getMuseum() {
@@ -198,38 +170,12 @@ public class GriefAlert implements PluginContainer {
     return configHelper;
   }
 
-  public NotSoClassicLoader getNotSoClassicLoaderInstance() {
-    return NotSoClassicLoader.getInstance();
+  public Logger getLogger() {
+    return logger;
   }
 
-  public WorldEdit getWorldEditInstance() {
-    return WorldEdit.getInstance();
-  }
-
-  public String formatFlattenedId(Player player, String preFlattenedId) {
-    player.sendMessage(Text.of(TextColors.GRAY, "Pre-flattened Id: ", TextColors.GREEN, preFlattenedId));
-    try {
-      int[] legacyArray = getNotSoClassicLoaderInstance().getLegacyFromFlattened(preFlattenedId);
-      String legacyArrayString = "";
-      for (int i : legacyArray) legacyArrayString += String.valueOf(i) + ", ";
-      player.sendMessage(Text.of(TextColors.GRAY, "Legacy id: ", TextColors.GREEN, legacyArrayString));
-      int legacy = Objects.requireNonNull(legacyArray)[0];
-      String postFlattenedId = getNotSoClassicLoaderInstance().getFlattenedIDFromLegacy(legacy);
-      player.sendMessage(Text.of(TextColors.GRAY, "Post-flattened Id: ", TextColors.GREEN, postFlattenedId));
-      return postFlattenedId;
-    } catch (NullPointerException e) {
-      player.sendMessage(Text.of(TextColors.RED, "Doh! The damn legacy integer array is null! Silly NSCL!"));
-      e.printStackTrace();
-      return preFlattenedId;
-    }
-
-  }
-
-  @Override
-  @NonnullByDefault
-  @SuppressWarnings("all")
-  public String getId() {
-    return "griefalert";
+  public static GriefAlert getInstance() {
+    return instance;
   }
 
   @SuppressWarnings("checkstyle:LineLength")

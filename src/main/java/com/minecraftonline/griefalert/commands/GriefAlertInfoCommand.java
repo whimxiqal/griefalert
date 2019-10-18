@@ -15,9 +15,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public class GriefAlertInfoCommand extends AbstractCommand {
 
-  GriefAlertInfoCommand(GriefAlert plugin) {
+  GriefAlertInfoCommand() {
     super(
-        plugin,
         GriefAlert.Permission.GRIEFALERT_COMMAND_INFO,
         Text.of("Get info about a given grief alert")
     );
@@ -32,7 +31,7 @@ public class GriefAlertInfoCommand extends AbstractCommand {
                                @NonnullByDefault CommandContext args) throws CommandException {
     Player player = (Player) src;
     if (args.<Integer>getOne("alert code").isPresent()) {
-      Optional<GriefEvent> event = plugin.getGriefEventCache()
+      Optional<GriefEvent> event = GriefAlert.getInstance().getGriefEventCache()
           .get(args.<Integer>getOne("alert code").get());
       if (event.isPresent()) {
         player.sendMessage(event.get().getSummary());

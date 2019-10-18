@@ -9,14 +9,9 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 public class ConfigHelper {
 
-  private final GriefAlert plugin;
-
   private static final int DEFAULT_ALERTS_CODE_LIMIT = 9999;
   private static final int DEFAULT_MAX_REPEATED_HIDDEN_ALERT = 10;
   private static final boolean DEFAULT_SHOW_ALERTS_IN_CONSOLE = true;
-  private static final String DEFAULT_SQL_USERNAME = "user";
-  private static final String DEFAULT_SQL_PASSWORD = "PA$$word";
-  private static final String DEFAULT_SQL_ADDRESS = "localhost:3306/minecraft";
 
   private int cachedEventLimit;
   private int hiddenRepeatedEventLimit;
@@ -29,13 +24,11 @@ public class ConfigHelper {
    * Create and initialize this helper class for managing the configuration data. This constructor
    * initializes a new file if one does not exist and it loads
    *
-   * @param plugin     The main plugin instance
    * @param configPath The path to the configuration
    * @param root       The root node of the configuration object
    */
-  public ConfigHelper(GriefAlert plugin, Path configPath, ConfigurationNode root) {
-    this.plugin = plugin;
-    initialize(plugin, configPath, root);
+  public ConfigHelper(Path configPath, ConfigurationNode root) {
+    initialize(configPath, root);
     load(root);
   }
 
@@ -43,20 +36,17 @@ public class ConfigHelper {
    * Initializes the configuration nodes with their appropriate values, designated as
    * local static variables.
    */
-  private void initialize(GriefAlert plugin, Path configPath, ConfigurationNode root) {
+  private void initialize(Path configPath, ConfigurationNode root) {
     if (!configPath.toFile().exists()) {
-      plugin.getLogger().info("No configuration file found. Generating new one...");
+      GriefAlert.getInstance().getLogger().info("No configuration file found. Generating new one...");
       try {
         root.getNode("alertsCodeLimit").setValue(DEFAULT_ALERTS_CODE_LIMIT);
         root.getNode("maxHiddenRepeatedEvents").setValue(DEFAULT_MAX_REPEATED_HIDDEN_ALERT);
         root.getNode("showAlertsInConsole").setValue(DEFAULT_SHOW_ALERTS_IN_CONSOLE);
-        root.getNode("SQLusername").setValue(DEFAULT_SQL_USERNAME);
-        root.getNode("SQLpassword").setValue(DEFAULT_SQL_PASSWORD);
-        root.getNode("SQLdb").setValue(DEFAULT_SQL_ADDRESS);
-        plugin.getConfigManager().save(root);
-        plugin.getLogger().info("New configuration file created successfully");
+        GriefAlert.getInstance().getConfigManager().save(root);
+        GriefAlert.getInstance().getLogger().info("New configuration file created successfully");
       } catch (IOException e) {
-        plugin.getLogger().error("Exception while initializing configuration", e);
+        GriefAlert.getInstance().getLogger().error("Exception while initializing configuration", e);
       }
     }
   }
@@ -69,16 +59,13 @@ public class ConfigHelper {
    */
   public void load(ConfigurationNode root) {
     try {
-      plugin.getConfigManager().load();
+      GriefAlert.getInstance().getConfigManager().load();
       cachedEventLimit = root.getNode("alertsCodeLimit").getInt();
       hiddenRepeatedEventLimit = root.getNode("maxHiddenRepeatedEvents").getInt();
       alertEventsToConsole = root.getNode("showAlertsInConsole").getBoolean();
-      sqlUsername = root.getNode("SQLusername").getString();
-      sqlPassword = root.getNode("SQLpassword").getString();
-      sqlDatabaseAddress = root.getNode("SQLdb").getString();
-      plugin.getLogger().info("Configuration file loaded");
+      GriefAlert.getInstance().getLogger().info("Configuration file loaded");
     } catch (IOException e) {
-      plugin.getLogger().error("Exception while loading configuration", e);
+      GriefAlert.getInstance().getLogger().error("Exception while loading configuration", e);
     }
   }
 

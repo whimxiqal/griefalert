@@ -15,7 +15,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 public abstract class AbstractCommand implements CommandExecutor {
 
-  protected final GriefAlert plugin;
   public final GriefAlert.Permission permission;
   private final Text description;
   private List<AbstractCommand> commandChildren = new LinkedList<>();
@@ -25,14 +24,11 @@ public abstract class AbstractCommand implements CommandExecutor {
   /**
    * A general Grief Alert command object.
    *
-   * @param plugin      The main instance of Grief Alert
    * @param permission  The permission which is required for this command
    * @param description The general description of this command functionality
    */
-  public AbstractCommand(GriefAlert plugin,
-                         GriefAlert.Permission permission,
+  public AbstractCommand(GriefAlert.Permission permission,
                          Text description) {
-    this.plugin = plugin;
     this.permission = permission;
     this.description = description;
     if (!(this instanceof HelpCommand)) {
@@ -40,11 +36,10 @@ public abstract class AbstractCommand implements CommandExecutor {
     }
   }
 
-  public AbstractCommand(GriefAlert plugin,
-                         GriefAlert.Permission permission,
+  public AbstractCommand(GriefAlert.Permission permission,
                          Text description,
                          String primaryAlias) {
-    this(plugin, permission, description);
+    this(permission, description);
     addAlias(primaryAlias);
   }
 

@@ -3,7 +3,7 @@ package com.minecraftonline.griefalert.commands;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfile;
-import com.minecraftonline.griefalert.tools.General;
+import com.minecraftonline.griefalert.util.General;
 
 import java.io.IOException;
 
@@ -22,13 +22,12 @@ import org.spongepowered.api.world.DimensionTypes;
 
 public class GriefAlertBuilderCommand extends AbstractCommand {
 
-  GriefAlertBuilderCommand(GriefAlert plugin) {
-    super(plugin, GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD, Text.of("Build a grief profile"));
+  GriefAlertBuilderCommand() {
+    super(GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD, Text.of("Build a grief profile"));
     addAlias("build");
 
     // Add 'Save'
     addChild(new AbstractCommand(
-        plugin,
         GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD,
         Text.of("Save your alert profile"), "save") {
       @Override
@@ -37,9 +36,9 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
                                    @NonnullByDefault CommandContext args) throws CommandException {
         if (src instanceof Player) {
           Player player = (Player) src;
-          if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
+          if (GriefAlert.getInstance().getMuseum().getProfileBuilder(player).isPresent()) {
             try {
-              if (plugin.getMuseum().getProfileBuilder(player).get().solidify(plugin)) {
+              if (GriefAlert.getInstance().getMuseum().getProfileBuilder(player).get().solidify()) {
                 player.sendMessage(Text.of(TextColors.GREEN, "Your profile has been added"));
               } else {
                 player.sendMessage(Text.of(
@@ -67,7 +66,6 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
     });
     // Add 'Toggle'
     addChild(new AbstractCommand(
-        plugin,
         GriefAlert.Permission.GRIEFALERT_COMMAND_BUILD,
         Text.of("Toogle build mode"), "toggle") {
       @Override
@@ -76,11 +74,11 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
                                    @NonnullByDefault CommandContext args) throws CommandException {
         if (src instanceof Player) {
           Player player = (Player) src;
-          plugin.getMuseum().setBuildingState(
+          GriefAlert.getInstance().getMuseum().setBuildingState(
               player,
-              !plugin.getMuseum().getProfileBuilder(player).isPresent()
+              !GriefAlert.getInstance().getMuseum().getProfileBuilder(player).isPresent()
           );
-          if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
+          if (GriefAlert.getInstance().getMuseum().getProfileBuilder(player).isPresent()) {
             player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
           } else {
             player.sendMessage(Text.of(TextColors.GREEN, "You are no longer in Add Profile mode."));
@@ -106,11 +104,11 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
                                @NonnullByDefault CommandContext args) throws CommandException {
     if (src instanceof Player) {
       Player player = (Player) src;
-      if (plugin.getMuseum().setBuildingState(player, true)) {
+      if (GriefAlert.getInstance().getMuseum().setBuildingState(player, true)) {
         player.sendMessage(Text.of(TextColors.GREEN, "You are now in Add Profile mode."));
       }
-      if (plugin.getMuseum().getProfileBuilder(player).isPresent()) {
-        GriefProfileBuilder builder = plugin.getMuseum().getProfileBuilder(player).get();
+      if (GriefAlert.getInstance().getMuseum().getProfileBuilder(player).isPresent()) {
+        GriefProfileBuilder builder = GriefAlert.getInstance().getMuseum().getProfileBuilder(player).get();
         if (args.hasAny("d") || args.<String>getOne("deny").isPresent()) {
           builder.setDenied(!builder.denied);
         }
@@ -192,7 +190,7 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
       this.type = type;
     }
 
-    boolean solidify(GriefAlert plugin) throws IOException {
+    boolean solidify() throws IOException {
       GriefProfile candidate = new GriefProfile(
           type,
           griefedId,
@@ -201,9 +199,9 @@ public class GriefAlertBuilderCommand extends AbstractCommand {
           stealthy,
           dimensionParameterArray
       );
-      if (!plugin.getMuseum().containsSimilar(candidate)) {
-        plugin.getMuseum().add(candidate);
-        plugin.getMuseum().store(candidate);
+      if (!GriefAlert.getInstance().getMuseum().containsSimilar(candidate)) {
+        GriefAlert.getInstance().getMuseum().add(candidate);
+        GriefAlert.getInstance().getMuseum().store(candidate);
         return true;
       } else {
         return false;

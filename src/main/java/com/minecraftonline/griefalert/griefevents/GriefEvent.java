@@ -5,8 +5,10 @@ import com.minecraftonline.griefalert.griefevents.comms.Messenger;
 import com.minecraftonline.griefalert.griefevents.profiles.EventWrapper;
 import com.minecraftonline.griefalert.griefevents.profiles.GriefProfile;
 import com.minecraftonline.griefalert.griefevents.profiles.SpecialtyBehavior;
-import com.minecraftonline.griefalert.tools.ClickableMessage;
-import com.minecraftonline.griefalert.tools.General;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.GriefAlertMessage;
+import com.minecraftonline.griefalert.util.General;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -52,7 +54,6 @@ public class GriefEvent extends GriefProfile {
     generated.runSpecialBehavior(plugin);   // Execute the special behavior this event may have
     generated.cache();                      // Save the data in the cache store for access in-game
     generated.broadcast();                  // Tell all staff members
-    generated.log();                        // Log this event with the database
     try {
       if (generated.isDenied()) {
         ((Cancellable) generated.getEvent().getEvent()).setCancelled(true);
@@ -78,10 +79,6 @@ public class GriefEvent extends GriefProfile {
     return event;
   }
 
-  private void log() {
-    plugin.getGriefLogger().log(this);
-  }
-
   public String getSpecialLogString() {
     return specialty.getSpecialLogString(this);
   }
@@ -91,15 +88,15 @@ public class GriefEvent extends GriefProfile {
   }
 
   private void broadcast() {
-    ClickableMessage.Builder builder = ClickableMessage.builder(Text.builder()
+    GriefAlertMessage.Builder builder = GriefAlertMessage.builder(Text.builder()
         .color(getAlertColor())
         .append(Text.of(
             General.formatPlayerName(event.getGriefer()),
             " ",
             event.getType().toPreteritVerb(),
-            General.correctIndefiniteArticles(" a " + event.getGriefedName()),
+            Grammar.correctIndefiniteArticles(" a " + event.getGriefedName()),
             " in "
-        )));
+        )).build());
     if (event.getGriefedLocation().isPresent()) {
       builder.append(Text.of("the " + event.getGriefedLocation().get().getExtent().getDimension().getType().getName() + " "));
     } else {
@@ -110,7 +107,7 @@ public class GriefEvent extends GriefProfile {
         "/griefalert check " + cacheCode,
         Text.of("Teleport here.\n", getSummary())
     );
-    ClickableMessage message = builder.build();
+    GriefAlertMessage message = builder.build();
     // Make sure the Grief Event isn't stealthy before sending it out too all staff.
     if (!stealthy) {
       MessageChannel staffChannel = Messenger.getStaffBroadcastChannel();
@@ -135,7 +132,7 @@ public class GriefEvent extends GriefProfile {
         .append(Text.of(TextColors.LIGHT_PURPLE, TextStyles.BOLD, " " + event.getType().toPreteritVerb()
             .toLowerCase()))
         .append(Text.of(TextColors.RED,
-            General.correctIndefiniteArticles(" a " + event.getGriefedName())));
+            Grammar.correctIndefiniteArticles(" a " + event.getGriefedName())));
     if (event.getGriefedLocation().isPresent()) {
       Location<World> location = event.getGriefedLocation().get();
       builder.append(Text.of("\nLocation: "

@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert.tools;
+package com.minecraftonline.griefalert.util;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import org.spongepowered.api.Sponge;
@@ -134,26 +134,6 @@ public abstract class General {
     IllegalColorCodeException(String s) {
       super("This color name is invalid: " + s);
     }
-  }
-
-  /**
-   * Converts all indefinite articles (<b>an, a</b>) to the appropriate version
-   * in a string by reading whether the next word begins with a vowel.
-   *
-   * @param string The string to read and correct
-   * @return The corrected string
-   */
-  public static String correctIndefiniteArticles(String string) {
-    String[] tokens = string.replaceAll(" an ", " a ").split(" a ");
-    String output = tokens[0];
-    for (int i = 1; i < tokens.length; i++) {
-      if ("aeiou".contains(String.valueOf(tokens[i].charAt(0)).toLowerCase())) {
-        output = String.join(" an ", output, tokens[i]);
-      } else {
-        output = String.join(" a ", output, tokens[i]);
-      }
-    }
-    return output;
   }
 
   /**

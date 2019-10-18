@@ -12,7 +12,7 @@ public class HelpCommand extends AbstractCommand {
   private final AbstractCommand parentCommand;
 
   HelpCommand(AbstractCommand parent) {
-    super(parent.plugin, parent.permission, Text.of("Show list of all sub-commands"));
+    super(parent.permission, Text.of("Show list of all sub-commands"));
     this.parentCommand = parent;
     addAlias("help");
   }
