@@ -14,13 +14,20 @@ public class UseAlert extends Alert {
   private final TextColor targetColor = Format.ALERT_TARGET_COLOR;
   private final TextColor dimensionColor = Format.ALERT_DIMENSION_COLOR;
 
-  UseAlert(int cacheCode, Transform<World> transform) {
-    super(cacheCode, transform);
+  UseAlert(int cacheCode) {
+    super(cacheCode);
   }
 
+  @Override
   public Text getMessageText() {
     // TODO: Write message text for UseAlert
     return Text.of("UseAlert text");
+  }
+
+  @Override
+  public Transform<World> getTransform() {
+    // TODO: Write getTransform
+    return null;
   }
 
 }

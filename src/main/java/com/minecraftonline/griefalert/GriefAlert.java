@@ -159,7 +159,7 @@ public final class GriefAlert {
     return new File(configDirectory.getParentFile().getParentFile().getPath() + "/" + "griefalert");
   }
 
-  public ProfileCabinet getMuseum() {
+  public ProfileCabinet getProfileCabinet() {
     return museum;
   }
 
@@ -181,15 +181,6 @@ public final class GriefAlert {
 
   public static GriefAlert getInstance() {
     return instance;
-  }
-
-  public static class GriefType {
-    public static final GriefType DESTROY = new GriefType();
-    public static final GriefType USE = new GriefType();
-    public static final GriefType INTERACT = new GriefType();
-    public String toPreteritVerb() {
-      return "preterite";
-    }
   }
 
 }

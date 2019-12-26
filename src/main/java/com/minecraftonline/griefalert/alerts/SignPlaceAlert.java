@@ -14,10 +14,11 @@ public class SignPlaceAlert extends Alert {
   private final TextColor targetColor = Format.ALERT_TARGET_COLOR;
   private final TextColor dimensionColor = Format.ALERT_DIMENSION_COLOR;
 
-  SignPlaceAlert(int cacheCode, Transform<World> transform) {
-    super(cacheCode, transform);
+  SignPlaceAlert(int cacheCode) {
+    super(cacheCode);
   }
 
+  @Override
   public Text getMessageText() {
     // TODO: Write message text for SignPlaceAlert
     return Text.of("SignPlaceAlert");
@@ -39,5 +40,11 @@ public class SignPlaceAlert extends Alert {
 //            "\n", "Line 4: ", lines.get(3)
 //        )).orElse(Text.of("No sign data available"))
 //    );
+  }
+
+  @Override
+  public Transform<World> getTransform() {
+    // TODO: Write getTransform
+    return null;
   }
 }

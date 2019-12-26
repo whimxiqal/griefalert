@@ -1,37 +1,31 @@
 package com.minecraftonline.griefalert.util;
 
-import com.google.inject.internal.cglib.reflect.$FastClass;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.util.DataQueries;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.xml.crypto.Data;
 
 import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
-import jdk.nashorn.internal.ir.Block;
 import org.slf4j.Logger;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
 public abstract class Prism {
+
+  // TODO: Finish these Prism helper functions to access PrismRecord data
 
   /**
    * Get the player as a cause of the event from the PrismRecord. Return null
@@ -64,7 +58,6 @@ public abstract class Prism {
 //    if (!world.isPresent()) {
 //      return Optional.empty();
 //    }
-//    // TODO Return the Location!
 //
 //  }
 
@@ -246,6 +239,38 @@ public abstract class Prism {
     return Optional.of(Arrays.asList("Line1", "Line2", "Line3", "Line4"));
   }
 
+  public static Optional<DimensionType> getDimensionType(PrismRecord record) {
+    // TODO: Implement getDimensionType
+    return null;
+  }
+
+  public static Text printRecord(PrismRecord record) {
+
+    Logger l = GriefAlert.getInstance().getLogger();
+
+    l.info("PrismRecord info");
+    l.info("----------------");
+
+    Map<DataQuery, Object> dataMap = record.getDataContainer().getValues(true);
+    for (DataQuery query : dataMap.keySet()) {
+      l.info("{ "
+          + query.toString() + ", "
+          + "(" + dataMap.get(query).getClass().toString() + ") "
+          + dataMap.get(query).toString() + " }");
+    }
+
+    Text.Builder parsedBuilder = Text.builder();
+
+    parsedBuilder.append(Text.of("Player: ", Prism.getPlayer(record).map(Player::getName).orElse("")));
+    parsedBuilder.append(Text.of("\n"));
+    parsedBuilder.append(Text.of("Location: ", Prism.getLocation(record).map(Location::toString).orElse("")));
+    parsedBuilder.append(Text.of("\n"));
+    parsedBuilder.append(Text.of("Event: ", record.getEvent()));
+    parsedBuilder.append(Text.of("\n"));
+    parsedBuilder.append(Text.of("Object: ", Prism.getGriefedObjectName(record).orElse("")));
+
+    return parsedBuilder.build();
+  }
 
 
   @Nullable

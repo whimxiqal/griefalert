@@ -14,13 +14,20 @@ public class PlaceAlert extends Alert {
   private final TextColor targetColor = Format.ALERT_TARGET_COLOR;
   private final TextColor dimensionColor = Format.ALERT_DIMENSION_COLOR;
 
-  PlaceAlert(int cacheCode, Transform<World> transform) {
-    super(cacheCode, transform);
+  public PlaceAlert(int cacheCode) {
+    super(cacheCode);
   }
 
+  @Override
   public Text getMessageText() {
     // TODO: Write message text for PlaceAlert
     return Text.of("PlaceAlert text");
+  }
+
+  @Override
+  public Transform<World> getTransform() {
+    // TODO: Write getTransform
+    return null;
   }
 
 }

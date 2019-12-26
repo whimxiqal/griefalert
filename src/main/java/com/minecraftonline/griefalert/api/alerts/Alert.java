@@ -12,9 +12,8 @@ import java.util.*;
 
 public abstract class Alert {
 
-  private int cacheCode;
+  private final int cacheCode;
   protected DataContainer dataContainer;
-  protected Transform<World> transform;
 
 
   /**
@@ -22,9 +21,8 @@ public abstract class Alert {
    * @param cacheCode The integer which corresponds to this Alert's location
    *                  in the AlertCache
    */
-  public Alert(int cacheCode, Transform<World> transform) {
+  public Alert(int cacheCode) {
     this.cacheCode = cacheCode;
-    this.transform = transform;
   }
 
 
@@ -35,6 +33,7 @@ public abstract class Alert {
    */
   public abstract Text getMessageText();
 
+  public abstract Transform<World> getTransform();
 
   /**
    * Getter for the integer which represents this cached item in the ongoing.
@@ -65,11 +64,6 @@ public abstract class Alert {
    */
   final void getData(DataQuery path) {
     dataContainer.get(path);
-  }
-
-
-  public final Transform<World> getTransform() {
-    return transform;
   }
 
   /**

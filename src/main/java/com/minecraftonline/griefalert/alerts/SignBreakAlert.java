@@ -14,10 +14,11 @@ public class SignBreakAlert extends Alert {
   private final TextColor targetColor = Format.ALERT_TARGET_COLOR;
   private final TextColor dimensionColor = Format.ALERT_DIMENSION_COLOR;
 
-  SignBreakAlert(int cacheCode, Transform<World> transform) {
-    super(cacheCode, transform);
+  SignBreakAlert(int cacheCode) {
+    super(cacheCode);
   }
 
+  @Override
   public Text getMessageText() {
     // TODO: Write message text for SignBreakAlert
     return Text.of("SignBreakAlert");
@@ -39,6 +40,12 @@ public class SignBreakAlert extends Alert {
 //            "\n", "Line 4: ", lines.get(3)
 //        )).orElse(Text.of("No sign data available"))
 //    );
+  }
+
+  @Override
+  public Transform<World> getTransform() {
+    // TODO: Write getTransform
+    return null;
   }
 
 }

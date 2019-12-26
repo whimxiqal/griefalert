@@ -1,5 +1,6 @@
 package com.minecraftonline.griefalert.api.profiles;
 
+import com.google.common.collect.Lists;
 import com.helion3.prism.api.data.PrismEvent;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
@@ -12,6 +13,7 @@ import org.spongepowered.api.world.DimensionType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GriefProfile {
@@ -62,6 +64,17 @@ public class GriefProfile {
 
   public static Builder builder(GriefEvent prismEvent, String griefedObjectId) {
     return new Builder(prismEvent, griefedObjectId);
+  }
+
+  public String print() {
+    // TODO: Update print() to return a Text object with appropriate styling
+    return
+          "-- GriefProfile --\n"
+        + "Event Type: " + eventType + "\n"
+        + "Target: " + target + "\n"
+        + "Ignored Dimensions: [" + String.join(", ",
+              Lists.transform(ignoredDimensions, DimensionType::getName)) + "\n"
+        + "------------------";
   }
 
   public static class Builder {

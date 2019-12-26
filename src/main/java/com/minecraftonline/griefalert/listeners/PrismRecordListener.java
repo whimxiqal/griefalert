@@ -2,7 +2,16 @@ package com.minecraftonline.griefalert.listeners;
 
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
+import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.alerts.BreakAlert;
+import com.minecraftonline.griefalert.alerts.DeathAlert;
+import com.minecraftonline.griefalert.alerts.PlaceAlert;
+import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.util.Comms;
+import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -10,9 +19,11 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.Location;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
 
@@ -22,48 +33,54 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
     PrismRecord record = event.getPrismRecord();
 
     // Temporary print statement to see all information within PrismRecord
-    printAllData(record);
+    Sponge.getServer().getBroadcastChannel().send(Prism.printRecord(record));
 
     // PSEUDO-CODE
 
     // TODO: Finish handler in PrismRecordListener
 
     // See if this record matches any GriefProfiles
-    // If yes, create an Alert of the appropriate type
-    // Add the alert to the AlertQueue
-    // Broadcast the Alert's message
-  }
 
-
-  /**
-   * Debugging helper method to print all data within a PrismRecord.
-   * @param record The PrismRecord.
-   */
-  private void printAllData(PrismRecord record) {
-    Logger l = GriefAlert.getInstance().getLogger();
-
-    l.info("PrismRecord info");
-    l.info("----------------");
-
-    Map<DataQuery, Object> dataMap = record.getDataContainer().getValues(true);
-    for (DataQuery query : dataMap.keySet()) {
-      l.info("{ "
-          + query.toString() + ", "
-          + "(" + dataMap.get(query).getClass().toString() + ") "
-          + dataMap.get(query).toString() + " }");
+    Optional<String> targetOptional = Prism.getTarget(record);
+    if (!targetOptional.isPresent()) {
+      return;
     }
 
-    Text.Builder parsedBuilder = Text.builder();
+    Optional<DimensionType> dimensionTypeOptional = Prism.getDimensionType(record);
+    if (!dimensionTypeOptional.isPresent()) {
+      return;
+    }
 
-    parsedBuilder.append(Text.of("Player: ", Prism.getPlayer(record).map(Player::getName).orElse("")));
-    parsedBuilder.append(Text.of("\n"));
-    parsedBuilder.append(Text.of("Location: ", Prism.getLocation(record).map(Location::toString).orElse("")));
-    parsedBuilder.append(Text.of("\n"));
-    parsedBuilder.append(Text.of("Event: ", record.getEvent()));
-    parsedBuilder.append(Text.of("\n"));
-    parsedBuilder.append(Text.of("Object: ", Prism.getGriefedObjectName(record).orElse("")));
+    Optional<GriefProfile> profileOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
+        GriefEvents.Registry.of(record.getEvent()),
+        targetOptional.get(),
+        dimensionTypeOptional.get()
+    );
 
-    Sponge.getServer().getBroadcastChannel().send(parsedBuilder.build());
+    // If yes, create an Alert of the appropriate type
+    if (profileOptional.isPresent()) {
+      // Add the alert to the AlertQueue
+      Alert alert = null;
 
+      if (record.getEvent().equals(PrismEvents.BLOCK_BREAK.getName())) {
+        alert = new BreakAlert(GriefAlert.getInstance().getAlertQueue().cursor());
+        GriefAlert.getInstance().getAlertQueue().push(alert);
+      } else if (record.getEvent().equals(PrismEvents.BLOCK_PLACE.getName())) {
+        alert = new PlaceAlert(GriefAlert.getInstance().getAlertQueue().cursor());
+        GriefAlert.getInstance().getAlertQueue().push(alert);
+      } else if (record.getEvent().equals(PrismEvents.ENTITY_DEATH.getName())) {
+        alert = new DeathAlert(GriefAlert.getInstance().getAlertQueue().cursor());
+        GriefAlert.getInstance().getAlertQueue().push(alert);
+      }
+      // Broadcast the Alert's message
+      if (alert == null) {
+        GriefAlert.getInstance().getLogger().error("A PrismRecord matched a Grief Profile but "
+            + "an Alert could not be made.");
+        GriefAlert.getInstance().getLogger().error(Prism.printRecord(record).toPlain());
+        GriefAlert.getInstance().getLogger().error(profileOptional.get().print());
+      }
+      Comms.getStaffBroadcastChannel().send(alert.getFullText());
+    }
   }
+
 }
