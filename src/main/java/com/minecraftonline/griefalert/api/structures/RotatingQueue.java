@@ -9,34 +9,50 @@ public abstract class RotatingQueue<P> {
 
   private int capacity;
   private int cursor;
+  private int size;
   private ArrayList<P> data;
-  boolean isFull = false;
+  private boolean isFull = false;
 
   public RotatingQueue(int capacity) {
     this.capacity = capacity;
     cursor = 0;
+    size = 0;
     data = new ArrayList<>(capacity);
+    for (int i = 0; i < capacity; i++) {
+      data.add(null);
+    }
   }
 
   private void incrementCursor() {
-    if (cursor == capacity - 1) {
-      isFull = true;
-    }
     cursor = (cursor + 1) % capacity;
   }
 
-  public int getCapacity() {
+  private void incrementSize() {
+    if (!isFull && size < capacity) {
+      size++;
+      if (size == capacity) {
+        isFull = true;
+      }
+    }
+  }
+
+  public int capacity() {
     return capacity;
   }
 
-  public int getCursor() {
+  public int cursor() {
     return cursor;
+  }
+
+  public int size() {
+    return size;
   }
 
   public int push(P value) {
     data.set(cursor, value);
     int output = cursor;
     incrementCursor();
+    incrementSize();
     return output;
   }
 
@@ -44,10 +60,10 @@ public abstract class RotatingQueue<P> {
     return data.get(index);
   }
 
-  public List<P> getChronologicalData() {
+  public List<P> getDataByTime() {
     List<P> output = new LinkedList<>();
     if (!isFull) {
-      Collections.copy(output, data);
+      Collections.copy(output, data.subList(0, size));
     } else {
       int localCursor = cursor;
       for (int i = 0; i < capacity; i++) {
@@ -58,19 +74,8 @@ public abstract class RotatingQueue<P> {
     return output;
   }
 
-  public List<P> getAntiChronologicalData() {
-    List<P> output = new LinkedList<>();
-    if (!isFull) {
-      Collections.copy(output, data);
-      Collections.reverse(output);
-    } else {
-      int localCursor = cursor;
-      for (int i = 0; i < capacity; i++) {
-        localCursor = (localCursor - 1) % capacity;
-        output.add(data.get(localCursor));
-      }
-    }
-    return output;
+  public List<P> getDataByIndex() {
+    return data.subList(0, size);
   }
 
 }
