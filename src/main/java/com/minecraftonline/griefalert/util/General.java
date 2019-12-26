@@ -8,6 +8,10 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * A General tools class to house static methods for small data manipulations and methods.
  */
@@ -147,6 +151,14 @@ public abstract class General {
         player.getOption("prefix").orElse("")
             + player.getName()
             + player.getOption("suffix").orElse(""));
+  }
+
+  public static <P, S> List<S> convertList(List<P> original, Function<P, S> converter) {
+    List<S> output = new LinkedList<>();
+    for (P item : original) {
+      output.add(converter.apply(item));
+    }
+    return output;
   }
 
 }

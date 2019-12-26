@@ -1,6 +1,8 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -12,7 +14,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 public class GriefAlertReloadCommand extends AbstractCommand {
 
   public GriefAlertReloadCommand() {
-    super(GriefAlert.Permission.GRIEFALERT_COMMAND_RELOAD, Text.of(
+    super(Permissions.GRIEFALERT_COMMAND_RELOAD, Text.of(
         "Reload all Grief Profiles from host"
     ));
     addAlias("reload");

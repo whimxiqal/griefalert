@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.commands;
 
-import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -16,7 +17,7 @@ public class GriefAlertCommand extends AbstractCommand {
    */
   public GriefAlertCommand() {
     super(
-        GriefAlert.Permission.GRIEFALERT_COMMAND,
+        Permissions.GRIEFALERT_COMMAND,
         Text.of("The root command for all Grief Alert commands")
     );
     addAlias("griefalert");
@@ -25,7 +26,7 @@ public class GriefAlertCommand extends AbstractCommand {
     addChild(new GriefAlertInfoCommand());
     addChild(new GriefAlertRecentCommand());
     addChild(new GriefAlertReturnCommand());
-    addChild(new GriefAlertBuilderCommand());
+    //addChild(new GriefAlertBuilderCommand());
     addChild(new GriefAlertReloadCommand());
 
   }

@@ -1,6 +1,6 @@
 package com.minecraftonline.griefalert.util;
 
-public class Grammar {
+public abstract class Grammar {
 
   /**
    * Converts all indefinite articles (<b>an, a</b>) to the appropriate version

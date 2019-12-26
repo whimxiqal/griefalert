@@ -3,18 +3,18 @@ package com.minecraftonline.griefalert;
 import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
+import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
+import com.minecraftonline.griefalert.alerts.AlertQueue;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
-import com.minecraftonline.griefalert.griefevents.GriefEventCache;
-import com.minecraftonline.griefalert.griefevents.profiles.GriefProfileMuseum;
+import com.minecraftonline.griefalert.listeners.PrismRecordListener;
+import com.minecraftonline.griefalert.profiles.ProfileCabinet;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.util.General;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
 
-import com.sk89q.worldedit.WorldEdit;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
@@ -30,8 +29,6 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * The main class for the plugin Grief Alert.
@@ -45,7 +42,7 @@ import org.spongepowered.api.text.format.TextColors;
     dependencies = {@Dependency(id = "prism"), @Dependency(id = "worldedit")})
 public final class GriefAlert {
 
-  public static final String VERSION = "23.0";
+  public static final String VERSION = "24.0";
   private static GriefAlert instance;
   public static final String MC_VERSION = "1.12.2";
 
@@ -85,8 +82,8 @@ public final class GriefAlert {
 
 
   // Custom classes to help manage plugin
-  private GriefProfileMuseum museum;
-  private GriefEventCache griefEventCache;
+  private ProfileCabinet museum;
+  private AlertQueue alertQueue;
   private ConfigHelper configHelper;
 
   @Listener
@@ -109,12 +106,13 @@ public final class GriefAlert {
       e.printStackTrace();
     }
     // Load the config from the Sponge API and set the specific node values.
-    this.configHelper = new ConfigHelper(defaultConfig, rootNode);
-    museum = new GriefProfileMuseum(this);
-    griefEventCache = new GriefEventCache(this);
+    configHelper = new ConfigHelper(defaultConfig, rootNode);
+    museum = new ProfileCabinet();
+    alertQueue = new AlertQueue(configHelper.getCachedEventLimit());
 
     // Register all the commands with Sponge
     registerCommands();
+    registerListeners();
 
   }
 
@@ -149,12 +147,19 @@ public final class GriefAlert {
         griefAlertCommand.getAliases());
   }
 
+  private void registerListeners() {
+    Sponge.getEventManager().registerListener(
+        this,
+        PrismRecordPreSaveEvent.class,
+        new PrismRecordListener()
+    );
+  }
 
   public File getDataDirectory() {
     return new File(configDirectory.getParentFile().getParentFile().getPath() + "/" + "griefalert");
   }
 
-  public GriefProfileMuseum getMuseum() {
+  public ProfileCabinet getMuseum() {
     return museum;
   }
 
@@ -162,8 +167,8 @@ public final class GriefAlert {
     return configManager;
   }
 
-  public GriefEventCache getGriefEventCache() {
-    return griefEventCache;
+  public AlertQueue getAlertQueue() {
+    return alertQueue;
   }
 
   public ConfigHelper getConfigHelper() {
@@ -178,124 +183,13 @@ public final class GriefAlert {
     return instance;
   }
 
-  @SuppressWarnings("checkstyle:LineLength")
-  public static final class Permission {
-
-    public static final Permission GRIEFALERT_COMMAND = new Permission(
-        "griefalert.command"
-    );
-    public static final Permission GRIEFALERT_COMMAND_CHECK = new Permission(
-        "griefalert.command.check"
-    );
-    public static final Permission GRIEFALERT_COMMAND_INFO = new Permission(
-        "griefalert.command.info"
-    );
-    public static final Permission GRIEFALERT_COMMAND_RECENT = new Permission(
-        "griefalert.command.recent"
-    );
-    public static final Permission GRIEFALERT_COMMAND_LOGS = new Permission(
-        "griefalert.command.logs"
-    );
-    public static final Permission GRIEFALERT_COMMAND_ROLLBACK = new Permission(
-        "griefalert.command.rollback"
-    );
-    public static final Permission GRIEFALERT_COMMAND_BUILD = new Permission(
-        "griefalert.command.build"
-    );
-    public static final Permission GRIEFALERT_MESSAGING = new Permission(
-        "griefalert.messaging"
-    );
-    public static final Permission GRIEFALERT_SILENT = new Permission(
-        "griefalert.silent"
-    );
-    public static final Permission GRIEFALERT_DEGRIEF = new Permission(
-        "griefalert.degrief"
-    );
-    public static final Permission GRIEFALERT_COMMAND_RELOAD = new Permission(
-        "griefalert.reload"
-    );
-
-
-    private final String permissionString;
-
-    private Permission(String permissionString) {
-      this.permissionString = permissionString;
-    }
-
-    public String toString() {
-      return permissionString;
-    }
-  }
-
-  public static final class GriefType {
-
-    public static final GriefType DESTROY = new GriefType(
-        "destroy",
-        "destroyed",
-        "destroy"
-    );
-    public static final GriefType INTERACT = new GriefType(
-        "interact",
-        "interacted with",
-        "interact with");
-    public static final GriefType USE = new GriefType(
-        "use",
-        "used",
-        "use");
-    public static final GriefType DEGRIEF = new GriefType(
-        "degrief",
-        "degriefed",
-        "degrief");
-
-    private final String name;
-    private final String preteriteVerb;
-    private final String presentVerb;
-
-    private GriefType(String name, String preteriteVerb, String presentVerb) {
-      this.name = name;
-      this.preteriteVerb = preteriteVerb;
-      this.presentVerb = presentVerb;
-    }
-
-    /**
-     * Get the GriefType associated with the String version of the name.
-     *
-     * @param name The name of the GriefType
-     * @return The static instance of a GriefType with the given name
-     * @throws IllegalArgumentException if an invalid name is input to this method
-     */
-    public static GriefType from(String name) throws IllegalArgumentException {
-      switch (name.toLowerCase()) {
-        case "destroy":
-          return DESTROY;
-        case "interact":
-          return INTERACT;
-        case "use":
-          return USE;
-        case "degrief":
-          return DEGRIEF;
-        default:
-          throw new IllegalArgumentException(name + ": Illegal GriefType name. Options are"
-              + " 'destroy', 'interact', 'use', or 'degrief'");
-      }
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public String toString() {
-      return getName();
-    }
-
+  public static class GriefType {
+    public static final GriefType DESTROY = new GriefType();
+    public static final GriefType USE = new GriefType();
+    public static final GriefType INTERACT = new GriefType();
     public String toPreteritVerb() {
-      return preteriteVerb;
+      return "preterite";
     }
-
-    public String toPresentVerb() {
-      return presentVerb;
-    }
-
   }
+
 }

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.World;
@@ -13,7 +14,11 @@ import org.spongepowered.api.world.World;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Format {
+public final class Format {
+
+  public static final TextColor ALERT_ACTION_COLOR = TextColors.LIGHT_PURPLE;
+  public static final TextColor ALERT_TARGET_COLOR = TextColors.AQUA;
+  public static final TextColor ALERT_DIMENSION_COLOR = TextColors.GOLD;
 
   private Format() {
   }
@@ -151,7 +156,7 @@ public class Format {
    * @return Text Formatted content.
    */
   public static Text prefix() {
-    return Text.of(TextColors.DARK_PURPLE, Reference.NAME, " //", TextColors.RESET, " ");
+    return Text.of(TextColors.DARK_PURPLE, Reference.NAME, " |", TextColors.RESET, " ");
   }
 
   /**

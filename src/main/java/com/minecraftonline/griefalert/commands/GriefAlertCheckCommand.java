@@ -1,8 +1,13 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.griefevents.GriefEvent;
+
 import java.util.Optional;
+
+import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.Prism;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -13,13 +18,14 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public class GriefAlertCheckCommand extends AbstractCommand {
 
   GriefAlertCheckCommand() {
     super(
-        GriefAlert.Permission.GRIEFALERT_COMMAND_CHECK,
+        Permissions.GRIEFALERT_COMMAND_CHECK,
         Text.of("Check the grief alert with the given id")
     );
     addAlias("check");
@@ -34,27 +40,21 @@ public class GriefAlertCheckCommand extends AbstractCommand {
     if (src instanceof Player) {
       Player player = (Player) src;
       if (args.<Integer>getOne("alert code").isPresent()) {
-        Optional<GriefEvent> event = GriefAlert.getInstance().getGriefEventCache()
-            .get(args.<Integer>getOne("alert code").get());
-        if (event.isPresent()) {
-          Optional<Transform<World>> grieferTransform = event.get().getEvent()
-              .getGrieferSnapshot().getTransform();
-          if (grieferTransform.isPresent()) {
-            GriefAlert.getInstance().getGriefEventCache().putSnapshot(player);
-            if (!player.setTransformSafely(grieferTransform.get())) {
-              player.sendMessage(Text.of(
-                  TextColors.YELLOW,
-                  "A safe place to teleport could not be identified.")
-              );
-            }
-            player.sendMessage(event.get().getSummary());
+
+
+        try {
+          Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
+          if (player.setTransformSafely(alert.getTransform())) {
+            // TODO: Save officers location
           } else {
             player.sendMessage(Text.of(
-                TextColors.RED,
-                "The location of the offending player could not be found.")
+                TextColors.YELLOW,
+                "A safe place to teleport could not be identified.")
             );
           }
-        } else {
+          player.sendMessage(alert.getMessageText());
+
+        } catch (IndexOutOfBoundsException e) {
           player.sendMessage(Text.of(
               TextColors.RED,
               "The Grief Event you tried to access could not be found.")

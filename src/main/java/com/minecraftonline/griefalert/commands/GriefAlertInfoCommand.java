@@ -1,8 +1,12 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.griefevents.GriefEvent;
+
 import java.util.Optional;
+
+import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -17,7 +21,7 @@ public class GriefAlertInfoCommand extends AbstractCommand {
 
   GriefAlertInfoCommand() {
     super(
-        GriefAlert.Permission.GRIEFALERT_COMMAND_INFO,
+        Permissions.GRIEFALERT_COMMAND_INFO,
         Text.of("Get info about a given grief alert")
     );
     addAlias("info");
@@ -31,16 +35,8 @@ public class GriefAlertInfoCommand extends AbstractCommand {
                                @NonnullByDefault CommandContext args) throws CommandException {
     Player player = (Player) src;
     if (args.<Integer>getOne("alert code").isPresent()) {
-      Optional<GriefEvent> event = GriefAlert.getInstance().getGriefEventCache()
-          .get(args.<Integer>getOne("alert code").get());
-      if (event.isPresent()) {
-        player.sendMessage(event.get().getSummary());
-      } else {
-        player.sendMessage(Text.of(
-            TextColors.RED,
-            "The Grief Event you tried to access could not be found")
-        );
-      }
+      Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
+      player.sendMessage(alert.getMessageText());
     } else {
       player.sendMessage(Text.of(
           TextColors.RED,

@@ -1,10 +1,10 @@
-package com.minecraftonline.griefalert.commands;
-
-import com.minecraftonline.griefalert.GriefAlert;
+package com.minecraftonline.griefalert.api.commands;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import com.minecraftonline.griefalert.commands.HelpCommand;
+import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandExecutor;
@@ -15,7 +15,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 public abstract class AbstractCommand implements CommandExecutor {
 
-  public final GriefAlert.Permission permission;
+  public final Permissions.Permission permission;
   private final Text description;
   private List<AbstractCommand> commandChildren = new LinkedList<>();
   private List<String> aliases = new LinkedList<>();
@@ -27,7 +27,7 @@ public abstract class AbstractCommand implements CommandExecutor {
    * @param permission  The permission which is required for this command
    * @param description The general description of this command functionality
    */
-  public AbstractCommand(GriefAlert.Permission permission,
+  public AbstractCommand(Permissions.Permission permission,
                          Text description) {
     this.permission = permission;
     this.description = description;
@@ -36,7 +36,7 @@ public abstract class AbstractCommand implements CommandExecutor {
     }
   }
 
-  public AbstractCommand(GriefAlert.Permission permission,
+  public AbstractCommand(Permissions.Permission permission,
                          Text description,
                          String primaryAlias) {
     this(permission, description);
@@ -47,11 +47,11 @@ public abstract class AbstractCommand implements CommandExecutor {
     return this.aliases.add(alias);
   }
 
-  void addChild(AbstractCommand abstractCommand) {
+  protected void addChild(AbstractCommand abstractCommand) {
     this.commandChildren.add(abstractCommand);
   }
 
-  void addCommandElement(CommandElement commandElement) {
+  protected void addCommandElement(CommandElement commandElement) {
     this.commandElements.add(commandElement);
   }
 
@@ -67,16 +67,15 @@ public abstract class AbstractCommand implements CommandExecutor {
     return this.commandElements;
   }
 
-  void sendHelp(CommandSource source) {
+  public void sendHelp(CommandSource source) {
     source.sendMessage(Text.of(TextColors.GOLD, "==============="));
     source.sendMessage(Text.of(TextColors.GOLD, getAliases().get(0) + " : Command Help"));
     source.sendMessage(Text.of(TextColors.YELLOW, getDescription()));
-    for (AbstractCommand command : getChildren()) {
-      source.sendMessage(Text.of(
-          TextColors.AQUA,
-          command.getAliases().get(0),
-          TextColors.GRAY, ": ", command.getDescription()));
-    }
+    getChildren().forEach((command) -> source.sendMessage(Text.of(
+        TextColors.AQUA,
+        command.getAliases().get(0),
+        TextColors.GRAY, ": ", command.getDescription())
+    ));
   }
 
   /**

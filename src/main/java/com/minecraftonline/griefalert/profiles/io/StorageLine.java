@@ -1,25 +1,25 @@
-package com.minecraftonline.griefalert.griefevents.profiles;
+package com.minecraftonline.griefalert.profiles.io;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class GriefProfileStorageLine {
+public class StorageLine {
 
   private static final String DATA_DELIMITER = " ";
   private static final String COMMENT_DELIMITER = "#";
   private String line;
   private String comment = "";
 
-  private GriefProfileStorageLine(List<String> tokens) {
+  private StorageLine(List<String> tokens) {
     this.line = String.join(DATA_DELIMITER, tokens);
   }
 
-  GriefProfileStorageLine(String line) {
+  StorageLine(String line) {
     this.line = line;
   }
 
-  public static GriefProfileStorageLine.Builder builder() {
-    return new GriefProfileStorageLine.Builder();
+  public static StorageLine.Builder builder() {
+    return new StorageLine.Builder();
   }
 
   public String toString() {
@@ -31,7 +31,7 @@ public class GriefProfileStorageLine {
    *
    * @return An array of String-type objects from the storage line
    */
-  String[] getTokens() {
+  public String[] getTokens() {
     String[] macroTokens = line.split(COMMENT_DELIMITER);
     String data = macroTokens[0];
     return data.split(DATA_DELIMITER);
@@ -73,13 +73,13 @@ String getComment() {
       items = new LinkedList<>();
     }
 
-    GriefProfileStorageLine.Builder addItem(String item) {
+    public StorageLine.Builder addItem(String item) {
       items.add(removeDelimiters(item));
       return this;
     }
 
-    public GriefProfileStorageLine build() {
-      return new GriefProfileStorageLine(items);
+    public StorageLine build() {
+      return new StorageLine(items);
     }
 
     private String removeDelimiters(String line) {

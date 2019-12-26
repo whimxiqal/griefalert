@@ -2,6 +2,9 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import java.util.Optional;
+
+import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -17,7 +20,7 @@ public class GriefAlertReturnCommand extends AbstractCommand {
 
   GriefAlertReturnCommand() {
     super(
-        GriefAlert.Permission.GRIEFALERT_COMMAND_CHECK,
+        Permissions.GRIEFALERT_COMMAND_CHECK,
         Text.of("Return to your previous location prior to a grief alert check")
     );
     addAlias("return");
@@ -31,7 +34,7 @@ public class GriefAlertReturnCommand extends AbstractCommand {
     if (src instanceof Player) {
       Player player = (Player) src;
       Optional<EntitySnapshot> optionalEntitySnapshot =
-          GriefAlert.getInstance().getGriefEventCache().getSnapshot(player);
+          GriefAlert.getInstance().getAlertQueue().getOfficerSnapshot(player.getUniqueId());
       if (optionalEntitySnapshot.isPresent()
           && optionalEntitySnapshot.get().getTransform().isPresent()) {
         if (player.setTransformSafely(optionalEntitySnapshot.get().getTransform().get())) {

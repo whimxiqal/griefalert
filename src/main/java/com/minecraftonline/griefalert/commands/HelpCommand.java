@@ -1,5 +1,6 @@
 package com.minecraftonline.griefalert.commands;
 
+import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -11,7 +12,7 @@ public class HelpCommand extends AbstractCommand {
 
   private final AbstractCommand parentCommand;
 
-  HelpCommand(AbstractCommand parent) {
+  public HelpCommand(AbstractCommand parent) {
     super(parent.permission, Text.of("Show list of all sub-commands"));
     this.parentCommand = parent;
     addAlias("help");

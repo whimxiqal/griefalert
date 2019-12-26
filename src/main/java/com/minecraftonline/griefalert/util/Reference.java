@@ -1,6 +1,6 @@
 package com.minecraftonline.griefalert.util;
 
-public final class Reference {
+public abstract class Reference {
 
   private Reference() {
   }

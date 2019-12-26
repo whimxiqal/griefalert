@@ -10,14 +10,16 @@ apply plugin: 'idea'
 repositories {
 	mavenCentral()
     google()
-//    maven { url "http://prism.helion3.com/repo/" }
     maven { url "http://maven.sk89q.com/repo/" }
     jcenter()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '23.0' // Project Version
+version = '24.0' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -30,9 +32,9 @@ compileJava {
 
 dependencies {
     compileOnly "org.spongepowered:spongeapi:${sponge_version}"
-//    compile 'com.helion3.prism:Prism:3'
     compile 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
+    compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 //sponge.plugin.meta {
