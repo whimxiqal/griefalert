@@ -63,7 +63,7 @@ public abstract class RotatingQueue<P> {
   public List<P> getDataByTime() {
     List<P> output = new LinkedList<>();
     if (!isFull) {
-      Collections.copy(output, data.subList(0, size));
+      output.addAll(data.subList(0, size));
     } else {
       int localCursor = cursor;
       for (int i = 0; i < capacity; i++) {

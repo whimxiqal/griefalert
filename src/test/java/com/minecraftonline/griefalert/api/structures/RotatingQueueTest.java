@@ -66,13 +66,13 @@ public class RotatingQueueTest {
     queue.push(2);
     queue.push(3);
 
-    Assert.assertArrayEquals(new Integer[]{1, 2, 3}, queue.getDataByTime().toArray(new Integer[3]));
+    Assert.assertArrayEquals(new Integer[]{1, 2, 3}, queue.getDataByIndex().toArray(new Integer[3]));
     assertEquals((Object) 3, queue.getDataByTime().size());
 
     queue.push(4);
     queue.push(5);
 
-    Assert.assertArrayEquals(new Integer[]{5, 2, 3, 4}, queue.getDataByTime().toArray(new Integer[4]));
+    Assert.assertArrayEquals(new Integer[]{5, 2, 3, 4}, queue.getDataByIndex().toArray(new Integer[4]));
     assertEquals((Object) 4, queue.getDataByTime().size());
 
   }

@@ -1,15 +1,13 @@
 package com.minecraftonline.griefalert.profiles.io;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.profiles.GriefProfileOld;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.annotation.Nonnull;
-
-import com.minecraftonline.griefalert.util.ProfileStorageKeys.*;
 
 public class Exporter {
 
@@ -27,7 +25,7 @@ public class Exporter {
     return filePath.toFile();
   }
 
-  public void store(@Nonnull GriefProfile profile) throws IOException {
+  public void store(@Nonnull GriefProfileOld profile) throws IOException {
     if (GriefAlert.getInstance().getDataDirectory().mkdirs() && getFile().createNewFile()) {
       GriefAlert.getInstance().getLogger().info("New Grief Profiles file created");
     }

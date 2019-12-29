@@ -9,6 +9,7 @@ import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.profiles.ProfileCabinet;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
+import com.minecraftonline.griefalert.storage.MySQLProfileStorage;
 import com.minecraftonline.griefalert.util.General;
 
 import java.io.File;
@@ -85,6 +86,7 @@ public final class GriefAlert {
   private ProfileCabinet museum;
   private AlertQueue alertQueue;
   private ConfigHelper configHelper;
+  private MySQLProfileStorage profileStorage;
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
@@ -109,6 +111,7 @@ public final class GriefAlert {
     configHelper = new ConfigHelper(defaultConfig, rootNode);
     museum = new ProfileCabinet();
     alertQueue = new AlertQueue(configHelper.getCachedEventLimit());
+    profileStorage = new MySQLProfileStorage();
 
     // Register all the commands with Sponge
     registerCommands();
@@ -173,6 +176,10 @@ public final class GriefAlert {
 
   public ConfigHelper getConfigHelper() {
     return configHelper;
+  }
+
+  public MySQLProfileStorage getProfileStorage() {
+    return profileStorage;
   }
 
   public Logger getLogger() {

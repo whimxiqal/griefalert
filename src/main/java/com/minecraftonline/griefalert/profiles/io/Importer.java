@@ -1,29 +1,28 @@
 package com.minecraftonline.griefalert.profiles.io;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
-import com.minecraftonline.griefalert.util.ProfileStorageKeys.*;
+import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import org.spongepowered.api.data.DataContainer;
 
 public class Importer {
 
   private final Path filePath;
 
-  /**
-   * A new Importer to scrape data from a specific file in the
-   * plugin's data folder.
-   *
-   * @param fileName The name of the file in which the data is saved
-   */
-  public Importer(String fileName) {
-    this.filePath = Paths.get(GriefAlert.getInstance().getDataDirectory().getPath(), fileName);
+  public Importer(Path filePath) {
+    this.filePath = filePath;
   }
 
   private File getFile() {
@@ -35,7 +34,7 @@ public class Importer {
    *
    * @return A list of the saved objects
    */
-  public List<GriefProfile> retrieve() {
+  public List<GriefProfile> retrieve() throws FileNotFoundException {
 
     // TODO: Write a better retrieval program to account for a new Profile saving organization -> JSON
 
@@ -56,7 +55,29 @@ public class Importer {
     //      }
     //    }
 
-    return new LinkedList<>();
+    // parsing file "JSONExample.json"
+
+    List<GriefProfile> output = new LinkedList<>();
+
+    for (JsonElement element : (new JsonParser()).parse(new JsonReader(new FileReader(filePath.toFile()))).getAsJsonArray()) {
+
+      DataContainer dataContainer = DataContainer.createNew();
+
+      String event = "break";
+      try {
+        dataContainer.set(GriefProfileDataQueries.EVENT, GriefEvents.Registry.of(event));
+      } catch (IllegalArgumentException e) {
+        GriefAlert.getInstance().getLogger().debug("A GriefProfile could not be loaded "
+            + "because of an invalid event: " + event);
+
+      }
+
+      output.add(GriefProfile.of(dataContainer));
+
+    }
+
+
+    return output;
 //    List<GriefProfile> griefProfiles = new LinkedList<>();
 //    try {
 //      if (GriefAlert.getInstance().getDataDirectory().mkdirs() || getFile().createNewFile()) {

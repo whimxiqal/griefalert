@@ -2,31 +2,23 @@ package com.minecraftonline.griefalert.profiles;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.profiles.GriefProfileOld;
 
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.profiles.GriefProfiles;
 import com.minecraftonline.griefalert.profiles.io.Exporter;
 import com.minecraftonline.griefalert.profiles.io.Importer;
-import com.minecraftonline.griefalert.util.Prism;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.World;
 
 public class ProfileCabinet {
 
-  private static final String GRIEF_PROFILES_FILE_NAME = "grief_profiles.txt";
-
-  private Table<GriefEvent, String, GriefProfile> storage = HashBasedTable.create();
-
-  private final Importer importer = new Importer(GRIEF_PROFILES_FILE_NAME);
-  private final Exporter exporter = new Exporter(GRIEF_PROFILES_FILE_NAME);
+  private Table<GriefEvent, String, GriefProfileOld> storage = HashBasedTable.create();
 
   /**
    * Constructor for a new museum to hold all Grief Profiles. This museum should be considered
@@ -53,13 +45,13 @@ public class ProfileCabinet {
     // ...
 
     // Get all other profiles from the onsite profile list
-    importer.retrieve().forEach(this::add);
+    // importer.retrieve().forEach(this::add);
   }
 
 
-  public Optional<GriefProfile> getProfileOf(GriefEvent griefEvent, String target, DimensionType dimensionType) {
+  public Optional<GriefProfileOld> getProfileOf(GriefEvent griefEvent, String target, DimensionType dimensionType) {
 
-    Optional<GriefProfile> profileOptional = Optional.ofNullable(storage.get(griefEvent, target));
+    Optional<GriefProfileOld> profileOptional = Optional.ofNullable(storage.get(griefEvent, target));
 
     // Make sure the dimension is not ignored
     if (profileOptional.isPresent()) {
@@ -80,7 +72,7 @@ public class ProfileCabinet {
    *
    * @param profile The profile to add
    */
-  public boolean add(GriefProfile profile) {
+  public boolean add(GriefProfileOld profile) {
     if (storage.contains(profile.getEventType(), profile.getTarget())) {
       return false;
     } else {
@@ -89,7 +81,8 @@ public class ProfileCabinet {
     }
   }
 
-  public void store(GriefProfile profile) throws IOException {
-    exporter.store(profile);
+  public void store(GriefProfile profile) throws Exception {
+    GriefAlert.getInstance().getProfileStorage().connect();
+    GriefAlert.getInstance().getProfileStorage().write(profile);
   }
 }

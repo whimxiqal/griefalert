@@ -8,21 +8,14 @@ import com.minecraftonline.griefalert.alerts.BreakAlert;
 import com.minecraftonline.griefalert.alerts.DeathAlert;
 import com.minecraftonline.griefalert.alerts.PlaceAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.data.GriefEvent;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.profiles.GriefProfileOld;
 import com.minecraftonline.griefalert.util.Comms;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
-import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.Location;
 
-import java.util.Map;
 import java.util.Optional;
 
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
@@ -51,7 +44,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       return;
     }
 
-    Optional<GriefProfile> profileOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
+    Optional<GriefProfileOld> profileOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
         GriefEvents.Registry.of(record.getEvent()),
         targetOptional.get(),
         dimensionTypeOptional.get()
