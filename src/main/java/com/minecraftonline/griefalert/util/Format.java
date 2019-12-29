@@ -16,7 +16,7 @@ import java.net.URL;
 
 public final class Format {
 
-  public static final TextColor ALERT_ACTION_COLOR = TextColors.LIGHT_PURPLE;
+  public static final TextColor ALERT_EVENT_COLOR = TextColors.LIGHT_PURPLE;
   public static final TextColor ALERT_TARGET_COLOR = TextColors.AQUA;
   public static final TextColor ALERT_DIMENSION_COLOR = TextColors.GOLD;
 

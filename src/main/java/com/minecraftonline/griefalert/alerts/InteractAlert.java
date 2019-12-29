@@ -4,32 +4,30 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public class UseAlert extends Alert {
+public class InteractAlert extends Alert {
 
-  private InteractItemEvent.Secondary itemEvent;
+  private InteractBlockEvent.Secondary blockEvent;
   private Transform<World> grieferTransform;
 
-  UseAlert(int cacheCode, GriefProfile griefProfile, InteractItemEvent.Secondary event) {
+  public InteractAlert(int cacheCode, GriefProfile griefProfile, InteractBlockEvent.Secondary event) {
     super(cacheCode, griefProfile);
-    itemEvent = event;
+    blockEvent = event;
     grieferTransform = ((Player) event.getCause().root()).getTransform();
   }
 
   @Override
   public Text getMessageText() {
-    // TODO: Write message text for UseAlert
-    return Text.of("UseAlert text");
+    return null;
   }
 
   @Override
   public Optional<Transform<World>> getTransform() {
     return Optional.of(grieferTransform);
   }
-
 }

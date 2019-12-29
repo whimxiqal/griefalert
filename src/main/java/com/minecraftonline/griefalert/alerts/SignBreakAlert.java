@@ -1,21 +1,13 @@
 package com.minecraftonline.griefalert.alerts;
 
-import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.util.Format;
-import org.spongepowered.api.entity.Transform;
+import com.helion3.prism.api.records.PrismRecord;
+import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
-public class SignBreakAlert extends Alert {
+public class SignBreakAlert extends PrismAlert {
 
-  private final TextColor eventColor = Format.ALERT_ACTION_COLOR;
-  private final TextColor targetColor = Format.ALERT_TARGET_COLOR;
-  private final TextColor dimensionColor = Format.ALERT_DIMENSION_COLOR;
-
-  SignBreakAlert(int cacheCode) {
-    super(cacheCode);
+  public SignBreakAlert(int cacheCode, GriefProfile griefProfile, PrismRecord prismRecord) {
+    super(cacheCode, griefProfile, prismRecord);
   }
 
   @Override
@@ -40,12 +32,6 @@ public class SignBreakAlert extends Alert {
 //            "\n", "Line 4: ", lines.get(3)
 //        )).orElse(Text.of("No sign data available"))
 //    );
-  }
-
-  @Override
-  public Transform<World> getTransform() {
-    // TODO: Write getTransform
-    return null;
   }
 
 }

@@ -1,28 +1,35 @@
 package com.minecraftonline.griefalert.api.alerts;
 
+import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.World;
 
 import java.util.*;
 
 public abstract class Alert {
 
-  private final int cacheCode;
+  protected final int cacheCode;
+  protected final GriefProfile griefProfile;
   protected DataContainer dataContainer;
 
 
   /**
    * Default constructor.
-   * @param cacheCode The integer which corresponds to this Alert's location
-   *                  in the AlertCache
+   *
+   * @param cacheCode    The integer which corresponds to this Alert's location
+   *                     in the AlertCache
+   * @param griefProfile The grief profile which matched this Alert
    */
-  public Alert(int cacheCode) {
+  protected Alert(int cacheCode, GriefProfile griefProfile) {
     this.cacheCode = cacheCode;
+    this.griefProfile = griefProfile;
   }
 
 
@@ -33,7 +40,7 @@ public abstract class Alert {
    */
   public abstract Text getMessageText();
 
-  public abstract Transform<World> getTransform();
+  public abstract Optional<Transform<World>> getTransform();
 
   /**
    * Getter for the integer which represents this cached item in the ongoing.
@@ -41,7 +48,7 @@ public abstract class Alert {
    *
    * @return integer for cache code
    */
-  final int getCacheCode() {
+  public final int getCacheCode() {
     return cacheCode;
   }
 
@@ -50,16 +57,18 @@ public abstract class Alert {
    * Add the data to this Alert's data container. The appropriate data
    * must be put into the container to be appropriately parsed by
    * the Alert instance.
-   * @param path The DataQuery to set with.
+   *
+   * @param path  The DataQuery to set with.
    * @param value The value to set with.
    */
-  final void setData(DataQuery path, Object value) {
+  public final void setData(DataQuery path, Object value) {
     dataContainer.set(path, value);
   }
 
 
   /**
    * Get the data from this Alert's data container.
+   *
    * @param path The DataQuery to access with.
    */
   final void getData(DataQuery path) {
@@ -68,6 +77,7 @@ public abstract class Alert {
 
   /**
    * Get the final text version of the Alert to broadcast to staff.
+   *
    * @return the Text for broadcasting.
    */
   public final Text getFullText() {
@@ -77,10 +87,32 @@ public abstract class Alert {
     ));
   }
 
+  protected final TextColor getEventColor() {
+    return griefProfile.getDataContainer()
+        .getString(GriefProfileDataQueries.EVENT_COLOR)
+        .map(General::stringToColor)
+        .orElse(Format.ALERT_EVENT_COLOR);
+  }
+
+  protected final TextColor getTargetColor() {
+    return griefProfile.getDataContainer()
+        .getString(GriefProfileDataQueries.TARGET_COLOR)
+        .map(General::stringToColor)
+        .orElse(Format.ALERT_TARGET_COLOR);
+  }
+
+  protected final TextColor getDimensionColor() {
+    return griefProfile.getDataContainer()
+        .getString(GriefProfileDataQueries.DIMENSION_COLOR)
+        .map(General::stringToColor)
+        .orElse(Format.ALERT_DIMENSION_COLOR);
+  }
+
 
   /**
    * Get the final text version of the Alert to broadcast to staff with
    * other interactive items to access other alerts.
+   *
    * @param otherCodes The list of other items to add to the text.
    * @return A full text to be broadcast to staff.
    */
@@ -103,7 +135,7 @@ public abstract class Alert {
       );
     });
     return builder.build();
-}
+  }
 
 
 }

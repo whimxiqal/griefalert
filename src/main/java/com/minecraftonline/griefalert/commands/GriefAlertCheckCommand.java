@@ -8,6 +8,7 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Permissions;
 import com.minecraftonline.griefalert.util.Prism;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -44,8 +45,12 @@ public class GriefAlertCheckCommand extends AbstractCommand {
 
         try {
           Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
-          if (player.setTransformSafely(alert.getTransform())) {
+          if (alert.getTransform().isPresent() && player.setTransformSafely(alert.getTransform().get())) {
+
             // TODO: Save officers location
+            Sponge.getServer().getBroadcastChannel()
+                .send(Text.of(player.getName() + " is teleported to a grief alert."));
+
           } else {
             player.sendMessage(Text.of(
                 TextColors.YELLOW,

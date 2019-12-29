@@ -18,7 +18,7 @@ import org.spongepowered.api.world.DimensionType;
 
 public class ProfileCabinet {
 
-  private Table<GriefEvent, String, GriefProfileOld> storage = HashBasedTable.create();
+  private Table<GriefEvent, String, GriefProfile> storage = HashBasedTable.create();
 
   /**
    * Constructor for a new museum to hold all Grief Profiles. This museum should be considered
@@ -49,9 +49,9 @@ public class ProfileCabinet {
   }
 
 
-  public Optional<GriefProfileOld> getProfileOf(GriefEvent griefEvent, String target, DimensionType dimensionType) {
+  public Optional<GriefProfile> getProfileOf(GriefEvent griefEvent, String target, DimensionType dimensionType) {
 
-    Optional<GriefProfileOld> profileOptional = Optional.ofNullable(storage.get(griefEvent, target));
+    Optional<GriefProfile> profileOptional = Optional.ofNullable(storage.get(griefEvent, target));
 
     // Make sure the dimension is not ignored
     if (profileOptional.isPresent()) {
@@ -72,11 +72,11 @@ public class ProfileCabinet {
    *
    * @param profile The profile to add
    */
-  public boolean add(GriefProfileOld profile) {
-    if (storage.contains(profile.getEventType(), profile.getTarget())) {
+  public boolean add(GriefProfile profile) {
+    if (storage.contains(profile.getGriefEvent(), profile.getTarget())) {
       return false;
     } else {
-      storage.put(profile.getEventType(), profile.getTarget(), profile);
+      storage.put(profile.getGriefEvent(), profile.getTarget(), profile);
       return true;
     }
   }
