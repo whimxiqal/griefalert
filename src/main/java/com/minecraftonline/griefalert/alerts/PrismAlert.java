@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.alerts;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import com.minecraftonline.griefalert.util.Prism;
@@ -13,6 +14,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public abstract class PrismAlert extends Alert {
 
@@ -38,23 +40,40 @@ public abstract class PrismAlert extends Alert {
       return Optional.empty();
     }
 
-    if (prismRecord.getEvent().equals(PrismEvents.BLOCK_BREAK.getName())) {
+    if (prismRecord.getEvent().equals(PrismEvents.BLOCK_BREAK.getId())) {
+
       if (targetOptional.get().contains("sign")) {
+
+        // Condition for a SignBreakAlert
         return Optional.of(new SignBreakAlert(cacheCode, griefProfile, prismRecord));
       } else {
+
+        // Condition for a BreakAlert
         return Optional.of(new BreakAlert(cacheCode, griefProfile, prismRecord));
       }
-    } else if (prismRecord.getEvent().equals(PrismEvents.BLOCK_PLACE.getName())) {
+    } else if (prismRecord.getEvent().equals(PrismEvents.BLOCK_PLACE.getId())) {
       if (targetOptional.get().contains("sign")) {
+
+        // Condition for a SignPlaceAlert
         return Optional.of(new SignPlaceAlert(cacheCode, griefProfile, prismRecord));
       } else {
+
+        // Condition for a PlaceAlert
         return Optional.of(new PlaceAlert(cacheCode, griefProfile, prismRecord));
       }
-    } else if (prismRecord.getEvent().equals(PrismEvents.ENTITY_DEATH.getName())) {
+    } else if (prismRecord.getEvent().equals(PrismEvents.ENTITY_DEATH.getId())) {
+
+      // Condition for a DeathAlert
       return Optional.of(new DeathAlert(cacheCode, griefProfile, prismRecord));
     }
 
     return Optional.empty();
+  }
+
+  @Override
+  public Player getGriefer() {
+    // TODO: Handle unchecked Optional gets
+    return Sponge.getServer().getPlayer(UUID.fromString(Prism.getPlayerUuid(prismRecord).get())).get();
   }
 
   @Override

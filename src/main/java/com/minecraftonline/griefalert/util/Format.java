@@ -9,16 +9,18 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public final class Format {
 
-  public static final TextColor ALERT_EVENT_COLOR = TextColors.LIGHT_PURPLE;
-  public static final TextColor ALERT_TARGET_COLOR = TextColors.AQUA;
-  public static final TextColor ALERT_DIMENSION_COLOR = TextColors.GOLD;
+  public static final TextColor ALERT_EVENT_COLOR = TextColors.RED;
+  public static final TextColor ALERT_TARGET_COLOR = TextColors.RED;
+  public static final TextColor ALERT_DIMENSION_COLOR = TextColors.RED;
 
   private Format() {
   }
@@ -129,6 +131,27 @@ public final class Format {
   }
 
   /**
+   * Returns content formatted as a success message.
+   *
+   * @param objects Object[] Content to format
+   * @return Text Formatted content.
+   */
+  public static Text info(Object... objects) {
+    return success(Text.of(objects));
+  }
+
+  /**
+   * Returns content formatted as a success message.
+   *
+   * @param content Text Content to format
+   * @return Text Formatted content.
+   */
+  public static Text info(Text content) {
+    checkNotNull(content);
+    return Text.of(prefix(), TextColors.YELLOW, content);
+  }
+
+  /**
    * Returns content formatted as a bonus message.
    *
    * @param objects Object[] Content to format
@@ -156,7 +179,7 @@ public final class Format {
    * @return Text Formatted content.
    */
   public static Text prefix() {
-    return Text.of(TextColors.DARK_PURPLE, Reference.NAME, " |", TextColors.RESET, " ");
+    return Text.of(TextColors.DARK_PURPLE, "|", Reference.NAME, "|", TextColors.RESET, " ");
   }
 
   /**
@@ -226,11 +249,11 @@ public final class Format {
    * @param clickAction Click Action
    * @return Text Formatted content.
    */
-  public static Text location(int x, int y, int z, World world, boolean clickAction) {
+  public static Text location(int x, int y, int z, @Nullable World world, boolean clickAction) {
     Text.Builder textBuilder = Text.builder();
-    textBuilder.append(Text.of("(x:", x, " y:", y, " z:", z));
+    textBuilder.append(Text.of(String.format("(x: %s, y: %s, z: %s", x, y, z)));
     if (world != null) {
-      textBuilder.append(Text.of(" world:", world.getName()));
+      textBuilder.append(Text.of(", dimension: ", world.getDimension().getType().getName()));
 
       if (clickAction) {
         textBuilder.onClick(TextActions.executeCallback(commandSource -> {
@@ -244,5 +267,13 @@ public final class Format {
     }
 
     return textBuilder.append(Text.of(")")).build();
+  }
+
+  public static Text endLine() {
+    return Text.of("\n");
+  }
+
+  public static Text space() {
+    return Text.of(" ");
   }
 }

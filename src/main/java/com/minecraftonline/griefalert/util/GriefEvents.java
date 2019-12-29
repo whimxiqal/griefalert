@@ -4,6 +4,8 @@ import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 
+import java.util.Optional;
+
 public final class GriefEvents {
 
   private GriefEvents() {
@@ -17,32 +19,32 @@ public final class GriefEvents {
 
   public static class Registry {
 
-    public static GriefEvent of(String event) throws IllegalArgumentException {
-      switch (event.toLowerCase()) {
+    public static Optional<GriefEvent> of(String id) throws IllegalArgumentException {
+      switch (id.toLowerCase()) {
         case "break":
-          return GriefEvents.BREAK;
+          return Optional.of(GriefEvents.BREAK);
         case "place":
-          return GriefEvents.PLACE;
+          return Optional.of(GriefEvents.PLACE);
         case "death":
-          return GriefEvents.DEATH;
+          return Optional.of(GriefEvents.DEATH);
         case "use":
-          return GriefEvents.ITEM_USE;
+          return Optional.of(GriefEvents.ITEM_USE);
         case "interact":
-          return GriefEvents.INTERACT;
+          return Optional.of(GriefEvents.INTERACT);
         default:
-          throw new IllegalArgumentException("Invalid event name: " + event);
+          return Optional.empty();
       }
     }
 
-    public static GriefEvent of(PrismEvent prismEvent) throws IllegalArgumentException {
+    public static Optional<GriefEvent> of(PrismEvent prismEvent) throws IllegalArgumentException {
       if (prismEvent == PrismEvents.BLOCK_BREAK) {
-        return GriefEvents.BREAK;
+        return Optional.of(GriefEvents.BREAK);
       } else if (prismEvent == PrismEvents.BLOCK_PLACE) {
-        return GriefEvents.PLACE;
+        return Optional.of(GriefEvents.PLACE);
       } else if (prismEvent == PrismEvents.ENTITY_DEATH) {
-        return GriefEvents.DEATH;
+        return Optional.of(GriefEvents.DEATH);
       } else {
-        throw new IllegalArgumentException("Incompatible PrismEvent with GriefEvent: " + prismEvent.getName());
+        return Optional.empty();
       }
     }
 

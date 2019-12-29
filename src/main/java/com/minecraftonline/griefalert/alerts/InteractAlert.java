@@ -30,4 +30,9 @@ public class InteractAlert extends Alert {
   public Optional<Transform<World>> getTransform() {
     return Optional.of(grieferTransform);
   }
+
+  @Override
+  public Player getGriefer() {
+    return (Player) blockEvent.getCause().root();
+  }
 }

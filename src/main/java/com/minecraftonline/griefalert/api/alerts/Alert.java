@@ -1,17 +1,19 @@
 package com.minecraftonline.griefalert.api.alerts;
 
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.World;
 
 import java.util.*;
@@ -36,7 +38,7 @@ public abstract class Alert {
     this.griefProfile = griefProfile;
   }
 
-  public final boolean checkAlert(Player officer) {
+  public final boolean check(Player officer) {
 
     // Get the necessary transform so the officer can teleport
     if (!getTransform().isPresent()) {
@@ -65,29 +67,25 @@ public abstract class Alert {
 
   }
 
-  public static boolean revertTransform(Player officer) {
+  public static int revertTransform(Player officer) {
 
     if (!officerTransformHistory.containsKey(officer.getUniqueId())){
-      return false;
+      return -1;
     }
 
     Stack<Transform<World>> history = officerTransformHistory.get(officer.getUniqueId());
 
     if (history.isEmpty()) {
-      return false;
+      return -1;
     }
 
     Transform<World> previousTransform = history.pop();
 
     if (!officer.setTransformSafely(previousTransform)) {
       Errors.sendCannotTeleportSafely(officer, previousTransform);
-      return false;
     }
 
-    officer.sendMessage(Format.message(String.format(
-        "Return to previous location. (%s saved locations left)",
-        history.size())));
-    return true;
+    return history.size();
 
   }
 
@@ -100,6 +98,8 @@ public abstract class Alert {
   public abstract Text getMessageText();
 
   public abstract Optional<Transform<World>> getTransform();
+
+  public abstract Player getGriefer();
 
   /**
    * Getter for the integer which represents this cached item in the ongoing.
@@ -139,10 +139,37 @@ public abstract class Alert {
    * @return the Text for broadcasting.
    */
   public final Text getFullText() {
-    return Text.of(getMessageText(), " ", Format.command(String.valueOf(getCacheCode()),
-        "/g check " + getCacheCode(),
-        Text.of("CHECK GRIEF ALERT")
-    ));
+    return getFullText(new LinkedList<>());
+  }
+
+  /**
+   * Get the final text version of the Alert to broadcast to staff with
+   * other interactive items to access other alerts.
+   *
+   * @param otherCodes The list of other items to add to the text.
+   * @return A full text to be broadcast to staff.
+   */
+  final Text getFullText(List<Integer> otherCodes) {
+    try {
+      Text.Builder builder = Text.builder().append(getMessageText());
+      otherCodes.add(0, getCacheCode()); // Add this to the list
+      otherCodes.forEach((i) -> {
+        builder.append(Format.space());
+        Alert other = GriefAlert.getInstance().getAlertQueue().get(i);
+        try {
+          builder.append(
+              Format.command(String.valueOf(i),
+                  "/ga check " + other.getCacheCode(),
+                  Text.of(other.getSummary())));
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      });
+      return builder.build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Text.EMPTY;
+    }
   }
 
   protected final TextColor getEventColor() {
@@ -166,34 +193,24 @@ public abstract class Alert {
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 
+  protected Text getSummary() throws Exception {
+    Text.Builder builder = Text.builder();
 
-  /**
-   * Get the final text version of the Alert to broadcast to staff with
-   * other interactive items to access other alerts.
-   *
-   * @param otherCodes The list of other items to add to the text.
-   * @return A full text to be broadcast to staff.
-   */
-  final Text getFullText(List<Integer> otherCodes) {
-    Text.Builder builder = Text.builder().append(getMessageText());
-    builder.append(Text.of(" "));
-    List<Integer> codes = otherCodes;
-    codes.add(getCacheCode());
-    builder.append(Format.command(String.valueOf(getCacheCode()),
-        "/g check " + getCacheCode(),
-        Text.of("CHECK GRIEF ALERT")
-    ));
-    codes.forEach((i) -> {
-      builder.append(Text.of(" "));
-      builder.append(
-          Format.command(String.valueOf(i),
-              "/g check " + getCacheCode(),
-              Text.of("CHECK GRIEF ALERT")
-          )
-      );
-    });
+    builder.append(Text.of(TextColors.GOLD, TextStyles.BOLD, "Grief Alert"), Format.endLine());
+    builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, getGriefer().getName()), Format.endLine());
+    builder.append(Text.of(TextColors.DARK_AQUA, "Event: ", TextColors.GRAY, griefProfile.getGriefEvent().getId()), Format.endLine());
+    builder.append(Text.of(TextColors.DARK_AQUA, "Target: ", TextColors.GRAY, griefProfile.getTarget()), Format.endLine());
+    getTransform().ifPresent((transform) ->
+        builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY,  Format.location(
+            transform.getLocation().getBlockX(),
+            transform.getLocation().getBlockY(),
+            transform.getLocation().getBlockZ(),
+            transform.getLocation().getExtent(),
+            false))));
+
     return builder.build();
   }
+
 
 
 }

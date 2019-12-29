@@ -32,4 +32,9 @@ public class UseAlert extends Alert {
     return Optional.of(grieferTransform);
   }
 
+  @Override
+  public Player getGriefer() {
+    return (Player) itemEvent.getCause().root();
+  }
+
 }

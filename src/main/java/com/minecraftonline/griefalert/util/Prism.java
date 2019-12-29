@@ -9,16 +9,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helion3.prism.util.PrismEvents;
-import com.minecraftonline.griefalert.GriefAlert;
-import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -38,84 +31,31 @@ public abstract class Prism {
     return record.getDataContainer().getString(DataQueries.Player);
   }
 
-  public static Optional<Player> getPlayer(PrismRecord record) {
-    return Optional.empty();
-  }
-
   public static Optional<String> getTarget(PrismRecord record) {
     return record.getDataContainer().getString(DataQueries.Target);
   }
 
-//  public static Optional<Location<World>> getLocation(PrismRecord record) {
-//    Optional<Integer> x = record.getDataContainer().getInt(DataQueries.X);
-//    Optional<Integer> y = record.getDataContainer().getInt(DataQueries.Y);
-//    Optional<Integer> z = record.getDataContainer().getInt(DataQueries.Z);
-//    Optional<String> worldUuid = record.getDataContainer().getString(DataQueries.WorldUuid);
-//    if (!x.isPresent() || !y.isPresent() || !z.isPresent() || !worldUuid.isPresent()) {
-//      return Optional.empty();
-//    }
-//    Optional<World> world = Sponge.getServer().getWorld(worldUuid.get());
-//    if (!world.isPresent()) {
-//      return Optional.empty();
-//    }
-//
-//  }
-
-//  /**
-//   * Get the BlockType of the event from the PrismRecord.
-//   *
-//   * @param record The PrismRecord which houses all event data
-//   * @return The BlockType from the event, or null if none exists
-//   */
-//  public static Optional<BlockType> getBlockType(PrismRecord record) {
-//    return record.getDataContainer().getObject(DataQueries.BlockType, BlockType.class);
-//  }
-
-//  /**
-//   * Get the EventName of the event from the PrismRecord.
-//   *
-//   * @param record The PrismRecord which houses all event data
-//   * @return The EventName from the event, or null if none exists
-//   */
-//  public static Optional<String> getEventName(PrismRecord record) {
-//    return record.getDataContainer().getObject(DataQueries.EventName, String.class);
-//  }
-
-  /**
-   * Get the BlockSnapshot of the original block of the event from the PrismRecord.
-   *
-   * @param record The PrismRecord which houses all event data
-   * @return The BlockSnapshot from the event, or null if none exists
-   */
-  public static Optional<BlockType> getOriginalBlockType(PrismRecord record) {
-    Sponge.getServer().getBroadcastChannel().send(Format.heading("getOriginalBlockType"));
-    Optional<DataContainer> originalBlockDataContainer = record.getDataContainer().getObject(DataQueries.ReplacementBlock, DataContainer.class);
-    if (originalBlockDataContainer.isPresent()) {
-      Sponge.getServer().getBroadcastChannel().send(Format.message("originalBlockDataContainer found!"));
-      Optional<DataContainer> blockStateDataContainer = originalBlockDataContainer.get().getObject(DataQueries.BlockState, DataContainer.class);
-      if (blockStateDataContainer.isPresent()) {
-        Sponge.getServer().getBroadcastChannel().send(Format.message("blockStateDataContainer found!"));
-        return blockStateDataContainer.get().getObject(DataQueries.BlockType, BlockType.class);
-      }
+  public static Optional<Location<World>> getLocation(PrismRecord record) {
+    Optional<DataView> locationView = record.getDataContainer().getView(DataQueries.Location);
+    if (!locationView.isPresent()) {
+      return Optional.empty();
     }
-    return Optional.empty();
-  }
 
-  /**
-   * Get the BlockSnapshot of the replacement block of the event from the PrismRecord.
-   *
-   * @param record The PrismRecord which houses all event data
-   * @return The BlockSnapshot from the event, or null if none exists
-   */
-  public static Optional<BlockType> getReplacementBlockType(PrismRecord record) {
-    Optional<DataContainer> replacementBlockDataContainer = record.getDataContainer().getObject(DataQueries.ReplacementBlock, DataContainer.class);
-    if (replacementBlockDataContainer.isPresent()) {
-      Optional<DataContainer> blockStateDataContainer = replacementBlockDataContainer.get().getObject(DataQueries.BlockState, DataContainer.class);
-      if (blockStateDataContainer.isPresent()) {
-        return blockStateDataContainer.get().getObject(DataQueries.BlockType, BlockType.class);
-      }
+    Optional<String> worldUuid = locationView.get().getString(DataQueries.WorldUuid);
+    if (!worldUuid.isPresent()) {
+      return Optional.empty();
     }
-    return Optional.empty();
+
+    Optional<World> world = Sponge.getServer().getWorld(UUID.fromString(worldUuid.get()));
+    Optional<Integer> x = locationView.get().getInt(DataQueries.X);
+    Optional<Integer> y = locationView.get().getInt(DataQueries.Y);
+    Optional<Integer> z = locationView.get().getInt(DataQueries.Z);
+    if (!Optionals.allPresent(world, x, y, z)) {
+      return Optional.empty();
+    }
+
+    return Optional.of(new Location<>(world.get(), x.get(), y.get(), z.get()));
+
   }
 
   /**
@@ -128,109 +68,6 @@ public abstract class Prism {
     return record.getDataContainer().getObject(DataQueries.EntityType, EntityType.class);
   }
 
-  /**
-   * Get the UUID of the world of the event from the PrismRecord.
-   *
-   * @param record The PrismRecord which houses all event data
-   * @return The UUID from the event, or null if none exists
-   */
-  public static Optional<UUID> getWorldUuid(PrismRecord record) {
-    return record.getDataContainer().getObject(DataQueries.WorldUuid, UUID.class);
-  }
-
-  public static Optional<Location<World>> getLocation(PrismRecord record) {
-    try {
-      return record.getDataContainer().getObject(DataQueries.Location, Location.class).map(location -> (Location<World>) location);
-    } catch (ClassCastException e) {
-      GriefAlert.getInstance().getLogger().error("Location from PrismRecord was not of generic type World");
-      return Optional.empty();
-    }
-  }
-
-  public static Optional<String> getGriefedObjectId(PrismRecord record) {
-//    Optional<String> eventNameOptional = Prism.getEventName(record);
-//    if (!eventNameOptional.isPresent()) {
-//      Sponge.getServer().getBroadcastChannel().send(Format.message("No event name found within record, " + record.getEvent()));
-//      return Optional.empty();
-//    }
-//    Sponge.getServer().getBroadcastChannel().send(
-//        Format.heading("getGriefedObjectId"),
-//        Format.message(": " + eventNameOptional.get())
-//    );
-    Optional<PrismEvent> eventOptional = Registry.getPrismEvent(record.getEvent());
-    if (eventOptional.isPresent()) {
-      PrismEvent event = eventOptional.get();
-      Sponge.getServer().getBroadcastChannel().send(
-          Format.heading("getGriefedObjectId"),
-          Format.message(": " + event.getName())
-      );
-      if (event.equals(PrismEvents.BLOCK_PLACE)) {
-        Optional<BlockType> blockTypeOptional = getReplacementBlockType(record);
-        return blockTypeOptional.map(BlockType::getId);
-      } else if (event.equals(PrismEvents.BLOCK_GROW)) {
-        Optional<BlockType> blockTypeOptional = getOriginalBlockType(record);
-        return blockTypeOptional.map(BlockType::getId);
-      } else if (event.equals(PrismEvents.BLOCK_BREAK)) {
-        Optional<BlockType> blockTypeOptional = getOriginalBlockType(record);
-        if (!blockTypeOptional.isPresent()) {
-          Sponge.getServer().getBroadcastChannel().send(Format.message("No BlockSnapshot found!"));
-        }
-        return blockTypeOptional.map(BlockType::getId);
-      } else if (event.equals(PrismEvents.BLOCK_DECAY)) {
-        Optional<BlockType> blockTypeOptional = getOriginalBlockType(record);
-        return blockTypeOptional.map(BlockType::getId);
-      } else if (event.equals(PrismEvents.ENTITY_DEATH)) {
-        Optional<EntityType> blockTypeOptional = getEntityType(record);
-        return blockTypeOptional.map(EntityType::getId);
-      }
-    }
-    return Optional.empty();
-  }
-
-  public static Optional<String> getGriefedObjectName(PrismRecord record) {
-
-    Logger l = GriefAlert.getInstance().getLogger();
-    l.info(Format.message("getGriefedObjectName run").toPlain());
-
-    Optional<PrismEvent> eventOptional = Registry.getPrismEvent(record.getEvent());
-    if (eventOptional.isPresent()) {
-
-      PrismEvent event = eventOptional.get();
-      if (event.equals(PrismEvents.BLOCK_PLACE)) {
-        l.info(Format.message("Found 'Place'").toPlain());
-        return getReplacementBlockType(record).map(
-            blockType -> blockType.getTranslation().get()
-        );
-      } else if (event.equals(PrismEvents.BLOCK_GROW)) {
-        l.info(Format.message("Found 'Grow'").toPlain());
-        return getOriginalBlockType(record).map(
-            blockType -> blockType.getTranslation().get()
-        );
-      } else if (event.equals(PrismEvents.BLOCK_BREAK)) {
-        l.info(Format.message("Found 'Break'").toPlain());
-        return getOriginalBlockType(record).map(
-            blockType -> blockType.getTranslation().get()
-        );
-      } else if (event.equals(PrismEvents.BLOCK_DECAY)) {
-        l.info(Format.message("Found 'Decay'").toPlain());
-        return getOriginalBlockType(record).map(
-            blockType -> blockType.getTranslation().get()
-        );
-      } else if (event.equals(PrismEvents.ENTITY_DEATH)) {
-        l.info(Format.message("Found 'Death'").toPlain());
-        return getEntityType(record).map(
-            entityType -> entityType.getTranslation().get()
-        );
-      }
-    } else {
-      l.info(Format.message("Registry could not find a valid GriefEvent").toPlain());
-    }
-
-    l.info(Format.message("Returning Optional.empty()").toPlain());
-    return Optional.empty();
-
-  }
-
   public static Optional<List<String>> getPlacedSignLines(PrismRecord record) {
     return Optional.of(Arrays.asList("Line1", "Line2", "Line3", "Line4"));
   }
@@ -239,37 +76,10 @@ public abstract class Prism {
     return Optional.of(Arrays.asList("Line1", "Line2", "Line3", "Line4"));
   }
 
-  public static Optional<DimensionType> getDimensionType(PrismRecord record) {
-    // TODO: Implement getDimensionType
-    return null;
-  }
+  public static String printRecord(PrismRecord record) {
 
-  public static Text printRecord(PrismRecord record) {
+    return record.getDataContainer().getValues(true).toString();
 
-    Logger l = GriefAlert.getInstance().getLogger();
-
-    l.info("PrismRecord info");
-    l.info("----------------");
-
-    Map<DataQuery, Object> dataMap = record.getDataContainer().getValues(true);
-    for (DataQuery query : dataMap.keySet()) {
-      l.info("{ "
-          + query.toString() + ", "
-          + "(" + dataMap.get(query).getClass().toString() + ") "
-          + dataMap.get(query).toString() + " }");
-    }
-
-    Text.Builder parsedBuilder = Text.builder();
-
-    parsedBuilder.append(Text.of("Player: ", Prism.getPlayer(record).map(Player::getName).orElse("")));
-    parsedBuilder.append(Text.of("\n"));
-    parsedBuilder.append(Text.of("Location: ", Prism.getLocation(record).map(Location::toString).orElse("")));
-    parsedBuilder.append(Text.of("\n"));
-    parsedBuilder.append(Text.of("Event: ", record.getEvent()));
-    parsedBuilder.append(Text.of("\n"));
-    parsedBuilder.append(Text.of("Object: ", Prism.getGriefedObjectName(record).orElse("")));
-
-    return parsedBuilder.build();
   }
 
 
@@ -279,11 +89,11 @@ public abstract class Prism {
     /**
      * Return the PrismEvent associated with the given event name.
      *
-     * @param eventName The name of the PrismEvent
+     * @param eventId The name of the PrismEvent
      * @return The PrismEvent or null if none exists
      */
-    public static Optional<PrismEvent> getPrismEvent(@Nonnull String eventName) {
-      switch (eventName.toLowerCase()) {
+    public static Optional<PrismEvent> getPrismEvent(@Nonnull String eventId) {
+      switch (eventId.toLowerCase()) {
         case "break":
           return Optional.of(PrismEvents.BLOCK_BREAK);
         case "decay":

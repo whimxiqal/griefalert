@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -33,7 +34,19 @@ public class GriefAlertReturnCommand extends AbstractCommand {
   public CommandResult execute(@NonnullByDefault CommandSource src,
                                @NonnullByDefault CommandContext args) throws CommandException {
     if (src instanceof Player) {
-      Alert.revertTransform((Player) src);
+
+      Player player = (Player) src;
+
+      int revertsRemaining = Alert.revertTransform(player);
+
+      if (revertsRemaining < 0) {
+        player.sendMessage(Format.info("You have no previous location(s)"));
+      } else {
+        player.sendMessage(Format.success(
+            "Returned to previous location. (",
+            Format.bonus(revertsRemaining),
+            " remaining saved locations)"));
+      }
     }
     return CommandResult.success();
   }

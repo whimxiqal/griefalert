@@ -42,6 +42,7 @@ public class ProfileCabinet {
     // Add all constant GriefProfiles in load as well
     add(GriefProfiles.PLACE_SIGN);
     add(GriefProfiles.BREAK_SIGN);
+    add(GriefProfiles.BREAK_COBBLESTONE_TEST);
     // ...
 
     // Get all other profiles from the onsite profile list

@@ -42,7 +42,12 @@ public class GriefProfile {
       throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
     }
 
-    return GriefEvents.Registry.of(eventOptional.get());
+    Optional<GriefEvent> griefEventOptional = GriefEvents.Registry.of(eventOptional.get());
+    if (!griefEventOptional.isPresent()) {
+      throw new ProfileMalformedException("Invalid GriefEvent Id: " + eventOptional.get());
+    }
+
+    return griefEventOptional.get();
   }
 
 

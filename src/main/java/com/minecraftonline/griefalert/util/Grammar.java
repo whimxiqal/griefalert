@@ -22,4 +22,12 @@ public abstract class Grammar {
     return output;
   }
 
+  public static Object addIndefiniteArticle(String s) {
+    s = s.trim();
+    if ("aeiou".contains(String.valueOf(s.charAt(0)).toLowerCase())) {
+      return "an " + s;
+    } else {
+      return "a " + s;
+    }
+  }
 }
