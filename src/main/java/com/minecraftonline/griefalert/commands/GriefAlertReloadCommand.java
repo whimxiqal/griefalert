@@ -2,6 +2,7 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -25,7 +26,7 @@ public class GriefAlertReloadCommand extends AbstractCommand {
   public CommandResult execute(@NonnullByDefault CommandSource src,
                                @NonnullByDefault CommandContext args) throws CommandException {
     GriefAlert.getInstance().reload();
-    src.sendMessage(Text.of(TextColors.GREEN, "Grief Alert reloaded!"));
+    src.sendMessage(Format.success("Grief Alert reloaded!"));
     return CommandResult.success();
   }
 

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
 import com.minecraftonline.griefalert.util.Prism;
 import org.spongepowered.api.Sponge;
@@ -44,38 +45,27 @@ public class GriefAlertCheckCommand extends AbstractCommand {
 
 
         try {
+
           Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
-          if (alert.getTransform().isPresent() && player.setTransformSafely(alert.getTransform().get())) {
-
-            // TODO: Save officers location
-            Sponge.getServer().getBroadcastChannel()
-                .send(Text.of(player.getName() + " is teleported to a grief alert."));
-
-          } else {
-            player.sendMessage(Text.of(
-                TextColors.YELLOW,
-                "A safe place to teleport could not be identified.")
-            );
-          }
-          player.sendMessage(alert.getMessageText());
+          alert.checkAlert(player);
 
         } catch (IndexOutOfBoundsException e) {
-          player.sendMessage(Text.of(
+          player.sendMessage(Format.error(Text.of(
               TextColors.RED,
               "The Grief Event you tried to access could not be found.")
-          );
+          ));
         }
       } else {
-        player.sendMessage(Text.of(
+        player.sendMessage(Format.error(Text.of(
             TextColors.RED,
             "The queried Grief Event code could not be parsed.")
-        );
+        ));
       }
     } else {
-      src.sendMessage(Text.of(
+      src.sendMessage(Format.error(Text.of(
           TextColors.RED,
           "Only players may execute this command")
-      );
+      ));
     }
     return CommandResult.success();
   }

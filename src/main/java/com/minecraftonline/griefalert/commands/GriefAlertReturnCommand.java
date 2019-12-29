@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.commands;
 import com.minecraftonline.griefalert.GriefAlert;
 import java.util.Optional;
 
+import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
@@ -32,28 +33,7 @@ public class GriefAlertReturnCommand extends AbstractCommand {
   public CommandResult execute(@NonnullByDefault CommandSource src,
                                @NonnullByDefault CommandContext args) throws CommandException {
     if (src instanceof Player) {
-      Player player = (Player) src;
-      Optional<EntitySnapshot> optionalEntitySnapshot =
-          GriefAlert.getInstance().getAlertQueue().getOfficerSnapshot(player.getUniqueId());
-      if (optionalEntitySnapshot.isPresent()
-          && optionalEntitySnapshot.get().getTransform().isPresent()) {
-        if (player.setTransformSafely(optionalEntitySnapshot.get().getTransform().get())) {
-          player.sendMessage(Text.of(
-              TextColors.GREEN,
-              "Sent to your location previous to your last grief check")
-          );
-        } else {
-          player.sendMessage(Text.of(
-              TextColors.YELLOW,
-              "A safe location could not be determined")
-          );
-        }
-      } else {
-        player.sendMessage(Text.of(
-            TextColors.YELLOW,
-            "You don't have a saved location prior to any grief checks")
-        );
-      }
+      Alert.revertTransform((Player) src);
     }
     return CommandResult.success();
   }

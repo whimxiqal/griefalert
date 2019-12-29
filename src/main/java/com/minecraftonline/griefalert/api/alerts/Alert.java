@@ -1,12 +1,15 @@
 package com.minecraftonline.griefalert.api.alerts;
 
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.World;
@@ -15,10 +18,11 @@ import java.util.*;
 
 public abstract class Alert {
 
+  private static final HashMap<UUID, Stack<Transform<World>>> officerTransformHistory = new HashMap<>();
+
   protected final int cacheCode;
   protected final GriefProfile griefProfile;
   protected DataContainer dataContainer;
-
 
   /**
    * Default constructor.
@@ -30,6 +34,61 @@ public abstract class Alert {
   protected Alert(int cacheCode, GriefProfile griefProfile) {
     this.cacheCode = cacheCode;
     this.griefProfile = griefProfile;
+  }
+
+  public final boolean checkAlert(Player officer) {
+
+    // Get the necessary transform so the officer can teleport
+    if (!getTransform().isPresent()) {
+      return false;
+    }
+
+    Transform<World> alertTransform = getTransform().get();
+
+    // Save the officer's previous transform and add it into the alert's database later
+    // if the officer successfully teleports.
+    Transform<World> officerPreviousTransform = officer.getTransform();
+
+    // Teleport the officer
+    if (!officer.setTransformSafely(alertTransform)) {
+      Errors.sendCannotTeleportSafely(officer, alertTransform);
+      return false;
+    }
+
+    // The officer has teleported successfully, so save their previous location in the history
+    officerTransformHistory.putIfAbsent(officer.getUniqueId(), new Stack<>());
+    officerTransformHistory.get(officer.getUniqueId()).push(officerPreviousTransform);
+
+    officer.sendMessage(Format.heading("Checking Grief Alert:"));
+    officer.sendMessage(getMessageText());
+    return true;
+
+  }
+
+  public static boolean revertTransform(Player officer) {
+
+    if (!officerTransformHistory.containsKey(officer.getUniqueId())){
+      return false;
+    }
+
+    Stack<Transform<World>> history = officerTransformHistory.get(officer.getUniqueId());
+
+    if (history.isEmpty()) {
+      return false;
+    }
+
+    Transform<World> previousTransform = history.pop();
+
+    if (!officer.setTransformSafely(previousTransform)) {
+      Errors.sendCannotTeleportSafely(officer, previousTransform);
+      return false;
+    }
+
+    officer.sendMessage(Format.message(String.format(
+        "Return to previous location. (%s saved locations left)",
+        history.size())));
+    return true;
+
   }
 
 
@@ -51,7 +110,6 @@ public abstract class Alert {
   public final int getCacheCode() {
     return cacheCode;
   }
-
 
   /**
    * Add the data to this Alert's data container. The appropriate data

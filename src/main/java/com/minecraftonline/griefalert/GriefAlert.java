@@ -83,7 +83,7 @@ public final class GriefAlert {
 
 
   // Custom classes to help manage plugin
-  private ProfileCabinet museum;
+  private ProfileCabinet cabinet;
   private AlertQueue alertQueue;
   private ConfigHelper configHelper;
   private MySQLProfileStorage profileStorage;
@@ -109,7 +109,7 @@ public final class GriefAlert {
     }
     // Load the config from the Sponge API and set the specific node values.
     configHelper = new ConfigHelper(defaultConfig, rootNode);
-    museum = new ProfileCabinet();
+    cabinet = new ProfileCabinet();
     alertQueue = new AlertQueue(configHelper.getCachedEventLimit());
     profileStorage = new MySQLProfileStorage();
 
@@ -137,8 +137,7 @@ public final class GriefAlert {
       e.printStackTrace();
     }
     configHelper.load(rootNode);
-    museum.reload();
-    // Must reload grief event logger after config
+    cabinet.reload();  // Must reload grief event logger after config
   }
 
 
@@ -163,7 +162,7 @@ public final class GriefAlert {
   }
 
   public ProfileCabinet getProfileCabinet() {
-    return museum;
+    return cabinet;
   }
 
   public ConfigurationLoader<CommentedConfigurationNode> getConfigManager() {
