@@ -1,24 +1,18 @@
 package com.minecraftonline.griefalert.alerts;
 
 import com.helion3.prism.api.records.PrismRecord;
-import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.Grammar;
-import com.minecraftonline.griefalert.util.Prism;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.Optional;
-import java.util.UUID;
-
 public class BreakAlert extends PrismAlert {
 
-  public BreakAlert(int cacheCode, GriefProfile griefProfile, PrismRecord prismRecord) {
-    super(cacheCode, griefProfile, prismRecord);
+  BreakAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
+    super(cacheCode, griefProfile, prismDataContainer);
   }
 
   @Override

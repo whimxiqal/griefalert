@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import com.helion3.prism.util.PrismEvents;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.world.Location;
@@ -77,9 +78,11 @@ public abstract class Prism {
   }
 
   public static String printRecord(PrismRecord record) {
-
-    return record.getDataContainer().getValues(true).toString();
-
+    List<String> lines = new LinkedList<>();
+    for (DataQuery query : record.getDataContainer().getKeys(false)) {
+      lines.add(query.asString(" ") + ": " + record.getDataContainer().get(query));
+    }
+    return String.join("\n", lines);
   }
 
 

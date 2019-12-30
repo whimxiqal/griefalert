@@ -8,6 +8,7 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
 import com.minecraftonline.griefalert.util.Prism;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
@@ -18,15 +19,15 @@ import java.util.function.Supplier;
 
 public abstract class PrismAlert extends Alert {
 
-  private final PrismRecord prismRecord;
+  private final DataContainer prismDataContainer;
   private Transform<World> grieferTransform;
 
-  PrismAlert(int cacheCode, GriefProfile griefProfile, PrismRecord prismRecord) {
+  protected PrismAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
     super(cacheCode, griefProfile);
-    this.prismRecord = prismRecord;
+    this.prismDataContainer = prismDataContainer;
 
     grieferTransform = null;
-    prismRecord.getDataContainer().getString(DataQueries.Player).ifPresent(
+    prismDataContainer.getString(DataQueries.Player).ifPresent(
         (s) ->
             grieferTransform = Sponge.getServer()
                 .getPlayer(UUID.fromString(s))
@@ -45,26 +46,26 @@ public abstract class PrismAlert extends Alert {
       if (targetOptional.get().contains("sign")) {
 
         // Condition for a SignBreakAlert
-        return Optional.of(new SignBreakAlert(cacheCode, griefProfile, prismRecord));
+        return Optional.of(new SignBreakAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
       } else {
 
         // Condition for a BreakAlert
-        return Optional.of(new BreakAlert(cacheCode, griefProfile, prismRecord));
+        return Optional.of(new BreakAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
       }
     } else if (prismRecord.getEvent().equals(PrismEvents.BLOCK_PLACE.getId())) {
       if (targetOptional.get().contains("sign")) {
 
         // Condition for a SignPlaceAlert
-        return Optional.of(new SignPlaceAlert(cacheCode, griefProfile, prismRecord));
+        return Optional.of(new SignPlaceAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
       } else {
 
         // Condition for a PlaceAlert
-        return Optional.of(new PlaceAlert(cacheCode, griefProfile, prismRecord));
+        return Optional.of(new PlaceAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
       }
     } else if (prismRecord.getEvent().equals(PrismEvents.ENTITY_DEATH.getId())) {
 
       // Condition for a DeathAlert
-      return Optional.of(new DeathAlert(cacheCode, griefProfile, prismRecord));
+      return Optional.of(new DeathAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
     }
 
     return Optional.empty();
@@ -72,8 +73,18 @@ public abstract class PrismAlert extends Alert {
 
   @Override
   public Player getGriefer() {
-    // TODO: Handle unchecked Optional gets
-    return Sponge.getServer().getPlayer(UUID.fromString(Prism.getPlayerUuid(prismRecord).get())).get();
+    Optional<String> uuidOptional = prismDataContainer.getString(DataQueries.Player);
+    if (!uuidOptional.isPresent()) {
+      GriefAlert.getInstance().getLogger().error("Could not get griefer UUID from PrismRecord in a PrismAlert");
+      GriefAlert.getInstance().getLogger().error(prismDataContainer.toString());
+    }
+
+    Optional<Player> playerOptional = Sponge.getServer().getPlayer(UUID.fromString(uuidOptional.get()));
+    if (!playerOptional.isPresent()) {
+      GriefAlert.getInstance().getLogger().error("Could not find player using UUID: " + uuidOptional.get());
+    }
+
+    return playerOptional.get();
   }
 
   @Override

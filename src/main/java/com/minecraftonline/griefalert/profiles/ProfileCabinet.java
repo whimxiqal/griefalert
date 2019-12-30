@@ -5,15 +5,10 @@ import com.google.common.collect.Table;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.profiles.GriefProfile;
-import com.minecraftonline.griefalert.api.profiles.GriefProfileOld;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.profiles.GriefProfiles;
-import com.minecraftonline.griefalert.profiles.io.Exporter;
-import com.minecraftonline.griefalert.profiles.io.Importer;
 import org.spongepowered.api.world.DimensionType;
 
 public class ProfileCabinet {

@@ -24,7 +24,6 @@ public abstract class Alert {
 
   protected final int cacheCode;
   protected final GriefProfile griefProfile;
-  protected DataContainer dataContainer;
 
   /**
    * Default constructor.
@@ -109,28 +108,6 @@ public abstract class Alert {
    */
   public final int getCacheCode() {
     return cacheCode;
-  }
-
-  /**
-   * Add the data to this Alert's data container. The appropriate data
-   * must be put into the container to be appropriately parsed by
-   * the Alert instance.
-   *
-   * @param path  The DataQuery to set with.
-   * @param value The value to set with.
-   */
-  public final void setData(DataQuery path, Object value) {
-    dataContainer.set(path, value);
-  }
-
-
-  /**
-   * Get the data from this Alert's data container.
-   *
-   * @param path The DataQuery to access with.
-   */
-  final void getData(DataQuery path) {
-    dataContainer.get(path);
   }
 
   /**

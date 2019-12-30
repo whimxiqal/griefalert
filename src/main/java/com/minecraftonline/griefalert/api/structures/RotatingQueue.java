@@ -57,6 +57,9 @@ public abstract class RotatingQueue<P> {
   }
 
   public P get(int index) throws IndexOutOfBoundsException {
+    if (data.get(index) == null) {
+      throw new IndexOutOfBoundsException();
+    }
     return data.get(index);
   }
 
