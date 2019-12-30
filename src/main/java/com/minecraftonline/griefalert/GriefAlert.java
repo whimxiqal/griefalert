@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.alerts.AlertQueue;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
+import com.minecraftonline.griefalert.listeners.ExtraListeners;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.profiles.ProfileCabinet;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
@@ -155,6 +156,7 @@ public final class GriefAlert {
         PrismRecordPreSaveEvent.class,
         new PrismRecordListener()
     );
+    ExtraListeners.register(this);
   }
 
   public File getDataDirectory() {

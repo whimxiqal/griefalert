@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.api.records;
 
 import com.google.common.collect.Lists;
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.exceptions.ProfileMalformedException;
 import com.minecraftonline.griefalert.util.GriefEvents;
@@ -36,18 +37,13 @@ public class GriefProfile {
 
 
   public GriefEvent getGriefEvent() throws ProfileMalformedException {
-    Optional<String> eventOptional = dataContainer.getString(GriefProfileDataQueries.EVENT);
+    Optional<GriefEvent> eventOptional = dataContainer.get(GriefProfileDataQueries.EVENT).map((object) -> (GriefEvent) object);
 
     if (!eventOptional.isPresent()) {
       throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
     }
 
-    Optional<GriefEvent> griefEventOptional = GriefEvents.Registry.of(eventOptional.get());
-    if (!griefEventOptional.isPresent()) {
-      throw new ProfileMalformedException("Invalid GriefEvent Id: " + eventOptional.get());
-    }
-
-    return griefEventOptional.get();
+    return eventOptional.get();
   }
 
 
@@ -68,13 +64,6 @@ public class GriefProfile {
     return dimensionListOptional.filter(objects -> Lists.transform(objects, Object::toString).contains(dimensionType.getName())).isPresent();
 
   }
-
-
-  public boolean similarTo(GriefProfile other) {
-    // TODO: implement
-    return false;
-  }
-
 
   public String printData() {
     return dataContainer.getValues(true).toString();

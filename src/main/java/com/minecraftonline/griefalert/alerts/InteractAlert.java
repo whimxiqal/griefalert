@@ -17,15 +17,10 @@ public class InteractAlert extends Alert {
   private InteractBlockEvent.Secondary blockEvent;
   private Transform<World> grieferTransform;
 
-  public InteractAlert(int cacheCode, GriefProfile griefProfile, InteractBlockEvent.Secondary event) {
-    super(cacheCode, griefProfile);
+  public InteractAlert(GriefProfile griefProfile, InteractBlockEvent.Secondary event) {
+    super(griefProfile);
     blockEvent = event;
     grieferTransform = ((Player) event.getCause().root()).getTransform();
-  }
-
-  @Override
-  public Text getMessageText() {
-    return null;
   }
 
   @Override

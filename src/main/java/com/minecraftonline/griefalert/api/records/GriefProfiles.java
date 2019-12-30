@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.api.records;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.text.format.TextColors;
 
 public final class GriefProfiles {
 
@@ -14,16 +15,29 @@ public final class GriefProfiles {
   public static final GriefProfile PLACE_SIGN = GriefProfile.of(
       DataContainer.createNew()
           .set(GriefProfileDataQueries.TARGET, "minecraft:sign")
-          .set(GriefProfileDataQueries.EVENT, GriefEvents.PLACE.getId()));
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.PLACE));
 
   public static final GriefProfile BREAK_SIGN = GriefProfile.of(
       DataContainer.createNew()
           .set(GriefProfileDataQueries.TARGET, "minecraft:sign")
-          .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK.getId()));
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK));
 
   public static final GriefProfile BREAK_COBBLESTONE_TEST = GriefProfile.of(
       DataContainer.createNew()
           .set(GriefProfileDataQueries.TARGET, "minecraft:cobblestone")
-          .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK.getId()));
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK));
+
+  public static final GriefProfile KILL_COW_TEST = GriefProfile.of(
+      DataContainer.createNew()
+          .set(GriefProfileDataQueries.TARGET, "cow")
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.DEATH)
+          .set(GriefProfileDataQueries.TARGET_COLOR, TextColors.GOLD)
+          .set(GriefProfileDataQueries.DIMENSION_COLOR, TextColors.AQUA)
+          .set(GriefProfileDataQueries.EVENT_COLOR, TextColors.GREEN));
+
+  public static final GriefProfile USE_EGG_TEST = GriefProfile.of(
+      DataContainer.createNew()
+          .set(GriefProfileDataQueries.TARGET, "minecraft:egg")
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.ITEM_USE));
 
 }

@@ -1,5 +1,6 @@
 package com.minecraftonline.griefalert.storage;
 
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.MySQLProfileQuery;
 import org.spongepowered.api.data.DataContainer;
@@ -11,9 +12,9 @@ public class MySQLProfileStorage {
 
   public boolean connect() throws Exception {
     // TODO: implement
-    String address = sqlAddress();
-    String username = sqlUsername();
-    String password = sqlPassword();
+    String address = GriefAlert.getInstance().getConfigHelper().getSqlDatabaseAddress();
+    String username = GriefAlert.getInstance().getConfigHelper().getSqlUsername();
+    String password = GriefAlert.getInstance().getConfigHelper().getSqlPassword();
 
     // ...
     return false;
@@ -34,21 +35,6 @@ public class MySQLProfileStorage {
 
   private Connection getConnection() {
     // TODO: implement
-    return null;
-  }
-
-  private String sqlAddress() {
-    // TODO: implement... use ConfigHelper to get it from the configuration file
-    return null;
-  }
-
-  private String sqlUsername() {
-    // TODO: implement... use ConfigHelper to get it from the configuration file
-    return null;
-  }
-
-  private String sqlPassword() {
-    // TODO: implement... use ConfigHelper to get it from the configuration file
     return null;
   }
 

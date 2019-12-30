@@ -3,36 +3,25 @@ package com.minecraftonline.griefalert.api.alerts;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.Errors;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import com.minecraftonline.griefalert.util.*;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.World;
 
 import java.util.*;
 
-public abstract class Alert {
+public abstract class Alert implements Runnable {
 
   private static final HashMap<UUID, Stack<Transform<World>>> officerTransformHistory = new HashMap<>();
 
-  protected final int cacheCode;
+  protected int cacheCode;
   protected final GriefProfile griefProfile;
   private boolean silent = false;
 
-  /**
-   * Default constructor.
-   *
-   * @param cacheCode    The integer which corresponds to this Alert's location
-   *                     in the AlertCache
-   * @param griefProfile The grief profile which matched this Alert
-   */
-  protected Alert(int cacheCode, GriefProfile griefProfile) {
+  protected Alert(GriefProfile griefProfile) {
     this.cacheCode = cacheCode;
     this.griefProfile = griefProfile;
   }
@@ -94,7 +83,19 @@ public abstract class Alert {
    *
    * @return the Text representation of this Alert.
    */
-  public abstract Text getMessageText();
+  public Text getMessageText() {
+    Text.Builder builder = Text.builder();
+    builder.append(Text.of(
+        General.formatPlayerName(getGriefer()),
+        Format.space(),
+        getEventColor(), getGriefEvent().getPastTense(),
+        Format.space(),
+        getTargetColor(), Grammar.addIndefiniteArticle(griefProfile.getTarget().replace("minecraft:", ""))));
+    getTransform().ifPresent((transform -> builder.append(Text.of(
+        TextColors.RED, " in the ",
+        getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
+    return builder.build();
+  }
 
   public abstract Optional<Transform<World>> getTransform();
 
@@ -118,6 +119,18 @@ public abstract class Alert {
 
   public void setSilent(boolean silent) {
     this.silent = silent;
+  }
+
+  public void pushAndRun() {
+    GriefAlert.getInstance().getAlertQueue().push(this);
+    run();
+  }
+
+  @Override
+  public void run() {
+    if (!isSilent()) {
+      Comms.getStaffBroadcastChannel().send(getFullText());
+    }
   }
 
   /**
@@ -166,22 +179,19 @@ public abstract class Alert {
 
   protected final TextColor getEventColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.EVENT_COLOR)
-        .map(General::stringToColor)
+        .getString(GriefProfileDataQueries.EVENT_COLOR).map(General::stringToColor)
         .orElse(Format.ALERT_EVENT_COLOR);
   }
 
   protected final TextColor getTargetColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.TARGET_COLOR)
-        .map(General::stringToColor)
+        .getString(GriefProfileDataQueries.TARGET_COLOR).map(General::stringToColor)
         .orElse(Format.ALERT_TARGET_COLOR);
   }
 
   protected final TextColor getDimensionColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.DIMENSION_COLOR)
-        .map(General::stringToColor)
+        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map(General::stringToColor)
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 
@@ -203,5 +213,7 @@ public abstract class Alert {
   }
 
 
-
+  public final void setCacheCode(int cacheCode) {
+    this.cacheCode = cacheCode;
+  }
 }

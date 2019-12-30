@@ -12,8 +12,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class BreakAlert extends PrismAlert {
 
-  BreakAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
-    super(cacheCode, griefProfile, prismDataContainer);
+  BreakAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {
+    super(griefProfile, prismDataContainer);
   }
 
   @Override

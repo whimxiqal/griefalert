@@ -34,4 +34,8 @@ public class GriefEvent {
     return pastTense;
   }
 
+  @Override
+  public String toString() {
+    return getId();
+  }
 }

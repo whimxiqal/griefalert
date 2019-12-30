@@ -6,6 +6,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.records.GriefProfiles;
@@ -38,6 +39,8 @@ public class ProfileCabinet {
     add(GriefProfiles.PLACE_SIGN);
     add(GriefProfiles.BREAK_SIGN);
     add(GriefProfiles.BREAK_COBBLESTONE_TEST);
+    add(GriefProfiles.KILL_COW_TEST);
+    add(GriefProfiles.USE_EGG_TEST);
     // ...
 
     // Get all other profiles from the onsite profile list
@@ -61,13 +64,6 @@ public class ProfileCabinet {
     return profileOptional;
   }
 
-  /**
-   * Add a new Grief Profile to the museum. This will not check if a similar one already exists,
-   * so check that it does not before calling this method. An info alert will be sent to the
-   * console.
-   *
-   * @param profile The profile to add
-   */
   public boolean add(GriefProfile profile) {
     if (storage.contains(profile.getGriefEvent(), profile.getTarget())) {
       return false;
@@ -80,5 +76,9 @@ public class ProfileCabinet {
   public void store(GriefProfile profile) throws Exception {
     GriefAlert.getInstance().getProfileStorage().connect();
     GriefAlert.getInstance().getProfileStorage().write(profile);
+  }
+
+  public Collection<GriefProfile> getProfiles() {
+    return storage.values();
   }
 }

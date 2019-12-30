@@ -27,8 +27,8 @@ public abstract class PrismAlert extends Alert {
   private final DataContainer prismDataContainer;
   private Transform<World> grieferTransform;
 
-  protected PrismAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
-    super(cacheCode, griefProfile);
+  protected PrismAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {
+    super(griefProfile);
     this.prismDataContainer = prismDataContainer;
 
     grieferTransform = null;
@@ -40,7 +40,7 @@ public abstract class PrismAlert extends Alert {
     );
   }
 
-  public static Optional<PrismAlert> of(int cacheCode, GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  public static Optional<PrismAlert> of(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     Optional<String> targetOptional = Prism.getTarget(prismRecord);
     if (!targetOptional.isPresent()) {
       return Optional.empty();
@@ -51,26 +51,26 @@ public abstract class PrismAlert extends Alert {
       if (targetOptional.get().contains("sign")) {
 
         // Condition for a SignBreakAlert
-        return Optional.of(new SignBreakAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
+        return Optional.of(new SignBreakAlert(griefProfile, prismRecord.getDataContainer()));
       } else {
 
         // Condition for a BreakAlert
-        return Optional.of(new BreakAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
+        return Optional.of(new BreakAlert(griefProfile, prismRecord.getDataContainer()));
       }
     } else if (prismRecord.getEvent().equals(PrismEvents.BLOCK_PLACE.getId())) {
       if (targetOptional.get().contains("sign")) {
 
         // Condition for a SignPlaceAlert
-        return Optional.of(new SignPlaceAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
+        return Optional.of(new SignPlaceAlert(griefProfile, prismRecord.getDataContainer()));
       } else {
 
         // Condition for a PlaceAlert
-        return Optional.of(new PlaceAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
+        return Optional.of(new PlaceAlert(griefProfile, prismRecord.getDataContainer()));
       }
     } else if (prismRecord.getEvent().equals(PrismEvents.ENTITY_DEATH.getId())) {
 
       // Condition for a DeathAlert
-      return Optional.of(new DeathAlert(cacheCode, griefProfile, prismRecord.getDataContainer()));
+      return Optional.of(new DeathAlert(griefProfile, prismRecord.getDataContainer()));
     }
 
     return Optional.empty();
@@ -95,19 +95,6 @@ public abstract class PrismAlert extends Alert {
   @Override
   public Optional<Transform<World>> getTransform() {
     return Optional.ofNullable(grieferTransform);
-  }
-
-  @Override
-  public Text getMessageText() {
-    // TODO: Write message text for BreakAlert
-    return Text.of(
-        General.formatPlayerName(getGriefer()),
-        Format.space(),
-        getEventColor(), getGriefEvent().getPastTense(),
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(griefProfile.getTarget().replace("minecraft:", "")),
-        TextColors.RED, " in the ",
-        getDimensionColor(), getTransform().get().getExtent().getDimension().getType());
   }
 
 }

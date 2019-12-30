@@ -8,8 +8,8 @@ import org.spongepowered.api.text.Text;
 
 public class SignPlaceAlert extends PrismAlert {
 
-  SignPlaceAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
-    super(cacheCode, griefProfile, prismDataContainer);
+  SignPlaceAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {
+    super(griefProfile, prismDataContainer);
   }
 
   @Override

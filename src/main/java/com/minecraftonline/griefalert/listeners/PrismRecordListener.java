@@ -1,5 +1,6 @@
 package com.minecraftonline.griefalert.listeners;
 
+import com.google.common.collect.Lists;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.GriefAlert;
@@ -9,10 +10,12 @@ import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Comms;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.world.DimensionType;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
 
@@ -26,6 +29,11 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
     // See if this record matches any GriefProfiles
 
+    if (!GriefEvents.Registry.of(record.getEvent()).isPresent()) {
+      GriefAlert.getInstance().getLogger().debug(String.format("PrismEvent passed: Prism Event '%s' is not being checked.", record.getEvent()));
+      return;
+    }
+
     Optional<String> targetOptional = Prism.getTarget(record);
     if (!targetOptional.isPresent()) {
       GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no target found.");
@@ -38,11 +46,6 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       return;
     }
 
-    if (!GriefEvents.Registry.of(record.getEvent()).isPresent()) {
-      GriefAlert.getInstance().getLogger().debug(String.format("PrismEvent passed: Prism Event '%s' is not being checked.", record.getEvent()));
-      return;
-    }
-
     Optional<GriefProfile> profileOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
         GriefEvents.Registry.of(record.getEvent()).get(),
         targetOptional.get(),
@@ -51,9 +54,9 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
     // If yes, create an Alert of the appropriate type
     profileOptional.ifPresent((profile) -> {
-      int nextCacheNum = GriefAlert.getInstance().getAlertQueue().cursor();
+      GriefAlert.getInstance().getLogger().debug("PrismEvent matched a GriefProfile");
 
-      Optional<PrismAlert> alert = PrismAlert.of(nextCacheNum, profile, record);
+      Optional<PrismAlert> alert = PrismAlert.of(profile, record);
 
       if (!alert.isPresent()) {
         GriefAlert.getInstance().getLogger().error("A PrismRecord matched a Grief Profile but "
@@ -63,13 +66,8 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
         return;
       }
 
-      // Add the alert to the AlertQueue
-      GriefAlert.getInstance().getAlertQueue().push(alert.get());
-
-      // Broadcast the Alert's message
-      if (!alert.get().isSilent()) {
-        Comms.getStaffBroadcastChannel().send(alert.get().getFullText());
-      }
+      // Cache the Alert and broadcast its message
+      alert.get().pushAndRun();
     });
   }
 

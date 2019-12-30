@@ -20,6 +20,7 @@ public class AlertQueue extends RotatingQueue<Alert> {
   @Override
   public int push(Alert alert) {
     int output = super.push(alert);
+    alert.setCacheCode(output);
 
     repeatMap.putIfAbsent(alert.getGriefer().getUniqueId(), new LinkedList<>());
     LinkedList<Alert> repeats = repeatMap.get(alert.getGriefer().getUniqueId());

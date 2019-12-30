@@ -8,14 +8,8 @@ import org.spongepowered.api.text.Text;
 
 public class PlaceAlert extends PrismAlert {
 
-  PlaceAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
-    super(cacheCode, griefProfile, prismDataContainer);
-  }
-
-  @Override
-  public Text getMessageText() {
-    // TODO: Write message text for PlaceAlert
-    return Text.of("PlaceAlert text");
+  PlaceAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {
+    super(griefProfile, prismDataContainer);
   }
 
   @Override

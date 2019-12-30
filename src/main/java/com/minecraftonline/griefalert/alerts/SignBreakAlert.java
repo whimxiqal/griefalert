@@ -8,8 +8,8 @@ import org.spongepowered.api.text.Text;
 
 public class SignBreakAlert extends PrismAlert {
 
-  SignBreakAlert(int cacheCode, GriefProfile griefProfile, DataContainer prismDataContainer) {
-    super(cacheCode, griefProfile, prismDataContainer);
+  SignBreakAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {
+    super(griefProfile, prismDataContainer);
   }
 
   @Override

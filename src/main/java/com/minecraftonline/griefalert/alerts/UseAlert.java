@@ -17,16 +17,14 @@ public class UseAlert extends Alert {
   private InteractItemEvent.Secondary itemEvent;
   private Transform<World> grieferTransform;
 
-  UseAlert(int cacheCode, GriefProfile griefProfile, InteractItemEvent.Secondary event) {
-    super(cacheCode, griefProfile);
+  private UseAlert(GriefProfile griefProfile, InteractItemEvent.Secondary event) {
+    super(griefProfile);
     itemEvent = event;
     grieferTransform = ((Player) event.getCause().root()).getTransform();
   }
 
-  @Override
-  public Text getMessageText() {
-    // TODO: Write message text for UseAlert
-    return Text.of("UseAlert text");
+  public static UseAlert of(GriefProfile griefProfile, InteractItemEvent.Secondary event) {
+    return new UseAlert(griefProfile, event);
   }
 
   @Override
