@@ -1,7 +1,8 @@
 package com.minecraftonline.griefalert.alerts;
 
-import com.helion3.prism.api.records.PrismRecord;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.util.GriefEvents;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.Text;
 
@@ -33,6 +34,11 @@ public class SignPlaceAlert extends PrismAlert {
 //            "\n", "Line 4: ", lines.get(3)
 //        )).orElse(Text.of("No sign data available"))
 //    );
+  }
+
+  @Override
+  public GriefEvent getGriefEvent() {
+    return GriefEvents.PLACE;
   }
 
 }

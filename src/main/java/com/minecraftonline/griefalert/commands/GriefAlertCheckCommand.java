@@ -36,7 +36,6 @@ public class GriefAlertCheckCommand extends AbstractCommand {
       Player player = (Player) src;
       if (args.<Integer>getOne("alert code").isPresent()) {
 
-
         try {
 
           Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
@@ -45,20 +44,17 @@ public class GriefAlertCheckCommand extends AbstractCommand {
         } catch (IndexOutOfBoundsException e) {
           player.sendMessage(Format.error(Text.of(
               TextColors.RED,
-              "The Grief Event you tried to access could not be found.")
-          ));
+              "That alert could not be found.")));
         }
       } else {
         player.sendMessage(Format.error(Text.of(
             TextColors.RED,
-            "The queried Grief Event code could not be parsed.")
-        ));
+            "The alert code could not be parsed.")));
       }
     } else {
       src.sendMessage(Format.error(Text.of(
           TextColors.RED,
-          "Only players may execute this command")
-      ));
+          "Only players may execute this command")));
     }
     return CommandResult.success();
   }

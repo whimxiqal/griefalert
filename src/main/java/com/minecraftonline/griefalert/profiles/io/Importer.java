@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;

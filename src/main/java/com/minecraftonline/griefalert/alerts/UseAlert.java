@@ -1,7 +1,9 @@
 package com.minecraftonline.griefalert.alerts;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.util.GriefEvents;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
@@ -35,6 +37,11 @@ public class UseAlert extends Alert {
   @Override
   public Player getGriefer() {
     return (Player) itemEvent.getCause().root();
+  }
+
+  @Override
+  public GriefEvent getGriefEvent() {
+    return GriefEvents.ITEM_USE;
   }
 
 }

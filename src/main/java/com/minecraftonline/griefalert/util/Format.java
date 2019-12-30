@@ -64,7 +64,7 @@ public final class Format {
    */
   public static Text heading(Text content) {
     checkNotNull(content);
-    return Text.of(prefix(), TextColors.WHITE, content);
+    return Text.of(prefix(), TextColors.GOLD, TextStyles.BOLD, content);
   }
 
   /**

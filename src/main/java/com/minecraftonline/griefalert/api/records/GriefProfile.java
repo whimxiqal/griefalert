@@ -1,11 +1,11 @@
-package com.minecraftonline.griefalert.api.profiles;
+package com.minecraftonline.griefalert.api.records;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.exceptions.ProfileMalformedException;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.minecraftonline.griefalert.storage;
 
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.MySQLProfileQuery;
 import org.spongepowered.api.data.DataContainer;
 

@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert.api.profiles;
+package com.minecraftonline.griefalert.api.exceptions;
 
 public class ProfileMalformedException extends IllegalStateException {
 

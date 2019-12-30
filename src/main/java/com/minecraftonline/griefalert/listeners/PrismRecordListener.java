@@ -2,21 +2,15 @@ package com.minecraftonline.griefalert.listeners;
 
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.*;
-import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Comms;
-import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
-import com.sk89q.worldedit.util.Location;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
@@ -25,7 +19,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
   @Override
   public void handle(PrismRecordPreSaveEvent event) throws Exception {
-    PrismRecord record = event.getPrismRecord();
+    PrismRecordArchived record = PrismRecordArchived.of(event.getPrismRecord());
 
     // Temporary print statement to see all information within PrismRecord
     GriefAlert.getInstance().getLogger().debug(Prism.printRecord(record));
@@ -73,7 +67,9 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       GriefAlert.getInstance().getAlertQueue().push(alert.get());
 
       // Broadcast the Alert's message
-      Comms.getStaffBroadcastChannel().send(alert.get().getFullText());
+      if (!alert.get().isSilent()) {
+        Comms.getStaffBroadcastChannel().send(alert.get().getFullText());
+      }
     });
   }
 

@@ -1,13 +1,12 @@
 package com.minecraftonline.griefalert.api.alerts;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.profiles.GriefProfile;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -24,6 +23,7 @@ public abstract class Alert {
 
   protected final int cacheCode;
   protected final GriefProfile griefProfile;
+  private boolean silent = false;
 
   /**
    * Default constructor.
@@ -61,7 +61,7 @@ public abstract class Alert {
     officerTransformHistory.get(officer.getUniqueId()).push(officerPreviousTransform);
 
     officer.sendMessage(Format.heading("Checking Grief Alert:"));
-    officer.sendMessage(getMessageText());
+    officer.sendMessage(getSummary());
     return true;
 
   }
@@ -100,6 +100,8 @@ public abstract class Alert {
 
   public abstract Player getGriefer();
 
+  public abstract GriefEvent getGriefEvent();
+
   /**
    * Getter for the integer which represents this cached item in the ongoing.
    * AlertCache, which implements a RotatingQueue.
@@ -108,6 +110,14 @@ public abstract class Alert {
    */
   public final int getCacheCode() {
     return cacheCode;
+  }
+
+  public boolean isSilent() {
+    return silent;
+  }
+
+  public void setSilent(boolean silent) {
+    this.silent = silent;
   }
 
   /**
@@ -149,6 +159,11 @@ public abstract class Alert {
     }
   }
 
+  public final boolean isRepeatOf(Alert other) {
+    return other.getGriefer().getUniqueId().equals(getGriefer().getUniqueId())
+        && other.griefProfile.equals(griefProfile);
+  }
+
   protected final TextColor getEventColor() {
     return griefProfile.getDataContainer()
         .getString(GriefProfileDataQueries.EVENT_COLOR)
@@ -170,13 +185,12 @@ public abstract class Alert {
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 
-  protected Text getSummary() throws Exception {
+  protected Text getSummary() {
     Text.Builder builder = Text.builder();
 
-    builder.append(Text.of(TextColors.GOLD, TextStyles.BOLD, "Grief Alert"), Format.endLine());
     builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, getGriefer().getName()), Format.endLine());
     builder.append(Text.of(TextColors.DARK_AQUA, "Event: ", TextColors.GRAY, griefProfile.getGriefEvent().getId()), Format.endLine());
-    builder.append(Text.of(TextColors.DARK_AQUA, "Target: ", TextColors.GRAY, griefProfile.getTarget()), Format.endLine());
+    builder.append(Text.of(TextColors.DARK_AQUA, "Target: ", TextColors.GRAY, griefProfile.getTarget().replace("minecraft:", "")), Format.endLine());
     getTransform().ifPresent((transform) ->
         builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY,  Format.location(
             transform.getLocation().getBlockX(),

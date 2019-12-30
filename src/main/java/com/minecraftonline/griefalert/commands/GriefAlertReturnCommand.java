@@ -40,12 +40,12 @@ public class GriefAlertReturnCommand extends AbstractCommand {
       int revertsRemaining = Alert.revertTransform(player);
 
       if (revertsRemaining < 0) {
-        player.sendMessage(Format.info("You have no previous location(s)"));
+        player.sendMessage(Format.info("You have no previous location."));
       } else {
         player.sendMessage(Format.success(
             "Returned to previous location. (",
             Format.bonus(revertsRemaining),
-            " remaining saved locations)"));
+            " available)"));
       }
     }
     return CommandResult.success();

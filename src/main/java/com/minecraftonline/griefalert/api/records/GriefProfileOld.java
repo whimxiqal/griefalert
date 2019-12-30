@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert.api.profiles;
+package com.minecraftonline.griefalert.api.records;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.data.GriefEvent;

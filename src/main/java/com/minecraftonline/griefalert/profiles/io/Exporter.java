@@ -1,7 +1,7 @@
 package com.minecraftonline.griefalert.profiles.io;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.profiles.GriefProfileOld;
+import com.minecraftonline.griefalert.api.records.GriefProfileOld;
 
 import java.io.File;
 import java.io.IOException;
