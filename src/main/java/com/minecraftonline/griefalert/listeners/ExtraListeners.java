@@ -1,17 +1,24 @@
 package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.alerts.AttackAlert;
+import com.minecraftonline.griefalert.alerts.InteractAlert;
 import com.minecraftonline.griefalert.alerts.UseAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 
 import java.util.Optional;
 
 public final class ExtraListeners {
+
+  private ExtraListeners() {
+  }
 
   public static void register(GriefAlert plugin) {
     Sponge.getEventManager().registerListeners(plugin, new ExtraListeners());
@@ -31,10 +38,48 @@ public final class ExtraListeners {
     }
   }
 
-  // TODO: add listener for item frame
-  // TODO: add listener for armor stand
+  @Listener
+  public void onInteractBlockEventSecondary(InteractBlockEvent.Secondary event) {
+    if (event.getCause().root() instanceof Player) {
+      Player player = (Player) event.getCause().root();
 
-  private ExtraListeners() {
+      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
+          GriefEvents.INTERACT,
+          event.getTargetBlock().getState().getType().getId(),
+          player.getLocation().getExtent().getDimension().getType());
+
+      optionalProfile.ifPresent((profile) -> InteractAlert.of(profile, event).pushAndRun());
+    }
+  }
+
+  @Listener
+  public void onInteractEntityEventSecondary(InteractEntityEvent.Secondary event) {
+    if (event.getCause().root() instanceof Player) {
+      Player player = (Player) event.getCause().root();
+
+      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
+          GriefEvents.INTERACT,
+          event.getTargetEntity().getType().getId(),
+          player.getLocation().getExtent().getDimension().getType());
+
+      optionalProfile.ifPresent((profile) -> InteractAlert.of(profile, event).pushAndRun());
+    }
+  }
+
+  @Listener
+  public void onInteractEntityEventPrimary(InteractEntityEvent.Primary event) {
+
+    if (event.getCause().root() instanceof Player) {
+
+      Player player = (Player) event.getCause().root();
+
+      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
+          GriefEvents.ATTACK,
+          event.getTargetEntity().getType().getId(),
+          player.getLocation().getExtent().getDimension().getType());
+
+      optionalProfile.ifPresent((profile) -> AttackAlert.of(profile, event).pushAndRun());
+    }
   }
 
 }

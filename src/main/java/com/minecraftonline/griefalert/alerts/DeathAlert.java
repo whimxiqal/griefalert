@@ -5,6 +5,7 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import org.spongepowered.api.data.DataContainer;
 
+
 public class DeathAlert extends PrismAlert {
 
   DeathAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {

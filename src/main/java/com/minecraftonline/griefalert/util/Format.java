@@ -137,7 +137,7 @@ public final class Format {
    * @return Text Formatted content.
    */
   public static Text info(Object... objects) {
-    return success(Text.of(objects));
+    return info(Text.of(objects));
   }
 
   /**
@@ -275,5 +275,9 @@ public final class Format {
 
   public static Text space() {
     return Text.of(" ");
+  }
+
+  public static String removeMinecraftPrefix(String s) {
+    return s.replace("minecraft:", "");
   }
 }

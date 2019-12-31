@@ -34,14 +34,20 @@ public class ProfileCabinet {
   }
 
   private void load() {
-
     // Add all constant GriefProfiles in load as well
     add(GriefProfiles.PLACE_SIGN);
     add(GriefProfiles.BREAK_SIGN);
+    add(GriefProfiles.INTERACT_ITEM_FRAME);
+    add(GriefProfiles.INTERACT_ARMOR_STAND);
+    add(GriefProfiles.ATTACK_ITEM_FRAME);
+    add(GriefProfiles.ATTACK_ARMOR_STAND);
+    // ...
+
+    // Extras for testing
+    // TODO: remove
     add(GriefProfiles.BREAK_COBBLESTONE_TEST);
     add(GriefProfiles.KILL_COW_TEST);
     add(GriefProfiles.USE_EGG_TEST);
-    // ...
 
     // Get all other profiles from the onsite profile list
     // importer.retrieve().forEach(this::add);

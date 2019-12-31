@@ -22,6 +22,26 @@ public final class GriefProfiles {
           .set(GriefProfileDataQueries.TARGET, "minecraft:sign")
           .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK));
 
+  public static final GriefProfile INTERACT_ITEM_FRAME = GriefProfile.of(
+      DataContainer.createNew()
+          .set(GriefProfileDataQueries.TARGET, "minecraft:item_frame")
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.INTERACT));
+
+  public static final GriefProfile INTERACT_ARMOR_STAND = GriefProfile.of(
+      DataContainer.createNew()
+          .set(GriefProfileDataQueries.TARGET, "minecraft:armor_stand")
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.INTERACT));
+
+  public static final GriefProfile ATTACK_ITEM_FRAME = GriefProfile.of(
+      DataContainer.createNew()
+          .set(GriefProfileDataQueries.TARGET, "minecraft:item_frame")
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.ATTACK));
+
+  public static final GriefProfile ATTACK_ARMOR_STAND = GriefProfile.of(
+      DataContainer.createNew()
+          .set(GriefProfileDataQueries.TARGET, "minecraft:armor_stand")
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.ATTACK));
+
   public static final GriefProfile BREAK_COBBLESTONE_TEST = GriefProfile.of(
       DataContainer.createNew()
           .set(GriefProfileDataQueries.TARGET, "minecraft:cobblestone")
