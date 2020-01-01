@@ -17,12 +17,11 @@ public abstract class Alert implements Runnable {
 
   private static final HashMap<UUID, Stack<Transform<World>>> officerTransformHistory = new HashMap<>();
 
-  protected int cacheCode;
+  protected int stackIndex;
   protected final GriefProfile griefProfile;
   private boolean silent = false;
 
   protected Alert(GriefProfile griefProfile) {
-    this.cacheCode = cacheCode;
     this.griefProfile = griefProfile;
   }
 
@@ -103,14 +102,18 @@ public abstract class Alert implements Runnable {
 
   public abstract GriefEvent getGriefEvent();
 
+  public Optional<String> getExtraSummaryContent() {
+    return Optional.empty();
+  }
+
   /**
    * Getter for the integer which represents this cached item in the ongoing.
    * AlertCache, which implements a RotatingQueue.
    *
    * @return integer for cache code
    */
-  public final int getCacheCode() {
-    return cacheCode;
+  public final int getStackIndex() {
+    return stackIndex;
   }
 
   public boolean isSilent() {
@@ -149,17 +152,17 @@ public abstract class Alert implements Runnable {
    * @param otherCodes The list of other items to add to the text.
    * @return A full text to be broadcast to staff.
    */
-  final Text getFullText(List<Integer> otherCodes) {
+  private  Text getFullText(List<Integer> otherCodes) {
     try {
       Text.Builder builder = Text.builder().append(getMessageText());
-      otherCodes.add(0, getCacheCode()); // Add this to the list
+      otherCodes.add(0, getStackIndex()); // Add this to the list
       otherCodes.forEach((i) -> {
         builder.append(Format.space());
         Alert other = GriefAlert.getInstance().getAlertQueue().get(i);
         try {
           builder.append(
               Format.command(String.valueOf(i),
-                  "/ga check " + other.getCacheCode(),
+                  "/ga check " + other.getStackIndex(),
                   Text.of(other.getSummary())));
         } catch (Exception e) {
           e.printStackTrace();
@@ -173,8 +176,7 @@ public abstract class Alert implements Runnable {
   }
 
   public final boolean isRepeatOf(Alert other) {
-    return other.getGriefer().getUniqueId().equals(getGriefer().getUniqueId())
-        && other.griefProfile.equals(griefProfile);
+    return getMessageText().equals(other.getMessageText());
   }
 
   protected final TextColor getEventColor() {
@@ -195,12 +197,15 @@ public abstract class Alert implements Runnable {
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 
-  protected Text getSummary() {
+  private Text getSummary() {
     Text.Builder builder = Text.builder();
 
     builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, getGriefer().getName()), Format.endLine());
     builder.append(Text.of(TextColors.DARK_AQUA, "Event: ", TextColors.GRAY, griefProfile.getGriefEvent().getId()), Format.endLine());
     builder.append(Text.of(TextColors.DARK_AQUA, "Target: ", TextColors.GRAY, griefProfile.getTarget().replace("minecraft:", "")), Format.endLine());
+    getExtraSummaryContent().ifPresent((content) ->
+        builder.append(Text.of(TextColors.DARK_AQUA, "Extra: ", TextColors.GRAY, content, Format.endLine()))
+    );
     getTransform().ifPresent((transform) ->
         builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY,  Format.location(
             transform.getLocation().getBlockX(),
@@ -213,7 +218,7 @@ public abstract class Alert implements Runnable {
   }
 
 
-  public final void setCacheCode(int cacheCode) {
-    this.cacheCode = cacheCode;
+  public final void setStackIndex(int stackIndex) {
+    this.stackIndex = stackIndex;
   }
 }

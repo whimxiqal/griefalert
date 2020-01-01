@@ -1,11 +1,10 @@
 package com.minecraftonline.griefalert.api.structures;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class RotatingQueue<P> {
+public abstract class RotatingStack<P> {
 
   private int capacity;
   private int cursor;
@@ -13,7 +12,7 @@ public abstract class RotatingQueue<P> {
   private ArrayList<P> data;
   private boolean isFull = false;
 
-  public RotatingQueue(int capacity) {
+  public RotatingStack(int capacity) {
     this.capacity = capacity;
     cursor = 0;
     size = 0;
@@ -40,7 +39,7 @@ public abstract class RotatingQueue<P> {
     return capacity;
   }
 
-  public int cursor() {
+  protected int cursor() {
     return cursor;
   }
 

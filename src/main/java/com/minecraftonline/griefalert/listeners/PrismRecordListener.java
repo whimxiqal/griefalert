@@ -1,21 +1,16 @@
 package com.minecraftonline.griefalert.listeners;
 
-import com.google.common.collect.Lists;
-import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.alerts.*;
+import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.Comms;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.world.DimensionType;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
 

@@ -5,11 +5,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class RotatingQueueTest {
+public class RotatingStackTest {
 
   @Test
   public void pushAndGet() {
-    RotatingQueue<Integer> queue = new RotatingQueue<Integer>(4) {};
+    RotatingStack<Integer> queue = new RotatingStack<Integer>(4) {};
 
     assertEquals((Object) 0, queue.size());
 
@@ -41,7 +41,7 @@ public class RotatingQueueTest {
 
   @Test
   public void getDataByTime() {
-    RotatingQueue<Integer> queue = new RotatingQueue<Integer>(4) {};
+    RotatingStack<Integer> queue = new RotatingStack<Integer>(4) {};
 
     queue.push(1);
     queue.push(2);
@@ -60,7 +60,7 @@ public class RotatingQueueTest {
 
   @Test
   public void getDataByIndex() {
-    RotatingQueue<Integer> queue = new RotatingQueue<Integer>(4) {};
+    RotatingStack<Integer> queue = new RotatingStack<Integer>(4) {};
 
     queue.push(1);
     queue.push(2);

@@ -1,13 +1,14 @@
-package com.minecraftonline.griefalert.alerts;
+/* Created by PietElite */
+
+package com.minecraftonline.griefalert.alerts.sponge;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import java.util.Optional;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.world.World;
-
-import java.util.Optional;
 
 public abstract class SpongeAlert extends Alert {
 

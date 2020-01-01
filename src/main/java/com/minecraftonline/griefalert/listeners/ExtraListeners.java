@@ -1,9 +1,10 @@
 package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.alerts.AttackAlert;
-import com.minecraftonline.griefalert.alerts.InteractAlert;
-import com.minecraftonline.griefalert.alerts.UseAlert;
+import com.minecraftonline.griefalert.alerts.sponge.InteractBlockAlert;
+import com.minecraftonline.griefalert.alerts.sponge.UseAlert;
+import com.minecraftonline.griefalert.alerts.sponge.entities.AttackEntityAlert;
+import com.minecraftonline.griefalert.alerts.sponge.entities.InteractEntityAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import org.spongepowered.api.Sponge;
@@ -48,7 +49,7 @@ public final class ExtraListeners {
           event.getTargetBlock().getState().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> InteractAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> InteractBlockAlert.of(profile, event).pushAndRun());
     }
   }
 
@@ -62,7 +63,7 @@ public final class ExtraListeners {
           event.getTargetEntity().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> InteractAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> InteractEntityAlert.of(profile, event).pushAndRun());
     }
   }
 
@@ -78,7 +79,7 @@ public final class ExtraListeners {
           event.getTargetEntity().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> AttackAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> AttackEntityAlert.of(profile, event).pushAndRun());
     }
   }
 

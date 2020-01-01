@@ -4,7 +4,7 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
-import com.minecraftonline.griefalert.alerts.AlertQueue;
+import com.minecraftonline.griefalert.alerts.AlertStack;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.listeners.ExtraListeners;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
@@ -85,7 +85,7 @@ public final class GriefAlert {
 
   // Custom classes to help manage plugin
   private ProfileCabinet cabinet;
-  private AlertQueue alertQueue;
+  private AlertStack alertQueue;
   private ConfigHelper configHelper;
   private MySQLProfileStorage profileStorage;
 
@@ -111,7 +111,7 @@ public final class GriefAlert {
     // Load the config from the Sponge API and set the specific node values.
     configHelper = new ConfigHelper(defaultConfig, rootNode);
     cabinet = new ProfileCabinet();
-    alertQueue = new AlertQueue(configHelper.getCachedEventLimit());
+    alertQueue = new AlertStack(configHelper.getCachedEventLimit());
     profileStorage = new MySQLProfileStorage();
 
     // Register all the commands with Sponge
@@ -171,7 +171,7 @@ public final class GriefAlert {
     return configManager;
   }
 
-  public AlertQueue getAlertQueue() {
+  public AlertStack getAlertQueue() {
     return alertQueue;
   }
 

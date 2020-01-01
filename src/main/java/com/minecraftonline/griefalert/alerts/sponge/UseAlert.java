@@ -1,4 +1,6 @@
-package com.minecraftonline.griefalert.alerts;
+/* Created by PietElite */
+
+package com.minecraftonline.griefalert.alerts.sponge;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;

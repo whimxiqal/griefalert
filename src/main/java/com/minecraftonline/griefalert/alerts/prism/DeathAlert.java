@@ -1,15 +1,17 @@
-package com.minecraftonline.griefalert.alerts;
+/* Created by PietElite */
+
+package com.minecraftonline.griefalert.alerts.prism;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.GriefEvents;
-import org.spongepowered.api.data.DataContainer;
 
 
 public class DeathAlert extends PrismAlert {
 
-  DeathAlert(GriefProfile griefProfile, DataContainer prismDataContainer) {
-    super(griefProfile, prismDataContainer);
+  DeathAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+    super(griefProfile, prismRecord);
   }
 
   @Override
