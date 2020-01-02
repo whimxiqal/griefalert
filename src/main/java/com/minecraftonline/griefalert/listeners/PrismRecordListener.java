@@ -7,6 +7,7 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
+import com.minecraftonline.griefalert.util.Registry;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.world.DimensionType;
 
@@ -24,7 +25,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
     // See if this record matches any GriefProfiles
 
-    if (!GriefEvents.Registry.of(record.getEvent()).isPresent()) {
+    if (!Registry.lookupGriefEvent(record.getEvent()).isPresent()) {
       GriefAlert.getInstance().getLogger().debug(String.format("PrismEvent passed: Prism Event '%s' is not being checked.", record.getEvent()));
       return;
     }
@@ -42,7 +43,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
     }
 
     Optional<GriefProfile> profileOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
-        GriefEvents.Registry.of(record.getEvent()).get(),
+        Registry.lookupGriefEvent(record.getEvent()).get(),
         targetOptional.get(),
         dimensionTypeOptional.get()
     );

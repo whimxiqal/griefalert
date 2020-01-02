@@ -19,37 +19,4 @@ public final class GriefEvents {
   public static final GriefEvent INTERACT = GriefEvent.of("interact", "Interact", "interacted with");
   public static final GriefEvent ATTACK = GriefEvent.of("attack", "Attack", "attacked");
 
-  public static class Registry {
-
-    public static Optional<GriefEvent> of(String id) throws IllegalArgumentException {
-      switch (id.toLowerCase()) {
-        case "break":
-          return Optional.of(GriefEvents.BREAK);
-        case "place":
-          return Optional.of(GriefEvents.PLACE);
-        case "death":
-          return Optional.of(GriefEvents.DEATH);
-        case "use":
-          return Optional.of(GriefEvents.ITEM_USE);
-        case "interact":
-          return Optional.of(GriefEvents.INTERACT);
-        default:
-          return Optional.empty();
-      }
-    }
-
-    public static Optional<GriefEvent> of(PrismEvent prismEvent) throws IllegalArgumentException {
-      if (prismEvent == PrismEvents.BLOCK_BREAK) {
-        return Optional.of(GriefEvents.BREAK);
-      } else if (prismEvent == PrismEvents.BLOCK_PLACE) {
-        return Optional.of(GriefEvents.PLACE);
-      } else if (prismEvent == PrismEvents.ENTITY_DEATH) {
-        return Optional.of(GriefEvents.DEATH);
-      } else {
-        return Optional.empty();
-      }
-    }
-
-  }
-
 }
