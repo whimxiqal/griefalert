@@ -49,9 +49,8 @@ public final class GriefProfiles {
       DataContainer.createNew()
           .set(GriefProfileDataQueries.TARGET, "minecraft:cobblestone")
           .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK)
-          .set(GriefProfileDataQueries.IGNORED_DIMENSIONS, Lists.newArrayList(
-              DimensionTypes.NETHER,
-              DimensionTypes.THE_END)));
+          .set(GriefProfileDataQueries.IGNORE_OVERWORLD, true)
+      .set(GriefProfileDataQueries.IGNORE_THE_END, true));
 
   public static final GriefProfile KILL_COW_TEST = GriefProfile.of(
       DataContainer.createNew()

@@ -50,7 +50,7 @@ public class ProfileCabinet {
     add(GriefProfiles.USE_EGG_TEST);
 
     // Get all other profiles from the onsite profile list
-    // importer.retrieve().forEach(this::add);
+    GriefAlert.getInstance().getProfileStorage().retrieve().forEach(this::add);
   }
 
 

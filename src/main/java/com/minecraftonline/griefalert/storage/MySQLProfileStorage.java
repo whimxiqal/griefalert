@@ -1,11 +1,11 @@
 package com.minecraftonline.griefalert.storage;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.api.storage.MySQLProfileQuery;
-import org.spongepowered.api.data.DataContainer;
 
 import java.sql.Connection;
+import java.util.Collections;
 import java.util.List;
 
 public class MySQLProfileStorage {
@@ -28,9 +28,14 @@ public class MySQLProfileStorage {
     // TODO: implement
   }
 
-  public List<DataContainer> query(MySQLProfileQuery query) {
-    // TODO: implement after implementing MySQLProfileQuery
-    return null;
+  public boolean remove(GriefEvent griefEvent, String target) {
+    // TODO: implement
+    return false;
+  }
+
+  public List<GriefProfile> retrieve() {
+    // TODO: implement
+    return Collections.emptyList();
   }
 
   private Connection getConnection() {

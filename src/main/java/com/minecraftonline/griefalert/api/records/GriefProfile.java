@@ -1,13 +1,12 @@
 package com.minecraftonline.griefalert.api.records;
 
-import com.google.common.collect.Lists;
-import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.exceptions.ProfileMalformedException;
-import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.DimensionTypes;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,8 +59,17 @@ public class GriefProfile {
 
 
   public boolean isIgnoredIn(DimensionType dimensionType) {
-    Optional<List<?>> dimensionListOptional = dataContainer.getList(GriefProfileDataQueries.IGNORED_DIMENSIONS);
-    return dimensionListOptional.map(objects -> objects.contains(dimensionType.getId())).orElse(false);
+    DataQuery query;
+    if (dimensionType == DimensionTypes.OVERWORLD) {
+      query = GriefProfileDataQueries.IGNORE_OVERWORLD;
+    } else if (dimensionType == DimensionTypes.NETHER) {
+      query = GriefProfileDataQueries.IGNORE_NETHER;
+    } else {
+      query = GriefProfileDataQueries.IGNORE_THE_END;
+    }
+
+    return dataContainer.getBoolean(query).orElse(false);
+
   }
 
   public String printData() {
