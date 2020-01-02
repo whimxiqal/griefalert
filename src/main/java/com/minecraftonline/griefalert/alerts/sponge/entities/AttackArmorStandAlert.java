@@ -31,7 +31,7 @@ public class AttackArmorStandAlert extends AttackEntityAlert {
         TextColors.RED,
         String.format(
             "(%s)",
-            SpongeEvents.getArmorStandContentMessage((InteractEntityEvent) getEvent()))));
+            SpongeEvents.getArmorStandContentMessage(getEntitySnapshot()))));
     getTransform().ifPresent((transform -> builder.append(Text.of(
         TextColors.RED, " in the ",
         getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
@@ -40,7 +40,7 @@ public class AttackArmorStandAlert extends AttackEntityAlert {
 
   @Override
   public Optional<String> getExtraSummaryContent() {
-    return SpongeEvents.getArmorStandContent((InteractEntityEvent) getEvent());
+    return SpongeEvents.getArmorStandContent(getEntitySnapshot());
   }
 
 }

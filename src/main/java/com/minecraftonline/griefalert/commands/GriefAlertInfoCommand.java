@@ -4,6 +4,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -33,13 +34,15 @@ public class GriefAlertInfoCommand extends AbstractCommand {
                                @NonnullByDefault CommandContext args) throws CommandException {
     Player player = (Player) src;
     if (args.<Integer>getOne("alert code").isPresent()) {
-      Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
-      player.sendMessage(alert.getMessageText());
+      try {
+        Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
+        player.sendMessage(Format.heading("Grief Alert Info"));
+        player.sendMessage(alert.getSummary());
+      } catch (IndexOutOfBoundsException e) {
+        player.sendMessage(Format.error("That alert could not be found."));
+      }
     } else {
-      player.sendMessage(Text.of(
-          TextColors.RED,
-          "The queried Grief Event code could not be parsed")
-      );
+      player.sendMessage(Format.error("The queried Grief Event code could not be parsed"));
     }
     return CommandResult.success();
   }

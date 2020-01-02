@@ -31,7 +31,7 @@ public class AttackItemFrameAlert extends AttackEntityAlert {
         TextColors.RED,
         String.format(
             "(%s)",
-            SpongeEvents.getItemFrameContentMessage((InteractEntityEvent) getEvent()))));
+            SpongeEvents.getItemFrameContentMessage(getEntitySnapshot()))));
     getTransform().ifPresent((transform -> builder.append(Text.of(
         TextColors.RED, " in the ",
         getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
@@ -40,7 +40,7 @@ public class AttackItemFrameAlert extends AttackEntityAlert {
 
   @Override
   public Optional<String> getExtraSummaryContent() {
-    return SpongeEvents.getItemFrameContent((InteractEntityEvent) getEvent());
+    return SpongeEvents.getItemFrameContent(getEntitySnapshot());
   }
 
 }

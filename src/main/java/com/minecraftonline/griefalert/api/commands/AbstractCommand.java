@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.api.commands;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.commands.HelpCommand;
 import com.minecraftonline.griefalert.util.Permissions;
 import org.spongepowered.api.command.CommandSource;
@@ -15,7 +16,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 public abstract class AbstractCommand implements CommandExecutor {
 
-  public final Permissions.Permission permission;
+  public final Permission permission;
   private final Text description;
   private List<AbstractCommand> commandChildren = new LinkedList<>();
   private List<String> aliases = new LinkedList<>();
@@ -27,7 +28,7 @@ public abstract class AbstractCommand implements CommandExecutor {
    * @param permission  The permission which is required for this command
    * @param description The general description of this command functionality
    */
-  public AbstractCommand(Permissions.Permission permission,
+  public AbstractCommand(Permission permission,
                          Text description) {
     this.permission = permission;
     this.description = description;
@@ -36,7 +37,7 @@ public abstract class AbstractCommand implements CommandExecutor {
     }
   }
 
-  public AbstractCommand(Permissions.Permission permission,
+  public AbstractCommand(Permission permission,
                          Text description,
                          String primaryAlias) {
     this(permission, description);

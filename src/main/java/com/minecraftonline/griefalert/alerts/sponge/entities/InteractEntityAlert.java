@@ -8,7 +8,7 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 
-public class InteractEntityAlert extends SpongeAlert {
+public class InteractEntityAlert extends EntityAlert {
 
   InteractEntityAlert(GriefProfile griefProfile, InteractEntityEvent.Secondary event) {
     super(griefProfile, event);

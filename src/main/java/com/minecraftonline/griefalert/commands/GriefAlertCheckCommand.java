@@ -42,9 +42,7 @@ public class GriefAlertCheckCommand extends AbstractCommand {
           alert.check(player);
 
         } catch (IndexOutOfBoundsException e) {
-          player.sendMessage(Format.error(Text.of(
-              TextColors.RED,
-              "That alert could not be found.")));
+          player.sendMessage(Format.error("That alert could not be found."));
         }
       } else {
         player.sendMessage(Format.error(Text.of(

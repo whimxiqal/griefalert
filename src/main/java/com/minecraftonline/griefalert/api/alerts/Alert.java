@@ -197,7 +197,7 @@ public abstract class Alert implements Runnable {
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 
-  private Text getSummary() {
+  public Text getSummary() {
     Text.Builder builder = Text.builder();
 
     builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, getGriefer().getName()), Format.endLine());

@@ -5,6 +5,8 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.alerts.AlertStack;
+import com.minecraftonline.griefalert.api.commands.DeprecatedCommand;
+import com.minecraftonline.griefalert.commands.DeprecatedCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.listeners.ExtraListeners;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
@@ -148,6 +150,12 @@ public final class GriefAlert {
         this,
         griefAlertCommand.buildCommandSpec(),
         griefAlertCommand.getAliases());
+    for (DeprecatedCommand command : DeprecatedCommands.get()) {
+      Sponge.getCommandManager().register(
+          this,
+          command.buildCommandSpec(),
+          command.getAliases());
+    }
   }
 
   private void registerListeners() {
