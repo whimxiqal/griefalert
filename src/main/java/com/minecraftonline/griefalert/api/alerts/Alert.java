@@ -208,11 +208,7 @@ public abstract class Alert implements Runnable {
     );
     getTransform().ifPresent((transform) ->
         builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY,  Format.location(
-            transform.getLocation().getBlockX(),
-            transform.getLocation().getBlockY(),
-            transform.getLocation().getBlockZ(),
-            transform.getLocation().getExtent(),
-            false))));
+            transform.getLocation()))));
 
     return builder.build();
   }

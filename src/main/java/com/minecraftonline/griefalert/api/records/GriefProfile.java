@@ -11,6 +11,7 @@ import org.spongepowered.api.world.DimensionType;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GriefProfile {
 
@@ -60,9 +61,7 @@ public class GriefProfile {
 
   public boolean isIgnoredIn(DimensionType dimensionType) {
     Optional<List<?>> dimensionListOptional = dataContainer.getList(GriefProfileDataQueries.IGNORED_DIMENSIONS);
-
-    return dimensionListOptional.filter(objects -> Lists.transform(objects, Object::toString).contains(dimensionType.getName())).isPresent();
-
+    return dimensionListOptional.map(objects -> objects.contains(dimensionType.getId())).orElse(false);
   }
 
   public String printData() {

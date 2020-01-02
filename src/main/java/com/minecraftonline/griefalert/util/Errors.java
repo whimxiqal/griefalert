@@ -15,12 +15,8 @@ public final class Errors {
     receiver.sendMessage(
         ChatTypes.CHAT,
         Format.error(
-            String.format(
-                "You could not be teleported safely to this location: %s, %s, %s; %s",
-                transform.getPosition().getFloorX(),
-                transform.getPosition().getFloorY(),
-                transform.getPosition().getFloorZ(),
-                transform.getExtent().getDimension().getType().getName())));
+                "You could not be teleported safely to this location: ", Format.location(
+                transform.getLocation())));
   }
 
 }

@@ -1,9 +1,12 @@
 package com.minecraftonline.griefalert.api.records;
 
+import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.DimensionTypes;
 
 public final class GriefProfiles {
 
@@ -45,7 +48,10 @@ public final class GriefProfiles {
   public static final GriefProfile BREAK_COBBLESTONE_TEST = GriefProfile.of(
       DataContainer.createNew()
           .set(GriefProfileDataQueries.TARGET, "minecraft:cobblestone")
-          .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK));
+          .set(GriefProfileDataQueries.EVENT, GriefEvents.BREAK)
+          .set(GriefProfileDataQueries.IGNORED_DIMENSIONS, Lists.newArrayList(
+              DimensionTypes.NETHER,
+              DimensionTypes.THE_END)));
 
   public static final GriefProfile KILL_COW_TEST = GriefProfile.of(
       DataContainer.createNew()

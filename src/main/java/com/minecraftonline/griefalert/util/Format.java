@@ -10,6 +10,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
@@ -237,36 +238,14 @@ public final class Format {
     return textBuilder.build();
   }
 
-  /**
-   * Return content formatted with location information.
-   * Optionally a click action can be added to teleport
-   * the message recipients to the provided location.
-   *
-   * @param x           X Coordinate
-   * @param y           Y Coordinate
-   * @param z           Z Coordinate
-   * @param world       World
-   * @param clickAction Click Action
-   * @return Text Formatted content.
-   */
-  public static Text location(int x, int y, int z, @Nullable World world, boolean clickAction) {
-    Text.Builder textBuilder = Text.builder();
-    textBuilder.append(Text.of(String.format("(x: %s, y: %s, z: %s", x, y, z)));
-    if (world != null) {
-      textBuilder.append(Text.of(", dimension: ", world.getDimension().getType().getName()));
+  public static Text location(Location<World> location) {
+    return Text.of(String.format(
+        "(x: %s, y: %s, z: %s, dimension: %s)",
+        location.getBlockX(),
+        location.getBlockY(),
+        location.getBlockZ(),
+        location.getExtent().getDimension().getType().getName()));
 
-      if (clickAction) {
-        textBuilder.onClick(TextActions.executeCallback(commandSource -> {
-          if (!(commandSource instanceof Player)) {
-            return;
-          }
-
-          ((Player) commandSource).setLocation(world.getLocation(x, y, z));
-        }));
-      }
-    }
-
-    return textBuilder.append(Text.of(")")).build();
   }
 
   public static Text endLine() {
