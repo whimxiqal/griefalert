@@ -3,6 +3,7 @@ package com.minecraftonline.griefalert.api.records;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.exceptions.ProfileMalformedException;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import com.minecraftonline.griefalert.util.Registry;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.DimensionType;
@@ -37,10 +38,16 @@ public class GriefProfile {
 
 
   public GriefEvent getGriefEvent() throws ProfileMalformedException {
-    Optional<GriefEvent> eventOptional = dataContainer.get(GriefProfileDataQueries.EVENT).map((object) -> (GriefEvent) object);
+    Optional<String> eventIdOptional = dataContainer.getString(GriefProfileDataQueries.EVENT);
+
+    if (!eventIdOptional.isPresent()) {
+      throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
+    }
+
+    Optional<GriefEvent> eventOptional = Registry.lookupGriefEvent(eventIdOptional.get());
 
     if (!eventOptional.isPresent()) {
-      throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
+      throw new ProfileMalformedException("Invalid GriefEvent id saved in GriefProfile: \n" + printData());
     }
 
     return eventOptional.get();

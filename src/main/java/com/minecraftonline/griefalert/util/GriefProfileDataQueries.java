@@ -9,9 +9,9 @@ public final class GriefProfileDataQueries {
 
   public static final DataQuery EVENT = DataQuery.of("event");
   public static final DataQuery TARGET = DataQuery.of("target");
-  public static final DataQuery IGNORE_OVERWORLD = DataQuery.of("ignoreOverworld");
-  public static final DataQuery IGNORE_NETHER = DataQuery.of("ignoreNether");
-  public static final DataQuery IGNORE_THE_END = DataQuery.of("ignoreTheEnd");
+  public static final DataQuery IGNORE_OVERWORLD = DataQuery.of("ignore_overworld");
+  public static final DataQuery IGNORE_NETHER = DataQuery.of("ignore_nether");
+  public static final DataQuery IGNORE_THE_END = DataQuery.of("ignore_the_end");
   public static final DataQuery EVENT_COLOR = DataQuery.of("event_color");
   public static final DataQuery TARGET_COLOR = DataQuery.of("target_color");
   public static final DataQuery DIMENSION_COLOR = DataQuery.of("dimension_color");

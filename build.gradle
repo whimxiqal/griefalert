@@ -31,10 +31,11 @@ compileJava {
 }
 
 dependencies {
-    compileOnly "org.spongepowered:spongeapi:${sponge_version}"
+    compile "org.spongepowered:spongeapi:${sponge_version}"
     compile 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
     compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'org.xerial:sqlite-jdbc:3.8.11.2'
 }
 
 //sponge.plugin.meta {

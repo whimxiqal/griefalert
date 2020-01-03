@@ -161,4 +161,10 @@ public abstract class General {
     return output;
   }
 
+  public static void printStackTraceToDebugLogger(StackTraceElement[] elements) {
+    for (StackTraceElement element : elements) {
+      GriefAlert.getInstance().getLogger().debug(element.toString());
+    }
+  }
+
 }

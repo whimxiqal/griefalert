@@ -12,7 +12,7 @@ import com.minecraftonline.griefalert.listeners.ExtraListeners;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.profiles.ProfileCabinet;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
-import com.minecraftonline.griefalert.storage.MySQLProfileStorage;
+import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.util.General;
 
 import java.io.File;
@@ -89,7 +89,7 @@ public final class GriefAlert {
   private ProfileCabinet cabinet;
   private AlertStack alertQueue;
   private ConfigHelper configHelper;
-  private MySQLProfileStorage profileStorage;
+  private MySqlProfileStorage profileStorage;
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
@@ -105,16 +105,19 @@ public final class GriefAlert {
   @Listener
   public void initialize(GamePreInitializationEvent event) {
     General.stampConsole();
+
+    // Load the config from the Sponge API and set the specific node values.
     try {
       rootNode = configManager.load();
     } catch (IOException e) {
       e.printStackTrace();
     }
-    // Load the config from the Sponge API and set the specific node values.
+
+    // Set helper manager classes
     configHelper = new ConfigHelper(defaultConfig, rootNode);
+    profileStorage = new MySqlProfileStorage();
     cabinet = new ProfileCabinet();
     alertQueue = new AlertStack(configHelper.getCachedEventLimit());
-    profileStorage = new MySQLProfileStorage();
 
     // Register all the commands with Sponge
     registerCommands();
@@ -187,7 +190,7 @@ public final class GriefAlert {
     return configHelper;
   }
 
-  public MySQLProfileStorage getProfileStorage() {
+  public MySqlProfileStorage getProfileStorage() {
     return profileStorage;
   }
 

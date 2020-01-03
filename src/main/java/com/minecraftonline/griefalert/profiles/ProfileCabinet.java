@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.records.GriefProfiles;
+import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import org.spongepowered.api.world.DimensionType;
 
 public class ProfileCabinet {
@@ -50,7 +51,15 @@ public class ProfileCabinet {
     add(GriefProfiles.USE_EGG_TEST);
 
     // Get all other profiles from the onsite profile list
-    GriefAlert.getInstance().getProfileStorage().retrieve().forEach(this::add);
+    MySqlProfileStorage profileStorage = GriefAlert.getInstance().getProfileStorage();
+    try {
+      profileStorage.connect();
+      profileStorage.retrieve().forEach(this::add);
+      profileStorage.close();
+    } catch (Exception e) {
+      GriefAlert.getInstance().getLogger().error("Could not setup SQL connection to GriefProfiles.");
+    } finally {
+    }
   }
 
 
