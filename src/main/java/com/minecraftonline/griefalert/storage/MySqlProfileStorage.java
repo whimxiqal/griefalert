@@ -159,15 +159,22 @@ public class MySqlProfileStorage {
     ResultSet rs = connection.prepareStatement(command).executeQuery();
 
     while (rs.next()) {
-      profiles.add(GriefProfile.of(DataContainer.createNew()
+      DataContainer container = DataContainer.createNew()
           .set(GriefProfileDataQueries.EVENT, rs.getString(1))
           .set(GriefProfileDataQueries.TARGET, rs.getString(2))
           .set(GriefProfileDataQueries.IGNORE_OVERWORLD, rs.getBoolean(3))
           .set(GriefProfileDataQueries.IGNORE_NETHER, rs.getBoolean(4))
-          .set(GriefProfileDataQueries.IGNORE_THE_END, rs.getBoolean(5))
-          .set(GriefProfileDataQueries.EVENT_COLOR, rs.getString(6))
-          .set(GriefProfileDataQueries.TARGET_COLOR, rs.getString(7))
-          .set(GriefProfileDataQueries.DIMENSION_COLOR, rs.getString(8))));
+          .set(GriefProfileDataQueries.IGNORE_THE_END, rs.getBoolean(5));
+      if (rs.getString(6) != null) {
+        container.set(GriefProfileDataQueries.EVENT_COLOR, rs.getString(6));
+      }
+      if (rs.getString(7) != null) {
+        container.set(GriefProfileDataQueries.TARGET_COLOR, rs.getString(7));
+      }
+      if (rs.getString(8) != null) {
+        container.set(GriefProfileDataQueries.DIMENSION_COLOR, rs.getString(8));
+      }
+      profiles.add(GriefProfile.of(container));
     }
 
     return profiles;

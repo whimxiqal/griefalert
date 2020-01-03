@@ -107,21 +107,12 @@ public abstract class PrismAlert extends Alert {
         return Optional.of(new BreakAlert(griefProfile, prismRecord));
       }
     } else if (prismRecord.getEvent().equals(PrismEvents.BLOCK_PLACE.getId())) {
-      if (targetOptional.get().contains("sign")) {
 
-        // -----------------------------
-        // Condition for a SignPlaceAlert
-        // -----------------------------
+      // -----------------------------
+      // Condition for a PlaceAlert
+      // -----------------------------
 
-        return Optional.of(new SignPlaceAlert(griefProfile, prismRecord));
-      } else {
-
-        // -----------------------------
-        // Condition for a PlaceAlert
-        // -----------------------------
-
-        return Optional.of(new PlaceAlert(griefProfile, prismRecord));
-      }
+      return Optional.of(new PlaceAlert(griefProfile, prismRecord));
     } else if (prismRecord.getEvent().equals(PrismEvents.ENTITY_DEATH.getId())) {
 
       // -----------------------------

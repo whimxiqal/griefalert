@@ -36,6 +36,10 @@ public class GriefProfile {
     return dataContainer;
   }
 
+  public boolean isValid() {
+    return dataContainer.getString(GriefProfileDataQueries.EVENT).isPresent()
+        && dataContainer.getString(GriefProfileDataQueries.TARGET).isPresent();
+  }
 
   public GriefEvent getGriefEvent() throws ProfileMalformedException {
     Optional<String> eventIdOptional = dataContainer.getString(GriefProfileDataQueries.EVENT);

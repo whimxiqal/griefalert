@@ -5,10 +5,8 @@ package com.minecraftonline.griefalert.alerts.prism;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.GriefEvents;
-import com.minecraftonline.griefalert.util.Prism;
+import com.minecraftonline.griefalert.util.*;
+
 import java.util.List;
 import java.util.Optional;
 import org.spongepowered.api.text.Text;
@@ -31,7 +29,7 @@ public class SignBreakAlert extends PrismAlert {
         Format.space(),
         getEventColor(), "broke",
         Format.space(),
-        getTargetColor(), "a sign"));
+        getTargetColor(), Grammar.addIndefiniteArticle(griefProfile.getTarget())));
 
     getTransform().ifPresent((transform -> builder.append(Text.of(
         TextColors.RED, " in the ",

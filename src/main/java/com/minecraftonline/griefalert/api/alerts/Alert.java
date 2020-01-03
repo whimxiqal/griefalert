@@ -131,9 +131,15 @@ public abstract class Alert implements Runnable {
 
   @Override
   public void run() {
+
+    if (getGriefer().hasPermission(Permissions.GRIEFALERT_SILENT.toString())) {
+      setSilent(true);
+    }
+
     if (!isSilent()) {
       Comms.getStaffBroadcastChannel().send(getFullText());
     }
+
   }
 
   /**
@@ -181,19 +187,22 @@ public abstract class Alert implements Runnable {
 
   protected final TextColor getEventColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.EVENT_COLOR).map(General::stringToColor)
+        .getString(GriefProfileDataQueries.EVENT_COLOR).map((s) -> Registry.lookupTextColor(s)
+            .orElse(Format.ALERT_EVENT_COLOR))
         .orElse(Format.ALERT_EVENT_COLOR);
   }
 
   protected final TextColor getTargetColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.TARGET_COLOR).map(General::stringToColor)
+        .getString(GriefProfileDataQueries.TARGET_COLOR).map((s) -> Registry.lookupTextColor(s)
+            .orElse(Format.ALERT_TARGET_COLOR))
         .orElse(Format.ALERT_TARGET_COLOR);
   }
 
   protected final TextColor getDimensionColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map(General::stringToColor)
+        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map((s) -> Registry.lookupTextColor(s)
+            .orElse(Format.ALERT_DIMENSION_COLOR))
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 

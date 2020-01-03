@@ -2,14 +2,18 @@ package com.minecraftonline.griefalert.api.data;
 
 public class Permission {
 
-  private final String permissionString;
+  private final String perm;
 
-  public Permission(String permissionString) {
-    this.permissionString = permissionString;
+  private Permission(String perm) {
+    this.perm = perm;
+  }
+
+  public static Permission of(String perm) {
+    return new Permission(perm);
   }
 
   public String toString() {
-    return permissionString;
+    return perm;
   }
 
 }

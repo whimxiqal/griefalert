@@ -30,7 +30,8 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       return;
     }
 
-    Optional<String> targetOptional = Prism.getTarget(record);
+    // Replace spaces with underscores because for some reason Prism removes them...
+    Optional<String> targetOptional = Prism.getTarget(record).map((s) -> s.replace(" ", "_"));
     if (!targetOptional.isPresent()) {
       GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no target found.");
       return;

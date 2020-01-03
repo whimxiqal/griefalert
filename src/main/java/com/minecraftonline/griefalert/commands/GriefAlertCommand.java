@@ -27,14 +27,14 @@ public class GriefAlertCommand extends AbstractCommand {
     addChild(new GriefAlertRecentCommand());
     addChild(new GriefAlertReturnCommand());
     addChild(new GriefAlertReloadCommand());
+    addChild(new GriefAlertProfileCommand());
 
   }
 
   @Override
-  @NonnullByDefault
   public CommandResult execute(@NonnullByDefault CommandSource src,
                                @NonnullByDefault CommandContext args) throws CommandException {
-    src.sendMessage(Text.of(TextColors.GREEN, "Success!"));
+    sendHelp(src);
     return CommandResult.success();
   }
 

@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import com.minecraftonline.griefalert.api.records.GriefProfiles;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
+import com.minecraftonline.griefalert.util.General;
 import org.spongepowered.api.world.DimensionType;
 
 public class ProfileCabinet {
@@ -31,7 +32,7 @@ public class ProfileCabinet {
   public void reload() {
     storage.clear();
     load();
-    GriefAlert.getInstance().getLogger().warn("Grief Profiles were imported to profile museum cache.");
+    GriefAlert.getInstance().getLogger().info("Grief Profiles were reloaded");
   }
 
   private void load() {
@@ -57,8 +58,8 @@ public class ProfileCabinet {
       profileStorage.retrieve().forEach(this::add);
       profileStorage.close();
     } catch (Exception e) {
-      GriefAlert.getInstance().getLogger().error("Could not setup SQL connection to GriefProfiles.");
-    } finally {
+      GriefAlert.getInstance().getLogger().error("Could not setup SQL connection to GriefProfiles. See debug logger for more info");
+      General.printStackTraceToDebugLogger(e);
     }
   }
 
