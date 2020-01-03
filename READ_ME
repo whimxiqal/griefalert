@@ -8,11 +8,3 @@ Commands:
 	/gcheck
 	/grecent
 	/griefalert toggle debugmode <true|false>
-
-Notes to Administrators:
-	
-	Unchecked Server Compatibility Details:
-	(Some things are specific to MCO and require the attention of MCO staff
-	who know how systems need to connect into the old systems)
-		- Logging grief instances to SQL database with correct syntax (see GriefLogger.java)
-		- Logging sign placement instances to SQL database with correct syntax (see GriefLogger.java)
