@@ -1,5 +1,10 @@
 package com.minecraftonline.griefalert.util;
 
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.util.DataQueries;
@@ -9,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataQuery;
@@ -70,12 +76,42 @@ public abstract class Prism {
     return record.getDataContainer().getObject(DataQueries.EntityType, EntityType.class);
   }
 
-  public static Optional<List<String>> getPlacedSignLines(PrismRecordArchived record) {
-    return Optional.of(Arrays.asList("Line1", "Line2", "Line3", "Line4"));
-  }
+  public static Optional<SignText> getBrokenSignLines(PrismRecordArchived record) {
+    Optional<DataView> originalOptional = record.getDataContainer().getView(DataQueries.OriginalBlock);
 
-  public static Optional<List<String>> getBrokenSignLines(PrismRecordArchived record) {
-    return Optional.of(Arrays.asList("Line1", "Line2", "Line3", "Line4"));
+    if (!originalOptional.isPresent()) {
+      return Optional.empty();
+    }
+
+    Optional<DataView> unsafeOptional = originalOptional.get().getView(DataQueries.UnsafeData);
+
+    if (!unsafeOptional.isPresent()) {
+      return Optional.empty();
+    }
+
+    Optional<String> text1 = unsafeOptional.get().getString(DataQuery.of("Text1")).map((text) ->
+        new Gson().fromJson(
+            text,
+            JsonObject.class).get("text").getAsString());
+    Optional<String> text2 = unsafeOptional.get().getString(DataQuery.of("Text2")).map((text) ->
+        new Gson().fromJson(
+            text,
+            JsonObject.class).get("text").getAsString());
+    Optional<String> text3 = unsafeOptional.get().getString(DataQuery.of("Text3")).map((text) ->
+        new Gson().fromJson(
+            text,
+            JsonObject.class).get("text").getAsString());
+    Optional<String> text4 = unsafeOptional.get().getString(DataQuery.of("Text4")).map((text) ->
+        new Gson().fromJson(
+            text,
+            JsonObject.class).get("text").getAsString());
+    return Optional.of(SignText.of(
+        text1.orElse(null),
+        text2.orElse(null),
+        text3.orElse(null),
+        text4.orElse(null)));
+
+
   }
 
   public static String printRecord(PrismRecordArchived record) {

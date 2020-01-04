@@ -118,7 +118,7 @@ public final class GriefAlert {
     configHelper = new ConfigHelper(defaultConfig, rootNode);
     profileStorage = new MySqlProfileStorage();
     cabinet = new ProfileCabinet();
-    alertQueue = new AlertStack(configHelper.getCachedEventLimit());
+    alertQueue = new AlertStack(10); //configHelper.getCachedEventLimit());
 
     // Register all the commands with Sponge
     registerCommands();

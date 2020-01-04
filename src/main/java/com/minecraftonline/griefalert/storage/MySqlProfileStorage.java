@@ -1,6 +1,5 @@
 package com.minecraftonline.griefalert.storage;
 
-import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;

@@ -3,12 +3,14 @@
 package com.minecraftonline.griefalert.alerts.prism;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.*;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -22,7 +24,7 @@ public class SignBreakAlert extends PrismAlert {
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
 
-    Optional<List<String>> linesOptional = Prism.getBrokenSignLines(getPrismRecord());
+    Optional<SignText> signTextOptional = Prism.getBrokenSignLines(getPrismRecord());
 
     builder.append(Text.of(
         General.formatPlayerName(getGriefer()),
@@ -35,14 +37,13 @@ public class SignBreakAlert extends PrismAlert {
         TextColors.RED, " in the ",
         getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
 
-    linesOptional.ifPresent((lines) -> builder.append(Text.of(
-        TextColors.WHITE,
-        String.format(
-            "\nLine 1: %s\nLine 2: %s\nLine 3: %s\nLine 4: %s",
-            lines.get(0),
-            lines.get(1),
-            lines.get(2),
-            lines.get(3)))));
+    signTextOptional.ifPresent((sign) -> {
+
+      sign.getText1().ifPresent((text) -> builder.append(Text.of(TextColors.GRAY, "\nLine 1: " + text)));
+      sign.getText2().ifPresent((text) -> builder.append(Text.of(TextColors.GRAY, "\nLine 2: " + text)));
+      sign.getText3().ifPresent((text) -> builder.append(Text.of(TextColors.GRAY, "\nLine 3: " + text)));
+      sign.getText4().ifPresent((text) -> builder.append(Text.of(TextColors.GRAY, "\nLine 4: " + text)));
+    });
 
     return builder.build();
   }
