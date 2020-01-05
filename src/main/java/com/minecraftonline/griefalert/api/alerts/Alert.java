@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.alerts;
 
 import com.google.common.collect.Lists;
@@ -35,13 +37,29 @@ import org.spongepowered.api.world.World;
  */
 public abstract class Alert implements Runnable {
 
+
+  // FIELDS
+
   private int stackIndex;
   private final GriefProfile griefProfile;
   private boolean silent = false;
 
+
+  // PROTECTED CONSTRUCTOR
+
   protected Alert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
   }
+
+
+  // ABSTRACT METHODS: ALPHABETICAL
+
+
+  public abstract Player getGriefer();
+
+  public abstract GriefEvent getGriefEvent();
+
+  public abstract Optional<Transform<World>> getTransform();
 
   public final boolean checkBy(Player officer) {
 
@@ -74,7 +92,7 @@ public abstract class Alert implements Runnable {
     }
 
     // The officer has teleported successfully, so save their previous location in the history
-    GriefAlert.getInstance().getAlertQueue().getOfficerCheckHistory().push(
+    GriefAlert.getInstance().getAlertQueue().addOfficerTransform(
         officer.getUniqueId(),
         officerPreviousTransform);
 
@@ -85,27 +103,6 @@ public abstract class Alert implements Runnable {
         " is checking alert number ",
         Format.bonus(clickToCheck(getStackIndex()))));
     return true;
-
-  }
-
-  public static Optional<Integer> revertTransform(Player officer) {
-
-    MapStack<UUID, Transform<World>> history = GriefAlert
-        .getInstance()
-        .getAlertQueue()
-        .getOfficerCheckHistory();
-
-    Optional<Transform<World>> previousTransformOptional = history.pop(officer.getUniqueId());
-
-    if (!previousTransformOptional.isPresent()) {
-      return Optional.empty();
-    }
-
-    if (!officer.setTransformSafely(previousTransformOptional.get())) {
-      Errors.sendCannotTeleportSafely(officer, previousTransformOptional.get());
-    }
-
-    return Optional.of(history.size(officer.getUniqueId()));
 
   }
 
@@ -128,12 +125,6 @@ public abstract class Alert implements Runnable {
         getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
     return builder.build();
   }
-
-  public abstract Optional<Transform<World>> getTransform();
-
-  public abstract Player getGriefer();
-
-  public abstract GriefEvent getGriefEvent();
 
   public final String getTarget() {
     return griefProfile.getTarget();

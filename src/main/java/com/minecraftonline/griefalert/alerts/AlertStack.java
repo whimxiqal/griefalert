@@ -7,9 +7,14 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.structures.HashMapStack;
 import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingStack;
+import com.minecraftonline.griefalert.util.Errors;
+
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 
@@ -69,7 +74,30 @@ public final class AlertStack extends RotatingStack<Alert> {
     return output;
   }
 
-  public MapStack<UUID, Transform<World>> getOfficerCheckHistory() {
-    return officerCheckHistory;
+  /**
+   * Return an officer to their previous known location before a grief check.
+   *
+   * @param officer The officer to teleport
+   * @return An optional of how many saved locations are left. Return an empty
+   *         Optional if there were no transforms left to begin with.
+   */
+  public Optional<Integer> revertOfficerTransform(Player officer) {
+
+    Optional<Transform<World>> previousTransformOptional = officerCheckHistory
+        .pop(officer.getUniqueId());
+
+    if (!previousTransformOptional.isPresent()) {
+      return Optional.empty();
+    }
+
+    if (!officer.setTransformSafely(previousTransformOptional.get())) {
+      Errors.sendCannotTeleportSafely(officer, previousTransformOptional.get());
+    }
+
+    return Optional.of(officerCheckHistory.size(officer.getUniqueId()));
+  }
+
+  public void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
+    officerCheckHistory.push(officerUuid, transform);
   }
 }
