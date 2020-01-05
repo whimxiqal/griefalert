@@ -8,13 +8,12 @@ import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.GriefEvents;
+import java.util.Optional;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-
-import java.util.Optional;
 
 public class InteractBlockAlert extends SpongeAlert {
 

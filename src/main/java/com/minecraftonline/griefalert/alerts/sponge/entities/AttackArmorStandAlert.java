@@ -43,7 +43,8 @@ public class AttackArmorStandAlert extends AttackEntityAlert {
 
   @Override
   public Optional<String> getExtraSummaryContent() {
-    return SpongeEvents.getArmorStandContent(getEntitySnapshot()).map((list) -> String.join(", ", list));
+    return SpongeEvents.getArmorStandContent(getEntitySnapshot())
+        .map((list) -> String.join(", ", list));
   }
 
 }

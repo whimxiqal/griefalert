@@ -11,7 +11,6 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-
 public class AttackItemFrameAlert extends AttackEntityAlert {
 
   AttackItemFrameAlert(final GriefProfile griefProfile, final InteractEntityEvent.Primary event) {

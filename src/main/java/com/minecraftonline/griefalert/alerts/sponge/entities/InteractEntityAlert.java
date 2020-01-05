@@ -2,7 +2,6 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
-import com.minecraftonline.griefalert.alerts.sponge.SpongeAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;

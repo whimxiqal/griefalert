@@ -45,7 +45,8 @@ public class InteractArmorStandAlert extends InteractEntityAlert {
 
   @Override
   public Optional<String> getExtraSummaryContent() {
-    return SpongeEvents.getArmorStandContent(getEntitySnapshot()).map((list) -> String.join(", ", list));
+    return SpongeEvents.getArmorStandContent(getEntitySnapshot())
+        .map((list) -> String.join(", ", list));
   }
 
 }

@@ -13,10 +13,8 @@ import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import com.minecraftonline.griefalert.util.Permissions;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
