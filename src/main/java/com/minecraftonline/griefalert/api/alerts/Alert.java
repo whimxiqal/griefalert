@@ -1,9 +1,11 @@
 package com.minecraftonline.griefalert.api.alerts;
 
+import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.*;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -18,7 +20,7 @@ public abstract class Alert implements Runnable {
   private static final HashMap<UUID, Stack<Transform<World>>> officerTransformHistory = new HashMap<>();
 
   protected int stackIndex;
-  protected final GriefProfile griefProfile;
+  private final GriefProfile griefProfile;
   private boolean silent = false;
 
   protected Alert(GriefProfile griefProfile) {
@@ -50,13 +52,17 @@ public abstract class Alert implements Runnable {
 
     officer.sendMessage(Format.heading("Checking Grief Alert:"));
     officer.sendMessage(getSummary());
+    Comms.getStaffBroadcastChannel().send(Format.info(
+        General.formatPlayerName(officer),
+        " is checking alert number ",
+        Format.bonus(clickToCheck(getStackIndex()))));
     return true;
 
   }
 
   public static int revertTransform(Player officer) {
 
-    if (!officerTransformHistory.containsKey(officer.getUniqueId())){
+    if (!officerTransformHistory.containsKey(officer.getUniqueId())) {
       return -1;
     }
 
@@ -87,9 +93,9 @@ public abstract class Alert implements Runnable {
     builder.append(Text.of(
         General.formatPlayerName(getGriefer()),
         Format.space(),
-        getEventColor(), getGriefEvent().getPastTense(),
+        getEventColor(), getGriefEvent().getPreterite(),
         Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(griefProfile.getTarget().replace("minecraft:", ""))));
+        getTargetColor(), Grammar.addIndefiniteArticle(getTarget().replace("minecraft:", ""))));
     getTransform().ifPresent((transform -> builder.append(Text.of(
         TextColors.RED, " in the ",
         getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
@@ -101,6 +107,12 @@ public abstract class Alert implements Runnable {
   public abstract Player getGriefer();
 
   public abstract GriefEvent getGriefEvent();
+
+  public final String getTarget() {
+    return griefProfile.getTarget();
+  }
+
+  ;
 
   public Optional<String> getExtraSummaryContent() {
     return Optional.empty();
@@ -148,37 +160,29 @@ public abstract class Alert implements Runnable {
    * @return the Text for broadcasting.
    */
   public final Text getFullText() {
-    return getFullText(new LinkedList<>());
+    return getFullText(Lists.newArrayList(getStackIndex()));
   }
 
   /**
    * Get the final text version of the Alert to broadcast to staff with
    * other interactive items to access other alerts.
    *
-   * @param otherCodes The list of other items to add to the text.
+   * @param allIndices The list of other items to add to the text.
    * @return A full text to be broadcast to staff.
    */
-  private  Text getFullText(List<Integer> otherCodes) {
-    try {
-      Text.Builder builder = Text.builder().append(getMessageText());
-      otherCodes.add(0, getStackIndex()); // Add this to the list
-      otherCodes.forEach((i) -> {
-        builder.append(Format.space());
-        Alert other = GriefAlert.getInstance().getAlertQueue().get(i);
-        try {
-          builder.append(
-              Format.command(String.valueOf(i),
-                  "/ga check " + other.getStackIndex(),
-                  Text.of(other.getSummary())));
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      });
-      return builder.build();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Text.EMPTY;
-    }
+  public Text getFullText(List<Integer> allIndices) {
+    Text.Builder builder = Text.builder().append(getMessageText());
+    allIndices.forEach((i) -> {
+      builder.append(Format.space());
+      builder.append(clickToCheck(i));
+    });
+    return builder.build();
+  }
+
+  private Text clickToCheck(int index) {
+    return Format.command(String.valueOf(index),
+        "/ga check " + index,
+        GriefAlert.getInstance().getAlertQueue().get(index).getSummary());
   }
 
   public final boolean isRepeatOf(Alert other) {
@@ -187,21 +191,21 @@ public abstract class Alert implements Runnable {
 
   protected final TextColor getEventColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.EVENT_COLOR).map((s) -> Registry.lookupTextColor(s)
+        .getString(GriefProfileDataQueries.EVENT_COLOR).map((s) -> Sponge.getRegistry().getType(TextColor.class, s)
             .orElse(Format.ALERT_EVENT_COLOR))
         .orElse(Format.ALERT_EVENT_COLOR);
   }
 
   protected final TextColor getTargetColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.TARGET_COLOR).map((s) -> Registry.lookupTextColor(s)
+        .getString(GriefProfileDataQueries.TARGET_COLOR).map((s) -> Sponge.getRegistry().getType(TextColor.class, s)
             .orElse(Format.ALERT_TARGET_COLOR))
         .orElse(Format.ALERT_TARGET_COLOR);
   }
 
   protected final TextColor getDimensionColor() {
     return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map((s) -> Registry.lookupTextColor(s)
+        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map((s) -> Sponge.getRegistry().getType(TextColor.class, s)
             .orElse(Format.ALERT_DIMENSION_COLOR))
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
@@ -209,14 +213,14 @@ public abstract class Alert implements Runnable {
   public Text getSummary() {
     Text.Builder builder = Text.builder();
 
-    builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, getGriefer().getName()), Format.endLine());
+    builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, General.formatPlayerName(getGriefer())), Format.endLine());
     builder.append(Text.of(TextColors.DARK_AQUA, "Event: ", TextColors.GRAY, griefProfile.getGriefEvent().getId()), Format.endLine());
     builder.append(Text.of(TextColors.DARK_AQUA, "Target: ", TextColors.GRAY, griefProfile.getTarget().replace("minecraft:", "")), Format.endLine());
     getExtraSummaryContent().ifPresent((content) ->
         builder.append(Text.of(TextColors.DARK_AQUA, "Extra: ", TextColors.GRAY, content, Format.endLine()))
     );
     getTransform().ifPresent((transform) ->
-        builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY,  Format.location(
+        builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY, Format.location(
             transform.getLocation()))));
 
     return builder.build();
@@ -226,4 +230,5 @@ public abstract class Alert implements Runnable {
   public final void setStackIndex(int stackIndex) {
     this.stackIndex = stackIndex;
   }
+
 }

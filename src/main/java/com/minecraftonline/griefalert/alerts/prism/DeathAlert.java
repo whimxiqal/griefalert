@@ -18,5 +18,4 @@ public class DeathAlert extends PrismAlert {
   public GriefEvent getGriefEvent() {
     return GriefEvents.DEATH;
   }
-
 }

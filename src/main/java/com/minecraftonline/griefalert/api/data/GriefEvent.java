@@ -1,37 +1,46 @@
 package com.minecraftonline.griefalert.api.data;
 
 import com.helion3.prism.api.data.PrismEvent;
+import com.minecraftonline.griefalert.util.GriefEvents;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.util.annotation.CatalogedBy;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public class GriefEvent {
+@CatalogedBy(GriefEvents.class)
+public class GriefEvent implements CatalogType {
 
   private final String id;
   private final String name;
-  private final String pastTense;
+  private final String preterite;
 
-  private GriefEvent(String id, String name, String pastTense) {
+  public GriefEvent(String id, String name, String preterite) {
     this.id = id;
     this.name = name;
-    this.pastTense = pastTense;
+    this.preterite = preterite;
   }
 
-  public static GriefEvent of(String id, String name, String pastTense) {
-    return new GriefEvent(id, name, pastTense);
+  public static GriefEvent of(String id, String name, String preterite) {
+    return new GriefEvent(id, name, preterite);
   }
 
   public static GriefEvent of(PrismEvent prismEvent) {
     return new GriefEvent(prismEvent.getId(), prismEvent.getName(), prismEvent.getPastTense());
   }
 
+  @Override
+  @NonnullByDefault
   public String getId() {
     return id;
   }
 
+  @Override
+  @NonnullByDefault
   public String getName() {
     return name;
   }
 
-  public String getPastTense() {
-    return pastTense;
+  public String getPreterite() {
+    return preterite;
   }
 
   @Override

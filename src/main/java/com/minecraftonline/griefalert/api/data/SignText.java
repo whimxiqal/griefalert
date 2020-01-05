@@ -1,7 +1,7 @@
 package com.minecraftonline.griefalert.api.data;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 public class SignText {
 
@@ -21,6 +21,15 @@ public class SignText {
     this.text4 = text4;
   }
 
+  /**
+   * Create a new wrapper for the four text lines on a sign.
+   *
+   * @param text1 Text for first line
+   * @param text2 Text for second line
+   * @param text3 Text for third line
+   * @param text4 Text for fourth line
+   * @return The corresponding <code>SignText</code>
+   */
   public static SignText of(
       @Nullable String text1,
       @Nullable String text2,

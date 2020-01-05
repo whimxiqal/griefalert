@@ -31,7 +31,7 @@ public class SignBreakAlert extends PrismAlert {
         Format.space(),
         getEventColor(), "broke",
         Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(griefProfile.getTarget())));
+        getTargetColor(), Grammar.addIndefiniteArticle(getTarget())));
 
     getTransform().ifPresent((transform -> builder.append(Text.of(
         TextColors.RED, " in the ",

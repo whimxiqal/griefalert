@@ -3,11 +3,11 @@
 package com.minecraftonline.griefalert.alerts.prism;
 
 import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
+import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
 
 import java.util.NoSuchElementException;
@@ -89,36 +89,15 @@ public abstract class PrismAlert extends Alert {
       return Optional.empty();
     }
 
-    if (prismRecord.getEvent().equals(PrismEvents.BLOCK_BREAK.getId())) {
-
+    if (griefProfile.getGriefEvent().equals(GriefEvents.BREAK)) {
       if (targetOptional.get().contains("sign")) {
-
-        // -----------------------------
-        // Condition for a SignBreakAlert
-        // -----------------------------
-
         return Optional.of(new SignBreakAlert(griefProfile, prismRecord));
       } else {
-
-        // -----------------------------
-        // Condition for a BreakAlert
-        // -----------------------------
-
         return Optional.of(new BreakAlert(griefProfile, prismRecord));
       }
-    } else if (prismRecord.getEvent().equals(PrismEvents.BLOCK_PLACE.getId())) {
-
-      // -----------------------------
-      // Condition for a PlaceAlert
-      // -----------------------------
-
+    } else if (griefProfile.getGriefEvent().equals(GriefEvents.PLACE)) {
       return Optional.of(new PlaceAlert(griefProfile, prismRecord));
-    } else if (prismRecord.getEvent().equals(PrismEvents.ENTITY_DEATH.getId())) {
-
-      // -----------------------------
-      // Condition for a DeathAlert
-      // -----------------------------
-
+    } else if (griefProfile.getGriefEvent().equals(GriefEvents.DEATH)) {
       return Optional.of(new DeathAlert(griefProfile, prismRecord));
     }
 

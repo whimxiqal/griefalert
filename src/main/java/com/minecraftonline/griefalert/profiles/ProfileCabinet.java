@@ -54,9 +54,7 @@ public class ProfileCabinet {
     // Get all other profiles from the onsite profile list
     MySqlProfileStorage profileStorage = GriefAlert.getInstance().getProfileStorage();
     try {
-      profileStorage.connect();
       profileStorage.retrieve().forEach(this::add);
-      profileStorage.close();
     } catch (Exception e) {
       GriefAlert.getInstance().getLogger().error("Could not setup SQL connection to GriefProfiles. See debug logger for more info");
       General.printStackTraceToDebugLogger(e);
@@ -87,11 +85,6 @@ public class ProfileCabinet {
       storage.put(profile.getGriefEvent(), profile.getTarget(), profile);
       return true;
     }
-  }
-
-  public void store(GriefProfile profile) throws Exception {
-    GriefAlert.getInstance().getProfileStorage().connect();
-    GriefAlert.getInstance().getProfileStorage().write(profile);
   }
 
   public Collection<GriefProfile> getProfiles() {

@@ -5,42 +5,35 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.DimensionTypes;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MySqlProfileStorage {
 
   private static final String TABLE_NAME = "GriefAlertProfiles";
+  private final String address;
   private Connection connection;
 
-  /**
-   * Create a connection with the SQL database.
-   *
-   * @throws SQLException if error through SQL
-   */
-  public void connect() throws SQLException {
-    connect("jdbc:sqlite:" + GriefAlert.getInstance().getDataDirectory().getPath() + "/griefalert.db");
+  public MySqlProfileStorage() throws SQLException {
+    address = "jdbc:sqlite:" + GriefAlert.getInstance().getDataDirectory().getPath() + "/griefalert.db";
+    createTable();
   }
 
-  public void connect(String address) throws SQLException {
+  private void connect() throws SQLException {
     try {
       Class.forName("org.sqlite.JDBC");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
     connection = DriverManager.getConnection(address);
-    createTable();
   }
 
-  /**
-   * Close the connection with the SQL database.
-   *
-   * @return true if the close was successful
-   * @throws SQLException if error through SQL
-   */
-  public boolean close() throws SQLException {
+  private boolean close() throws SQLException {
     if (getConnection() == null || getConnection().isClosed()) {
       return false;
     }
@@ -49,18 +42,20 @@ public class MySqlProfileStorage {
   }
 
   private void createTable() throws SQLException {
+    connect();
     String profiles = "CREATE TABLE IF NOT EXISTS "
         + TABLE_NAME + " ("
         + GriefProfileDataQueries.EVENT + " varchar(16) NOT NULL, "
         + GriefProfileDataQueries.TARGET + " varchar(255) NOT NULL, "
-        + GriefProfileDataQueries.IGNORE_OVERWORLD + " bit NOT NULL, "
-        + GriefProfileDataQueries.IGNORE_NETHER + " bit NOT NULL, "
-        + GriefProfileDataQueries.IGNORE_THE_END + " bit NOT NULL, "
+        + "ignore_overworld bit NOT NULL, "
+        + "ignore_nether bit NOT NULL, "
+        + "ignore_the_end bit NOT NULL, "
         + GriefProfileDataQueries.EVENT_COLOR + " varchar(16), "
         + GriefProfileDataQueries.TARGET_COLOR + " varchar(16), "
         + GriefProfileDataQueries.DIMENSION_COLOR + " varchar(16) "
         + ");";
     getConnection().prepareStatement(profiles).execute();
+    close();
   }
 
   /**
@@ -76,9 +71,9 @@ public class MySqlProfileStorage {
         TABLE_NAME,
         GriefProfileDataQueries.EVENT,
         GriefProfileDataQueries.TARGET,
-        GriefProfileDataQueries.IGNORE_OVERWORLD,
-        GriefProfileDataQueries.IGNORE_NETHER,
-        GriefProfileDataQueries.IGNORE_THE_END,
+        "ignore_overworld",
+        "ignore_nether",
+        "ignore_the_end",
         GriefProfileDataQueries.EVENT_COLOR,
         GriefProfileDataQueries.TARGET_COLOR,
         GriefProfileDataQueries.DIMENSION_COLOR);
@@ -87,16 +82,20 @@ public class MySqlProfileStorage {
       return false;
     }
 
+    connect();
     PreparedStatement statement = getConnection().prepareStatement(command);
 
     statement.setString(1, profile.getGriefEvent().getId());
     statement.setString(2, profile.getTarget());
     statement.setBoolean(3, profile.getDataContainer()
-        .getBoolean(GriefProfileDataQueries.IGNORE_OVERWORLD).orElse(false));
+        .getList(GriefProfileDataQueries.IGNORED)
+        .map((list) -> list.contains(DimensionTypes.OVERWORLD.getId())).orElse(false));
     statement.setBoolean(4, profile.getDataContainer()
-        .getBoolean(GriefProfileDataQueries.IGNORE_NETHER).orElse(false));
+        .getList(GriefProfileDataQueries.IGNORED)
+        .map((list) -> list.contains(DimensionTypes.NETHER.getId())).orElse(false));
     statement.setBoolean(5, profile.getDataContainer()
-        .getBoolean(GriefProfileDataQueries.IGNORE_THE_END).orElse(false));
+        .getList(GriefProfileDataQueries.IGNORED)
+        .map((list) -> list.contains(DimensionTypes.THE_END.getId())).orElse(false));
     statement.setString(6, profile.getDataContainer()
         .getString(GriefProfileDataQueries.EVENT_COLOR).orElse(null));
     statement.setString(7, profile.getDataContainer()
@@ -105,20 +104,22 @@ public class MySqlProfileStorage {
         .getString(GriefProfileDataQueries.DIMENSION_COLOR).orElse(null));
 
     statement.execute();
-
+    close();
     return true;
   }
 
   private boolean exists(GriefEvent griefEvent, String target) throws SQLException {
-
+    connect();
     String command = "SELECT * FROM "
         + TABLE_NAME + " WHERE "
         + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
         + GriefProfileDataQueries.TARGET + " = '" + target + "';";
 
     ResultSet rs = getConnection().prepareStatement(command).executeQuery();
+    boolean hasResult = rs.next();
 
-    return rs.next();
+    close();
+    return hasResult;
 
   }
 
@@ -135,13 +136,14 @@ public class MySqlProfileStorage {
       return false;
     }
 
+    connect();
     String command = "DELETE FROM "
         + TABLE_NAME + " WHERE "
         + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
         + GriefProfileDataQueries.TARGET + " = '" + target + "';";
 
     getConnection().prepareStatement(command).execute();
-
+    close();
     return true;
   }
 
@@ -152,6 +154,7 @@ public class MySqlProfileStorage {
    * @throws SQLException if error through SQL
    */
   public List<GriefProfile> retrieve() throws SQLException {
+    connect();
     List<GriefProfile> profiles = new LinkedList<>();
 
     String command = "SELECT * FROM " + TABLE_NAME + ";";
@@ -160,10 +163,19 @@ public class MySqlProfileStorage {
     while (rs.next()) {
       DataContainer container = DataContainer.createNew()
           .set(GriefProfileDataQueries.EVENT, rs.getString(1))
-          .set(GriefProfileDataQueries.TARGET, rs.getString(2))
-          .set(GriefProfileDataQueries.IGNORE_OVERWORLD, rs.getBoolean(3))
-          .set(GriefProfileDataQueries.IGNORE_NETHER, rs.getBoolean(4))
-          .set(GriefProfileDataQueries.IGNORE_THE_END, rs.getBoolean(5));
+          .set(GriefProfileDataQueries.TARGET, rs.getString(2));
+
+      List<String> ignored = new ArrayList<>();
+      if (rs.getBoolean(3)) {
+        ignored.add(DimensionTypes.OVERWORLD.getId());
+      }
+      if (rs.getBoolean(4)) {
+        ignored.add(DimensionTypes.NETHER.getId());
+      }
+      if (rs.getBoolean(5)) {
+        ignored.add(DimensionTypes.THE_END.getId());
+      }
+      container.set(GriefProfileDataQueries.IGNORED, ignored);
       if (rs.getString(6) != null) {
         container.set(GriefProfileDataQueries.EVENT_COLOR, rs.getString(6));
       }
@@ -175,7 +187,7 @@ public class MySqlProfileStorage {
       }
       profiles.add(GriefProfile.of(container));
     }
-
+    close();
     return profiles;
 
   }

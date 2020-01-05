@@ -48,5 +48,4 @@ public class AttackEntityAlert extends EntityAlert {
   public GriefEvent getGriefEvent() {
     return GriefEvents.ATTACK;
   }
-
 }

@@ -3,7 +3,7 @@ package com.minecraftonline.griefalert.api.records;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.exceptions.ProfileMalformedException;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import com.minecraftonline.griefalert.util.Registry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.DimensionType;
@@ -11,7 +11,6 @@ import org.spongepowered.api.world.DimensionTypes;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class GriefProfile {
 
@@ -41,24 +40,18 @@ public class GriefProfile {
         && dataContainer.getString(GriefProfileDataQueries.TARGET).isPresent();
   }
 
-  public GriefEvent getGriefEvent() throws ProfileMalformedException {
-    Optional<String> eventIdOptional = dataContainer.getString(GriefProfileDataQueries.EVENT);
-
-    if (!eventIdOptional.isPresent()) {
-      throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
-    }
-
-    Optional<GriefEvent> eventOptional = Registry.lookupGriefEvent(eventIdOptional.get());
+  public GriefEvent getGriefEvent() {
+    Optional<GriefEvent> eventOptional = dataContainer.getCatalogType(GriefProfileDataQueries.EVENT, GriefEvent.class);
 
     if (!eventOptional.isPresent()) {
-      throw new ProfileMalformedException("Invalid GriefEvent id saved in GriefProfile: \n" + printData());
+      throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
     }
 
     return eventOptional.get();
   }
 
 
-  public String getTarget() throws ProfileMalformedException {
+  public String getTarget() {
     Optional<String> targetOptional = dataContainer.getString(GriefProfileDataQueries.TARGET);
 
     if (!targetOptional.isPresent()) {
@@ -70,17 +63,8 @@ public class GriefProfile {
 
 
   public boolean isIgnoredIn(DimensionType dimensionType) {
-    DataQuery query;
-    if (dimensionType == DimensionTypes.OVERWORLD) {
-      query = GriefProfileDataQueries.IGNORE_OVERWORLD;
-    } else if (dimensionType == DimensionTypes.NETHER) {
-      query = GriefProfileDataQueries.IGNORE_NETHER;
-    } else {
-      query = GriefProfileDataQueries.IGNORE_THE_END;
-    }
-
-    return dataContainer.getBoolean(query).orElse(false);
-
+    return dataContainer.getCatalogTypeList(GriefProfileDataQueries.IGNORED, DimensionType.class)
+        .map((list) -> list.contains(dimensionType)).orElse(false);
   }
 
   public String printData() {

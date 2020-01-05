@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.alerts.AlertStack;
 import com.minecraftonline.griefalert.api.commands.DeprecatedCommand;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.commands.DeprecatedCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.listeners.ExtraListeners;
@@ -18,7 +19,11 @@ import com.minecraftonline.griefalert.util.General;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Optional;
 
+import com.minecraftonline.griefalert.util.GriefEvents;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -27,13 +32,16 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameRegistryEvent;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.registry.CatalogRegistryModule;
 
 /**
  * The main class for the plugin Grief Alert.
@@ -95,6 +103,7 @@ public final class GriefAlert {
   @Listener
   public void onConstruction(GameConstructionEvent event) {
     instance = this;
+    registerCatalogTypes();
   }
 
   /**
@@ -116,9 +125,15 @@ public final class GriefAlert {
 
     // Set helper manager classes
     configHelper = new ConfigHelper(defaultConfig, rootNode);
-    profileStorage = new MySqlProfileStorage();
+
+    try {
+      profileStorage = new MySqlProfileStorage();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
     cabinet = new ProfileCabinet();
-    alertQueue = new AlertStack(10); //configHelper.getCachedEventLimit());
+    alertQueue = new AlertStack(configHelper.getCachedEventLimit());
 
     // Register all the commands with Sponge
     registerCommands();
@@ -168,6 +183,10 @@ public final class GriefAlert {
         new PrismRecordListener()
     );
     ExtraListeners.register(this);
+  }
+
+  private void registerCatalogTypes() {
+    Sponge.getRegistry().registerModule(GriefEvent.class, GriefEvents.REGISTRY_MODULE);
   }
 
   public File getDataDirectory() {

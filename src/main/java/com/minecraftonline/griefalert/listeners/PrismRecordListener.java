@@ -3,11 +3,12 @@ package com.minecraftonline.griefalert.listeners;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.Prism;
-import com.minecraftonline.griefalert.util.Registry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.world.DimensionType;
 
@@ -25,13 +26,13 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
     // See if this record matches any GriefProfiles
 
-    if (!Registry.lookupGriefEvent(record.getEvent()).isPresent()) {
+    if (!Sponge.getRegistry().getType(GriefEvent.class, record.getEvent()).isPresent()) {
       GriefAlert.getInstance().getLogger().debug(String.format("PrismEvent passed: Prism Event '%s' is not being checked.", record.getEvent()));
       return;
     }
 
     // Replace spaces with underscores because for some reason Prism removes them...
-    Optional<String> targetOptional = Prism.getTarget(record).map((s) -> s.replace(" ", "_"));
+    Optional<String> targetOptional = Prism.getTarget(record).map(General::ensureIdFormat);
     if (!targetOptional.isPresent()) {
       GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no target found.");
       return;
@@ -43,8 +44,14 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       return;
     }
 
+    Optional<String> playerUuidOptional = Prism.getPlayerUuid(record);
+    if (!playerUuidOptional.isPresent()) {
+      GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no player found.");
+      return;
+    }
+
     Optional<GriefProfile> profileOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
-        Registry.lookupGriefEvent(record.getEvent()).get(),
+        Sponge.getRegistry().getType(GriefEvent.class, record.getEvent()).get(),
         targetOptional.get(),
         dimensionTypeOptional.get()
     );
