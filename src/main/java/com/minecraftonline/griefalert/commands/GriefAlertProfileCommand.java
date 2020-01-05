@@ -29,8 +29,6 @@ import java.util.function.Function;
 
 public class GriefAlertProfileCommand extends AbstractCommand {
 
-  // TODO: implement
-
   public GriefAlertProfileCommand() {
     super(Permissions.GRIEFALERT_COMMAND_PROFILE,
         Text.of("Perform alterations to the profiles used for flagging alerts"));

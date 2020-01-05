@@ -4,22 +4,41 @@ import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.*;
+import com.minecraftonline.griefalert.util.Comms;
+import com.minecraftonline.griefalert.util.Errors;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import com.minecraftonline.griefalert.util.Permissions;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.UUID;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
-import java.util.*;
-
+/**
+ * An object to hold all information about an Alert caused by an
+ * event matching a {@link GriefProfile}.
+ */
 public abstract class Alert implements Runnable {
 
   private static final HashMap<UUID, Stack<Transform<World>>> officerTransformHistory = new HashMap<>();
 
-  protected int stackIndex;
+  private int stackIndex;
   private final GriefProfile griefProfile;
   private boolean silent = false;
 
@@ -27,7 +46,16 @@ public abstract class Alert implements Runnable {
     this.griefProfile = griefProfile;
   }
 
-  public final boolean check(Player officer) {
+  public final boolean checkBy(Player officer) {
+
+    // Prepare PrismRecord for sending to a PrismRecordEvent
+    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
+    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
+
+    PreCheckAlertEvent preCheckAlertEvent = new PreCheckAlertEvent(this, Cause.of(eventContext, plugin));
+
+    // Tell Sponge that this PrismRecordEvent has occurred
+    Sponge.getEventManager().post(preCheckAlertEvent);
 
     // Get the necessary transform so the officer can teleport
     if (!getTransform().isPresent()) {
@@ -39,6 +67,8 @@ public abstract class Alert implements Runnable {
     // Save the officer's previous transform and add it into the alert's database later
     // if the officer successfully teleports.
     Transform<World> officerPreviousTransform = officer.getTransform();
+
+    // CheckEvent
 
     // Teleport the officer
     if (!officer.setTransformSafely(alertTransform)) {

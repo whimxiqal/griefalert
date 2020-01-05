@@ -26,8 +26,6 @@ import org.spongepowered.api.world.World;
 
 public abstract class Prism {
 
-  // TODO: Finish these Prism helper functions to access PrismRecord data
-
   /**
    * Get the player as a cause of the event from the PrismRecord. Return null
    * if none exists.

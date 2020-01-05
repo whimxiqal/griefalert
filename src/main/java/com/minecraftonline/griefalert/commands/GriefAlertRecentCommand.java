@@ -43,7 +43,6 @@ public class GriefAlertRecentCommand extends AbstractCommand {
   @NonnullByDefault
   public CommandResult execute(@NonnullByDefault CommandSource src,
                                @NonnullByDefault CommandContext args) throws CommandException {
-    // TODO: finish /ga recent
     List<Alert> matching = new LinkedList<>();
 
     List<Alert> cacheReversed = GriefAlert.getInstance().getAlertQueue().getDataByTime();

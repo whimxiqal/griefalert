@@ -19,17 +19,18 @@ public abstract class Permissions {
   public static final Permission GRIEFALERT_COMMAND_PROFILE = Permission.of(
       "griefalert.command.profile"
   );
+  public static final Permission GRIEFALERT_COMMAND_RELOAD = Permission.of(
+      "griefalert.command.reload"
+  );
   public static final Permission GRIEFALERT_MESSAGING = Permission.of(
       "griefalert.messaging"
   );
   public static final Permission GRIEFALERT_SILENT = Permission.of(
       "griefalert.silent"
   );
+  // Unused
   public static final Permission GRIEFALERT_DEGRIEF = Permission.of(
       "griefalert.degrief"
-  );
-  public static final Permission GRIEFALERT_COMMAND_RELOAD = Permission.of(
-      "griefalert.reload"
   );
 
 }

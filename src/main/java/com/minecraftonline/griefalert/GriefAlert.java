@@ -125,6 +125,7 @@ public final class GriefAlert {
 
     // Set helper manager classes
     configHelper = new ConfigHelper(defaultConfig, rootNode);
+    getDataDirectory().mkdirs();
 
     try {
       profileStorage = new MySqlProfileStorage();
@@ -221,4 +222,7 @@ public final class GriefAlert {
     return instance;
   }
 
+  public PluginContainer getPluginContainer() {
+    return this.pluginContainer;
+  }
 }

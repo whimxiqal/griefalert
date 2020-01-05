@@ -8,7 +8,6 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.text.Text;

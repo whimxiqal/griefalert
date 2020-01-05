@@ -24,6 +24,7 @@ public abstract class Comms {
           staff.add(player);
         }
       }
+      staff.add(Sponge.getServer().getConsole());
       return staff;
     };
   }
