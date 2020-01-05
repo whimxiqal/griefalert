@@ -4,12 +4,14 @@ package com.minecraftonline.griefalert.alerts;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.structures.HashMapStack;
+import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingStack;
-
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.world.World;
+
 
 
 /**
@@ -23,7 +25,8 @@ import javax.annotation.Nonnull;
 public final class AlertStack extends RotatingStack<Alert> {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
-  private final HashMap<UUID, LinkedList<Alert>> repeatMap = new HashMap<>();
+  private final MapStack<UUID, Alert> grieferRepeatHistory = new HashMapStack<>();
+  private final MapStack<UUID, Transform<World>> officerCheckHistory = new HashMapStack<>();
 
   public AlertStack(final int capacity) {
     super(capacity);
@@ -48,22 +51,25 @@ public final class AlertStack extends RotatingStack<Alert> {
     alert.setStackIndex(output);
 
     // Update alertMap
-    repeatMap.putIfAbsent(alert.getGriefer().getUniqueId(), new LinkedList<>());
-    LinkedList<Alert> repeats = repeatMap.get(alert.getGriefer().getUniqueId());
-
-    if (!repeats.isEmpty() && alert.isRepeatOf(repeats.getLast())) {
+    UUID grieferUuid = alert.getGriefer().getUniqueId();
+    if (grieferRepeatHistory.peek(grieferUuid).filter(alert::isRepeatOf).isPresent()) {
       alert.setSilent(true);
+    } else {
+      grieferRepeatHistory.clear(grieferUuid);
     }
 
-    repeats.add(alert);
+    grieferRepeatHistory.push(grieferUuid, alert);
 
-    int hiddenEventLimit = GriefAlert.getInstance().getConfigHelper().getHiddenRepeatedEventLimit();
-    if (repeats.size() >= hiddenEventLimit) {
-      repeats.clear();
+    int silentAlertLimit = GriefAlert.getInstance().getConfigHelper().getHiddenRepeatedEventLimit();
+    if (grieferRepeatHistory.size(grieferUuid) >= silentAlertLimit) {
+      grieferRepeatHistory.clear(grieferUuid);
     }
 
     // Finish
     return output;
   }
 
+  public MapStack<UUID, Transform<World>> getOfficerCheckHistory() {
+    return officerCheckHistory;
+  }
 }

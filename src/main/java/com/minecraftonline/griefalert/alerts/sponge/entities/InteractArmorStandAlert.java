@@ -6,6 +6,8 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.SpongeEvents;
+
+import java.util.List;
 import java.util.Optional;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.text.Text;
@@ -31,9 +33,10 @@ public class InteractArmorStandAlert extends InteractEntityAlert {
         getTargetColor(), "an armor_stand",
         Format.space(),
         TextColors.RED,
-        String.format(
-            "(%s)",
-            SpongeEvents.getArmorStandContentMessage(getEntitySnapshot()))));
+        "(containing ",
+        Format.bonus(SpongeEvents.getArmorStandContent(
+            getEntitySnapshot()).map(List::size).orElse(0)),
+        " items)"));
     getTransform().ifPresent((transform -> builder.append(Text.of(
         TextColors.RED, " in the ",
         getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));

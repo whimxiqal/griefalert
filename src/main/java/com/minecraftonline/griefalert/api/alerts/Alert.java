@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.util.Comms;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
@@ -35,8 +36,6 @@ import org.spongepowered.api.world.World;
  * event matching a {@link GriefProfile}.
  */
 public abstract class Alert implements Runnable {
-
-  private static final HashMap<UUID, Stack<Transform<World>>> officerTransformHistory = new HashMap<>();
 
   private int stackIndex;
   private final GriefProfile griefProfile;
@@ -77,8 +76,9 @@ public abstract class Alert implements Runnable {
     }
 
     // The officer has teleported successfully, so save their previous location in the history
-    officerTransformHistory.putIfAbsent(officer.getUniqueId(), new Stack<>());
-    officerTransformHistory.get(officer.getUniqueId()).push(officerPreviousTransform);
+    GriefAlert.getInstance().getAlertQueue().getOfficerCheckHistory().push(
+        officer.getUniqueId(),
+        officerPreviousTransform);
 
     officer.sendMessage(Format.heading("Checking Grief Alert:"));
     officer.sendMessage(getSummary());
@@ -90,25 +90,24 @@ public abstract class Alert implements Runnable {
 
   }
 
-  public static int revertTransform(Player officer) {
+  public static Optional<Integer> revertTransform(Player officer) {
 
-    if (!officerTransformHistory.containsKey(officer.getUniqueId())) {
-      return -1;
+    MapStack<UUID, Transform<World>> history = GriefAlert
+        .getInstance()
+        .getAlertQueue()
+        .getOfficerCheckHistory();
+
+    Optional<Transform<World>> previousTransformOptional = history.pop(officer.getUniqueId());
+
+    if (!previousTransformOptional.isPresent()) {
+      return Optional.empty();
     }
 
-    Stack<Transform<World>> history = officerTransformHistory.get(officer.getUniqueId());
-
-    if (history.isEmpty()) {
-      return -1;
+    if (!officer.setTransformSafely(previousTransformOptional.get())) {
+      Errors.sendCannotTeleportSafely(officer, previousTransformOptional.get());
     }
 
-    Transform<World> previousTransform = history.pop();
-
-    if (!officer.setTransformSafely(previousTransform)) {
-      Errors.sendCannotTeleportSafely(officer, previousTransform);
-    }
-
-    return history.size();
+    return Optional.of(history.size(officer.getUniqueId()));
 
   }
 
