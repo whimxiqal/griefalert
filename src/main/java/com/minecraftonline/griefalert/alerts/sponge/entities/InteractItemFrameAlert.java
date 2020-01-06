@@ -32,10 +32,9 @@ public class InteractItemFrameAlert extends InteractEntityAlert {
         TextColors.RED,
         String.format(
             "(%s)",
-            SpongeEvents.getItemFrameContentMessage(getEntitySnapshot()))));
-    getTransform().ifPresent((transform -> builder.append(Text.of(
+            SpongeEvents.getItemFrameContentMessage(getEntitySnapshot())),
         TextColors.RED, " in the ",
-        getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
+        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
     return builder.build();
   }
 

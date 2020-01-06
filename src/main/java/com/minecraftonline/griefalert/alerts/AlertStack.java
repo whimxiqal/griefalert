@@ -96,7 +96,7 @@ public final class AlertStack extends RotatingStack<Alert> {
     return Optional.of(officerCheckHistory.size(officer.getUniqueId()));
   }
 
-  public void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
+  void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
     officerCheckHistory.push(officerUuid, transform);
   }
 }

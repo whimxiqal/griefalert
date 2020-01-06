@@ -44,8 +44,4 @@ public class AttackEntityAlert extends EntityAlert {
     }
   }
 
-  @Override
-  public GriefEvent getGriefEvent() {
-    return GriefEvents.ATTACK;
-  }
 }

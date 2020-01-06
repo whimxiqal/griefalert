@@ -1,21 +1,28 @@
 package com.minecraftonline.griefalert.alerts.prism;
 
-import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.*;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.Grammar;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 public class ReplaceAlert extends PrismAlert {
 
-  private final String originalBlockId;
+  private final String replacementBlockId;
 
-  public ReplaceAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord, String originalBlockId) {
+  public ReplaceAlert(GriefProfile griefProfile,
+                      PrismRecordArchived prismRecord,
+                      String replacementBlockId) {
     super(griefProfile, prismRecord);
-    this.originalBlockId = originalBlockId;
+    this.replacementBlockId = replacementBlockId;
   }
 
+  /**
+   * Special constructor for <code>Text</code> for a <code>ReplaceAlert</code>.
+   *
+   * @return The <code>Text</code>
+   */
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(
@@ -23,19 +30,16 @@ public class ReplaceAlert extends PrismAlert {
         Format.space(),
         getEventColor(), "replaced",
         Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(originalBlockId.replace("minecraft:", "")),
+        getTargetColor(), Grammar.addIndefiniteArticle(getTarget()
+            .replace("minecraft:", "")),
         Format.space(), "with",
         Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(Prism.getTarget(getPrismRecord()).get().replace("minecraft:", ""))));
-    getTransform().ifPresent((transform -> builder.append(Text.of(
+        getTargetColor(), Grammar.addIndefiniteArticle(replacementBlockId
+            .replace("minecraft:", ""))));
+    builder.append(Text.of(
         TextColors.RED, " in the ",
-        getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
+        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
     return builder.build();
-  }
-
-  @Override
-  public GriefEvent getGriefEvent() {
-    return GriefEvents.REPLACE;
   }
 
 }

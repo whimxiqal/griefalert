@@ -4,11 +4,9 @@ package com.minecraftonline.griefalert.alerts.prism;
 
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.alerts.AbstractAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.GriefEvents;
-import com.minecraftonline.griefalert.util.Prism;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -22,23 +20,21 @@ import org.spongepowered.api.world.World;
 /**
  * <code>Alert</code> for all which derive from Prism.
  */
-public abstract class PrismAlert extends Alert {
+public abstract class PrismAlert extends AbstractAlert {
 
   private final PrismRecordArchived prismRecord;
-  private Transform<World> grieferTransform;
+  private final Transform<World> grieferTransform;
 
   PrismAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile);
     this.prismRecord = prismRecord;
 
     // Immediately set the transform of the griefer upon triggering the Alert
-    grieferTransform = null;
-    prismRecord.getDataContainer().getString(DataQueries.Player).ifPresent(
+    grieferTransform = prismRecord.getDataContainer().getString(DataQueries.Player).flatMap(
         (s) ->
-            grieferTransform = Sponge.getServer()
+            Sponge.getServer()
                 .getPlayer(UUID.fromString(s))
-                .map(Player::getTransform).orElse(null)
-    );
+                .map(Player::getTransform)).orElseThrow(RuntimeException::new);
   }
 
   PrismRecordArchived getPrismRecord() {
@@ -46,8 +42,8 @@ public abstract class PrismAlert extends Alert {
   }
 
   @Override
-  public Optional<Transform<World>> getTransform() {
-    return Optional.ofNullable(grieferTransform);
+  public Transform<World> getGrieferTransform() {
+    return grieferTransform;
   }
 
   @Override

@@ -1,245 +1,175 @@
-/* Created by PietElite */
-
 package com.minecraftonline.griefalert.api.alerts;
 
-import com.google.common.collect.Lists;
-import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.Comms;
-import com.minecraftonline.griefalert.util.Errors;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Grammar;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import com.minecraftonline.griefalert.util.Permissions;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
 /**
- * An object to hold all information about an Alert caused by an
- * event matching a {@link GriefProfile}.
+ * An interface for an <code>Object</code> to store information and send messages
+ * regarding events that match a certain {@link GriefProfile}.
+ *
+ * @author PietElite
  */
-public abstract class Alert implements Runnable {
+public interface Alert extends Runnable {
 
+  /**
+   * Get the <code>Player</code> responsible for triggering the <code>Alert</code>.
+   *
+   * @return The griefer
+   */
+  Player getGriefer();
 
-  // FIELDS
+  /**
+   * Get the <code>Transform</code> of the griefer when the griefer
+   * triggered the <code>Alert</code>.
+   *
+   * @return The <code>Transform</code>
+   * @see Player
+   */
+  Transform<World> getGrieferTransform();
 
-  private int stackIndex;
-  private final GriefProfile griefProfile;
-  private boolean silent = false;
-  private boolean pushed = false;
+  /**
+   * Construct the main message body for this <code>Alert</code>.
+   *
+   * @return the main <code>Text</code> for this <code>Alert</code>
+   */
+  Text getMessageText();
 
+  /**
+   * Get summary text for this <code>Alert</code>.
+   * TODO: change to reflect more accurate data
+   *
+   * @return Text representing a cohesive summary of the <code>Alert</code>
+   */
+  Text getSummary();
 
-  // PROTECTED CONSTRUCTOR
+  /**
+   * Get an <code>Optional</code> <code>String</code> that represent extra content for
+   * help compiling the summary text.
+   * TODO: change to reflect more accurate data
+   *
+   * @return The extra content
+   */
+  Optional<String> getExtraSummaryContent();
 
-  protected Alert(GriefProfile griefProfile) {
-    this.griefProfile = griefProfile;
-  }
+  /**
+   * Returns whether this <code>Alert</code> is silent.
+   *
+   * @return true if silent and staff are not notified of the <code>Alert</code>
+   */
+  boolean isSilent();
 
+  /**
+   * Sets whether this Alert will be silent when run.
+   *
+   * @param silent true if <code>Alert</code> is to be silent. False if
+   *               <code>Alert</code> is to not be silent.
+   */
+  void setSilent(boolean silent);
 
-  // ABSTRACT METHODS
+  /**
+   * Get the <code>GriefEvent</code> associated with this <code>Alert</code>.
+   * This is always the <code>GriefEvent</code> associated with the
+   * {@link GriefProfile}.
+   *
+   * @return The GriefEvent
+   */
+  GriefEvent getGriefEvent();
 
-  public abstract Player getGriefer();
-
-  public abstract GriefEvent getGriefEvent();
-
-  public abstract Optional<Transform<World>> getTransform();
-
-
-  // PUBLIC MEMBER METHODS
-
-  public String getTarget() {
-    return griefProfile.getTarget();
-  }
-
-  public Text getMessageText() {
-    Text.Builder builder = Text.builder();
-    builder.append(Text.of(
-        Format.playerName(getGriefer()),
-        Format.space(),
-        getEventColor(), getGriefEvent().getPreterite(),
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(getTarget().replace("minecraft:", ""))));
-    getTransform().ifPresent((transform -> builder.append(Text.of(
-        TextColors.RED, " in the ",
-        getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
-    return builder.build();
-  }
-
-  public Text getSummary() {
-    Text.Builder builder = Text.builder();
-
-    builder.append(Text.of(TextColors.DARK_AQUA, "Player: ", TextColors.GRAY, Format.playerName(getGriefer())), Format.endLine());
-    builder.append(Text.of(TextColors.DARK_AQUA, "Event: ", TextColors.GRAY, griefProfile.getGriefEvent().getId()), Format.endLine());
-    builder.append(Text.of(TextColors.DARK_AQUA, "Target: ", TextColors.GRAY, griefProfile.getTarget().replace("minecraft:", "")), Format.endLine());
-    getExtraSummaryContent().ifPresent((content) ->
-        builder.append(Text.of(TextColors.DARK_AQUA, "Extra: ", TextColors.GRAY, content, Format.endLine()))
-    );
-    getTransform().ifPresent((transform) ->
-        builder.append(Text.of(TextColors.DARK_AQUA, "Location: ", TextColors.GRAY, Format.location(
-            transform.getLocation()))));
-
-    return builder.build();
-  }
-
-  public Optional<String> getExtraSummaryContent() {
-    return Optional.empty();
-  }
-
-  public boolean isSilent() {
-    return silent;
-  }
-
-  public void setSilent(boolean silent) {
-    this.silent = silent;
-  }
-
-
-  // FINAL PUBLIC METHODS
+  /**
+   * Get the target of the alert. This is always the target associated with
+   * the {@link GriefProfile}.
+   *
+   * @return The String ID of the target
+   */
+  String getTarget();
 
   @Override
-  public final void run() {
+  void run();
 
-    if (pushed) {
-      try {
-        throw new IllegalAccessException("Tried to push an alert to the Alert Queue a second time");
-      } catch (IllegalAccessException e) {
-        e.printStackTrace();
-      }
-    }
+  /**
+   * Check the <code>Alert</code> with the given <code>Player</code>.
+   *
+   * @param officer The staff member
+   * @return true if the player teleported correctly
+   */
+  boolean checkBy(Player officer);
 
-    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
+  /**
+   * Get the number which correlates this <code>Alert</code> to the
+   * {@link com.minecraftonline.griefalert.alerts.AlertStack} for
+   * retrieval.
+   *
+   * @return The index within the <code>AlertStack</code>
+   */
+  int getStackIndex();
 
-    PreRunAlertEvent preRunAlertEvent = new PreRunAlertEvent(this, Cause.of(eventContext, plugin));
+  /**
+   * Get the <code>Text</code> of the <code>Alert</code> with this
+   * <code>Alert</code>'s stack index appended to the end.
+   *
+   * @return The <code>Text</code>
+   * @see com.minecraftonline.griefalert.alerts.AlertStack
+   */
+  Text getTextWithIndex();
 
-    Sponge.getEventManager().post(preRunAlertEvent);
+  /**
+   * Get the <code>Text</code> of the <code>Alert</code> with multiple
+   * stack indices appended to the end. This is mainly used for chainging
+   * similar <code>Alert</code>s together.
+   *
+   * @param allIndices The list of integers to append
+   * @return The <code>Text</code>
+   */
+  Text getTextWithIndices(List<Integer> allIndices);
 
-    GriefAlert.getInstance().getAlertQueue().push(this);
-    pushed = true;
+  /**
+   * Determine whether this <code>Alert</code> is a repeat of another <code>Alert</code>.
+   * Used for silencing <code>Alert</code>s which occur immediately following each other.
+   *
+   * @param other The other <code>Alert</code>
+   * @return true if other is a repeat of this <code>Alert</code>
+   */
+  boolean isRepeatOf(Alert other);
 
-    if (getGriefer().hasPermission(Permissions.GRIEFALERT_SILENT.toString())) {
-      setSilent(true);
-    }
+  /**
+   * Setter for the index corresponding to the index in the
+   * {@link com.minecraftonline.griefalert.alerts.AlertStack} which
+   * can retrieve this <code>Alert</code>.
+   *
+   * @param stackIndex the stack index
+   */
+  void setStackIndex(int stackIndex);
 
-    if (!isSilent()) {
-      Comms.getStaffBroadcastChannel().send(getTextWithIndex());
-    }
+  /**
+   * Getter for the <code>TextColor</code> of the Event in this <code>Alert</code>'s
+   * message.
+   *
+   * @return The Event <code>TextColor</code>
+   */
+  TextColor getEventColor();
 
-  }
+  /**
+   * Getter for the <code>TextColor</code> of the Target in this <code>Alert</code>'s
+   * message.
+   *
+   * @return The Target <code>TextColor</code>
+   */
+  TextColor getTargetColor();
 
-  public final boolean checkBy(Player officer) {
-
-    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
-
-    PreCheckAlertEvent preCheckAlertEvent = new PreCheckAlertEvent(this, Cause.of(eventContext, plugin), officer);
-
-    Sponge.getEventManager().post(preCheckAlertEvent);
-
-    // Get the necessary transform so the officer can teleport
-    if (!getTransform().isPresent()) {
-      return false;
-    }
-
-    Transform<World> alertTransform = getTransform().get();
-
-    // Save the officer's previous transform and add it into the alert's database later
-    // if the officer successfully teleports.
-    Transform<World> officerPreviousTransform = officer.getTransform();
-
-    // CheckEvent
-
-    // Teleport the officer
-    if (!officer.setTransformSafely(alertTransform)) {
-      Errors.sendCannotTeleportSafely(officer, alertTransform);
-      return false;
-    }
-
-    // The officer has teleported successfully, so save their previous location in the history
-    GriefAlert.getInstance().getAlertQueue().addOfficerTransform(
-        officer.getUniqueId(),
-        officerPreviousTransform);
-
-    officer.sendMessage(Format.heading("Checking Grief Alert:"));
-    officer.sendMessage(getSummary());
-    Comms.getStaffBroadcastChannel().send(Format.info(
-        Format.playerName(officer),
-        " is checking alert number ",
-        Format.bonus(clickToCheck(getStackIndex()))));
-    return true;
-
-  }
-
-  public final int getStackIndex() {
-    return stackIndex;
-  }
-
-  public final Text getTextWithIndex() {
-    return getTextWithIndices(Lists.newArrayList(getStackIndex()));
-  }
-
-  public final Text getTextWithIndices(List<Integer> allIndices) {
-    Text.Builder builder = Text.builder().append(getMessageText());
-    allIndices.forEach((i) -> {
-      builder.append(Format.space());
-      builder.append(clickToCheck(i));
-    });
-    return builder.build();
-  }
-
-  public final boolean isRepeatOf(Alert other) {
-    return getMessageText().equals(other.getMessageText());
-  }
-
-
-  // FINAL PROTECTED METHODS
-
-  protected final TextColor getEventColor() {
-    return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.EVENT_COLOR).map((s) -> Sponge.getRegistry().getType(TextColor.class, s)
-            .orElse(Format.ALERT_EVENT_COLOR))
-        .orElse(Format.ALERT_EVENT_COLOR);
-  }
-
-  protected final TextColor getTargetColor() {
-    return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.TARGET_COLOR).map((s) -> Sponge.getRegistry().getType(TextColor.class, s)
-            .orElse(Format.ALERT_TARGET_COLOR))
-        .orElse(Format.ALERT_TARGET_COLOR);
-  }
-
-  protected final TextColor getDimensionColor() {
-    return griefProfile.getDataContainer()
-        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map((s) -> Sponge.getRegistry().getType(TextColor.class, s)
-            .orElse(Format.ALERT_DIMENSION_COLOR))
-        .orElse(Format.ALERT_DIMENSION_COLOR);
-  }
-
-  public final void setStackIndex(int stackIndex) {
-    this.stackIndex = stackIndex;
-  }
-
-
-  // PRIVATE METHODS
-
-  private Text clickToCheck(int index) {
-    return Format.command(String.valueOf(index),
-        "/ga check " + index,
-        GriefAlert.getInstance().getAlertQueue().get(index).getSummary());
-  }
-
+  /**
+   * Getter for the <code>TextColor</code> of the Dimension in this <code>Alert</code>'s
+   * message.
+   *
+   * @return The Dimension <code>TextColor</code>
+   */
+  TextColor getDimensionColor();
 }

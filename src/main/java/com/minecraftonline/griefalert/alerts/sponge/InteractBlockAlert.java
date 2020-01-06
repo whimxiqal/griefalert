@@ -2,14 +2,13 @@
 
 package com.minecraftonline.griefalert.alerts.sponge;
 
-import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
-import com.minecraftonline.griefalert.util.GriefEvents;
 import java.util.Optional;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -40,21 +39,16 @@ public class InteractBlockAlert extends SpongeAlert {
         "holding",
         Format.space(),
         Optional.ofNullable(handHeldItem)
+            .filter((itemStack) -> !itemStack.getType().equals(ItemTypes.AIR))
             .map((itemStack -> Grammar.addIndefiniteArticle(
                 itemStack
                     .getType()
                     .getId()
                     .replace("minecraft:", ""))))
-            .orElse("nothing")));
-
-    getTransform().ifPresent((transform -> builder.append(Text.of(
+            .orElse("nothing"),
         TextColors.RED, " in the ",
-        getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
+        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
     return builder.build();
   }
 
-  @Override
-  public GriefEvent getGriefEvent() {
-    return GriefEvents.INTERACT;
-  }
 }

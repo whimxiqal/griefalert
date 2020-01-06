@@ -33,8 +33,4 @@ public class InteractEntityAlert extends EntityAlert {
     }
   }
 
-  @Override
-  public GriefEvent getGriefEvent() {
-    return GriefEvents.INTERACT;
-  }
 }

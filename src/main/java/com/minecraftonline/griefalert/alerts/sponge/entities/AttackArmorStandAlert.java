@@ -33,10 +33,9 @@ public class AttackArmorStandAlert extends AttackEntityAlert {
         "(containing ",
         Format.bonus(SpongeEvents.getArmorStandContent(
             getEntitySnapshot()).map(List::size).orElse(0)),
-        " items)"));
-    getTransform().ifPresent((transform -> builder.append(Text.of(
+        " items)",
         TextColors.RED, " in the ",
-        getDimensionColor(), transform.getExtent().getDimension().getType().getName()))));
+        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
     return builder.build();
   }
 

@@ -74,7 +74,11 @@ public abstract class AbstractCommand implements CommandExecutor {
     source.sendMessage(Text.of(TextColors.GOLD, "==============="));
     source.sendMessage(Text.of(TextColors.GOLD, getAliases().get(0) + " : Command Help"));
     source.sendMessage(Text.of(TextColors.YELLOW, getDescription()));
-      source.sendMessage(Text.of(TextColors.LIGHT_PURPLE, "Usage: ", TextColors.GRAY, buildCommandSpec().getUsage(source)));
+    source.sendMessage(Text.of(
+        TextColors.LIGHT_PURPLE,
+        "Usage: ",
+        TextColors.GRAY,
+        buildCommandSpec().getUsage(source)));
     getChildren().forEach((command) -> source.sendMessage(Text.of(
         TextColors.AQUA,
         command.getAliases().get(0),
@@ -85,7 +89,7 @@ public abstract class AbstractCommand implements CommandExecutor {
   /**
    * Build the Command Spec required by the Sponge command registrar.
    *
-   * @return
+   * @return the Command Spec
    */
   public CommandSpec buildCommandSpec() {
     CommandSpec.Builder commandSpecBuilder = CommandSpec.builder()

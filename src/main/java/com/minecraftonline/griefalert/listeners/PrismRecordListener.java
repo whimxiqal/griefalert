@@ -13,8 +13,6 @@ import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Prism;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.world.DimensionType;
 
@@ -98,17 +96,20 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       }
       GriefAlert.getInstance().getLogger().info("Found: " + originalBlockId.get());
 
-      Optional<GriefProfile> replaceOptional = GriefAlert.getInstance().getProfileCabinet().getProfileOf(
-          GriefEvents.REPLACE,
-          originalBlockId.get(),
-          dimensionTypeOptional.get()
-      );
+      Optional<GriefProfile> replaceOptional = GriefAlert.getInstance().getProfileCabinet()
+          .getProfileOf(
+              GriefEvents.REPLACE,
+              originalBlockId.get(),
+              dimensionTypeOptional.get());
+
+      Optional<String> replacementBlockId = Prism.getReplacementBlock(record)
+          .map((state) -> state.getType().getId());
 
       // If yes, create an Alert of the appropriate type
       replaceOptional.ifPresent((profile) -> {
         GriefAlert.getInstance().getLogger().debug("PrismEvent matched a GriefProfile");
 
-        PrismAlert alert = new ReplaceAlert(profile, record, originalBlockId.get());
+        PrismAlert alert = new ReplaceAlert(profile, record, replacementBlockId.orElse("unknown block"));
 
         // Cache the Alert and broadcast its message
         alert.run();
