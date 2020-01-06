@@ -35,7 +35,7 @@ public final class ExtraListeners {
           event.getItemStack().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> UseAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> UseAlert.of(profile, event).run());
     }
   }
 
@@ -49,7 +49,7 @@ public final class ExtraListeners {
           event.getTargetBlock().getState().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> InteractBlockAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> InteractBlockAlert.of(profile, event).run());
     }
   }
 
@@ -63,7 +63,7 @@ public final class ExtraListeners {
           event.getTargetEntity().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> InteractEntityAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> InteractEntityAlert.of(profile, event).run());
     }
   }
 
@@ -79,7 +79,7 @@ public final class ExtraListeners {
           event.getTargetEntity().getType().getId(),
           player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> AttackEntityAlert.of(profile, event).pushAndRun());
+      optionalProfile.ifPresent((profile) -> AttackEntityAlert.of(profile, event).run());
     }
   }
 

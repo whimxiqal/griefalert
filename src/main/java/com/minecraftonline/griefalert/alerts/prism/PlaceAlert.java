@@ -9,7 +9,7 @@ import com.minecraftonline.griefalert.util.GriefEvents;
 
 public class PlaceAlert extends PrismAlert {
 
-  PlaceAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  public PlaceAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
   }
 

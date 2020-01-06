@@ -10,7 +10,7 @@ import com.minecraftonline.griefalert.util.GriefEvents;
 
 public class DeathAlert extends PrismAlert {
 
-  DeathAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  public DeathAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
   }
 

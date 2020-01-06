@@ -1,25 +1,19 @@
 package com.minecraftonline.griefalert.commands;
 
-import com.google.common.collect.Lists;
-import com.helion3.prism.api.data.PrismEvent;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
-import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.*;
 
 import java.util.*;
 
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public class GriefAlertRecentCommand extends AbstractCommand {
@@ -85,14 +79,14 @@ public class GriefAlertRecentCommand extends AbstractCommand {
     LinkedList<Integer> indices = new LinkedList<>();
     for (Alert alert : matching) {
       if (!indices.isEmpty() && !GriefAlert.getInstance().getAlertQueue().get(indices.getLast()).isRepeatOf(alert)) {
-        src.sendMessage(GriefAlert.getInstance().getAlertQueue().get(indices.getFirst()).getFullText(indices));
+        src.sendMessage(GriefAlert.getInstance().getAlertQueue().get(indices.getFirst()).getTextWithIndices(indices));
         indices.clear();
       }
       indices.add(alert.getStackIndex());
     }
 
     if (!indices.isEmpty()) {
-      src.sendMessage(GriefAlert.getInstance().getAlertQueue().get(indices.getFirst()).getFullText(indices));
+      src.sendMessage(GriefAlert.getInstance().getAlertQueue().get(indices.getFirst()).getTextWithIndices(indices));
     }
 
     return CommandResult.success();

@@ -17,6 +17,11 @@ import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntityType;
@@ -120,4 +125,17 @@ public abstract class Prism {
     return String.join("\n", lines);
   }
 
+  public static Optional<BlockState> getOriginalBlock(PrismRecordArchived record) {
+    return record.getDataContainer().getView(DataQueries.OriginalBlock)
+        .flatMap(view -> view.getView(DataQueries.BlockState))
+        .flatMap(view -> BlockState.builder().build(view));
+
+  }
+
+  public static Optional<BlockState> getReplacementBlock(PrismRecordArchived record) {
+    return record.getDataContainer().getView(DataQueries.ReplacementBlock)
+        .flatMap(view -> view.getView(DataQueries.BlockState))
+        .flatMap(view -> BlockState.builder().build(view));
+
+  }
 }

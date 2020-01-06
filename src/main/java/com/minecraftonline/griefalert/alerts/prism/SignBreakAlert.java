@@ -15,7 +15,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class SignBreakAlert extends PrismAlert {
 
-  SignBreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  public SignBreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
   }
 
@@ -26,7 +26,7 @@ public class SignBreakAlert extends PrismAlert {
     Optional<SignText> signTextOptional = Prism.getBrokenSignLines(getPrismRecord());
 
     builder.append(Text.of(
-        General.formatPlayerName(getGriefer()),
+        Format.playerName(getGriefer()),
         Format.space(),
         getEventColor(), "broke",
         Format.space(),

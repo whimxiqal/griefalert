@@ -18,7 +18,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 
-
 /**
  * The ongoing queue for all <code>Alert</code>s. This is only local storage. Someone
  * can access each alert by their 'cachecode' using the <code>RotatingQueue</code>

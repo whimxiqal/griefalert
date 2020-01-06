@@ -9,7 +9,7 @@ import com.minecraftonline.griefalert.util.GriefEvents;
 
 public class BreakAlert extends PrismAlert {
 
-  BreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  public BreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
   }
 

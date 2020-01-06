@@ -5,7 +5,6 @@ package com.minecraftonline.griefalert.alerts.sponge;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class InteractBlockAlert extends SpongeAlert {
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(
-        General.formatPlayerName(getGriefer()),
+        Format.playerName(getGriefer()),
         Format.space(),
         getEventColor(), getGriefEvent().getPreterite(),
         Format.space(),

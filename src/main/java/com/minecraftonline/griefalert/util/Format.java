@@ -259,4 +259,14 @@ public final class Format {
   public static String removeMinecraftPrefix(String s) {
     return s.replace("minecraft:", "");
   }
+
+  /**
+   * Format the grief checker's name to include prefix and suffix.
+   *
+   * @param player The grief checker
+   * @return The Text form of the grief checker's name
+   */
+  public static Text playerName(Player player) {
+    return player.getDisplayNameData().displayName().get();
+  }
 }

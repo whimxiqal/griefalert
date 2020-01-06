@@ -4,7 +4,6 @@ package com.minecraftonline.griefalert.alerts.sponge.entities;
 
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.SpongeEvents;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class InteractArmorStandAlert extends InteractEntityAlert {
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(
-        General.formatPlayerName(getGriefer()),
+        Format.playerName(getGriefer()),
         Format.space(),
         getEventColor(), "interacted with",
         Format.space(),

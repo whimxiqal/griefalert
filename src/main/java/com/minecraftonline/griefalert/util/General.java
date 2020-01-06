@@ -25,16 +25,6 @@ public abstract class General {
   }
 
   /**
-   * Format the grief checker's name to include prefix and suffix.
-   *
-   * @param player The grief checker
-   * @return The Text form of the grief checker's name
-   */
-  public static Text formatPlayerName(Player player) {
-    return player.getDisplayNameData().displayName().get();
-  }
-
-  /**
    * Reformats a string so all spaces are replaced with underscores
    * and it has a 'minecraft:' tag if it didn't have a tag previously.
    * @param unsure The input string

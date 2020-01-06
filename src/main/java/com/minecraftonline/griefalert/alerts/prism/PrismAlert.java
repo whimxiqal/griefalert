@@ -72,36 +72,4 @@ public abstract class PrismAlert extends Alert {
     return playerOptional.get();
   }
 
-  /**
-   * Generator for the appropriate <code>Alert</code>> corresponding with a Prism-caused
-   * event. The returned <code>PrismAlert</code> will be empty if the given parameters do not allow
-   * for a valid <code>PrismAlert</code>.
-   *
-   * @param griefProfile The <code>GriefProfile</code> flagging this event
-   * @param prismRecord  The prism record
-   * @return An optional prism alert
-   */
-  public static Optional<PrismAlert> of(
-      GriefProfile griefProfile,
-      PrismRecordArchived prismRecord) {
-    Optional<String> targetOptional = Prism.getTarget(prismRecord);
-    if (!targetOptional.isPresent()) {
-      return Optional.empty();
-    }
-
-    if (griefProfile.getGriefEvent().equals(GriefEvents.BREAK)) {
-      if (targetOptional.get().contains("sign")) {
-        return Optional.of(new SignBreakAlert(griefProfile, prismRecord));
-      } else {
-        return Optional.of(new BreakAlert(griefProfile, prismRecord));
-      }
-    } else if (griefProfile.getGriefEvent().equals(GriefEvents.PLACE)) {
-      return Optional.of(new PlaceAlert(griefProfile, prismRecord));
-    } else if (griefProfile.getGriefEvent().equals(GriefEvents.DEATH)) {
-      return Optional.of(new DeathAlert(griefProfile, prismRecord));
-    }
-
-    return Optional.empty();
-  }
-
 }

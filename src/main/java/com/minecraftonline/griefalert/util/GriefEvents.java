@@ -32,13 +32,14 @@ public final class GriefEvents {
           DEATH,
           ITEM_USE,
           INTERACT,
-          ATTACK
+          ATTACK,
+          REPLACE
       );
     }
   };
-
   private GriefEvents() {
   }
+
 
   public static final GriefEvent BREAK = GriefEvent.of(PrismEvents.BLOCK_BREAK);
   public static final GriefEvent PLACE = GriefEvent.of(PrismEvents.BLOCK_PLACE);
@@ -46,5 +47,6 @@ public final class GriefEvents {
   public static final GriefEvent ITEM_USE = GriefEvent.of("use", "Item Use", "used");
   public static final GriefEvent INTERACT = GriefEvent.of("interact", "Interact", "interacted with");
   public static final GriefEvent ATTACK = GriefEvent.of("attack", "Attack", "attacked");
+  public static final GriefEvent REPLACE = GriefEvent.of("replace", "Replace", "replaced");
 
 }
