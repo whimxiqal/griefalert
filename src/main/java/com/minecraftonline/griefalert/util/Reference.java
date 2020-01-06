@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.util;
 
 public abstract class Reference {

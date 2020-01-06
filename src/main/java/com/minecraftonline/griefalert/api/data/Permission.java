@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.data;
 
 public class Permission {

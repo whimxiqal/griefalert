@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;

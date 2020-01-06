@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;

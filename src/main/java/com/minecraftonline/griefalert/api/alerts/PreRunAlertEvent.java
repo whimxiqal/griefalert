@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.alerts;
 
 import org.spongepowered.api.event.cause.Cause;
@@ -8,7 +10,7 @@ public class PreRunAlertEvent extends AbstractEvent {
   private Alert alert;
   private Cause cause;
 
-  public PreRunAlertEvent(Alert alert, Cause cause) {
+  PreRunAlertEvent(Alert alert, Cause cause) {
     this.alert = alert;
     this.cause = cause;
   }

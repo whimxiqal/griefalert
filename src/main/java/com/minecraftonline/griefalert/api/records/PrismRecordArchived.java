@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.records;
 
 import com.helion3.prism.api.records.PrismRecord;

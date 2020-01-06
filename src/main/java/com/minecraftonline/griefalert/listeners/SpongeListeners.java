@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
@@ -16,13 +18,13 @@ import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 
 import java.util.Optional;
 
-public final class ExtraListeners {
+public final class SpongeListeners {
 
-  private ExtraListeners() {
+  private SpongeListeners() {
   }
 
   public static void register(GriefAlert plugin) {
-    Sponge.getEventManager().registerListeners(plugin, new ExtraListeners());
+    Sponge.getEventManager().registerListeners(plugin, new SpongeListeners());
   }
 
   @Listener

@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.alerts;
 
 import org.spongepowered.api.entity.living.player.Player;
@@ -10,7 +12,7 @@ public class PreCheckAlertEvent extends AbstractEvent {
   private final Cause cause;
   private final Player officer;
 
-  public PreCheckAlertEvent(Alert alert, Cause cause, Player officer) {
+  PreCheckAlertEvent(Alert alert, Cause cause, Player officer) {
     this.alert = alert;
     this.cause = cause;
     this.officer = officer;
