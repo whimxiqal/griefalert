@@ -4,6 +4,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * An interface for persistent storage of {@link GriefProfile}s.
@@ -20,7 +21,7 @@ public interface ProfileStorage {
    *         input <code>GriefProfile</code>
    * @throws Exception if error
    */
-  boolean write(GriefProfile profile) throws Exception;
+  boolean write(@Nonnull final GriefProfile profile) throws Exception;
 
   /**
    * Remove the {@link GriefProfile} from persistent storage.
@@ -30,7 +31,8 @@ public interface ProfileStorage {
    * @return false if a <code>GriefProfile</code> was not found
    * @throws Exception if error
    */
-  boolean remove(GriefEvent griefEvent, String target) throws Exception;
+  boolean remove(@Nonnull final GriefEvent griefEvent, @Nonnull final String target)
+      throws Exception;
 
   /**
    * Get all <code>GriefProfile</code>s saved in persistent storage.
@@ -38,6 +40,7 @@ public interface ProfileStorage {
    * @return a list of <code>GriefProfile</code>s
    * @throws Exception if error
    */
+  @Nonnull
   List<GriefProfile> retrieve() throws Exception;
 
 }

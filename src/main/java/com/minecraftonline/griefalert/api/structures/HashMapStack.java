@@ -21,7 +21,7 @@ public class HashMapStack<K, V> implements MapStack<K, V> {
 
   @Nonnull
   @Override
-  public Optional<V> pop(@Nonnull K key) {
+  public Optional<V> pop(@Nonnull final K key) {
     ensurePresent(key);
     if (data.get(key).isEmpty()) {
       return Optional.empty();
@@ -31,7 +31,7 @@ public class HashMapStack<K, V> implements MapStack<K, V> {
 
   @Nonnull
   @Override
-  public Optional<V> peek(@Nonnull K key) {
+  public Optional<V> peek(@Nonnull final K key) {
     ensurePresent(key);
     if (data.get(key).isEmpty()) {
       return Optional.empty();
@@ -41,30 +41,30 @@ public class HashMapStack<K, V> implements MapStack<K, V> {
 
   @Nonnull
   @Override
-  public Integer size(@Nonnull K key) {
+  public Integer size(@Nonnull final K key) {
     ensurePresent(key);
     return data.get(key).size();
   }
 
   @Override
-  public void push(@Nonnull K key, @Nonnull V value) {
+  public void push(@Nonnull final K key, @Nonnull final V value) {
     ensurePresent(key);
     data.get(key).push(value);
   }
 
   @Override
-  public boolean isEmpty(@Nonnull K key) {
+  public boolean isEmpty(@Nonnull final K key) {
     ensurePresent(key);
     return data.get(key).isEmpty();
   }
 
   @Override
-  public void clear(@Nonnull K key) {
+  public void clear(@Nonnull final K key) {
     ensurePresent(key);
     data.get(key).clear();
   }
 
-  private void ensurePresent(K key) {
+  private void ensurePresent(@Nonnull final K key) {
     data.putIfAbsent(key, new Stack<>());
   }
 }

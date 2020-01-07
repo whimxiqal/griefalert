@@ -6,8 +6,8 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
-import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.caches.ProfileCache;
+import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.commands.ReplacedCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
@@ -19,6 +19,7 @@ import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.Reference;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,15 +48,14 @@ import org.spongepowered.api.plugin.PluginContainer;
  *
  * @author PietElite
  */
-@Plugin(id = "griefalert",
-    name = "GriefAlert",
+@Plugin(id = Reference.ID,
+    name = Reference.NAME,
     version = VERSION,
-    description = "Grief alert tool",
+    description = Reference.DESCRIPTION,
     dependencies = {@Dependency(id = "prism"), @Dependency(id = "worldedit")})
 public final class GriefAlert {
 
-  public static final String VERSION = "24.0";
-  public static final String MC_VERSION = "1.12.2";
+  public static final String VERSION = Reference.VERSION;
   private static GriefAlert instance;
 
   // Injected features directly from Sponge
@@ -95,7 +95,7 @@ public final class GriefAlert {
 
 
   // Custom classes to help manage plugin
-  private ProfileCache cabinet;
+  private ProfileCache profileCache;
   private RotatingAlertList rotatingAlertList;
   private ConfigHelper configHelper;
   private MySqlProfileStorage profileStorage;
@@ -135,7 +135,7 @@ public final class GriefAlert {
       e.printStackTrace();
     }
 
-    cabinet = new ProfileCache();
+    profileCache = new ProfileCache();
     rotatingAlertList = new RotatingAlertList(configHelper.getCachedEventLimit());
 
     // Register all the commands with Sponge
@@ -153,15 +153,18 @@ public final class GriefAlert {
     reload();
   }
 
+  /**
+   * Reload the entire plugin and its data.
+   */
   public void reload() {
-    logger.info("Reloading plugin");
+    getLogger().info("Reloading plugin");
     try {
       rootNode = configManager.load();
     } catch (IOException e) {
       e.printStackTrace();
     }
     configHelper.load(rootNode);
-    cabinet.reload();  // Must reload grief event logger after config
+    profileCache.reload();
   }
 
 
@@ -196,8 +199,8 @@ public final class GriefAlert {
     return new File(configDirectory.getParentFile().getParentFile().getPath() + "/" + "griefalert");
   }
 
-  public ProfileCache getProfileCabinet() {
-    return cabinet;
+  public ProfileCache getProfileCache() {
+    return profileCache;
   }
 
   public ConfigurationLoader<CommentedConfigurationNode> getConfigManager() {

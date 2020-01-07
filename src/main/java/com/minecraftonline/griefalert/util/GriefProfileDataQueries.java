@@ -6,7 +6,9 @@ import org.spongepowered.api.data.DataQuery;
 
 public final class GriefProfileDataQueries {
 
-
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
   private GriefProfileDataQueries() {
   }
 

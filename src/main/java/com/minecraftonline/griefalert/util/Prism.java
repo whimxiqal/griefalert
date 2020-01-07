@@ -2,36 +2,32 @@
 
 package com.minecraftonline.griefalert.util;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.helion3.prism.api.data.PrismEvent;
-import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.util.DataQueries;
-
-import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
-public abstract class Prism {
+public final class Prism {
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private Prism() {
+  }
 
   /**
    * Get the player as a cause of the event from the PrismRecord. Return null
@@ -48,21 +44,23 @@ public abstract class Prism {
     return record.getDataContainer().getString(DataQueries.Target);
   }
 
+  /**
+   * Get the location from a <code>PrismRecord</code>, if it exists.
+   *
+   * @param record the record
+   * @return the optional location
+   */
+  @SuppressWarnings("all")
   public static Optional<Location<World>> getLocation(PrismRecordArchived record) {
     Optional<DataView> locationView = record.getDataContainer().getView(DataQueries.Location);
-    if (!locationView.isPresent()) {
-      return Optional.empty();
-    }
 
-    Optional<String> worldUuid = locationView.get().getString(DataQueries.WorldUuid);
-    if (!worldUuid.isPresent()) {
-      return Optional.empty();
-    }
+    Optional<World> world = locationView
+        .flatMap((view) -> view.getString(DataQueries.WorldUuid))
+        .flatMap((s) -> Sponge.getServer().getWorld(UUID.fromString(s)));
 
-    Optional<World> world = Sponge.getServer().getWorld(UUID.fromString(worldUuid.get()));
-    Optional<Integer> x = locationView.get().getInt(DataQueries.X);
-    Optional<Integer> y = locationView.get().getInt(DataQueries.Y);
-    Optional<Integer> z = locationView.get().getInt(DataQueries.Z);
+    Optional<Integer> x = locationView.flatMap((view) -> view.getInt(DataQueries.X));
+    Optional<Integer> y = locationView.flatMap((view) -> view.getInt(DataQueries.Y));
+    Optional<Integer> z = locationView.flatMap((view) -> view.getInt(DataQueries.Z));
     if (!Optionals.allPresent(world, x, y, z)) {
       return Optional.empty();
     }
@@ -72,17 +70,14 @@ public abstract class Prism {
   }
 
   /**
-   * Get the EntityType of the entity in the event from the PrismRecord.
+   * If a broken sign exists, parse its lines and add it to a <code>SignText</code>.
    *
-   * @param record The PrismRecord which houses all event data
-   * @return The EntityType from the event, or null if none exists
+   * @param record the record to search through
+   * @return an optional of the <code>SignText</code>
    */
-  public static Optional<EntityType> getEntityType(PrismRecordArchived record) {
-    return record.getDataContainer().getObject(DataQueries.EntityType, EntityType.class);
-  }
-
-  public static Optional<SignText> getBrokenSignLines(PrismRecordArchived record) {
-    Optional<DataView> originalOptional = record.getDataContainer().getView(DataQueries.OriginalBlock);
+  public static Optional<SignText> getBrokenSignText(PrismRecordArchived record) {
+    Optional<DataView> originalOptional = record.getDataContainer()
+        .getView(DataQueries.OriginalBlock);
 
     if (!originalOptional.isPresent()) {
       return Optional.empty();
@@ -119,6 +114,12 @@ public abstract class Prism {
 
   }
 
+  /**
+   * Print a readable version of all data within the <code>PrismRecord</code>.
+   *
+   * @param record the record
+   * @return a string with all data
+   */
   public static String printRecord(PrismRecordArchived record) {
     List<String> lines = new LinkedList<>();
     for (DataQuery query : record.getDataContainer().getKeys(false)) {
@@ -127,6 +128,12 @@ public abstract class Prism {
     return String.join("\n", lines);
   }
 
+  /**
+   * Get the original state of the block from a <code>PrismRecord</code>.
+   *
+   * @param record the record
+   * @return the <code>BlockState</code> found
+   */
   public static Optional<BlockState> getOriginalBlock(PrismRecordArchived record) {
     return record.getDataContainer().getView(DataQueries.OriginalBlock)
         .flatMap(view -> view.getView(DataQueries.BlockState))
@@ -134,6 +141,12 @@ public abstract class Prism {
 
   }
 
+  /**
+   * Get the replacement state of the block from a <code>PrismRecord</code>.
+   *
+   * @param record the record
+   * @return the <code>BlockState</code> found
+   */
   public static Optional<BlockState> getReplacementBlock(PrismRecordArchived record) {
     return record.getDataContainer().getView(DataQueries.ReplacementBlock)
         .flatMap(view -> view.getView(DataQueries.BlockState))

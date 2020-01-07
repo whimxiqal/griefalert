@@ -31,10 +31,14 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
   private final MapStack<UUID, Alert> grieferRepeatHistory = new HashMapStack<>();
   private final MapStack<UUID, Transform<World>> officerCheckHistory = new HashMapStack<>();
 
+  /**
+   * Default constructor.
+   *
+   * @param capacity the capacity of this structure
+   */
   public RotatingAlertList(final int capacity) {
     super(capacity);
   }
-
 
   /**
    * Adds an alert to the queue. This method will replace the old <code>Alert</code> at

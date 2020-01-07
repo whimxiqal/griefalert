@@ -3,7 +3,6 @@
 package com.minecraftonline.griefalert.api.records;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
-import com.minecraftonline.griefalert.exceptions.MalformedProfileException;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.data.DataContainer;
@@ -96,6 +95,12 @@ public class GriefProfile {
 
   private String printData() {
     return dataContainer.getValues(true).toString();
+  }
+
+  public static class MalformedProfileException extends IllegalStateException {
+    MalformedProfileException(String s) {
+      super(s);
+    }
   }
 
 }

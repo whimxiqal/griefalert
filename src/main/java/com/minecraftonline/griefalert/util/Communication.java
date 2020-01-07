@@ -2,6 +2,8 @@
 
 package com.minecraftonline.griefalert.util;
 
+import com.minecraftonline.griefalert.GriefAlert;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,7 +12,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
-public abstract class Comms {
+public final class Communication {
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private Communication() {
+  }
 
   /**
    * Get the Message Channel which connects to all members with the
@@ -26,10 +34,11 @@ public abstract class Comms {
           staff.add(player);
         }
       }
-      staff.add(Sponge.getServer().getConsole());
+      if (GriefAlert.getInstance().getConfigHelper().isAlertEventsToConsole()) {
+        staff.add(Sponge.getServer().getConsole());
+      }
       return staff;
     };
   }
-
 
 }

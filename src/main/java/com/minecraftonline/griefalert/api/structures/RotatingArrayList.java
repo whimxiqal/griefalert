@@ -46,7 +46,7 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
   }
 
   @Override
-  public int push(@Nonnull P value) {
+  public int push(@Nonnull final P value) {
     data.set(cursor, value);
     int output = cursor;
     incrementCursor();

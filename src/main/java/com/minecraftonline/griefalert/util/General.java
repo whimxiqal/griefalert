@@ -12,7 +12,13 @@ import org.spongepowered.api.text.format.TextColors;
  *
  * @author PietElite
  */
-public abstract class General {
+public final class General {
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private General() {
+  }
 
   /**
    * Send a series of colored messages to the console, signifying the initialization

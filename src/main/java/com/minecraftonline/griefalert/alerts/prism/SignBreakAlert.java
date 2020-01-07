@@ -2,18 +2,19 @@
 
 package com.minecraftonline.griefalert.alerts.prism;
 
-import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.*;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.Prism;
 
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import javax.annotation.Nonnull;
 
 public class SignBreakAlert extends PrismAlert {
 
@@ -26,7 +27,7 @@ public class SignBreakAlert extends PrismAlert {
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
 
-    Optional<SignText> signTextOptional = Prism.getBrokenSignLines(getPrismRecord());
+    Optional<SignText> signTextOptional = Prism.getBrokenSignText(getPrismRecord());
 
     builder.append(Text.of(
         Format.playerName(getGriefer()),

@@ -4,7 +4,13 @@ package com.minecraftonline.griefalert.util;
 
 import com.minecraftonline.griefalert.api.data.Permission;
 
-public abstract class Permissions {
+public final class Permissions {
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private Permissions() {
+  }
 
   public static final Permission GRIEFALERT_COMMAND = Permission.of(
       "griefalert.command"
@@ -24,15 +30,13 @@ public abstract class Permissions {
   public static final Permission GRIEFALERT_COMMAND_RELOAD = Permission.of(
       "griefalert.command.reload"
   );
+
+  @SuppressWarnings("WeakerAccess")
   public static final Permission GRIEFALERT_MESSAGING = Permission.of(
       "griefalert.messaging"
   );
   public static final Permission GRIEFALERT_SILENT = Permission.of(
       "griefalert.silent"
-  );
-  // Unused
-  public static final Permission GRIEFALERT_DEGRIEF = Permission.of(
-      "griefalert.degrief"
   );
 
 }

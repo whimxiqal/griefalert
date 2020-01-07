@@ -8,12 +8,11 @@ import com.minecraftonline.griefalert.util.SpongeEvents;
 
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-
-import javax.annotation.Nonnull;
-
 
 public class InteractArmorStandAlert extends InteractEntityAlert {
 

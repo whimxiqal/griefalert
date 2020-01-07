@@ -3,19 +3,23 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
-import org.spongepowered.api.command.CommandException;
+import com.minecraftonline.griefalert.util.Reference;
+
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.format.TextStyles;
 
 public class GriefAlertCommand extends AbstractCommand {
 
   /**
-   * The base command for all Grief Alert subcommands.
+   * The base command for all Grief Alert sub-commands.
    */
   public GriefAlertCommand() {
     super(
@@ -26,17 +30,34 @@ public class GriefAlertCommand extends AbstractCommand {
     addAlias("ga");
     addChild(new GriefAlertCheckCommand());
     addChild(new GriefAlertInfoCommand());
-    addChild(new GriefAlertRecentCommand());
+    addChild(new GriefAlertSearchCommand());
     addChild(new GriefAlertReturnCommand());
     addChild(new GriefAlertReloadCommand());
     addChild(new GriefAlertProfileCommand());
 
   }
 
+  @Nonnull
   @Override
-  public CommandResult execute(@NonnullByDefault CommandSource src,
-                               @NonnullByDefault CommandContext args) throws CommandException {
-    sendHelp(src);
+  public CommandResult execute(@Nonnull CommandSource src,
+                               @Nonnull CommandContext args) {
+    src.sendMessage(Text.of(
+        Format.bonus("=============")));
+    src.sendMessage(Text.of(
+        Format.GRIEF_ALERT_THEME, TextStyles.BOLD, "GriefAlert",
+        Format.space(),
+        TextStyles.RESET, Format.bonus("by MinecraftOnline")));
+    src.sendMessage(Text.of(
+        TextColors.AQUA, "Authors: ",
+        Format.bonus(String.join(", ", Reference.AUTHORS))));
+    src.sendMessage(Format.bonus(
+        "Check out the ",
+        Format.space(),
+        Format.url("website", Reference.WEBSITE),
+        "."));
+    src.sendMessage(Format.bonus(
+        "Try: ",
+        TextColors.YELLOW, String.format("/%s help", getAliases().get(0))));
     return CommandResult.success();
   }
 

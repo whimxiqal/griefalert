@@ -11,13 +11,13 @@ import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nonnull;
 
 /**
  * <code>Alert</code> for all which derive from Prism.

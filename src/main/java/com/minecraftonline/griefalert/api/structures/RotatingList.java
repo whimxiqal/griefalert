@@ -38,7 +38,7 @@ public interface RotatingList<P> {
    * @param value the value
    * @return the index at which the value is stored
    */
-  int push(@Nonnull P value);
+  int push(@Nonnull final P value);
 
   /**
    * Get the current location of the cursor. This is the location where

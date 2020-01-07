@@ -3,10 +3,11 @@
 package com.minecraftonline.griefalert.api.commands;
 
 import com.minecraftonline.griefalert.api.data.Permission;
-import com.minecraftonline.griefalert.commands.HelpCommand;
 import com.minecraftonline.griefalert.util.Format;
+
 import java.util.LinkedList;
 import java.util.List;
+
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -14,6 +15,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 
 /**
  * An abstract class for all MinecraftOnline commands from which to extend. This
@@ -21,7 +23,7 @@ import org.spongepowered.api.text.format.TextColors;
  */
 public abstract class AbstractCommand implements CommandExecutor {
 
-  public final Permission permission;
+  private final Permission permission;
   private final Text description;
   private final List<AbstractCommand> commandChildren = new LinkedList<>();
   private final List<String> aliases = new LinkedList<>();
@@ -37,8 +39,8 @@ public abstract class AbstractCommand implements CommandExecutor {
                          Text description) {
     this.permission = permission;
     this.description = description;
-    if (!(this instanceof HelpCommand)) {
-      this.addChild(new HelpCommand(this));
+    if (!(this instanceof HelpSubCommand)) {
+      this.addChild(new HelpSubCommand(this));
     }
   }
 
@@ -77,21 +79,35 @@ public abstract class AbstractCommand implements CommandExecutor {
 
   /**
    * Send a help message about this command to the given <code>CommandSource</code>.
+   *
    * @param source The source of the help message
    */
-  public final void sendHelp(CommandSource source) {
-    source.sendMessage(Format.heading(String.join("|", getAliases()) + " : Command Help"));
-    source.sendMessage(Text.of(TextColors.YELLOW, getDescription()));
+  protected final void sendHelp(CommandSource source) {
     source.sendMessage(Text.of(
-        TextColors.LIGHT_PURPLE,
-        "Usage: ",
-        TextColors.GRAY,
+        Format.heading("Command Help : "),
+        Format.bonus(
+            "{",
+            Text.of(TextColors.GREEN, String.join(",", getAliases())),
+            "}"
+        )));
+    source.sendMessage(Text.of(
+        TextColors.LIGHT_PURPLE, "USAGE",
+        Format.space(),
+        TextColors.GRAY, TextStyles.ITALIC,
         buildCommandSpec().getUsage(source)));
-    getChildren().forEach((command) -> source.sendMessage(Text.of(
-        TextColors.AQUA,
-        String.join("|", command.getAliases()),
-        TextColors.GRAY, ": ", command.getDescription())
-    ));
+    source.sendMessage(Text.of(
+        TextColors.LIGHT_PURPLE, "DESC",
+        Format.space(),
+        Format.space(),
+        TextColors.YELLOW, getDescription()));
+    getChildren().forEach((command) -> {
+      if (source.hasPermission(command.getPermission().toString())) {
+        source.sendMessage(Text.of(
+            TextColors.AQUA,
+            String.join(",", command.getAliases()),
+            TextColors.GRAY, " - ", command.getDescription()));
+      }
+    });
   }
 
   /**
@@ -113,5 +129,9 @@ public abstract class AbstractCommand implements CommandExecutor {
 
   private Text getDescription() {
     return description;
+  }
+
+  Permission getPermission() {
+    return permission;
   }
 }

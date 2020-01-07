@@ -11,9 +11,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 /**
- * An event posted before an {@link Alert} has been run/executed. At the point of
- * this event being thrown, the <code>Alert</code> will have been formed, but
- * will not have been added to the
+ * An event posted directly before an {@link Alert} has been checked by an officer.
  *
  * @author PietElite
  */

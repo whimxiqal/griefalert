@@ -18,9 +18,6 @@ public class ConfigHelper {
   private int cachedEventLimit;
   private int hiddenRepeatedEventLimit;
   private boolean alertEventsToConsole;
-  private String sqlUsername;
-  private String sqlPassword;
-  private String sqlDatabaseAddress;
 
   /**
    * Create and initialize this helper class for managing the configuration data. This constructor
@@ -40,7 +37,8 @@ public class ConfigHelper {
    */
   private void initialize(Path configPath, ConfigurationNode root) {
     if (!configPath.toFile().exists()) {
-      GriefAlert.getInstance().getLogger().info("No configuration file found. Generating new one...");
+      GriefAlert.getInstance().getLogger().info(
+          "No configuration file found. Generating new one...");
       try {
         root.getNode("alertsCodeLimit").setValue(DEFAULT_ALERTS_CODE_LIMIT);
         root.getNode("maxHiddenRepeatedEvents").setValue(DEFAULT_MAX_REPEATED_HIDDEN_ALERT);
@@ -77,18 +75,6 @@ public class ConfigHelper {
 
   public int getHiddenRepeatedEventLimit() {
     return hiddenRepeatedEventLimit;
-  }
-
-  public String getSqlDatabaseAddress() {
-    return sqlDatabaseAddress;
-  }
-
-  public String getSqlPassword() {
-    return sqlPassword;
-  }
-
-  public String getSqlUsername() {
-    return sqlUsername;
   }
 
   public boolean isAlertEventsToConsole() {

@@ -9,7 +9,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.Comms;
+import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
@@ -168,7 +168,7 @@ public abstract class AbstractAlert implements Alert {
     }
 
     if (!isSilent()) {
-      Comms.getStaffBroadcastChannel().send(getTextWithIndex());
+      Communication.getStaffBroadcastChannel().send(getTextWithIndex());
     }
 
   }
@@ -212,7 +212,7 @@ public abstract class AbstractAlert implements Alert {
 
     officer.sendMessage(Format.heading("Checking Grief Alert:"));
     officer.sendMessage(getSummary());
-    Comms.getStaffBroadcastChannel().send(Format.info(
+    Communication.getStaffBroadcastChannel().send(Format.info(
         Format.playerName(officer),
         " is checking alert number ",
         Format.bonus(clickToCheck(getStackIndex()))));

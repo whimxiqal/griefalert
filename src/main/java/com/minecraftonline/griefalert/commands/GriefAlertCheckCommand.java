@@ -8,7 +8,7 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
-import org.spongepowered.api.command.CommandException;
+import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -16,7 +16,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public class GriefAlertCheckCommand extends AbstractCommand {
 
@@ -30,17 +29,19 @@ public class GriefAlertCheckCommand extends AbstractCommand {
     setCommandElement(GenericArguments.onlyOne(GenericArguments.integer(Text.of("alert code"))));
   }
 
+  @Nonnull
   @Override
-  @NonnullByDefault
-  public CommandResult execute(@NonnullByDefault CommandSource src,
-                               @NonnullByDefault CommandContext args) throws CommandException {
+  public CommandResult execute(@Nonnull CommandSource src,
+                               @Nonnull CommandContext args) {
     if (src instanceof Player) {
       Player player = (Player) src;
       if (args.<Integer>getOne("alert code").isPresent()) {
 
         try {
 
-          Alert alert = GriefAlert.getInstance().getRotatingAlertList().get(args.<Integer>getOne("alert code").get());
+          Alert alert = GriefAlert.getInstance()
+              .getRotatingAlertList()
+              .get(args.<Integer>getOne("alert code").get());
           alert.checkBy(player);
 
         } catch (IndexOutOfBoundsException e) {

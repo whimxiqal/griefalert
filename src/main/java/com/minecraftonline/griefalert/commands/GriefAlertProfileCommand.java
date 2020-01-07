@@ -7,8 +7,13 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.*;
-import org.spongepowered.api.command.CommandException;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import com.minecraftonline.griefalert.util.Permissions;
+
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -18,12 +23,10 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
-import javax.annotation.Nonnull;
-import java.sql.SQLException;
 
 public class GriefAlertProfileCommand extends AbstractCommand {
 
-  public GriefAlertProfileCommand() {
+  GriefAlertProfileCommand() {
     super(Permissions.GRIEFALERT_COMMAND_PROFILE,
         Text.of("Perform alterations to the profiles used for flagging alerts"));
     addAlias("profile");
@@ -36,7 +39,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
   @Nonnull
   @Override
-  public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
+  public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
     sendHelp(src);
     return CommandResult.success();
   }
@@ -51,16 +54,24 @@ public class GriefAlertProfileCommand extends AbstractCommand {
           GenericArguments.catalogedElement(Text.of("event"), GriefEvent.class),
           GenericArguments.string(Text.of("target")),
           GenericArguments.flags()
-              .valueFlag(GenericArguments.dimension(Text.of("dimension")), "-ignore", "i")
-              .valueFlag(GenericArguments.catalogedElement(Text.of("event_color"), TextColor.class), "-event_color")
-              .valueFlag(GenericArguments.catalogedElement(Text.of("target_color"), TextColor.class), "-target_color")
-              .valueFlag(GenericArguments.catalogedElement(Text.of("dimension_color"), TextColor.class), "-dimension_color")
+              .valueFlag(GenericArguments.dimension(
+                  Text.of("dimension")),
+                  "-ignore", "i")
+              .valueFlag(GenericArguments.catalogedElement(
+                  Text.of("event_color"), TextColor.class),
+                  "-event_color")
+              .valueFlag(GenericArguments.catalogedElement(
+                  Text.of("target_color"), TextColor.class),
+                  "-target_color")
+              .valueFlag(GenericArguments.catalogedElement(
+                  Text.of("dimension_color"), TextColor.class),
+                  "-dimension_color")
               .buildWith(GenericArguments.none())));
     }
 
     @Nonnull
     @Override
-    public CommandResult execute(@Nonnull CommandSource src,@Nonnull CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
       DataContainer dataContainer = DataContainer.createNew();
 
       dataContainer.set(
@@ -71,18 +82,22 @@ public class GriefAlertProfileCommand extends AbstractCommand {
           args.getOne("target").map((s) -> General.ensureIdFormat((String) s)).get());
 
       if (args.getOne("event_color").isPresent()) {
-        dataContainer.set(GriefProfileDataQueries.EVENT_COLOR, args.getOne("event_color").get());
+        dataContainer.set(GriefProfileDataQueries.EVENT_COLOR,
+            args.getOne("event_color").get());
       }
 
       if (args.getOne("target_color").isPresent()) {
-        dataContainer.set(GriefProfileDataQueries.TARGET_COLOR, args.getOne("target_color").get());
+        dataContainer.set(GriefProfileDataQueries.TARGET_COLOR,
+            args.getOne("target_color").get());
       }
 
       if (args.getOne("dimension_color").isPresent()) {
-        dataContainer.set(GriefProfileDataQueries.DIMENSION_COLOR, args.getOne("dimension_color").get());
+        dataContainer.set(GriefProfileDataQueries.DIMENSION_COLOR,
+            args.getOne("dimension_color").get());
       }
 
-      dataContainer.set(GriefProfileDataQueries.IGNORED, Lists.newArrayList(args.getAll("dimension")));
+      dataContainer.set(GriefProfileDataQueries.IGNORED,
+          Lists.newArrayList(args.getAll("dimension")));
 
       GriefProfile toAdd = GriefProfile.of(dataContainer);
       if (!toAdd.isValid()) {
@@ -93,10 +108,11 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       try {
         if (GriefAlert.getInstance().getProfileStorage().write(toAdd)) {
           src.sendMessage(Format.success("GriefProfile added"));
-          GriefAlert.getInstance().getProfileCabinet().reload();
+          GriefAlert.getInstance().getProfileCache().reload();
           return CommandResult.success();
         } else {
-          src.sendMessage(Format.error("GriefProfile addition failed. Maybe this format already exists?"));
+          src.sendMessage(Format.error("GriefProfile addition failed. "
+              + "Maybe this format already exists?"));
           return CommandResult.empty();
         }
       } catch (Exception e) {
@@ -124,14 +140,14 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
     @Nonnull
     @Override
-    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
       GriefEvent griefEvent = (GriefEvent) args.getOne("event").get();
       String target = args.getOne("target").map((s) -> General.ensureIdFormat((String) s)).get();
 
       try {
         if (GriefAlert.getInstance().getProfileStorage().remove(griefEvent, target)) {
-          GriefAlert.getInstance().getProfileCabinet().reload();
+          GriefAlert.getInstance().getProfileCache().reload();
           src.sendMessage(Format.success("Removed a Grief Profile"));
           return CommandResult.success();
         } else {
@@ -154,18 +170,19 @@ public class GriefAlertProfileCommand extends AbstractCommand {
   public static class CountCommand extends AbstractCommand {
 
     CountCommand() {
-      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Count how many profiles there are in use"));
+      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of(
+          "Count how many profiles there are in use"));
       addAlias("count");
       addAlias("c");
     }
 
     @Nonnull
     @Override
-    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
       src.sendMessage(Format.success(String.format(
           "There are %s Grief Profiles in use",
-          GriefAlert.getInstance().getProfileCabinet().getProfiles().size())));
+          GriefAlert.getInstance().getProfileCache().getProfiles().size())));
       return CommandResult.success();
 
     }
@@ -192,7 +209,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       ConsoleSource console = (ConsoleSource) src;
 
       console.sendMessage(Format.heading("=== Grief Profiles ==="));
-      for (GriefProfile profile : GriefAlert.getInstance().getProfileCabinet().getProfiles()) {
+      for (GriefProfile profile : GriefAlert.getInstance().getProfileCache().getProfiles()) {
         console.sendMessage(Format.bonus(profile.getDataContainer().getValues(true).toString()));
       }
       return CommandResult.success();

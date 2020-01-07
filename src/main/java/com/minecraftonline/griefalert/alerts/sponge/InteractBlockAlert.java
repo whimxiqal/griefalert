@@ -5,15 +5,16 @@ package com.minecraftonline.griefalert.alerts.sponge;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
+
 import java.util.Optional;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-
-import javax.annotation.Nonnull;
 
 public class InteractBlockAlert extends SpongeAlert {
 

@@ -3,18 +3,19 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import java.util.Optional;
-
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
-import org.spongepowered.api.command.CommandException;
+
+import java.util.Optional;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 
 public class GriefAlertReturnCommand extends AbstractCommand {
 
@@ -29,14 +30,16 @@ public class GriefAlertReturnCommand extends AbstractCommand {
   }
 
   @Override
-  @NonnullByDefault
-  public CommandResult execute(@NonnullByDefault CommandSource src,
-                               @NonnullByDefault CommandContext args) throws CommandException {
+  @Nonnull
+  public CommandResult execute(@Nonnull CommandSource src,
+                               @Nonnull CommandContext args) {
     if (src instanceof Player) {
 
       Player player = (Player) src;
 
-      Optional<Integer> revertsRemaining = GriefAlert.getInstance().getRotatingAlertList().revertOfficerTransform(player);
+      Optional<Integer> revertsRemaining = GriefAlert.getInstance()
+          .getRotatingAlertList()
+          .revertOfficerTransform(player);
 
       if (!revertsRemaining.isPresent()) {
         player.sendMessage(Format.info("You have no previous location."));

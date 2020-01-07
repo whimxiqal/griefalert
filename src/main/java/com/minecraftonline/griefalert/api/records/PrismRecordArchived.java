@@ -3,6 +3,7 @@
 package com.minecraftonline.griefalert.api.records;
 
 import com.helion3.prism.api.records.PrismRecord;
+import javax.annotation.Nonnull;
 import org.spongepowered.api.data.DataContainer;
 
 /**
@@ -19,7 +20,7 @@ public final class PrismRecordArchived {
   private final Object source;
   private final DataContainer dataContainer;
 
-  private PrismRecordArchived(PrismRecord record) {
+  private PrismRecordArchived(@Nonnull final PrismRecord record) {
     this.event = record.getEvent();
     this.source = record.getSource();
     this.dataContainer = record.getDataContainer().copy();
@@ -31,19 +32,23 @@ public final class PrismRecordArchived {
    * @param record the record to form into an archived copy
    * @return the archived copy
    */
-  public static PrismRecordArchived of(PrismRecord record) {
+  @Nonnull
+  public static PrismRecordArchived of(@Nonnull final PrismRecord record) {
     return new PrismRecordArchived(record);
   }
 
+  @Nonnull
   public String getEvent() {
     return event;
   }
 
+  @Nonnull
   @SuppressWarnings("unused")
   public Object getSource() {
     return source;
   }
 
+  @Nonnull
   public DataContainer getDataContainer() {
     return dataContainer;
   }
