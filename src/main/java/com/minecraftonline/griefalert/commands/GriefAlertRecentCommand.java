@@ -41,7 +41,7 @@ public class GriefAlertRecentCommand extends AbstractCommand {
                                @NonnullByDefault CommandContext args) throws CommandException {
     List<Alert> matching = new LinkedList<>();
 
-    List<Alert> cacheReversed = GriefAlert.getInstance().getAlertQueue().getDataByTime();
+    List<Alert> cacheReversed = GriefAlert.getInstance().getRotatingAlertList().getDataByTime();
     Collections.reverse(cacheReversed);
 
     int max = (int) args.getOne("maximum").orElse(20);
@@ -80,15 +80,15 @@ public class GriefAlertRecentCommand extends AbstractCommand {
 
     LinkedList<Integer> indices = new LinkedList<>();
     for (Alert alert : matching) {
-      if (!indices.isEmpty() && !GriefAlert.getInstance().getAlertQueue().get(indices.getLast()).isRepeatOf(alert)) {
-        src.sendMessage(GriefAlert.getInstance().getAlertQueue().get(indices.getFirst()).getTextWithIndices(indices));
+      if (!indices.isEmpty() && !GriefAlert.getInstance().getRotatingAlertList().get(indices.getLast()).isRepeatOf(alert)) {
+        src.sendMessage(GriefAlert.getInstance().getRotatingAlertList().get(indices.getFirst()).getTextWithIndices(indices));
         indices.clear();
       }
       indices.add(alert.getStackIndex());
     }
 
     if (!indices.isEmpty()) {
-      src.sendMessage(GriefAlert.getInstance().getAlertQueue().get(indices.getFirst()).getTextWithIndices(indices));
+      src.sendMessage(GriefAlert.getInstance().getRotatingAlertList().get(indices.getFirst()).getTextWithIndices(indices));
     }
 
     return CommandResult.success();

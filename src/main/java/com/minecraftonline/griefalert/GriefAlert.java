@@ -6,24 +6,25 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
-import com.minecraftonline.griefalert.api.caches.AlertStack;
+import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
+import com.minecraftonline.griefalert.api.caches.ProfileCache;
 import com.minecraftonline.griefalert.api.commands.ReplacedCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.commands.DeprecatedCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
-import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
-import com.minecraftonline.griefalert.api.caches.ProfileCabinet;
+import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.GriefEvents;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 
-import com.minecraftonline.griefalert.util.GriefEvents;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -42,7 +43,9 @@ import org.spongepowered.api.plugin.PluginContainer;
 /**
  * The main class for the plugin Grief Alert.
  * This plugin is made exclusively for MinecraftOnline.com
- * Do not use this plugin without explicit approval from the administration team of MinecraftOnline.
+ * Do not use this plugin without explicit approval from the administration team at MinecraftOnline.
+ *
+ * @author PietElite
  */
 @Plugin(id = "griefalert",
     name = "GriefAlert",
@@ -52,8 +55,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 public final class GriefAlert {
 
   public static final String VERSION = "24.0";
-  private static GriefAlert instance;
   public static final String MC_VERSION = "1.12.2";
+  private static GriefAlert instance;
 
   // Injected features directly from Sponge
 
@@ -62,6 +65,7 @@ public final class GriefAlert {
   private Logger logger;
 
   @Inject
+  @SuppressWarnings("UnusedDeclaration")
   private PluginContainer pluginContainer;
 
   @Inject
@@ -91,8 +95,8 @@ public final class GriefAlert {
 
 
   // Custom classes to help manage plugin
-  private ProfileCabinet cabinet;
-  private AlertStack alertQueue;
+  private ProfileCache cabinet;
+  private RotatingAlertList rotatingAlertList;
   private ConfigHelper configHelper;
   private MySqlProfileStorage profileStorage;
 
@@ -121,7 +125,9 @@ public final class GriefAlert {
 
     // Set helper manager classes
     configHelper = new ConfigHelper(defaultConfig, rootNode);
-    getDataDirectory().mkdirs();
+    if (getDataDirectory().mkdirs()) {
+      getLogger().info("Data directory created.");
+    }
 
     try {
       profileStorage = new MySqlProfileStorage();
@@ -129,8 +135,8 @@ public final class GriefAlert {
       e.printStackTrace();
     }
 
-    cabinet = new ProfileCabinet();
-    alertQueue = new AlertStack(configHelper.getCachedEventLimit());
+    cabinet = new ProfileCache();
+    rotatingAlertList = new RotatingAlertList(configHelper.getCachedEventLimit());
 
     // Register all the commands with Sponge
     registerCommands();
@@ -190,7 +196,7 @@ public final class GriefAlert {
     return new File(configDirectory.getParentFile().getParentFile().getPath() + "/" + "griefalert");
   }
 
-  public ProfileCabinet getProfileCabinet() {
+  public ProfileCache getProfileCabinet() {
     return cabinet;
   }
 
@@ -198,15 +204,15 @@ public final class GriefAlert {
     return configManager;
   }
 
-  public AlertStack getAlertQueue() {
-    return alertQueue;
+  public RotatingAlertList getRotatingAlertList() {
+    return rotatingAlertList;
   }
 
   public ConfigHelper getConfigHelper() {
     return configHelper;
   }
 
-  public MySqlProfileStorage getProfileStorage() {
+  public ProfileStorage getProfileStorage() {
     return profileStorage;
   }
 

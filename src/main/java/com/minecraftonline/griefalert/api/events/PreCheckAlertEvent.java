@@ -14,6 +14,8 @@ import org.spongepowered.api.event.impl.AbstractEvent;
  * An event posted before an {@link Alert} has been run/executed. At the point of
  * this event being thrown, the <code>Alert</code> will have been formed, but
  * will not have been added to the
+ *
+ * @author PietElite
  */
 public class PreCheckAlertEvent extends AbstractEvent {
 

@@ -2,7 +2,7 @@
 
 package com.minecraftonline.griefalert.api.alerts;
 
-import com.minecraftonline.griefalert.api.caches.AlertStack;
+import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
@@ -116,7 +116,7 @@ public interface Alert extends Runnable {
 
   /**
    * Get the number which correlates this <code>Alert</code> to the
-   * {@link AlertStack} for
+   * {@link RotatingAlertList} for
    * retrieval.
    *
    * @return The index within the <code>AlertStack</code>
@@ -128,7 +128,7 @@ public interface Alert extends Runnable {
    * <code>Alert</code>'s stack index appended to the end.
    *
    * @return The <code>Text</code>
-   * @see AlertStack
+   * @see RotatingAlertList
    */
   @Nonnull
   Text getTextWithIndex();
@@ -155,7 +155,7 @@ public interface Alert extends Runnable {
 
   /**
    * Setter for the index corresponding to the index in the
-   * {@link AlertStack} which
+   * {@link RotatingAlertList} which
    * can retrieve this <code>Alert</code>.
    *
    * @param stackIndex the stack index

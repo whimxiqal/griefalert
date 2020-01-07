@@ -5,6 +5,8 @@ package com.minecraftonline.griefalert.api.data;
 /**
  * An object to describe a permission to track which commands and actions can
  * be completed by people with certain levels of privilege.
+ *
+ * @author PietElite
  */
 public class Permission {
 

@@ -18,6 +18,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
+import javax.annotation.Nonnull;
 import java.sql.SQLException;
 
 public class GriefAlertProfileCommand extends AbstractCommand {
@@ -33,8 +34,9 @@ public class GriefAlertProfileCommand extends AbstractCommand {
     addChild(new ListCommand());
   }
 
+  @Nonnull
   @Override
-  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
     sendHelp(src);
     return CommandResult.success();
   }
@@ -56,8 +58,9 @@ public class GriefAlertProfileCommand extends AbstractCommand {
               .buildWith(GenericArguments.none())));
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src,@Nonnull CommandContext args) throws CommandException {
       DataContainer dataContainer = DataContainer.createNew();
 
       dataContainer.set(
@@ -96,8 +99,10 @@ public class GriefAlertProfileCommand extends AbstractCommand {
           src.sendMessage(Format.error("GriefProfile addition failed. Maybe this format already exists?"));
           return CommandResult.empty();
         }
-      } catch (SQLException e) {
-        GriefAlert.getInstance().getLogger().error("SQLException thrown when trying to add a profile: " + toAdd.printData());
+      } catch (Exception e) {
+        GriefAlert.getInstance().getLogger().error("An Exception thrown when trying to "
+            + "add a profile: "
+            + toAdd.getDataContainer().getValues(true).toString());
         General.printStackTraceToDebugLogger(e);
         return CommandResult.empty();
       }
@@ -117,8 +122,9 @@ public class GriefAlertProfileCommand extends AbstractCommand {
           GenericArguments.string(Text.of("target"))));
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
 
       GriefEvent griefEvent = (GriefEvent) args.getOne("event").get();
       String target = args.getOne("target").map((s) -> General.ensureIdFormat((String) s)).get();
@@ -132,8 +138,9 @@ public class GriefAlertProfileCommand extends AbstractCommand {
           src.sendMessage(Format.error("No Grief Profile was found with those parameters"));
           return CommandResult.empty();
         }
-      } catch (SQLException e) {
-        GriefAlert.getInstance().getLogger().error("SQLException thrown when trying to remove a profile: "
+      } catch (Exception e) {
+        GriefAlert.getInstance().getLogger().error("An Exception was thrown when trying to "
+            + "remove a profile: "
             + griefEvent.getId() + ", "
             + target);
         General.printStackTraceToDebugLogger(e);
@@ -152,8 +159,9 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       addAlias("c");
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
 
       src.sendMessage(Format.success(String.format(
           "There are %s Grief Profiles in use",
@@ -172,8 +180,9 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       addAlias("l");
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
       if (!(src instanceof ConsoleSource)) {
         src.sendMessage(Format.error("Only the console can use this command"));
@@ -184,7 +193,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
       console.sendMessage(Format.heading("=== Grief Profiles ==="));
       for (GriefProfile profile : GriefAlert.getInstance().getProfileCabinet().getProfiles()) {
-        console.sendMessage(Format.bonus(profile.printData()));
+        console.sendMessage(Format.bonus(profile.getDataContainer().getValues(true).toString()));
       }
       return CommandResult.success();
     }

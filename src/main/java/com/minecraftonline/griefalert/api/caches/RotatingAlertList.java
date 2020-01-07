@@ -6,7 +6,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.structures.HashMapStack;
 import com.minecraftonline.griefalert.api.structures.MapStack;
-import com.minecraftonline.griefalert.api.structures.RotatingStack;
+import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
 import com.minecraftonline.griefalert.util.Errors;
 
 import java.util.Optional;
@@ -23,15 +23,15 @@ import org.spongepowered.api.world.World;
  * API.
  *
  * @see Alert
- * @see RotatingStack
+ * @see RotatingArrayList
  */
-public final class AlertStack extends RotatingStack<Alert> {
+public final class RotatingAlertList extends RotatingArrayList<Alert> {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
   private final MapStack<UUID, Alert> grieferRepeatHistory = new HashMapStack<>();
   private final MapStack<UUID, Transform<World>> officerCheckHistory = new HashMapStack<>();
 
-  public AlertStack(final int capacity) {
+  public RotatingAlertList(final int capacity) {
     super(capacity);
   }
 
@@ -42,7 +42,7 @@ public final class AlertStack extends RotatingStack<Alert> {
    * </code> will also be assigned the corresponding index for retrieval.
    *
    * @param alert The alert to add
-   * @return The retrieval code
+   * @return The retrieval index
    */
   @Override
   public int push(@Nonnull final Alert alert) {

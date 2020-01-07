@@ -4,7 +4,7 @@ package com.minecraftonline.griefalert.api.alerts;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.caches.AlertStack;
+import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
@@ -122,7 +122,7 @@ public abstract class AbstractAlert implements Alert {
 
   /**
    * Run this <code>Alert</code>. This constitutes pushing this <code>Alert</code>
-   * to the {@link AlertStack} followed by
+   * to the {@link RotatingAlertList} followed by
    * broadcasting the <code>ALert</code> to staff members if the <code>Alert</code>
    * is not silent. This can only be done once.
    */
@@ -143,7 +143,7 @@ public abstract class AbstractAlert implements Alert {
       }
     }
 
-    GriefAlert.getInstance().getAlertQueue().push(this);
+    GriefAlert.getInstance().getRotatingAlertList().push(this);
     pushed = true;
 
   }
@@ -206,7 +206,7 @@ public abstract class AbstractAlert implements Alert {
     }
 
     // The officer has teleported successfully, so save their previous location in the history
-    GriefAlert.getInstance().getAlertQueue().addOfficerTransform(
+    GriefAlert.getInstance().getRotatingAlertList().addOfficerTransform(
         officer.getUniqueId(),
         officerPreviousTransform);
 
@@ -284,7 +284,7 @@ public abstract class AbstractAlert implements Alert {
   private Text clickToCheck(int index) {
     return Format.command(String.valueOf(index),
         "/ga check " + index,
-        GriefAlert.getInstance().getAlertQueue().get(index).getSummary());
+        GriefAlert.getInstance().getRotatingAlertList().get(index).getSummary());
   }
 
 }

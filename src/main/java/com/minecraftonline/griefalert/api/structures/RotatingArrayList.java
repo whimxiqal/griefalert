@@ -5,26 +5,27 @@ package com.minecraftonline.griefalert.api.structures;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
- * // TODO
- * @param <P>
+ * An abstract implementation of <code>RotatingList</code>.
  *
+ * @param <P> The type to store in the data structure
  * @author PietElite
  */
-public abstract class RotatingStack<P> {
+public abstract class RotatingArrayList<P> implements RotatingList<P> {
 
-  private int capacity;
+  private final int capacity;
   private int cursor;
   private int size;
   private ArrayList<P> data;
-  private boolean isFull = false;
 
   /**
-   * TODO
-   * @param capacity
+   * The default constructor.
+   *
+   * @param capacity The capacity of this structure
    */
-  public RotatingStack(int capacity) {
+  public RotatingArrayList(int capacity) {
     this.capacity = capacity;
     cursor = 0;
     size = 0;
@@ -34,49 +35,18 @@ public abstract class RotatingStack<P> {
     }
   }
 
-  private void incrementCursor() {
-    cursor = (cursor + 1) % capacity;
-  }
-
-  private void incrementSize() {
-    if (!isFull && size < capacity) {
-      size++;
-      if (size == capacity) {
-        isFull = true;
-      }
-    }
-  }
-
-  /**
-   * TODO
-   * @return
-   */
+  @Override
   public int capacity() {
     return capacity;
   }
 
-  /**
-   * TODO
-   * @return
-   */
-  protected int cursor() {
-    return cursor;
-  }
-
-  /**
-   * TODO
-   * @return
-   */
+  @Override
   public int size() {
     return size;
   }
 
-  /**
-   * TODO
-   * @param value
-   * @return
-   */
-  public int push(P value) {
+  @Override
+  public int push(@Nonnull P value) {
     data.set(cursor, value);
     int output = cursor;
     incrementCursor();
@@ -84,12 +54,8 @@ public abstract class RotatingStack<P> {
     return output;
   }
 
-  /**
-   * TODO
-   * @param index
-   * @return
-   * @throws IndexOutOfBoundsException
-   */
+  @Nonnull
+  @Override
   public P get(int index) throws IndexOutOfBoundsException {
     if (data.get(index) == null) {
       throw new IndexOutOfBoundsException();
@@ -97,13 +63,11 @@ public abstract class RotatingStack<P> {
     return data.get(index);
   }
 
-  /**
-   * TODO
-   * @return
-   */
+  @Nonnull
+  @Override
   public List<P> getDataByTime() {
     List<P> output = new LinkedList<>();
-    if (!isFull) {
+    if (!isFull()) {
       output.addAll(data.subList(0, size));
     } else {
       int localCursor = cursor;
@@ -115,12 +79,32 @@ public abstract class RotatingStack<P> {
     return output;
   }
 
-  /**
-   * TODO
-   * @return
-   */
+  @Nonnull
+  @Override
   public List<P> getDataByIndex() {
     return data.subList(0, size);
+  }
+
+  @Override
+  public boolean isFull() {
+    return size == capacity;
+  }
+
+  /**
+   * Get the cursor index location.
+   *
+   * @return The cursor index location
+   */
+  public int cursor() {
+    return cursor;
+  }
+
+  private void incrementCursor() {
+    cursor = (cursor + 1) % capacity;
+  }
+
+  private void incrementSize() {
+    size = Math.min(size + 1, capacity);
   }
 
 }

@@ -5,9 +5,9 @@ package com.minecraftonline.griefalert.storage;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 
 import java.sql.*;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MySqlProfileStorage {
+public class MySqlProfileStorage implements ProfileStorage {
 
   private static final String TABLE_NAME = "GriefAlertProfiles";
   private final String address;
@@ -60,13 +60,7 @@ public class MySqlProfileStorage {
     close();
   }
 
-  /**
-   * Write a GriefProfile into the database. Requires connection.
-   *
-   * @param profile The GriefProfile to add
-   * @return false if a grief profile already existed with the same target and grief event
-   * @throws SQLException if error through SQL
-   */
+  @Override
   public boolean write(GriefProfile profile) throws SQLException {
     String command = String.format(
         "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) values (?, ?, ?, ?, ?, ?, ?, ?);",
@@ -125,14 +119,7 @@ public class MySqlProfileStorage {
 
   }
 
-  /**
-   * Remove the GriefProfile with the given parameters. Requires connection.
-   *
-   * @param griefEvent The grief event of this profile to remove
-   * @param target     The target of this profile to remove
-   * @return false if a grief profile was not found
-   * @throws SQLException if error through SQL
-   */
+  @Override
   public boolean remove(GriefEvent griefEvent, String target) throws SQLException {
     if (!exists(griefEvent, target)) {
       return false;
@@ -149,12 +136,7 @@ public class MySqlProfileStorage {
     return true;
   }
 
-  /**
-   * Get all <code>GriefProfile</code>s saved in the database. Required connection.
-   *
-   * @return a list of grief profiles
-   * @throws SQLException if error through SQL
-   */
+  @Override
   public List<GriefProfile> retrieve() throws SQLException {
     connect();
     List<GriefProfile> profiles = new LinkedList<>();

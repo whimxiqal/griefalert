@@ -36,7 +36,7 @@ public class GriefAlertInfoCommand extends AbstractCommand {
     Player player = (Player) src;
     if (args.<Integer>getOne("alert code").isPresent()) {
       try {
-        Alert alert = GriefAlert.getInstance().getAlertQueue().get(args.<Integer>getOne("alert code").get());
+        Alert alert = GriefAlert.getInstance().getRotatingAlertList().get(args.<Integer>getOne("alert code").get());
         player.sendMessage(Format.heading("Grief Alert Info"));
         player.sendMessage(alert.getSummary());
       } catch (IndexOutOfBoundsException e) {

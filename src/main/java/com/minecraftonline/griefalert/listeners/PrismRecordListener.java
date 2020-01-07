@@ -79,7 +79,11 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
         GriefAlert.getInstance().getLogger().error("A PrismRecord matched a Grief Profile but "
             + "an Alert could not be made.");
         GriefAlert.getInstance().getLogger().error(Prism.printRecord(record));
-        GriefAlert.getInstance().getLogger().error(profileOptional.get().printData());
+        GriefAlert.getInstance().getLogger().error(profileOptional
+            .get()
+            .getDataContainer()
+            .getValues(true)
+            .toString());
         return;
       }
 

@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 /**
  * Holds the text within an instance of a sign.
+ *
+ * @author PietElite
  */
 public class SignText {
 

@@ -3,6 +3,7 @@
 package com.minecraftonline.griefalert.api.structures;
 
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 /**
  * An interface for mapping a key to a stack of a certain type. This was
@@ -10,7 +11,7 @@ import java.util.Optional;
  * and added if needed behind the scenes.
  *
  * @param <K> The key type
- * @param <V> The value type to be held in a stack
+ * @param <V> The value type
  * @author PietElite
  */
 public interface MapStack<K, V> {
@@ -24,7 +25,8 @@ public interface MapStack<K, V> {
    *         Returns an empty optional if no value is found, such as if the
    *         key was not found in the map or the stack is empty.
    */
-  Optional<V> pop(K key);
+  @Nonnull
+  Optional<V> pop(@Nonnull final K key);
 
 
   /**
@@ -35,7 +37,8 @@ public interface MapStack<K, V> {
    *         Returns an empty optional if no value is found, such as if the
    *         key was not found in the map or the stack is empty.
    */
-  Optional<V> peek(K key);
+  @Nonnull
+  Optional<V> peek(@Nonnull final K key);
 
 
   /**
@@ -45,7 +48,8 @@ public interface MapStack<K, V> {
    * @return The size of the stack. Returns zero if the stack is empty
    *         or the key is not found.
    */
-  Integer size(K key);
+  @Nonnull
+  Integer size(@Nonnull final K key);
 
 
   /**
@@ -56,7 +60,7 @@ public interface MapStack<K, V> {
    *              the stack is added and the value is pushed as the first
    *              item.
    */
-  void push(K key, V value);
+  void push(@Nonnull final K key, @Nonnull final V value);
 
 
   /**
@@ -67,12 +71,13 @@ public interface MapStack<K, V> {
    *         found in the map.
    */
   @SuppressWarnings("unused")
-  boolean isEmpty(K key);
+  boolean isEmpty(@Nonnull final K key);
 
 
   /**
    * Clear the stack mapped from the given key.
    * @param key The key to find the stack
    */
-  void clear(K key);
+  void clear(@Nonnull final K key);
+
 }

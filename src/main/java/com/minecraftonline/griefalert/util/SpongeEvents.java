@@ -58,12 +58,10 @@ public final class SpongeEvents {
         output.add(view.getString(DataQuery.of("id")).get());
       }
     }
-    // TODO finish
     return Optional.of(output);
   }
 
   public static String getArmorStandContentMessage(EntitySnapshot entitySnapshot) {
-    // TODO: implement
     return getArmorStandContent(entitySnapshot).map((list) -> String.join(", ", list)).orElse("empty");
   }
 

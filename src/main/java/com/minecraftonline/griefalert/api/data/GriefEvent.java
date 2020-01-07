@@ -12,6 +12,8 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
  * An object to describe a specific action. This is one of the factors which match
  * certain in-game events with {@link com.minecraftonline.griefalert.api.records.GriefProfile}s
  * so that {@link com.minecraftonline.griefalert.api.alerts.Alert}s can be triggered.
+ *
+ * @author PietElite
  */
 @CatalogedBy(GriefEvents.class)
 public class GriefEvent implements CatalogType {

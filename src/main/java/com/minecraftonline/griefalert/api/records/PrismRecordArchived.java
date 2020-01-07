@@ -5,6 +5,14 @@ package com.minecraftonline.griefalert.api.records;
 import com.helion3.prism.api.records.PrismRecord;
 import org.spongepowered.api.data.DataContainer;
 
+/**
+ * A record type that stores an archived {@link PrismRecord}. All methods are
+ * the same except that the {@link DataContainer} with all the data is copied
+ * for the purpose of saving the data before <code>Prism</code> edits the
+ * original <code>PrismRecord</code> later.
+ *
+ * @author PietElite
+ */
 public final class PrismRecordArchived {
 
   private final String event;
@@ -17,6 +25,12 @@ public final class PrismRecordArchived {
     this.dataContainer = record.getDataContainer().copy();
   }
 
+  /**
+   * General factory.
+   *
+   * @param record the record to form into an archived copy
+   * @return the archived copy
+   */
   public static PrismRecordArchived of(PrismRecord record) {
     return new PrismRecordArchived(record);
   }
