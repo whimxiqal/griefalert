@@ -2,13 +2,14 @@
 
 package com.minecraftonline.griefalert.alerts.sponge;
 
-import com.minecraftonline.griefalert.alerts.AbstractAlert;
+import com.minecraftonline.griefalert.api.alerts.AbstractAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import java.util.Optional;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.world.World;
+
+import javax.annotation.Nonnull;
 
 public abstract class SpongeAlert extends AbstractAlert {
 
@@ -25,11 +26,13 @@ public abstract class SpongeAlert extends AbstractAlert {
     return event;
   }
 
+  @Nonnull
   @Override
   public Transform<World> getGrieferTransform() {
     return grieferTransform;
   }
 
+  @Nonnull
   @Override
   public Player getGriefer() {
     return (Player) event.getCause().root();

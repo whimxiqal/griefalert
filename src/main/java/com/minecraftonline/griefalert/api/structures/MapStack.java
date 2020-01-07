@@ -11,6 +11,7 @@ import java.util.Optional;
  *
  * @param <K> The key type
  * @param <V> The value type to be held in a stack
+ * @author PietElite
  */
 public interface MapStack<K, V> {
 
@@ -65,6 +66,7 @@ public interface MapStack<K, V> {
    * @return true if there are no items in the stack or if no key was
    *         found in the map.
    */
+  @SuppressWarnings("unused")
   boolean isEmpty(K key);
 
 

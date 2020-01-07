@@ -8,9 +8,6 @@ import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.*;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -18,16 +15,10 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.world.DimensionType;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.function.Function;
 
 public class GriefAlertProfileCommand extends AbstractCommand {
 
@@ -54,7 +45,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Add a profile to the database"));
       addAlias("add");
       addAlias("a");
-      addCommandElement(GenericArguments.seq(
+      setCommandElement(GenericArguments.seq(
           GenericArguments.catalogedElement(Text.of("event"), GriefEvent.class),
           GenericArguments.string(Text.of("target")),
           GenericArguments.flags()
@@ -121,7 +112,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Remove a profile from the database"));
       addAlias("remove");
       addAlias("r");
-      addCommandElement(GenericArguments.seq(
+      setCommandElement(GenericArguments.seq(
           GenericArguments.catalogedElement(Text.of("event"), GriefEvent.class),
           GenericArguments.string(Text.of("target"))));
     }

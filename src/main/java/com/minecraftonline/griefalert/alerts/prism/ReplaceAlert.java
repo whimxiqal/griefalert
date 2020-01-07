@@ -7,6 +7,8 @@ import com.minecraftonline.griefalert.util.Grammar;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 public class ReplaceAlert extends PrismAlert {
 
   private final String replacementBlockId;
@@ -23,6 +25,7 @@ public class ReplaceAlert extends PrismAlert {
    *
    * @return The <code>Text</code>
    */
+  @Nonnull
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(

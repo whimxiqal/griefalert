@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * // TODO
+ * @param <P>
+ *
+ * @author PietElite
+ */
 public abstract class RotatingStack<P> {
 
   private int capacity;
@@ -14,6 +20,10 @@ public abstract class RotatingStack<P> {
   private ArrayList<P> data;
   private boolean isFull = false;
 
+  /**
+   * TODO
+   * @param capacity
+   */
   public RotatingStack(int capacity) {
     this.capacity = capacity;
     cursor = 0;
@@ -37,18 +47,35 @@ public abstract class RotatingStack<P> {
     }
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public int capacity() {
     return capacity;
   }
 
+  /**
+   * TODO
+   * @return
+   */
   protected int cursor() {
     return cursor;
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public int size() {
     return size;
   }
 
+  /**
+   * TODO
+   * @param value
+   * @return
+   */
   public int push(P value) {
     data.set(cursor, value);
     int output = cursor;
@@ -57,6 +84,12 @@ public abstract class RotatingStack<P> {
     return output;
   }
 
+  /**
+   * TODO
+   * @param index
+   * @return
+   * @throws IndexOutOfBoundsException
+   */
   public P get(int index) throws IndexOutOfBoundsException {
     if (data.get(index) == null) {
       throw new IndexOutOfBoundsException();
@@ -64,6 +97,10 @@ public abstract class RotatingStack<P> {
     return data.get(index);
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public List<P> getDataByTime() {
     List<P> output = new LinkedList<>();
     if (!isFull) {
@@ -78,6 +115,10 @@ public abstract class RotatingStack<P> {
     return output;
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public List<P> getDataByIndex() {
     return data.subList(0, size);
   }

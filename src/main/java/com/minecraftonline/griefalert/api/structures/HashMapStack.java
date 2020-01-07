@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.Stack;
 
+/**
+ * TODO
+ * @param <K>
+ * @param <V>
+ */
 public class HashMapStack<K, V> implements MapStack<K, V> {
 
   private HashMap<K, Stack<V>> data = new HashMap<>();

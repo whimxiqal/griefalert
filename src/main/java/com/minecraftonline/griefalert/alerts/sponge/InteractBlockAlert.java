@@ -13,6 +13,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 public class InteractBlockAlert extends SpongeAlert {
 
   private final ItemStack handHeldItem;
@@ -26,6 +28,7 @@ public class InteractBlockAlert extends SpongeAlert {
     return new InteractBlockAlert(griefProfile, event);
   }
 
+  @Nonnull
   @Override
   public Text getMessageText() {
     Text.Builder builder = Text.builder();

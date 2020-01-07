@@ -1,34 +1,35 @@
 /* Created by PietElite */
 
-package com.minecraftonline.griefalert.profiles;
+package com.minecraftonline.griefalert.api.caches;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
+import com.minecraftonline.griefalert.util.General;
 
 import java.util.Collection;
 import java.util.Optional;
 
-import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
-import com.minecraftonline.griefalert.util.General;
 import org.spongepowered.api.world.DimensionType;
 
+/**
+ * A cache to store all of the profiles in use on the server for fast retrieval.
+ *
+ * @author PietElite
+ */
 public class ProfileCabinet {
 
   private Table<GriefEvent, String, GriefProfile> storage = HashBasedTable.create();
 
-  /**
-   * Constructor for a new museum to hold all Grief Profiles. This museum should be considered
-   * immutable, and should only be used as a tool to check possible Grief Events against.
-   */
   public ProfileCabinet() {
     this.load();
   }
 
   /**
-   * Load in all data from the Grief Profiles file on the local machine.
+   * TODO
    */
   public void reload() {
     storage.clear();
@@ -36,6 +37,9 @@ public class ProfileCabinet {
     GriefAlert.getInstance().getLogger().info("Grief Profiles were reloaded");
   }
 
+  /**
+   * TODO
+   */
   private void load() {
 
     // Get all other profiles from the onsite profile list
@@ -48,7 +52,13 @@ public class ProfileCabinet {
     }
   }
 
-
+  /**
+   * TODO
+   * @param griefEvent
+   * @param target
+   * @param dimensionType
+   * @return
+   */
   public Optional<GriefProfile> getProfileOf(GriefEvent griefEvent, String target, DimensionType dimensionType) {
 
     Optional<GriefProfile> profileOptional = Optional.ofNullable(storage.get(griefEvent, target));
@@ -65,6 +75,11 @@ public class ProfileCabinet {
     return profileOptional;
   }
 
+  /**
+   * TODO
+   * @param profile
+   * @return
+   */
   public boolean add(GriefProfile profile) {
     if (storage.contains(profile.getGriefEvent(), profile.getTarget())) {
       return false;
@@ -74,7 +89,12 @@ public class ProfileCabinet {
     }
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public Collection<GriefProfile> getProfiles() {
     return storage.values();
   }
+
 }

@@ -1,6 +1,6 @@
 /* Created by PietElite */
 
-package com.minecraftonline.griefalert.api.exceptions;
+package com.minecraftonline.griefalert.exceptions;
 
 public class ProfileMalformedException extends IllegalStateException {
 

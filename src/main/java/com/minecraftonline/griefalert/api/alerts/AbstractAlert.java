@@ -1,13 +1,13 @@
 /* Created by PietElite */
 
-package com.minecraftonline.griefalert.alerts;
+package com.minecraftonline.griefalert.api.alerts;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.events.PreCheckAlertEvent;
-import com.minecraftonline.griefalert.events.PreRunAlertEvent;
+import com.minecraftonline.griefalert.api.caches.AlertStack;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
+import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Comms;
 import com.minecraftonline.griefalert.util.Errors;
@@ -18,6 +18,7 @@ import com.minecraftonline.griefalert.util.Permissions;
 
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
@@ -31,30 +32,25 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
+
 /**
  * An object to hold all information about an Alert caused by an
  * event matching a {@link GriefProfile}.
+ *
+ * @author PietElite
  */
 public abstract class AbstractAlert implements Alert {
-
-
-  // FIELDS
 
   private int stackIndex;
   private final GriefProfile griefProfile;
   private boolean silent = false;
   private boolean pushed = false;
 
-
-  // PROTECTED CONSTRUCTOR
-
   protected AbstractAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
   }
 
-
-  // PUBLIC MEMBER METHODS
-
+  @Nonnull
   @Override
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
@@ -69,6 +65,7 @@ public abstract class AbstractAlert implements Alert {
     return builder.build();
   }
 
+  @Nonnull
   @Override
   public Text getSummary() {
     Text.Builder builder = Text.builder();
@@ -95,6 +92,7 @@ public abstract class AbstractAlert implements Alert {
     return builder.build();
   }
 
+  @Nonnull
   @Override
   public Optional<String> getExtraSummaryContent() {
     return Optional.empty();
@@ -110,14 +108,13 @@ public abstract class AbstractAlert implements Alert {
     this.silent = silent;
   }
 
-
-  // FINAL PUBLIC METHODS
-
+  @Nonnull
   @Override
   public final GriefEvent getGriefEvent() {
     return griefProfile.getGriefEvent();
   }
 
+  @Nonnull
   @Override
   public final String getTarget() {
     return griefProfile.getTarget();
@@ -125,12 +122,18 @@ public abstract class AbstractAlert implements Alert {
 
   /**
    * Run this <code>Alert</code>. This constitutes pushing this <code>Alert</code>
-   * to the {@link com.minecraftonline.griefalert.alerts.AlertStack} followed by
+   * to the {@link AlertStack} followed by
    * broadcasting the <code>ALert</code> to staff members if the <code>Alert</code>
    * is not silent. This can only be done once.
    */
   @Override
   public final void run() {
+    push();
+    postPreBroadcastAlertEvent();
+    broadcast();
+  }
+
+  private void push() {
 
     if (pushed) {
       try {
@@ -140,15 +143,25 @@ public abstract class AbstractAlert implements Alert {
       }
     }
 
+    GriefAlert.getInstance().getAlertQueue().push(this);
+    pushed = true;
+
+  }
+
+  private void postPreBroadcastAlertEvent() {
+
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
 
-    PreRunAlertEvent preRunAlertEvent = new PreRunAlertEvent(this, Cause.of(eventContext, plugin));
+    PreBroadcastAlertEvent preBroadcastAlertEvent = new PreBroadcastAlertEvent(
+        this,
+        Cause.of(eventContext, plugin));
 
-    Sponge.getEventManager().post(preRunAlertEvent);
+    Sponge.getEventManager().post(preBroadcastAlertEvent);
 
-    GriefAlert.getInstance().getAlertQueue().push(this);
-    pushed = true;
+  }
+
+  private void broadcast() {
 
     if (getGriefer().hasPermission(Permissions.GRIEFALERT_SILENT.toString())) {
       setSilent(true);
@@ -169,7 +182,7 @@ public abstract class AbstractAlert implements Alert {
    * @return true if the officer was teleported to the location
    */
   @Override
-  public final boolean checkBy(Player officer) {
+  public final boolean checkBy(@Nonnull Player officer) {
 
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
@@ -211,13 +224,15 @@ public abstract class AbstractAlert implements Alert {
     return stackIndex;
   }
 
+  @Nonnull
   @Override
   public final Text getTextWithIndex() {
     return getTextWithIndices(Lists.newArrayList(getStackIndex()));
   }
 
+  @Nonnull
   @Override
-  public final Text getTextWithIndices(List<Integer> allIndices) {
+  public final Text getTextWithIndices(@Nonnull List<Integer> allIndices) {
     Text.Builder builder = Text.builder().append(getMessageText());
     allIndices.forEach((i) -> {
       builder.append(Format.space());
@@ -227,13 +242,11 @@ public abstract class AbstractAlert implements Alert {
   }
 
   @Override
-  public final boolean isRepeatOf(Alert other) {
+  public final boolean isRepeatOf(@Nonnull Alert other) {
     return getMessageText().equals(other.getMessageText());
   }
 
-
-  // FINAL PROTECTED METHODS
-
+  @Nonnull
   @Override
   public final TextColor getEventColor() {
     return griefProfile.getDataContainer()
@@ -243,6 +256,7 @@ public abstract class AbstractAlert implements Alert {
         .orElse(Format.ALERT_EVENT_COLOR);
   }
 
+  @Nonnull
   @Override
   public final TextColor getTargetColor() {
     return griefProfile.getDataContainer()
@@ -252,6 +266,7 @@ public abstract class AbstractAlert implements Alert {
         .orElse(Format.ALERT_TARGET_COLOR);
   }
 
+  @Nonnull
   @Override
   public final TextColor getDimensionColor() {
     return griefProfile.getDataContainer()
@@ -265,9 +280,6 @@ public abstract class AbstractAlert implements Alert {
   public final void setStackIndex(int stackIndex) {
     this.stackIndex = stackIndex;
   }
-
-
-  // PRIVATE METHODS
 
   private Text clickToCheck(int index) {
     return Format.command(String.valueOf(index),

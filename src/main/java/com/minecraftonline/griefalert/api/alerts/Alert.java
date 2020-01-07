@@ -1,16 +1,21 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.alerts;
 
+import com.minecraftonline.griefalert.api.caches.AlertStack;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.World;
+
 
 /**
  * An interface for an <code>Object</code> to store information and send messages
@@ -25,6 +30,7 @@ public interface Alert extends Runnable {
    *
    * @return The griefer
    */
+  @Nonnull
   Player getGriefer();
 
   /**
@@ -34,6 +40,7 @@ public interface Alert extends Runnable {
    * @return The <code>Transform</code>
    * @see Player
    */
+  @Nonnull
   Transform<World> getGrieferTransform();
 
   /**
@@ -41,23 +48,24 @@ public interface Alert extends Runnable {
    *
    * @return the main <code>Text</code> for this <code>Alert</code>
    */
+  @Nonnull
   Text getMessageText();
 
   /**
    * Get summary text for this <code>Alert</code>.
-   * TODO: change to reflect more accurate data
    *
    * @return Text representing a cohesive summary of the <code>Alert</code>
    */
+  @Nonnull
   Text getSummary();
 
   /**
    * Get an <code>Optional</code> <code>String</code> that represent extra content for
    * help compiling the summary text.
-   * TODO: change to reflect more accurate data
    *
    * @return The extra content
    */
+  @Nonnull
   Optional<String> getExtraSummaryContent();
 
   /**
@@ -82,6 +90,7 @@ public interface Alert extends Runnable {
    *
    * @return The GriefEvent
    */
+  @Nonnull
   GriefEvent getGriefEvent();
 
   /**
@@ -90,6 +99,7 @@ public interface Alert extends Runnable {
    *
    * @return The String ID of the target
    */
+  @Nonnull
   String getTarget();
 
   @Override
@@ -101,11 +111,12 @@ public interface Alert extends Runnable {
    * @param officer The staff member
    * @return true if the player teleported correctly
    */
-  boolean checkBy(Player officer);
+  @SuppressWarnings("UnusedReturnValue")
+  boolean checkBy(@Nonnull final Player officer);
 
   /**
    * Get the number which correlates this <code>Alert</code> to the
-   * {@link com.minecraftonline.griefalert.alerts.AlertStack} for
+   * {@link AlertStack} for
    * retrieval.
    *
    * @return The index within the <code>AlertStack</code>
@@ -117,8 +128,9 @@ public interface Alert extends Runnable {
    * <code>Alert</code>'s stack index appended to the end.
    *
    * @return The <code>Text</code>
-   * @see com.minecraftonline.griefalert.alerts.AlertStack
+   * @see AlertStack
    */
+  @Nonnull
   Text getTextWithIndex();
 
   /**
@@ -129,7 +141,8 @@ public interface Alert extends Runnable {
    * @param allIndices The list of integers to append
    * @return The <code>Text</code>
    */
-  Text getTextWithIndices(List<Integer> allIndices);
+  @Nonnull
+  Text getTextWithIndices(@Nonnull final List<Integer> allIndices);
 
   /**
    * Determine whether this <code>Alert</code> is a repeat of another <code>Alert</code>.
@@ -138,16 +151,16 @@ public interface Alert extends Runnable {
    * @param other The other <code>Alert</code>
    * @return true if other is a repeat of this <code>Alert</code>
    */
-  boolean isRepeatOf(Alert other);
+  boolean isRepeatOf(@Nonnull final Alert other);
 
   /**
    * Setter for the index corresponding to the index in the
-   * {@link com.minecraftonline.griefalert.alerts.AlertStack} which
+   * {@link AlertStack} which
    * can retrieve this <code>Alert</code>.
    *
    * @param stackIndex the stack index
    */
-  void setStackIndex(int stackIndex);
+  void setStackIndex(final int stackIndex);
 
   /**
    * Getter for the <code>TextColor</code> of the Event in this <code>Alert</code>'s
@@ -155,6 +168,7 @@ public interface Alert extends Runnable {
    *
    * @return The Event <code>TextColor</code>
    */
+  @Nonnull
   TextColor getEventColor();
 
   /**
@@ -163,6 +177,7 @@ public interface Alert extends Runnable {
    *
    * @return The Target <code>TextColor</code>
    */
+  @Nonnull
   TextColor getTargetColor();
 
   /**
@@ -171,5 +186,6 @@ public interface Alert extends Runnable {
    *
    * @return The Dimension <code>TextColor</code>
    */
+  @Nonnull
   TextColor getDimensionColor();
 }

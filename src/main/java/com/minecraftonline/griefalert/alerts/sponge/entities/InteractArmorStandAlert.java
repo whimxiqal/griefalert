@@ -12,6 +12,8 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 
 public class InteractArmorStandAlert extends InteractEntityAlert {
 
@@ -21,6 +23,7 @@ public class InteractArmorStandAlert extends InteractEntityAlert {
     super(griefProfile, event);
   }
 
+  @Nonnull
   @Override
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
@@ -41,6 +44,7 @@ public class InteractArmorStandAlert extends InteractEntityAlert {
     return builder.build();
   }
 
+  @Nonnull
   @Override
   public Optional<String> getExtraSummaryContent() {
     return SpongeEvents.getArmorStandContent(getEntitySnapshot())

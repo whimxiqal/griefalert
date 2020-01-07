@@ -12,6 +12,8 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 
 public class AttackArmorStandAlert extends AttackEntityAlert {
 
@@ -19,6 +21,7 @@ public class AttackArmorStandAlert extends AttackEntityAlert {
     super(griefProfile, event);
   }
 
+  @Nonnull
   @Override
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
@@ -39,6 +42,7 @@ public class AttackArmorStandAlert extends AttackEntityAlert {
     return builder.build();
   }
 
+  @Nonnull
   @Override
   public Optional<String> getExtraSummaryContent() {
     return SpongeEvents.getArmorStandContent(getEntitySnapshot())

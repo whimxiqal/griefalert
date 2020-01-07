@@ -13,12 +13,15 @@ import java.util.Optional;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 public class SignBreakAlert extends PrismAlert {
 
   public SignBreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
   }
 
+  @Nonnull
   @Override
   public Text getMessageText() {
     Text.Builder builder = Text.builder();

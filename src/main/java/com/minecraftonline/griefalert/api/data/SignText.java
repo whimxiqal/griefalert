@@ -5,6 +5,9 @@ package com.minecraftonline.griefalert.api.data;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
+/**
+ * Holds the text within an instance of a sign.
+ */
 public class SignText {
 
   private final String text1;

@@ -6,14 +6,14 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
-import com.minecraftonline.griefalert.alerts.AlertStack;
-import com.minecraftonline.griefalert.api.commands.DeprecatedCommand;
+import com.minecraftonline.griefalert.api.caches.AlertStack;
+import com.minecraftonline.griefalert.api.commands.ReplacedCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.commands.DeprecatedCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
-import com.minecraftonline.griefalert.profiles.ProfileCabinet;
+import com.minecraftonline.griefalert.api.caches.ProfileCabinet;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.util.General;
@@ -165,7 +165,7 @@ public final class GriefAlert {
         this,
         griefAlertCommand.buildCommandSpec(),
         griefAlertCommand.getAliases());
-    for (DeprecatedCommand command : DeprecatedCommands.get()) {
+    for (ReplacedCommand command : DeprecatedCommands.get()) {
       Sponge.getCommandManager().register(
           this,
           command.buildCommandSpec(),

@@ -4,7 +4,7 @@ package com.minecraftonline.griefalert.alerts.prism;
 
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.alerts.AbstractAlert;
+import com.minecraftonline.griefalert.api.alerts.AbstractAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 
@@ -16,6 +16,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
+
+import javax.annotation.Nonnull;
 
 /**
  * <code>Alert</code> for all which derive from Prism.
@@ -41,11 +43,13 @@ public abstract class PrismAlert extends AbstractAlert {
     return prismRecord;
   }
 
+  @Nonnull
   @Override
   public Transform<World> getGrieferTransform() {
     return grieferTransform;
   }
 
+  @Nonnull
   @Override
   public Player getGriefer() {
     Optional<String> uuidOptional = prismRecord.getDataContainer().getString(DataQueries.Player);

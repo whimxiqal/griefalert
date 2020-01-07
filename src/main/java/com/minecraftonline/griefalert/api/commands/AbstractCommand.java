@@ -2,27 +2,30 @@
 
 package com.minecraftonline.griefalert.api.commands;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.commands.HelpCommand;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.Format;
+import java.util.LinkedList;
+import java.util.List;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-
+/**
+ * An abstract class for all MinecraftOnline commands from which to extend. This
+ * class provides consistency to commands structure and visuals.
+ */
 public abstract class AbstractCommand implements CommandExecutor {
 
   public final Permission permission;
   private final Text description;
-  private List<AbstractCommand> commandChildren = new LinkedList<>();
-  private List<String> aliases = new LinkedList<>();
-  private List<CommandElement> commandElements = new LinkedList<>();
+  private final List<AbstractCommand> commandChildren = new LinkedList<>();
+  private final List<String> aliases = new LinkedList<>();
+  private CommandElement commandElement = GenericArguments.none();
 
   /**
    * A general Grief Alert command object.
@@ -46,33 +49,38 @@ public abstract class AbstractCommand implements CommandExecutor {
     addAlias(primaryAlias);
   }
 
-  protected boolean addAlias(String alias) {
-    return this.aliases.add(alias);
+  protected final void addAlias(String alias) {
+    this.aliases.add(alias);
   }
 
-  protected void addChild(AbstractCommand abstractCommand) {
+  protected final void addChild(AbstractCommand abstractCommand) {
     this.commandChildren.add(abstractCommand);
   }
 
-  protected void addCommandElement(CommandElement commandElement) {
-    this.commandElements.add(commandElement);
+  protected final void setCommandElement(CommandElement commandElement) {
+    this.commandElement = commandElement;
   }
 
-  private List<AbstractCommand> getChildren() {
+  @SuppressWarnings("WeakerAccess")
+  protected final List<AbstractCommand> getChildren() {
     return this.commandChildren;
   }
 
-  public List<String> getAliases() {
+  public final List<String> getAliases() {
     return this.aliases;
   }
 
-  public List<CommandElement> getCommandElements() {
-    return this.commandElements;
+  @SuppressWarnings("unused")
+  public final CommandElement getCommandElement() {
+    return this.commandElement;
   }
 
-  public void sendHelp(CommandSource source) {
-    source.sendMessage(Text.of(TextColors.GOLD, "==============="));
-    source.sendMessage(Text.of(TextColors.GOLD, getAliases().get(0) + " : Command Help"));
+  /**
+   * Send a help message about this command to the given <code>CommandSource</code>.
+   * @param source The source of the help message
+   */
+  public final void sendHelp(CommandSource source) {
+    source.sendMessage(Format.heading(String.join("|", getAliases()) + " : Command Help"));
     source.sendMessage(Text.of(TextColors.YELLOW, getDescription()));
     source.sendMessage(Text.of(
         TextColors.LIGHT_PURPLE,
@@ -81,7 +89,7 @@ public abstract class AbstractCommand implements CommandExecutor {
         buildCommandSpec().getUsage(source)));
     getChildren().forEach((command) -> source.sendMessage(Text.of(
         TextColors.AQUA,
-        command.getAliases().get(0),
+        String.join("|", command.getAliases()),
         TextColors.GRAY, ": ", command.getDescription())
     ));
   }
@@ -95,13 +103,11 @@ public abstract class AbstractCommand implements CommandExecutor {
     CommandSpec.Builder commandSpecBuilder = CommandSpec.builder()
         .description(this.description)
         .permission(this.permission.toString())
-        .executor(this);
-    for (AbstractCommand command : commandChildren) {
-      commandSpecBuilder.child(command.buildCommandSpec(), command.getAliases());
-    }
-    for (CommandElement element : commandElements) {
-      commandSpecBuilder.arguments(element);
-    }
+        .executor(this)
+        .arguments(commandElement);
+    commandChildren.forEach(
+        (child) ->
+            commandSpecBuilder.child(child.buildCommandSpec(), child.getAliases()));
     return commandSpecBuilder.build();
   }
 

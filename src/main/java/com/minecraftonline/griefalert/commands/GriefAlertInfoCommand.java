@@ -26,7 +26,7 @@ public class GriefAlertInfoCommand extends AbstractCommand {
     );
     addAlias("info");
     addAlias("i");
-    addCommandElement(GenericArguments.onlyOne(GenericArguments.integer(Text.of("alert code"))));
+    setCommandElement(GenericArguments.onlyOne(GenericArguments.integer(Text.of("alert code"))));
   }
 
   @Override

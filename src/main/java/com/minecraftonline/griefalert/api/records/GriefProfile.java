@@ -3,25 +3,19 @@
 package com.minecraftonline.griefalert.api.records;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
-import com.minecraftonline.griefalert.api.exceptions.ProfileMalformedException;
+import com.minecraftonline.griefalert.exceptions.ProfileMalformedException;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.DimensionTypes;
 
-import java.util.List;
 import java.util.Optional;
 
+/**
+ * TODO
+ *
+ * @author PietElite
+ */
 public class GriefProfile {
-
-  // action: {break, place, use, interact, death}
-  // target: {minecraft:cobblestone, minecraft:diamond_block, ...}
-  // ignored_dimensions: {*list of* overworld, nether, the_end}
-  // action_color: {blue, white, ...}
-  // target_color: {blue, white, ...}
-  // dimension_color: {blue, white, ...}
 
   private final DataContainer dataContainer;
 
@@ -33,42 +27,57 @@ public class GriefProfile {
     return new GriefProfile(dataContainer);
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public DataContainer getDataContainer() {
     return dataContainer;
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public boolean isValid() {
     return dataContainer.getString(GriefProfileDataQueries.EVENT).isPresent()
         && dataContainer.getString(GriefProfileDataQueries.TARGET).isPresent();
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public GriefEvent getGriefEvent() {
-    Optional<GriefEvent> eventOptional = dataContainer.getCatalogType(GriefProfileDataQueries.EVENT, GriefEvent.class);
-
-    if (!eventOptional.isPresent()) {
-      throw new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData());
-    }
-
-    return eventOptional.get();
+    return dataContainer.getCatalogType(GriefProfileDataQueries.EVENT, GriefEvent.class)
+        .orElseThrow(() ->
+            new ProfileMalformedException("No GriefEvent found in GriefProfile: \n" + printData()));
   }
 
-
+  /**
+   * TODO
+   * @return
+   */
   public String getTarget() {
-    Optional<String> targetOptional = dataContainer.getString(GriefProfileDataQueries.TARGET);
-
-    if (!targetOptional.isPresent()) {
-      throw new ProfileMalformedException("No Target found in GriefProfile: \n" + printData());
-    }
-
-    return targetOptional.get();
+    return dataContainer.getString(GriefProfileDataQueries.TARGET)
+        .orElseThrow(() ->
+            new ProfileMalformedException("No Target found in GriefProfile: \n" + printData()));
   }
 
-
+  /**
+   * TODO
+   * @param dimensionType
+   * @return
+   */
   public boolean isIgnoredIn(DimensionType dimensionType) {
     return dataContainer.getCatalogTypeList(GriefProfileDataQueries.IGNORED, DimensionType.class)
         .map((list) -> list.contains(dimensionType)).orElse(false);
   }
 
+  /**
+   * TODO
+   * @return
+   */
   public String printData() {
     return dataContainer.getValues(true).toString();
   }

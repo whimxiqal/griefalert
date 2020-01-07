@@ -27,7 +27,7 @@ public class GriefAlertRecentCommand extends AbstractCommand {
     );
     addAlias("recent");
     addAlias("n");
-    addCommandElement(GenericArguments.flags()
+    setCommandElement(GenericArguments.flags()
         .valueFlag(GenericArguments.string(Text.of("player")), "-player", "p")
         .valueFlag(GenericArguments.catalogedElement(Text.of("event"), GriefEvent.class), "-event", "e")
         .valueFlag(GenericArguments.string(Text.of("target")), "-target", "t")

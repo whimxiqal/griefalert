@@ -25,6 +25,7 @@ public final class PrismRecordArchived {
     return event;
   }
 
+  @SuppressWarnings("unused")
   public Object getSource() {
     return source;
   }

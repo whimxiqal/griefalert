@@ -10,6 +10,8 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 
 public class InteractItemFrameAlert extends InteractEntityAlert {
 
@@ -19,6 +21,7 @@ public class InteractItemFrameAlert extends InteractEntityAlert {
     super(griefProfile, event);
   }
 
+  @Nonnull
   @Override
   public Text getMessageText() {
     Text.Builder builder = Text.builder();
@@ -38,6 +41,7 @@ public class InteractItemFrameAlert extends InteractEntityAlert {
     return builder.build();
   }
 
+  @Nonnull
   @Override
   public Optional<String> getExtraSummaryContent() {
     return SpongeEvents.getItemFrameContent(getEntitySnapshot());

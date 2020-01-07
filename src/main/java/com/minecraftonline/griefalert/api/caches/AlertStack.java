@@ -1,6 +1,6 @@
 /* Created by PietElite */
 
-package com.minecraftonline.griefalert.alerts;
+package com.minecraftonline.griefalert.api.caches;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
-
 
 /**
  * The ongoing queue for all <code>Alert</code>s. This is only local storage. Someone
@@ -96,7 +95,7 @@ public final class AlertStack extends RotatingStack<Alert> {
     return Optional.of(officerCheckHistory.size(officer.getUniqueId()));
   }
 
-  void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
+  public void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
     officerCheckHistory.push(officerUuid, transform);
   }
 }
