@@ -30,10 +30,11 @@ public class GriefAlertCommand extends AbstractCommand {
     addAlias("ga");
     addChild(new GriefAlertCheckCommand());
     addChild(new GriefAlertInfoCommand());
-    addChild(new GriefAlertSearchCommand());
-    addChild(new GriefAlertReturnCommand());
-    addChild(new GriefAlertReloadCommand());
     addChild(new GriefAlertProfileCommand());
+    addChild(new GriefAlertQueryCommand());
+    addChild(new GriefAlertReloadCommand());
+    addChild(new GriefAlertReturnCommand());
+    addChild(new GriefAlertShowCommand());
 
   }
 

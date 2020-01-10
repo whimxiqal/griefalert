@@ -13,6 +13,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.commands.DeprecatedCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
+import com.minecraftonline.griefalert.holograms.HologramManager;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
@@ -36,6 +37,7 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
+import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -52,7 +54,9 @@ import org.spongepowered.api.plugin.PluginContainer;
     name = Reference.NAME,
     version = VERSION,
     description = Reference.DESCRIPTION,
-    dependencies = {@Dependency(id = "prism"), @Dependency(id = "worldedit")})
+    dependencies = {@Dependency(id = "prism"),
+        @Dependency(id = "worldedit"),
+        @Dependency(id = "holograms")})
 public final class GriefAlert {
 
   public static final String VERSION = Reference.VERSION;
@@ -99,6 +103,7 @@ public final class GriefAlert {
   private RotatingAlertList rotatingAlertList;
   private ConfigHelper configHelper;
   private MySqlProfileStorage profileStorage;
+  private HologramManager hologramManager;
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
@@ -141,6 +146,11 @@ public final class GriefAlert {
     // Register all the commands with Sponge
     registerCommands();
     registerListeners();
+  }
+
+  @Listener
+  public void onLoadComplete(GameLoadCompleteEvent event) {
+    hologramManager = new HologramManager();
   }
 
   /**
@@ -217,6 +227,10 @@ public final class GriefAlert {
 
   public ProfileStorage getProfileStorage() {
     return profileStorage;
+  }
+
+  public HologramManager getHologramManager() {
+    return hologramManager;
   }
 
   public Logger getLogger() {

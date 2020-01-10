@@ -22,17 +22,18 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 
 
-public class GriefAlertSearchCommand extends AbstractCommand {
+public class GriefAlertQueryCommand extends AbstractCommand {
 
   private static final int DEFAULT_MAXIMUM_QUERIES = 20;
+  private static final int MAXIMUM_MAXIMUM_QUERIES = 100;
 
-  GriefAlertSearchCommand() {
+  GriefAlertQueryCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_RECENT,
         Text.of("Get information regarding recent cached grief alerts")
     );
-    addAlias("search");
-    addAlias("s");
+    addAlias("query");
+    addAlias("q");
     setCommandElement(GenericArguments.flags()
         .valueFlag(
             GenericArguments.string(Text.of("player")),
@@ -60,6 +61,12 @@ public class GriefAlertSearchCommand extends AbstractCommand {
     Collections.reverse(cacheReversed);
 
     int max = (int) args.getOne("maximum").orElse(DEFAULT_MAXIMUM_QUERIES);
+
+    // ensure the result count isn't astronomical
+    if (max > MAXIMUM_MAXIMUM_QUERIES) {
+      src.sendMessage(Format.error("Search shortened to ", MAXIMUM_MAXIMUM_QUERIES, " results."));
+      max = MAXIMUM_MAXIMUM_QUERIES;
+    }
 
     for (Alert alert : cacheReversed) {
       if (matching.size() >= max) {
@@ -107,7 +114,7 @@ public class GriefAlertSearchCommand extends AbstractCommand {
             .get(indices.getFirst()).getTextWithIndices(indices));
         indices.clear();
       }
-      indices.add(alert.getStackIndex());
+      indices.add(alert.getCacheIndex());
     }
 
     if (!indices.isEmpty()) {

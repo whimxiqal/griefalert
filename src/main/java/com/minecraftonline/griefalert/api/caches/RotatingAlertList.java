@@ -55,7 +55,7 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
     int output = super.push(alert);
 
     // Set the alert with the proper index
-    alert.setStackIndex(output);
+    alert.setCacheIndex(output);
 
     // Update alertMap
     UUID grieferUuid = alert.getGriefer().getUniqueId();

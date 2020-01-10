@@ -12,6 +12,7 @@ public final class Permissions {
   private Permissions() {
   }
 
+
   public static final Permission GRIEFALERT_COMMAND = Permission.of(
       "griefalert.command"
   );
@@ -26,6 +27,9 @@ public final class Permissions {
   );
   public static final Permission GRIEFALERT_COMMAND_PROFILE = Permission.of(
       "griefalert.command.profile"
+  );
+  public static final Permission GRIEFALERT_COMMAND_SHOW = Permission.of(
+      "griefalert.command.show"
   );
   public static final Permission GRIEFALERT_COMMAND_RELOAD = Permission.of(
       "griefalert.command.reload"

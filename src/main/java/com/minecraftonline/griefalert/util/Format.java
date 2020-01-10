@@ -231,7 +231,9 @@ public final class Format {
         .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
             Text.of(TextColors.GRAY, label), "] "))
         .onClick(TextActions.runCommand(command))
-        .onHover(TextActions.showText(hoverMessage))
+        .onHover(TextActions.showText(Text.of(
+            (hoverMessage.isEmpty() ? hoverMessage : Text.of(hoverMessage, Format.endLine())),
+            Format.bonus(command))))
         .build();
   }
 

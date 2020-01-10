@@ -15,14 +15,19 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 public class InteractBlockAlert extends SpongeAlert {
 
   private final ItemStack handHeldItem;
+  private final Location<World> griefLocation;
 
   private InteractBlockAlert(GriefProfile griefProfile, InteractBlockEvent event) {
     super(griefProfile, event);
     handHeldItem = getGriefer().getItemInHand(HandTypes.MAIN_HAND).orElse(null);
+    griefLocation = event.getTargetBlock().getLocation().orElseThrow(() ->
+        new RuntimeException("Couldn't find the location of a block in an IneteractBlockAlert"));
   }
 
   public static InteractBlockAlert of(GriefProfile griefProfile, InteractBlockEvent event) {
@@ -53,6 +58,12 @@ public class InteractBlockAlert extends SpongeAlert {
         TextColors.RED, " in the ",
         getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
     return builder.build();
+  }
+
+  @Nonnull
+  @Override
+  public Location<World> getGriefLocation() {
+    return griefLocation.add(0.5, 0.5, 0.5);
   }
 
 }

@@ -1,11 +1,8 @@
 plugins {
 	id 'java'
-    //id 'com.github.johnrengelman.shadow' version '4.0.4'
     id 'org.spongepowered.plugin' version '0.9.0'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
-
-apply plugin: 'java'
-apply plugin: 'idea'
 
 repositories {
 	mavenCentral()
@@ -19,7 +16,7 @@ repositories {
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '24.0.0' // Project Version
+version = '1.0.0' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -31,31 +28,32 @@ compileJava {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeapi:${sponge_version}"
+    compile 'org.spongepowered:spongeapi:7.1.0'
     compile 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
-    compile fileTree(dir: 'libs', include: '*.jar')
+    shadow fileTree(dir: 'libs', include: '*.jar')
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
 }
 
-//sponge.plugin.meta {
-//    authors = ext.authors
-//}
-//
-//artifacts {
-//    archives shadowJar
-//}
-//
-//jar {
-//    classifier = "original"
-//}
 
-//shadowJar {
-//    classifier null
-//}
+
+sponge.plugin.meta {
+    authors = ext.authors
+}
+
+jar {
+    classifier = "original"
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    baseName = 'griefalert'
+    classifier = ''
+}
 
 jar.manifest {
     attributes "Implementation-Title": name,
             "Implementation-Version": version,
             "Implementation-Vendor": "MinecraftOnline"
 }
+

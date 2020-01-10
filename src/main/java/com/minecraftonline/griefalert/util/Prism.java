@@ -134,7 +134,7 @@ public final class Prism {
    * @param record the record
    * @return the <code>BlockState</code> found
    */
-  public static Optional<BlockState> getOriginalBlock(PrismRecordArchived record) {
+  public static Optional<BlockState> getOriginalBlockState(PrismRecordArchived record) {
     return record.getDataContainer().getView(DataQueries.OriginalBlock)
         .flatMap(view -> view.getView(DataQueries.BlockState))
         .flatMap(view -> BlockState.builder().build(view));

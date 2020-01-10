@@ -14,6 +14,7 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
@@ -42,6 +43,15 @@ public interface Alert extends Runnable {
    */
   @Nonnull
   Transform<World> getGrieferTransform();
+
+  /**
+   * Get the <code>Location</code> where the grief event occurred. For
+   * a block breakage, this would be where the block was, etc.
+   *
+   * @return the location
+   */
+  @Nonnull
+  Location<World> getGriefLocation();
 
   /**
    * Construct the main message body for this <code>Alert</code>.
@@ -121,7 +131,7 @@ public interface Alert extends Runnable {
    *
    * @return The index within the <code>AlertStack</code>
    */
-  int getStackIndex();
+  int getCacheIndex();
 
   /**
    * Get the <code>Text</code> of the <code>Alert</code> with this
@@ -158,9 +168,9 @@ public interface Alert extends Runnable {
    * {@link RotatingAlertList} which
    * can retrieve this <code>Alert</code>.
    *
-   * @param stackIndex the stack index
+   * @param cacheIndex the stack index
    */
-  void setStackIndex(final int stackIndex);
+  void setCacheIndex(final int cacheIndex);
 
   /**
    * Getter for the <code>TextColor</code> of the Event in this <code>Alert</code>'s

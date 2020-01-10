@@ -104,7 +104,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
     if (Sponge.getRegistry().getType(GriefEvent.class,
         record.getEvent()).get().equals(GriefEvents.PLACE)) {
 
-      Optional<String> originalBlockId = Prism.getOriginalBlock(record).map(
+      Optional<String> originalBlockId = Prism.getOriginalBlockState(record).map(
           (state) -> state.getType().getId());
 
       if (!originalBlockId.isPresent()) {

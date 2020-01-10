@@ -7,6 +7,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.AbstractAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
+import com.minecraftonline.griefalert.util.Prism;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import javax.annotation.Nonnull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
@@ -72,4 +74,12 @@ public abstract class PrismAlert extends AbstractAlert {
     return playerOptional.get();
   }
 
+  @Nonnull
+  @Override
+  public Location<World> getGriefLocation() {
+    return Prism.getLocation(getPrismRecord())
+        .map(location -> location.add(0.5, 0.2, 0.5))
+        .orElseThrow(() ->
+            new RuntimeException("Couldn't find the location in a PrismAlert"));
+  }
 }

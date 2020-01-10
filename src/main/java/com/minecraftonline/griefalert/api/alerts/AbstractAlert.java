@@ -41,7 +41,7 @@ import org.spongepowered.api.world.World;
  */
 public abstract class AbstractAlert implements Alert {
 
-  private int stackIndex;
+  private int cacheIndex;
   private final GriefProfile griefProfile;
   private boolean silent = false;
   private boolean pushed = false;
@@ -182,8 +182,9 @@ public abstract class AbstractAlert implements Alert {
    * @return true if the officer was teleported to the location
    */
   @Override
-  public final boolean checkBy(@Nonnull Player officer) {
+  public final boolean checkBy(@Nonnull final Player officer) {
 
+    // Post an event to show that the Alert is getting checked
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
 
@@ -210,24 +211,43 @@ public abstract class AbstractAlert implements Alert {
         officer.getUniqueId(),
         officerPreviousTransform);
 
-    officer.sendMessage(Format.heading("Checking Grief Alert:"));
-    officer.sendMessage(getSummary());
+    // Send the messages
     Communication.getStaffBroadcastChannel().send(Format.info(
         Format.playerName(officer),
         " is checking alert number ",
-        Format.bonus(clickToCheck(getStackIndex()))));
+        Format.bonus(clickToCheck(getCacheIndex()))));
+
+    officer.sendMessage(Format.heading("Checking Grief Alert: ",
+        Format.bonus(getCacheIndex())));
+    officer.sendMessage(getMessageText());
+    officer.sendMessage(Text.of(
+        Format.command(
+            "RECENT",
+            String.format(
+                "/griefalert query -p %s",
+                getGriefer().getName()),
+            Text.of("Search for recent events caused by this player.")),
+        Format.space(),
+        Format.command(
+            "SHOW",
+            String.format(
+                "/griefalert show %s",
+                getCacheIndex()),
+            Text.of("Search for recent events caused by this player."))));
+
     return true;
+
   }
 
   @Override
-  public final int getStackIndex() {
-    return stackIndex;
+  public final int getCacheIndex() {
+    return cacheIndex;
   }
 
   @Nonnull
   @Override
   public final Text getTextWithIndex() {
-    return getTextWithIndices(Lists.newArrayList(getStackIndex()));
+    return getTextWithIndices(Lists.newArrayList(getCacheIndex()));
   }
 
   @Nonnull
@@ -277,14 +297,14 @@ public abstract class AbstractAlert implements Alert {
   }
 
   @Override
-  public final void setStackIndex(int stackIndex) {
-    this.stackIndex = stackIndex;
+  public final void setCacheIndex(int cacheIndex) {
+    this.cacheIndex = cacheIndex;
   }
 
   private Text clickToCheck(int index) {
     return Format.command(String.valueOf(index),
         "/ga check " + index,
-        GriefAlert.getInstance().getRotatingAlertList().get(index).getSummary());
+        Text.of("Check this alert"));
   }
 
 }
