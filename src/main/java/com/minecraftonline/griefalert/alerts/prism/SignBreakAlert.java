@@ -6,53 +6,40 @@ import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.Prism;
-
-import java.util.Optional;
-import javax.annotation.Nonnull;
-
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-
 
 public class SignBreakAlert extends PrismAlert {
 
+  /**
+   * Default constructor for a sign break alert. This add all the 'extra'
+   * information about the text on its lines
+   *
+   * @param griefProfile the grief profile for this alert
+   * @param prismRecord  the prism record triggering this alert
+   */
   public SignBreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
-  }
 
-  @Nonnull
-  @Override
-  public Text getMessageText() {
-    Text.Builder builder = Text.builder();
+    Prism.getBrokenSignText(getPrismRecord())
+        .flatMap(SignText::getText1)
+        .ifPresent(text ->
+            addSummaryContent("Line 1", alert -> Format.bonus(text)));
 
-    Optional<SignText> signTextOptional = Prism.getBrokenSignText(getPrismRecord());
+    Prism.getBrokenSignText(getPrismRecord())
+        .flatMap(SignText::getText2)
+        .ifPresent(text ->
+            addSummaryContent("Line 2", alert -> Format.bonus(text)));
 
-    builder.append(Text.of(
-        Format.playerName(getGriefer()),
-        Format.space(),
-        getEventColor(), "broke",
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(getTarget())));
+    Prism.getBrokenSignText(getPrismRecord())
+        .flatMap(SignText::getText3)
+        .ifPresent(text ->
+            addSummaryContent("Line 3", alert -> Format.bonus(text)));
 
-    builder.append(Text.of(
-        TextColors.RED, " in the ",
-        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
+    Prism.getBrokenSignText(getPrismRecord())
+        .flatMap(SignText::getText4)
+        .ifPresent(text ->
+            addSummaryContent("Line 4", alert -> Format.bonus(text)));
 
-    signTextOptional.ifPresent((sign) -> {
-
-      sign.getText1().ifPresent((text) ->
-          builder.append(Text.of(TextColors.GRAY, "\nLine 1: " + text)));
-      sign.getText2().ifPresent((text) ->
-          builder.append(Text.of(TextColors.GRAY, "\nLine 2: " + text)));
-      sign.getText3().ifPresent((text) ->
-          builder.append(Text.of(TextColors.GRAY, "\nLine 3: " + text)));
-      sign.getText4().ifPresent((text) ->
-          builder.append(Text.of(TextColors.GRAY, "\nLine 4: " + text)));
-    });
-
-    return builder.build();
   }
 
 }

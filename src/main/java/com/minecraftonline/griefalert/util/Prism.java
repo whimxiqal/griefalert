@@ -5,13 +5,12 @@ package com.minecraftonline.griefalert.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.helion3.prism.util.DataQueries;
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -152,5 +151,10 @@ public final class Prism {
         .flatMap(view -> view.getView(DataQueries.BlockState))
         .flatMap(view -> BlockState.builder().build(view));
 
+  }
+
+  public static Optional<Date> getCreated(PrismRecordArchived prismRecord) {
+    Optional<Object> dateOptional = prismRecord.getDataContainer().get(DataQueries.Created);
+    return dateOptional.map(object -> (Date) object);
   }
 }

@@ -39,7 +39,7 @@ public final class SpongeEvents {
       return Optional.empty();
     }
 
-    return itemOptional.get().getString(DataQuery.of("id")).map(Format::removeMinecraftPrefix);
+    return itemOptional.get().getString(DataQuery.of("id"));
   }
 
   /**

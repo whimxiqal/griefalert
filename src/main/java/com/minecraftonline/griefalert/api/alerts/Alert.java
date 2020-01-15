@@ -6,8 +6,8 @@ import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.entity.Transform;
@@ -54,7 +54,16 @@ public interface Alert extends Runnable {
   Location<World> getGriefLocation();
 
   /**
-   * Construct the main message body for this <code>Alert</code>.
+   * Get the <code>Date</code> this alert was created.
+   * @return the <code>Date</code>
+   */
+  @Nonnull
+  Date getCreated();
+
+  /**
+   * Construct the main message body for this <code>Alert</code>. This
+   * is the main body of the text which is sent when the <code>Alert</code>
+   * is checked.
    *
    * @return the main <code>Text</code> for this <code>Alert</code>
    */
@@ -67,16 +76,7 @@ public interface Alert extends Runnable {
    * @return Text representing a cohesive summary of the <code>Alert</code>
    */
   @Nonnull
-  Text getSummary();
-
-  /**
-   * Get an <code>Optional</code> <code>String</code> that represent extra content for
-   * help compiling the summary text.
-   *
-   * @return The extra content
-   */
-  @Nonnull
-  Optional<String> getExtraSummaryContent();
+  Text getSummaryAll();
 
   /**
    * Returns whether this <code>Alert</code> is silent.
@@ -114,15 +114,6 @@ public interface Alert extends Runnable {
 
   @Override
   void run();
-
-  /**
-   * Check the <code>Alert</code> with the given <code>Player</code>.
-   *
-   * @param officer The staff member
-   * @return true if the player teleported correctly
-   */
-  @SuppressWarnings("UnusedReturnValue")
-  boolean checkBy(@Nonnull final Player officer);
 
   /**
    * Get the number which correlates this <code>Alert</code> to the

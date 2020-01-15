@@ -112,8 +112,6 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
         return;
       }
 
-      GriefAlert.getInstance().getLogger().info("Found: " + originalBlockId.get());
-
       Optional<GriefProfile> replaceOptional = GriefAlert.getInstance().getProfileCache()
           .getProfileOf(
               GriefEvents.REPLACE,

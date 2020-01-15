@@ -14,6 +14,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -36,7 +37,7 @@ public class InteractBlockAlert extends SpongeAlert {
 
   @Nonnull
   @Override
-  public Text getMessageText() {
+  public Text.Builder getMessageTextBuilder() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(
         Format.playerName(getGriefer()),
@@ -49,15 +50,12 @@ public class InteractBlockAlert extends SpongeAlert {
         Format.space(),
         Optional.ofNullable(handHeldItem)
             .filter((itemStack) -> !itemStack.getType().equals(ItemTypes.AIR))
-            .map((itemStack -> Grammar.addIndefiniteArticle(
-                itemStack
-                    .getType()
-                    .getId()
-                    .replace("minecraft:", ""))))
-            .orElse("nothing"),
+            .map(itemStack -> Grammar.addIndefiniteArticle(Format.item(
+                itemStack.getType().getId())))
+            .orElse(Text.of("nothing")),
         TextColors.RED, " in the ",
         getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
-    return builder.build();
+    return builder;
   }
 
   @Nonnull

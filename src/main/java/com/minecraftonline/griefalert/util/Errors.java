@@ -29,7 +29,7 @@ public final class Errors {
     receiver.sendMessage(
         ChatTypes.CHAT,
         Format.error(
-            "You could not be teleported safely to this location: ", Format.location(
+            "You could not be teleported safely to this location: ", Format.bonusLocation(
                 transform.getLocation())));
   }
 

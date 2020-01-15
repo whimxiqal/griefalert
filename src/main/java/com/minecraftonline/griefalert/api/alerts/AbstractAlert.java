@@ -9,6 +9,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
@@ -16,8 +17,14 @@ import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import com.minecraftonline.griefalert.util.Permissions;
 
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javafx.util.Pair;
+
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
@@ -28,6 +35,7 @@ import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
@@ -43,59 +51,96 @@ public abstract class AbstractAlert implements Alert {
 
   private int cacheIndex;
   private final GriefProfile griefProfile;
+  private final List<Pair<String, Function<Alert, Text>>> summaryContents = new LinkedList<>();
+  private final List<Pair<String, Function<Alert, Text>>> extraSummaryContents = new LinkedList<>();
   private boolean silent = false;
   private boolean pushed = false;
+  private final Date created;
 
   protected AbstractAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
+    created = new Date();
+    summaryContents.add(new Pair<>("Player", alert ->
+        Format.playerName(alert.getGriefer())));
+    summaryContents.add(new Pair<>("Event", alert ->
+        Format.bonus(alert.getGriefEvent().getName())));
+    summaryContents.add(new Pair<>("Target", alert ->
+        Format.bonus(Format.item(alert.getTarget()))));
+    summaryContents.add(new Pair<>("Location", alert ->
+        Format.bonusLocation(alert.getGriefLocation())));
+
   }
 
   @Nonnull
   @Override
-  public Text getMessageText() {
+  public Date getCreated() {
+    return created;
+  }
+
+  @Nonnull
+  protected Text.Builder getMessageTextBuilder() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(
         Format.playerName(getGriefer()),
         Format.space(),
         getEventColor(), getGriefEvent().getPreterite(),
         Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(getTarget().replace("minecraft:", "")),
+        getTargetColor(), Grammar.addIndefiniteArticle(Format.item(getTarget())),
         TextColors.RED, " in the ",
         getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
+    return builder;
+  }
+
+  @Override
+  @Nonnull
+  public final Text getMessageText() {
+    Text.Builder builder = getMessageTextBuilder();
+    Text hoverText = getSummaryExtra();
+    if (!hoverText.toPlain().isEmpty()) {
+      builder.onHover(TextActions.showText(hoverText));
+    }
     return builder.build();
   }
 
   @Nonnull
   @Override
-  public Text getSummary() {
+  public final Text getSummaryAll() {
     Text.Builder builder = Text.builder();
-
-    builder.append(Text.of(
-        TextColors.DARK_AQUA, "Player: ",
-        TextColors.GRAY, Format.playerName(getGriefer())), Format.endLine());
-    builder.append(Text.of(
-        TextColors.DARK_AQUA, "Event: ",
-        TextColors.GRAY, griefProfile.getGriefEvent().getId()), Format.endLine());
-    builder.append(Text.of(
-        TextColors.DARK_AQUA, "Target: ",
-        TextColors.GRAY, griefProfile.getTarget().replace("minecraft:", "")), Format.endLine());
-    getExtraSummaryContent().ifPresent((content) ->
-        builder.append(Text.of(
-            TextColors.DARK_AQUA, "Extra: ",
-            TextColors.GRAY, content, Format.endLine()))
-    );
-    builder.append(Text.of(
-        TextColors.DARK_AQUA, "Location: ",
-        TextColors.GRAY, Format.location(
-            getGrieferTransform().getLocation())));
-
+    builder.append(Text.joinWith(
+            Format.endLine(),
+            summaryContents.stream()
+                .map(pair -> Text.of(
+                    TextColors.DARK_AQUA, pair.getKey(), ": ",
+                    TextColors.RESET, pair.getValue().apply(this)))
+                .collect(Collectors.toList())));
+    Text summaryExtra = getSummaryExtra();
+    if (!summaryExtra.toPlain().isEmpty()) {
+      builder.append(Format.endLine());
+      builder.append(summaryExtra);
+    }
     return builder.build();
   }
 
-  @Nonnull
-  @Override
-  public Optional<String> getExtraSummaryContent() {
-    return Optional.empty();
+  protected final Text getSummaryExtra() {
+    return Text.joinWith(
+        Format.endLine(),
+        extraSummaryContents.stream()
+            .map(pair -> Text.of(
+                TextColors.DARK_AQUA, pair.getKey(), ": ",
+                TextColors.RESET, pair.getValue().apply(this)))
+            .collect(Collectors.toList()));
+  }
+
+  protected void addSummaryContent(String title, Function<Alert, Text> descriptionFunction) {
+    this.extraSummaryContents.add(new Pair<>(title, descriptionFunction));
+  }
+
+  protected void addSummaryContent(String title, Text description) {
+    this.extraSummaryContents.add(new Pair<>(title, alert -> description));
+  }
+
+  protected void addSummaryContent(String title, String description) {
+    this.extraSummaryContents.add(new Pair<>(title, alert -> Format.bonus(description)));
   }
 
   @Override
@@ -173,72 +218,6 @@ public abstract class AbstractAlert implements Alert {
 
   }
 
-  /**
-   * Check the <code>Alert</code> with this <code>Player</code>. Before
-   * teleporting the <code>Player</code> and sending general <code>Alert</code>
-   * information, a {@link PreCheckAlertEvent} is run.
-   *
-   * @param officer The <code>Player</code> to do the check
-   * @return true if the officer was teleported to the location
-   */
-  @Override
-  public final boolean checkBy(@Nonnull final Player officer) {
-
-    // Post an event to show that the Alert is getting checked
-    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
-
-    PreCheckAlertEvent preCheckAlertEvent = new PreCheckAlertEvent(
-        this,
-        Cause.of(eventContext, plugin), officer);
-
-    Sponge.getEventManager().post(preCheckAlertEvent);
-
-    // Save the officer's previous transform and add it into the alert's database later
-    // if the officer successfully teleports.
-    Transform<World> officerPreviousTransform = officer.getTransform();
-
-    // CheckEvent
-
-    // Teleport the officer
-    if (!officer.setTransformSafely(getGrieferTransform())) {
-      Errors.sendCannotTeleportSafely(officer, getGrieferTransform());
-      return false;
-    }
-
-    // The officer has teleported successfully, so save their previous location in the history
-    GriefAlert.getInstance().getRotatingAlertList().addOfficerTransform(
-        officer.getUniqueId(),
-        officerPreviousTransform);
-
-    // Send the messages
-    Communication.getStaffBroadcastChannel().send(Format.info(
-        Format.playerName(officer),
-        " is checking alert number ",
-        Format.bonus(clickToCheck(getCacheIndex()))));
-
-    officer.sendMessage(Format.heading("Checking Grief Alert: ",
-        Format.bonus(getCacheIndex())));
-    officer.sendMessage(getMessageText());
-    officer.sendMessage(Text.of(
-        Format.command(
-            "RECENT",
-            String.format(
-                "/griefalert query -p %s",
-                getGriefer().getName()),
-            Text.of("Search for recent events caused by this player.")),
-        Format.space(),
-        Format.command(
-            "SHOW",
-            String.format(
-                "/griefalert show %s",
-                getCacheIndex()),
-            Text.of("Search for recent events caused by this player."))));
-
-    return true;
-
-  }
-
   @Override
   public final int getCacheIndex() {
     return cacheIndex;
@@ -256,14 +235,14 @@ public abstract class AbstractAlert implements Alert {
     Text.Builder builder = Text.builder().append(getMessageText());
     allIndices.forEach((i) -> {
       builder.append(Format.space());
-      builder.append(clickToCheck(i));
+      builder.append(GriefAlertCheckCommand.clickToCheck(i));
     });
     return builder.build();
   }
 
   @Override
   public final boolean isRepeatOf(@Nonnull Alert other) {
-    return getMessageText().equals(other.getMessageText());
+    return getMessageText().toPlain().equals(other.getMessageText().toPlain());
   }
 
   @Nonnull
@@ -301,10 +280,6 @@ public abstract class AbstractAlert implements Alert {
     this.cacheIndex = cacheIndex;
   }
 
-  private Text clickToCheck(int index) {
-    return Format.command(String.valueOf(index),
-        "/ga check " + index,
-        Text.of("Check this alert"));
-  }
+
 
 }

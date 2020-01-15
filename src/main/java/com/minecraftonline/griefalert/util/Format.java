@@ -8,6 +8,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
@@ -203,7 +204,8 @@ public final class Format {
    * @return Text Formatted content.
    */
   @SuppressWarnings("unused")
-  public static Text url(String label, String url) {
+  @Nonnull
+  public static Text url(@Nonnull String label, @Nonnull String url) {
     Text.Builder textBuilder = Text.builder();
     textBuilder.append(Text.of(TextColors.BLUE, label));
 
@@ -226,7 +228,10 @@ public final class Format {
    * @param hoverMessage the message to display when hovering over clickable item
    * @return the command <code>Text</code>
    */
-  public static Text command(String label, String command, Text hoverMessage) {
+  @Nonnull
+  public static Text command(@Nonnull String label,
+                             @Nonnull String command,
+                             @Nonnull Text hoverMessage) {
     return Text.builder()
         .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
             Text.of(TextColors.GRAY, label), "] "))
@@ -242,24 +247,20 @@ public final class Format {
    * Optionally a hover action can be added to display
    * the full Item id.
    *
-   * @param id          Item Id
-   * @param hoverAction Hover Action
+   * @param id          the item id
    * @return Text Formatted content.
    */
-  @SuppressWarnings("unused")
-  public static Text item(String id, boolean hoverAction) {
-    checkNotNull(id);
+  @Nonnull
+  public static Text item(@Nonnull String id) {
 
-    Text.Builder textBuilder = Text.builder();
+    Text.Builder textBuilder = Text.builder().append(Text.of(TextStyles.ITALIC));
     if (StringUtils.contains(id, ":")) {
       textBuilder.append(Text.of(StringUtils.substringAfter(id, ":")));
     } else {
       textBuilder.append(Text.of(id));
     }
 
-    if (hoverAction) {
-      textBuilder.onHover(TextActions.showText(Text.of(id)));
-    }
+    textBuilder.onHover(TextActions.showText(Text.of(id)));
 
     return textBuilder.build();
   }
@@ -270,14 +271,14 @@ public final class Format {
    * @param location the location to format
    * @return the <code>Text</code> formatted content
    */
-  public static Text location(Location<World> location) {
-    return Text.of(String.format(
-        "(x: %s, y: %s, z: %s, dimension: %s)",
+  @Nonnull
+  public static Text bonusLocation(Location<World> location) {
+    return Format.bonus(String.format(
+        "(%s, %s, %s, %s)",
         location.getBlockX(),
         location.getBlockY(),
         location.getBlockZ(),
         location.getExtent().getDimension().getType().getName()));
-
   }
 
   public static Text endLine() {
@@ -286,18 +287,6 @@ public final class Format {
 
   public static Text space() {
     return Text.of(" ");
-  }
-
-  /**
-   * Reconstruct a string to remove it's prefix "minecraft:" if it
-   * has one. If not, then it does nothing.
-   *
-   * @param s the input string
-   * @return the formatted string
-   */
-  @SuppressWarnings("WeakerAccess")
-  public static String removeMinecraftPrefix(String s) {
-    return s.replace("minecraft:", "");
   }
 
   /**

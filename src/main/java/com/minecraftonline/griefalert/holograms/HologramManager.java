@@ -63,7 +63,7 @@ public class HologramManager {
                 Format.bonus(
                     alert.getGriefEvent().getPreterite(),
                     Format.space(),
-                    Format.removeMinecraftPrefix(alert.getTarget()))),
+                    Format.item(alert.getTarget()))),
             DISTANCE_BETWEEN_LINES)
         .orElseThrow(() -> new RuntimeException("Failed to create MultiLine Hologram"));
 

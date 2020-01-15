@@ -33,10 +33,10 @@ public final class GriefEvents {
       .of("interact", "Interact", "interacted with");
 
   public static final GriefEvent ATTACK = GriefEvent
-      .of("attack", "Attack", "attacked");
+      .of("attack", "Entity Attack", "attacked");
 
   public static final GriefEvent REPLACE = GriefEvent
-      .of("replace", "Replace", "replaced");
+      .of("replace", "Block Replace", "replaced");
 
   public static final CatalogRegistryModule<GriefEvent> REGISTRY_MODULE = new
       CatalogRegistryModule<GriefEvent>() {

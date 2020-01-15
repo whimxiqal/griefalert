@@ -42,7 +42,7 @@ public class GriefAlertCheckCommand extends AbstractCommand {
           Alert alert = GriefAlert.getInstance()
               .getRotatingAlertList()
               .get(args.<Integer>getOne("index").get());
-          alert.checkBy(player);
+          GriefAlert.getInstance().getRotatingAlertList().check(alert, player);
 
         } catch (IndexOutOfBoundsException e) {
           player.sendMessage(Format.error("That alert could not be found."));
@@ -59,4 +59,12 @@ public class GriefAlertCheckCommand extends AbstractCommand {
     }
     return CommandResult.success();
   }
+
+  public static Text clickToCheck(int index) {
+    return Format.command(String.valueOf(index),
+        "/ga check " + index,
+        Text.of("Check this alert"));
+  }
+
+
 }
