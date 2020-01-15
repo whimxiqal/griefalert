@@ -21,11 +21,13 @@ public class GriefEvent implements CatalogType {
   private final String id;
   private final String name;
   private final String preterite;
+  private final String description;
 
-  private GriefEvent(String id, String name, String preterite) {
+  private GriefEvent(String id, String name, String preterite, String description) {
     this.id = id;
     this.name = name;
     this.preterite = preterite;
+    this.description = description;
   }
 
   /**
@@ -36,8 +38,8 @@ public class GriefEvent implements CatalogType {
    * @param preterite The past tense version of this event
    * @return The corresponding generated <code>GriefEvent</code>
    */
-  public static GriefEvent of(String id, String name, String preterite) {
-    return new GriefEvent(id, name, preterite);
+  public static GriefEvent of(String id, String name, String preterite, String description) {
+    return new GriefEvent(id, name, preterite, description);
   }
 
   /**
@@ -47,8 +49,8 @@ public class GriefEvent implements CatalogType {
    * @param prismEvent The similar <code>PrismEvent</code>
    * @return The corresponding generated <code>GriefEvent</code>
    */
-  public static GriefEvent of(PrismEvent prismEvent) {
-    return new GriefEvent(prismEvent.getId(), prismEvent.getName(), prismEvent.getPastTense());
+  public static GriefEvent of(PrismEvent prismEvent, String description) {
+    return new GriefEvent(prismEvent.getId(), prismEvent.getName(), prismEvent.getPastTense(), description);
   }
 
   @Override
@@ -72,4 +74,7 @@ public class GriefEvent implements CatalogType {
     return getId();
   }
 
+  public String getDescription() {
+    return this.description;
+  }
 }

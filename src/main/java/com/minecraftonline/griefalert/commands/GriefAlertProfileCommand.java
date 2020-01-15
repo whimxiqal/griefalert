@@ -7,10 +7,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.*;
 
 import javax.annotation.Nonnull;
 
@@ -22,6 +19,8 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
+
+import java.util.stream.Collectors;
 
 
 public class GriefAlertProfileCommand extends AbstractCommand {
@@ -47,7 +46,15 @@ public class GriefAlertProfileCommand extends AbstractCommand {
   public static class AddCommand extends AbstractCommand {
 
     AddCommand() {
-      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Add a profile to the database"));
+      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of(
+          "Add a profile to the database. Events: ",
+          Text.joinWith(
+              Format.bonus(", "),
+              GriefEvents.REGISTRY_MODULE.getAll()
+                  .stream()
+                  .map(griefEvent ->
+                      Format.hover(griefEvent.getId(), griefEvent.getDescription()))
+                  .collect(Collectors.toList()))));
       addAlias("add");
       addAlias("a");
       setCommandElement(GenericArguments.seq(

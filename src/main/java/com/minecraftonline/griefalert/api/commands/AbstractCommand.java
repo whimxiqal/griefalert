@@ -87,7 +87,7 @@ public abstract class AbstractCommand implements CommandExecutor {
         Format.heading("Command Help : "),
         Format.bonus(
             "{",
-            Text.of(TextColors.GREEN, String.join(",", getAliases())),
+            Text.of(TextColors.GREEN, String.join(", ", getAliases())),
             "}"
         )));
     source.sendMessage(Text.of(

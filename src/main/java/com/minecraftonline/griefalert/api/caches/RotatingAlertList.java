@@ -152,8 +152,9 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
 
     officer.sendMessage(Format.heading("Checking Grief Alert: ",
         Format.bonus(alert.getCacheIndex())));
-    officer.sendMessage(alert.getMessageText());
+    officer.sendMessage(Text.of(TextColors.YELLOW, alert.getMessageText().toPlain()));
     Text.Builder panel = Text.builder().append(Text.of(
+        Format.bonus("=="),
         Format.space(),
         Format.command(
             "RECENT",
@@ -174,8 +175,8 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
             String.format(
                 "/griefalert info %s",
                 alert.getCacheIndex()),
-            Text.of("Display itemized information about the alert")
-        )));
+            Text.of("Display itemized information about the alert"))));
+
     if (alert instanceof PrismAlert) {
       if (((PrismAlert) alert).isReversed()) {
         panel.append(Format.bonus(
@@ -193,6 +194,10 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
                 Text.of("Rollback this event"))));
       }
     }
+
+    panel.append(Text.of(
+        Format.space(),
+        Format.bonus("==")));
     officer.sendMessage(panel.build());
 
     return true;

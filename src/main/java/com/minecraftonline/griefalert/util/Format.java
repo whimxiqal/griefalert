@@ -247,7 +247,7 @@ public final class Format {
    * Optionally a hover action can be added to display
    * the full Item id.
    *
-   * @param id          the item id
+   * @param id the item id
    * @return Text Formatted content.
    */
   @Nonnull
@@ -297,5 +297,19 @@ public final class Format {
    */
   public static Text playerName(Player player) {
     return player.getDisplayNameData().displayName().get();
+  }
+
+  /**
+   * Format the label with text to show upon hovering with the cursor.
+   *
+   * @param label   the label to be printed
+   * @param onHover the text to show upon hovering
+   * @return the formatted text
+   */
+  public static Text hover(String label, String onHover) {
+    return Text.builder()
+        .append(Text.of(TextStyles.ITALIC, label))
+        .onHover(TextActions.showText(Format.bonus(onHover)))
+        .build();
   }
 }

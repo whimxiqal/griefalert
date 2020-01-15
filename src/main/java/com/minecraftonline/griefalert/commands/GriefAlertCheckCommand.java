@@ -60,9 +60,15 @@ public class GriefAlertCheckCommand extends AbstractCommand {
     return CommandResult.success();
   }
 
+  /**
+   * Get a clickable message that allows the officer to check the alert.
+   *
+   * @param index the index of the alert saved in the cache
+   * @return the formatted <code>Text</code>
+   */
   public static Text clickToCheck(int index) {
     return Format.command(String.valueOf(index),
-        "/ga check " + index,
+        String.format("/griefalert check %s", index),
         Text.of("Check this alert"));
   }
 
