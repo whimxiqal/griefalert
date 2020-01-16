@@ -105,7 +105,7 @@ public abstract class PrismAlert extends AbstractAlert {
     session.addFlag(Flag.NO_GROUP);
     try {
       Query query = session.newQuery();
-      this.addConditionsTo(query);
+      this.addQueryConditionsTo(query);
 
       // Iterate query results
       CompletableFuture<List<Result>> futureResults = com.helion3.prism.Prism.getInstance().getStorageAdapter()
@@ -134,7 +134,7 @@ public abstract class PrismAlert extends AbstractAlert {
     return success.get();
   }
 
-  protected void addConditionsTo(Query query) {
+  protected void addQueryConditionsTo(Query query) {
     query.addCondition(FieldCondition.of(
         DataQueries.Player,
         MatchRule.EQUALS,

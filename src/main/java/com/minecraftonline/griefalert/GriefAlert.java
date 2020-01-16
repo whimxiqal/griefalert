@@ -54,9 +54,7 @@ import org.spongepowered.api.plugin.PluginContainer;
     name = Reference.NAME,
     version = VERSION,
     description = Reference.DESCRIPTION,
-    dependencies = {@Dependency(id = "prism"),
-        @Dependency(id = "worldedit"),
-        @Dependency(id = "holograms")})
+    dependencies = {@Dependency(id = "prism"), @Dependency(id = "holograms")})
 public final class GriefAlert {
 
   public static final String VERSION = Reference.VERSION;

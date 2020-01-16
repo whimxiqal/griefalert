@@ -7,6 +7,7 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -14,7 +15,7 @@ abstract class EntityAlert extends SpongeAlert {
 
   private final EntitySnapshot entitySnapshot;
 
-  EntityAlert(GriefProfile griefProfile, InteractEntityEvent event) {
+  EntityAlert(GriefProfile griefProfile, TargetEntityEvent event) {
     super(griefProfile, event);
     entitySnapshot = event.getTargetEntity().createSnapshot();
   }

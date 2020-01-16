@@ -12,11 +12,14 @@ import com.minecraftonline.griefalert.util.GriefEvents;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.entity.*;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 
 public final class SpongeListeners {
@@ -44,7 +47,7 @@ public final class SpongeListeners {
               event.getItemStack().getType().getId(),
               player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> UseAlert.of(profile, event).run());
+      optionalProfile.ifPresent((profile) -> new UseAlert(profile, event).run());
     }
   }
 
@@ -94,20 +97,53 @@ public final class SpongeListeners {
    * @param event the event for which to listen
    */
   @Listener
-  public void onInteractEntityEventPrimary(InteractEntityEvent.Primary event) {
+  public void onAttackEntityEvent(AttackEntityEvent event) {
 
-    if (event.getCause().root() instanceof Player) {
+    Logger l = GriefAlert.getInstance().getLogger();
+    l.info(event.getClass().getName());
+    if (event.getCause().root() instanceof EntityDamageSource) {
 
-      Player player = (Player) event.getCause().root();
 
-      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
-          .getProfileCache().getProfileOf(
-              GriefEvents.ATTACK,
-              event.getTargetEntity().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType());
+      EntityDamageSource damageSource = (EntityDamageSource) event.getCause().root();
+      l.info(damageSource.getSource().toString());
 
-      optionalProfile.ifPresent((profile) -> AttackEntityAlert.of(profile, event).run());
+      if (damageSource instanceof IndirectEntityDamageSource) {
+        IndirectEntityDamageSource indirectDamageSource = (IndirectEntityDamageSource) damageSource;
+
+        l.info(indirectDamageSource.getIndirectSource().toString());
+
+        if (indirectDamageSource.getIndirectSource() instanceof Player) {
+
+          Player player = (Player) indirectDamageSource.getIndirectSource();
+          String directCause = damageSource.getSource().getType().getId();
+
+          Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
+              .getProfileCache().getProfileOf(
+                  GriefEvents.ATTACK,
+                  event.getTargetEntity().getType().getId(),
+                  player.getLocation().getExtent().getDimension().getType());
+
+          optionalProfile.ifPresent((profile) ->
+              new AttackEntityAlert(profile, event, player, directCause).run());
+        }
+
+      } else if (damageSource.getSource() instanceof Player) {
+        Player player = (Player) damageSource.getSource();
+
+        Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
+            .getProfileCache().getProfileOf(
+                GriefEvents.ATTACK,
+                event.getTargetEntity().getType().getId(),
+                player.getLocation().getExtent().getDimension().getType());
+
+        optionalProfile.ifPresent((profile) ->
+            new AttackEntityAlert(profile, event, player).run());
+
+      } else {
+        l.info("damage Source not Player");
+      }
     }
+
   }
 
 }

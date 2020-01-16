@@ -12,6 +12,8 @@ import com.minecraftonline.griefalert.util.Grammar;
 import javax.annotation.Nonnull;
 
 import com.minecraftonline.griefalert.util.GriefEvents;
+import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 
 public class ReplaceAlert extends PrismAlert {
 
+  // the original block id is saved in getTarget()
   private final String replacementBlockId;
 
   public ReplaceAlert(GriefProfile griefProfile,
@@ -28,33 +31,15 @@ public class ReplaceAlert extends PrismAlert {
                       String replacementBlockId) {
     super(griefProfile, prismRecord);
     this.replacementBlockId = replacementBlockId;
-  }
-
-  /**
-   * Special constructor for <code>Text</code> for a <code>ReplaceAlert</code>.
-   *
-   * @return The <code>Text</code>
-   */
-  @Nonnull
-  public Text.Builder getMessageTextBuilder() {
-    Text.Builder builder = Text.builder();
-    builder.append(Text.of(
-        Format.playerName(getGriefer()),
-        Format.space(),
-        getEventColor(), "replaced",
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(Format.item(getTarget())),
-        Format.space(), "with",
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(Format.item(replacementBlockId))));
-    builder.append(Text.of(
-        TextColors.RED, " in the ",
-        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
-    return builder;
+    addSummaryContent("Replacement", Format.item(replacementBlockId));
+    addSummaryContent("Tool", Format.item(getGriefer()
+        .getItemInHand(HandTypes.MAIN_HAND)
+        .map(itemStack -> itemStack.getType().getId())
+        .orElse("none")));
   }
 
   @Override
-  public void addConditionsTo(Query query) {
+  public void addQueryConditionsTo(Query query) {
     query.addCondition(FieldCondition.of(
         DataQueries.Player,
         MatchRule.EQUALS,

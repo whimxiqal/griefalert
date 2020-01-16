@@ -5,12 +5,19 @@ package com.minecraftonline.griefalert.alerts.sponge.entities;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.GriefEvents;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.world.World;
+
+import javax.annotation.Nonnull;
 
 public class InteractEntityAlert extends EntityAlert {
 
+  private final Transform<World> grieferTransform;
+
   InteractEntityAlert(GriefProfile griefProfile, InteractEntityEvent.Secondary event) {
     super(griefProfile, event);
+    this.grieferTransform = getGriefer().getTransform();
   }
 
   /**
@@ -33,4 +40,9 @@ public class InteractEntityAlert extends EntityAlert {
     }
   }
 
+  @Nonnull
+  @Override
+  public Transform<World> getGrieferTransform() {
+    return grieferTransform;
+  }
 }

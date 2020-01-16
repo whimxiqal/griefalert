@@ -21,7 +21,7 @@ public class DeathAlert extends PrismAlert {
   }
 
   @Override
-  protected void addConditionsTo(Query query) {
+  protected void addQueryConditionsTo(Query query) {
     query.addCondition(FieldCondition.of(
         DataQueries.Player,
         MatchRule.EQUALS,
