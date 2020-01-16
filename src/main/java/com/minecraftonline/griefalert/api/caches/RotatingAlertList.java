@@ -12,12 +12,12 @@ import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
 import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
+import com.minecraftonline.griefalert.util.Format;
 
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.util.Format;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -87,25 +87,6 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
 
     // Finish
     return output;
-  }
-
-  /**
-   * Check the <code>Alert</code> with the given <code>Player</code>.
-   *
-   * @param index   the index of the <code>Alert</code> to check.
-   * @param officer The staff member
-   * @return true if the player teleported correctly
-   * @see Alert
-   */
-  public boolean check(int index, Player officer) {
-    Alert alert;
-    try {
-      alert = get(index);
-    } catch (IndexOutOfBoundsException e) {
-      officer.sendMessage(Format.error("No alert exists at that index"));
-      return false;
-    }
-    return check(alert, officer);
   }
 
   /**
@@ -209,7 +190,7 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
    *
    * @param officer The officer to teleport
    * @return An optional of how many saved locations are left. Return an empty
-   * Optional if there were no transforms left to begin with.
+   *         Optional if there were no transforms left to begin with.
    */
   public Optional<Integer> revertOfficerTransform(Player officer) {
 
@@ -227,7 +208,8 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
     return Optional.of(officerCheckHistory.size(officer.getUniqueId()));
   }
 
-  public void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
+  private void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
     officerCheckHistory.push(officerUuid, transform);
   }
+
 }

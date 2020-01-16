@@ -45,8 +45,10 @@ public abstract class AbstractAlert implements Alert {
 
   private int cacheIndex;
   private final GriefProfile griefProfile;
-  private final List<Tuple<String, Function<Alert, Text>>> summaryContents = new LinkedList<>();
-  private final List<Tuple<String, Function<Alert, Text>>> extraSummaryContents = new LinkedList<>();
+  private final List<Tuple<String, Function<Alert, Text>>> summaryContents =
+      new LinkedList<>();
+  private final List<Tuple<String, Function<Alert, Text>>> extraSummaryContents =
+      new LinkedList<>();
   private boolean silent = false;
   private boolean pushed = false;
   private final Date created;
@@ -101,12 +103,12 @@ public abstract class AbstractAlert implements Alert {
   public final Text getSummaryAll() {
     Text.Builder builder = Text.builder();
     builder.append(Text.joinWith(
-            Format.endLine(),
-            summaryContents.stream()
-                .map(pair -> Text.of(
-                    TextColors.DARK_AQUA, pair.getFirst(), ": ",
-                    TextColors.RESET, pair.getSecond().apply(this)))
-                .collect(Collectors.toList())));
+        Format.endLine(),
+        summaryContents.stream()
+            .map(pair -> Text.of(
+                TextColors.DARK_AQUA, pair.getFirst(), ": ",
+                TextColors.RESET, pair.getSecond().apply(this)))
+            .collect(Collectors.toList())));
     Text summaryExtra = getSummaryExtra();
     if (!summaryExtra.toPlain().isEmpty()) {
       builder.append(Format.endLine());
@@ -115,7 +117,7 @@ public abstract class AbstractAlert implements Alert {
     return builder.build();
   }
 
-  protected final Text getSummaryExtra() {
+  private Text getSummaryExtra() {
     return Text.joinWith(
         Format.endLine(),
         extraSummaryContents.stream()
@@ -133,6 +135,7 @@ public abstract class AbstractAlert implements Alert {
     this.extraSummaryContents.add(new Tuple<>(title, alert -> Format.bonus(description)));
   }
 
+  @SuppressWarnings("unused")
   protected void addSummaryContent(String title, String description) {
     this.extraSummaryContents.add(new Tuple<>(title, alert -> Format.bonus(description)));
   }

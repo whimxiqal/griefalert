@@ -2,14 +2,13 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
-import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.GriefEvents;
+
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.world.World;
-
-import javax.annotation.Nonnull;
 
 public class InteractEntityAlert extends EntityAlert {
 
@@ -22,8 +21,9 @@ public class InteractEntityAlert extends EntityAlert {
 
   /**
    * Generator for the appropriate InteractEntityAlert.
+   *
    * @param griefProfile The GriefProfile flagging this event
-   * @param event The event
+   * @param event        The event
    * @return The appropriate InteractEntityAlert
    */
   public static InteractEntityAlert of(

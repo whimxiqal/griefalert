@@ -7,25 +7,27 @@ import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Grammar;
-
-import javax.annotation.Nonnull;
-
 import com.minecraftonline.griefalert.util.GriefEvents;
-import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.regex.Pattern;
+
+import org.spongepowered.api.data.type.HandTypes;
+
 
 public class ReplaceAlert extends PrismAlert {
 
   // the original block id is saved in getTarget()
   private final String replacementBlockId;
 
+  /**
+   * General constructor.
+   *
+   * @param griefProfile       the <code>GriefProfile</code>
+   * @param prismRecord        the <code>PrismRecord</code>, archived
+   * @param replacementBlockId the id for the block which replaced the original
+   */
   public ReplaceAlert(GriefProfile griefProfile,
                       PrismRecordArchived prismRecord,
                       String replacementBlockId) {

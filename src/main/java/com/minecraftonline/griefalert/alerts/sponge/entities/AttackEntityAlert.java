@@ -2,25 +2,20 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
-import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.SpongeEvents;
-import org.spongepowered.api.data.type.HandTypes;
+
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
-import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nonnull;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * An <code>Alert</code> for the Attack <code>GriefEvent</code>.
@@ -32,6 +27,13 @@ public class AttackEntityAlert extends EntityAlert {
   private final Player griefer;
   private final Transform<World> griefTransform;
 
+  /**
+   * General constructor.
+   *
+   * @param griefProfile the <code>GriefProfile</code>
+   * @param event        the event which triggered the alert
+   * @param griefer      the cause of the event/alert
+   */
   public AttackEntityAlert(@Nonnull final GriefProfile griefProfile,
                            @Nonnull final AttackEntityEvent event,
                            @Nonnull final Player griefer) {
