@@ -100,18 +100,11 @@ public final class SpongeListeners {
   @Listener
   public void onAttackEntityEvent(AttackEntityEvent event) {
 
-    Logger l = GriefAlert.getInstance().getLogger();
-    l.info(event.getClass().getName());
     if (event.getCause().root() instanceof EntityDamageSource) {
-
-
       EntityDamageSource damageSource = (EntityDamageSource) event.getCause().root();
-      l.info(damageSource.getSource().toString());
 
       if (damageSource instanceof IndirectEntityDamageSource) {
         IndirectEntityDamageSource indirectDamageSource = (IndirectEntityDamageSource) damageSource;
-
-        l.info(indirectDamageSource.getIndirectSource().toString());
 
         if (indirectDamageSource.getIndirectSource() instanceof Player) {
 
@@ -139,12 +132,8 @@ public final class SpongeListeners {
 
         optionalProfile.ifPresent((profile) ->
             new AttackEntityAlert(profile, event, player).run());
-
-      } else {
-        l.info("damage Source not Player");
       }
     }
-
   }
 
 }
