@@ -237,7 +237,7 @@ public final class Format {
             Text.of(TextColors.GRAY, label), "] "))
         .onClick(TextActions.runCommand(command))
         .onHover(TextActions.showText(Text.of(
-            (hoverMessage.isEmpty() ? hoverMessage : Text.of(hoverMessage, Format.endLine())),
+            (hoverMessage.isEmpty() ? hoverMessage : Text.join(hoverMessage, Format.endLine())),
             Format.bonus(command))))
         .build();
   }

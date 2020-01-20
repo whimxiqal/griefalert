@@ -53,13 +53,20 @@ public class GriefAlertCommand extends AbstractCommand {
         TextColors.AQUA, "Authors: ",
         Format.bonus(String.join(", ", Reference.AUTHORS))));
     src.sendMessage(Format.bonus(
-        "Check out the ",
+        "Check out the",
         Format.space(),
         Format.url("website", Reference.WEBSITE),
+        Format.space(),
+        "or",
+        Format.space(),
+        Format.url("source code", Reference.SOURCE),
         "."));
     src.sendMessage(Format.bonus(
         "Try: ",
-        TextColors.YELLOW, String.format("/%s help", getAliases().get(0))));
+        TextColors.YELLOW, Format.command(
+            String.format("/%s help", getAliases().get(0)),
+            "/griefalert help",
+            Text.EMPTY)));
     return CommandResult.success();
   }
 
