@@ -46,7 +46,7 @@ public class GriefAlertCommand extends AbstractCommand {
     src.sendMessage(Text.of(
         Format.bonus("=============")));
     src.sendMessage(Text.of(
-        Format.GRIEF_ALERT_THEME, TextStyles.BOLD, "GriefAlert",
+        Format.GRIEF_ALERT_THEME, TextStyles.BOLD, String.format("GriefAlert v&s", Reference.VERSION),
         Format.space(),
         TextStyles.RESET, Format.bonus("by MinecraftOnline")));
     src.sendMessage(Text.of(

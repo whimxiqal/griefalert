@@ -126,7 +126,7 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
         officerPreviousTransform);
 
     // Send the messages
-    Communication.getStaffBroadcastChannel().send(Format.info(
+    Communication.getStaffBroadcastChannelWithout(officer).send(Format.info(
         Format.playerName(officer),
         " is checking alert number ",
         Format.bonus(GriefAlertCheckCommand.clickToCheck(alert.getCacheIndex()))));
@@ -137,42 +137,24 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
     Text.Builder panel = Text.builder().append(Text.of(
         Format.bonus("=="),
         Format.space(),
-        Format.command(
-            "RECENT",
-            String.format(
-                "/griefalert query -p %s",
-                alert.getGriefer().getName()),
-            Text.of("Search for recent events caused by this player")),
+        Format.getTagRecent(alert.getGriefer().getName()),
         Format.space(),
-        Format.command(
-            "SHOW",
-            String.format(
-                "/griefalert show %s",
-                alert.getCacheIndex()),
-            Text.of("Show the alert location in the world")),
+        Format.getTagShow(alert.getCacheIndex()),
         Format.space(),
-        Format.command(
-            "INFO",
-            String.format(
-                "/griefalert info %s",
-                alert.getCacheIndex()),
-            Text.of("Display itemized information about the alert"))));
+        Format.getTagInfo(alert.getCacheIndex()),
+        Format.space(),
+        Format.getTagReturn()));
 
     if (alert instanceof PrismAlert) {
       if (((PrismAlert) alert).isReversed()) {
         panel.append(Format.bonus(
-            TextColors.YELLOW,
+            TextColors.DARK_GRAY,
             TextStyles.ITALIC,
             "ROLLED BACK"));
       } else {
         panel.append(Text.of(
             Format.space(),
-            Format.command(
-                "ROLLBACK",
-                String.format(
-                    "/griefalert rollback %s",
-                    alert.getCacheIndex()),
-                Text.of("Rollback this event"))));
+            Format.getTagRollback(alert.getCacheIndex())));
       }
     }
 

@@ -243,6 +243,89 @@ public final class Format {
   }
 
   /**
+   * Get a tag allowing the user to immediately use the info command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagInfo(int index) {
+    return command(
+        "INFO",
+        String.format("/griefalert info %s", index),
+        Text.of(TextColors.YELLOW, "Get a summary of information about this alert")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the check command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagCheck(int index) {
+    return command(
+        "CHECK",
+        String.format("/griefalert check %s", index),
+        Text.of(TextColors.YELLOW, "Teleport to this location")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the rollback command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagRollback(int index) {
+    return command(
+        "ROLLBACK",
+        String.format("/griefalert rollback %s", index),
+        Text.of(TextColors.YELLOW, "Undo this event")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the return command.
+   *
+   * @return the formatted text
+   */
+  public static Text getTagReturn() {
+    return command(
+        "RETURN",
+        "/griefalert return",
+        Text.of(TextColors.YELLOW, "Return to last saved location before checking an alert")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use a simple query command.
+   *
+   * @param playerName The name of the player to query
+   * @return the formatted text
+   */
+  public static Text getTagRecent(String playerName) {
+    return Format.command(
+        "RECENT",
+        String.format("/griefalert query -p %s", playerName),
+        Text.of("Search for recent events caused by this player")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the show command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagShow(int index) {
+    return Format.command(
+        "SHOW",
+        String.format("/griefalert show %s", index),
+        Text.of("Show the alert location in the world")
+    );
+  }
+
+  /**
    * Returns content formatted with an Item name.
    * Optionally a hover action can be added to display
    * the full Item id.
