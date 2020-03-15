@@ -5,12 +5,14 @@ package com.minecraftonline.griefalert.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.helion3.prism.util.DataQueries;
-import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;

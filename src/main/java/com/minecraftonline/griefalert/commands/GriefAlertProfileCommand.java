@@ -7,8 +7,13 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.*;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+import com.minecraftonline.griefalert.util.Permissions;
 
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.command.CommandResult;
@@ -19,9 +24,6 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
-
-import java.util.stream.Collectors;
-
 
 public class GriefAlertProfileCommand extends AbstractCommand {
 

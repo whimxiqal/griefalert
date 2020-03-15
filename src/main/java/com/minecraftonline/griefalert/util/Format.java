@@ -4,6 +4,7 @@ package com.minecraftonline.griefalert.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
 import com.minecraftonline.griefalert.GriefAlert;
 
 import java.net.MalformedURLException;
@@ -234,12 +235,95 @@ public final class Format {
                              @Nonnull Text hoverMessage) {
     return Text.builder()
         .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
-            Text.of(TextColors.GRAY, label), "] "))
+            Text.of(TextColors.GRAY, label), "]"))
         .onClick(TextActions.runCommand(command))
         .onHover(TextActions.showText(Text.of(
-            (hoverMessage.isEmpty() ? hoverMessage : Text.of(hoverMessage, Format.endLine())),
+            (hoverMessage.isEmpty() ? hoverMessage : Text.join(hoverMessage, Format.endLine())),
             Format.bonus(command))))
         .build();
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the info command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagInfo(int index) {
+    return command(
+        "INFO",
+        String.format("/griefalert info %s", index),
+        Text.of(TextColors.YELLOW, "Get a summary of information about this alert")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the check command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagCheck(int index) {
+    return command(
+        "CHECK",
+        String.format("/griefalert check %s", index),
+        Text.of(TextColors.YELLOW, "Teleport to this location")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the rollback command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagRollback(int index) {
+    return command(
+        "ROLLBACK",
+        String.format("/griefalert rollback %s", index),
+        Text.of(TextColors.YELLOW, "Undo this event")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the return command.
+   *
+   * @return the formatted text
+   */
+  public static Text getTagReturn() {
+    return command(
+        "RETURN",
+        "/griefalert return",
+        Text.of(TextColors.YELLOW, "Return to last saved location before checking an alert")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use a simple query command.
+   *
+   * @param playerName The name of the player to query
+   * @return the formatted text
+   */
+  public static Text getTagRecent(String playerName) {
+    return Format.command(
+        "RECENT",
+        String.format("/griefalert query -p %s", playerName),
+        Text.of("Search for recent events caused by this player")
+    );
+  }
+
+  /**
+   * Get a tag allowing the user to immediately use the show command.
+   *
+   * @param index The alert index
+   * @return the formatted text
+   */
+  public static Text getTagShow(int index) {
+    return Format.command(
+        "SHOW",
+        String.format("/griefalert show %s", index),
+        Text.of("Show the alert location in the world")
+    );
   }
 
   /**
@@ -286,7 +370,11 @@ public final class Format {
   }
 
   public static Text space() {
-    return Text.of(" ");
+    return space(1);
+  }
+
+  public static Text space(int count) {
+    return Text.of(Strings.repeat(" ", count));
   }
 
   /**

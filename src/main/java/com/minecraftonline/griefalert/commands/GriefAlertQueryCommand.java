@@ -29,7 +29,7 @@ public class GriefAlertQueryCommand extends AbstractCommand {
 
   GriefAlertQueryCommand() {
     super(
-        Permissions.GRIEFALERT_COMMAND_RECENT,
+        Permissions.GRIEFALERT_COMMAND_QUERY,
         Text.of("Get information regarding recent cached grief alerts")
     );
     addAlias("query");

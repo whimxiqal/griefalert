@@ -7,11 +7,9 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
-import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
-import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
@@ -23,13 +21,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javafx.util.Pair;
-
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -38,7 +32,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.Tuple;
 
 
 /**
@@ -51,8 +45,10 @@ public abstract class AbstractAlert implements Alert {
 
   private int cacheIndex;
   private final GriefProfile griefProfile;
-  private final List<Pair<String, Function<Alert, Text>>> summaryContents = new LinkedList<>();
-  private final List<Pair<String, Function<Alert, Text>>> extraSummaryContents = new LinkedList<>();
+  private final List<Tuple<String, Function<Alert, Text>>> summaryContents =
+      new LinkedList<>();
+  private final List<Tuple<String, Function<Alert, Text>>> extraSummaryContents =
+      new LinkedList<>();
   private boolean silent = false;
   private boolean pushed = false;
   private final Date created;
@@ -60,13 +56,13 @@ public abstract class AbstractAlert implements Alert {
   protected AbstractAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
     created = new Date();
-    summaryContents.add(new Pair<>("Player", alert ->
+    summaryContents.add(new Tuple<>("Player", alert ->
         Format.playerName(alert.getGriefer())));
-    summaryContents.add(new Pair<>("Event", alert ->
+    summaryContents.add(new Tuple<>("Event", alert ->
         Format.bonus(alert.getGriefEvent().getName())));
-    summaryContents.add(new Pair<>("Target", alert ->
+    summaryContents.add(new Tuple<>("Target", alert ->
         Format.bonus(Format.item(alert.getTarget()))));
-    summaryContents.add(new Pair<>("Location", alert ->
+    summaryContents.add(new Tuple<>("Location", alert ->
         Format.bonusLocation(alert.getGriefLocation())));
 
   }
@@ -107,12 +103,12 @@ public abstract class AbstractAlert implements Alert {
   public final Text getSummaryAll() {
     Text.Builder builder = Text.builder();
     builder.append(Text.joinWith(
-            Format.endLine(),
-            summaryContents.stream()
-                .map(pair -> Text.of(
-                    TextColors.DARK_AQUA, pair.getKey(), ": ",
-                    TextColors.RESET, pair.getValue().apply(this)))
-                .collect(Collectors.toList())));
+        Format.endLine(),
+        summaryContents.stream()
+            .map(pair -> Text.of(
+                TextColors.DARK_AQUA, pair.getFirst(), ": ",
+                TextColors.RESET, pair.getSecond().apply(this)))
+            .collect(Collectors.toList())));
     Text summaryExtra = getSummaryExtra();
     if (!summaryExtra.toPlain().isEmpty()) {
       builder.append(Format.endLine());
@@ -121,26 +117,27 @@ public abstract class AbstractAlert implements Alert {
     return builder.build();
   }
 
-  protected final Text getSummaryExtra() {
+  private Text getSummaryExtra() {
     return Text.joinWith(
         Format.endLine(),
         extraSummaryContents.stream()
             .map(pair -> Text.of(
-                TextColors.DARK_AQUA, pair.getKey(), ": ",
-                TextColors.RESET, pair.getValue().apply(this)))
+                TextColors.DARK_AQUA, pair.getFirst(), ": ",
+                TextColors.RESET, pair.getSecond().apply(this)))
             .collect(Collectors.toList()));
   }
 
   protected void addSummaryContent(String title, Function<Alert, Text> descriptionFunction) {
-    this.extraSummaryContents.add(new Pair<>(title, descriptionFunction));
+    this.extraSummaryContents.add(new Tuple<>(title, descriptionFunction.andThen(Format::bonus)));
   }
 
   protected void addSummaryContent(String title, Text description) {
-    this.extraSummaryContents.add(new Pair<>(title, alert -> description));
+    this.extraSummaryContents.add(new Tuple<>(title, alert -> Format.bonus(description)));
   }
 
+  @SuppressWarnings("unused")
   protected void addSummaryContent(String title, String description) {
-    this.extraSummaryContents.add(new Pair<>(title, alert -> Format.bonus(description)));
+    this.extraSummaryContents.add(new Tuple<>(title, alert -> Format.bonus(description)));
   }
 
   @Override

@@ -1,4 +1,7 @@
 /src/test/
 /libs/
 *.iml
+*.properties
 .idea
+gradlew
+gradlew.bat

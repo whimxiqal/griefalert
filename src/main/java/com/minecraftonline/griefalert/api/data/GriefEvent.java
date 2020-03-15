@@ -50,7 +50,11 @@ public class GriefEvent implements CatalogType {
    * @return The corresponding generated <code>GriefEvent</code>
    */
   public static GriefEvent of(PrismEvent prismEvent, String description) {
-    return new GriefEvent(prismEvent.getId(), prismEvent.getName(), prismEvent.getPastTense(), description);
+    return new GriefEvent(
+        prismEvent.getId(),
+        prismEvent.getName(),
+        prismEvent.getPastTense(),
+        description);
   }
 
   @Override

@@ -7,54 +7,41 @@ import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Grammar;
-
-import javax.annotation.Nonnull;
-
 import com.minecraftonline.griefalert.util.GriefEvents;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import org.spongepowered.api.data.type.HandTypes;
+
+
 public class ReplaceAlert extends PrismAlert {
 
+  // the original block id is saved in getTarget()
   private final String replacementBlockId;
 
+  /**
+   * General constructor.
+   *
+   * @param griefProfile       the <code>GriefProfile</code>
+   * @param prismRecord        the <code>PrismRecord</code>, archived
+   * @param replacementBlockId the id for the block which replaced the original
+   */
   public ReplaceAlert(GriefProfile griefProfile,
                       PrismRecordArchived prismRecord,
                       String replacementBlockId) {
     super(griefProfile, prismRecord);
     this.replacementBlockId = replacementBlockId;
-  }
-
-  /**
-   * Special constructor for <code>Text</code> for a <code>ReplaceAlert</code>.
-   *
-   * @return The <code>Text</code>
-   */
-  @Nonnull
-  public Text.Builder getMessageTextBuilder() {
-    Text.Builder builder = Text.builder();
-    builder.append(Text.of(
-        Format.playerName(getGriefer()),
-        Format.space(),
-        getEventColor(), "replaced",
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(Format.item(getTarget())),
-        Format.space(), "with",
-        Format.space(),
-        getTargetColor(), Grammar.addIndefiniteArticle(Format.item(replacementBlockId))));
-    builder.append(Text.of(
-        TextColors.RED, " in the ",
-        getDimensionColor(), getGrieferTransform().getExtent().getDimension().getType().getName()));
-    return builder;
+    addSummaryContent("Replacement", Format.item(replacementBlockId));
+    addSummaryContent("Tool", Format.item(getGriefer()
+        .getItemInHand(HandTypes.MAIN_HAND)
+        .map(itemStack -> itemStack.getType().getId())
+        .orElse("none")));
   }
 
   @Override
-  public void addConditionsTo(Query query) {
+  public void addQueryConditionsTo(Query query) {
     query.addCondition(FieldCondition.of(
         DataQueries.Player,
         MatchRule.EQUALS,

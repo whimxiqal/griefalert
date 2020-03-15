@@ -2,6 +2,25 @@ plugins {
 	id 'java'
     id 'org.spongepowered.plugin' version '0.9.0'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id 'maven-publish'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/pietelite/griefalert")
+            credentials {
+                username = project.findProperty("gpr.user")
+                password = project.findProperty("gpr.key")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 repositories {
@@ -16,7 +35,7 @@ repositories {
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '1.0.0' // Project Version
+version = '1.0.3' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -29,20 +48,22 @@ compileJava {
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.1.0'
-    compile 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
-    compile 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
+    //compile 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
+    //compile 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
     compile fileTree(dir: 'libs', include: '*.jar')
     shadow fileTree(dir: 'libs', include: 'shadow/*.jar')
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
+    testImplementation('junit:junit:4.13')
+
 }
 
 sponge.plugin.meta {
     authors = ext.authors
 }
 
-jar {
-    classifier = "original"
-}
+//jar {
+//    classifier = "original"
+//}
 
 shadowJar {
     configurations = [project.configurations.shadow]

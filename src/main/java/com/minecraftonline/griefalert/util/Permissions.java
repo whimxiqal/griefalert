@@ -22,8 +22,8 @@ public final class Permissions {
   public static final Permission GRIEFALERT_COMMAND_INFO = Permission.of(
       "griefalert.command.info"
   );
-  public static final Permission GRIEFALERT_COMMAND_RECENT = Permission.of(
-      "griefalert.command.recent"
+  public static final Permission GRIEFALERT_COMMAND_QUERY = Permission.of(
+      "griefalert.command.query"
   );
   public static final Permission GRIEFALERT_COMMAND_PROFILE = Permission.of(
       "griefalert.command.profile"

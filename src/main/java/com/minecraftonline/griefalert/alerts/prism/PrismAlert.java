@@ -3,7 +3,11 @@
 package com.minecraftonline.griefalert.alerts.prism;
 
 import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.*;
+import com.helion3.prism.api.query.FieldCondition;
+import com.helion3.prism.api.query.MatchRule;
+import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.query.Sort;
 import com.helion3.prism.api.records.Actionable;
 import com.helion3.prism.api.records.Result;
 import com.helion3.prism.util.DataQueries;
@@ -14,7 +18,11 @@ import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Prism;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -98,21 +106,30 @@ public abstract class PrismAlert extends AbstractAlert {
     return Prism.getCreated(this.prismRecord).orElse(Date.from(Instant.EPOCH));
   }
 
-  public boolean rollback(CommandSource src) {
+  /**
+   * Rollback the event which caused this alert.
+   *
+   * @param src the source of the rollback request
+   * @return whether rollback was successful
+   */
+  public final boolean rollback(@Nonnull CommandSource src) {
     AtomicBoolean success = new AtomicBoolean(false);
     QuerySession session = new QuerySession(src);
     session.setSortBy(Sort.NEWEST_FIRST);
     session.addFlag(Flag.NO_GROUP);
     try {
       Query query = session.newQuery();
-      this.addConditionsTo(query);
+      this.addQueryConditionsTo(query);
 
       // Iterate query results
-      CompletableFuture<List<Result>> futureResults = com.helion3.prism.Prism.getInstance().getStorageAdapter()
+      CompletableFuture<List<Result>> futureResults = com.helion3.prism.Prism.getInstance()
+          .getStorageAdapter()
           .records().query(session, false);
       futureResults.thenAccept(results -> {
         if (results.isEmpty()) {
-          GriefAlert.getInstance().getLogger().error("Rollback query return no results.");
+          GriefAlert.getInstance().getLogger().error(String.format(
+              "Rollback query by %s return no results.",
+              src.getName()));
         } else {
           try {
             // Iterate record results
@@ -134,7 +151,7 @@ public abstract class PrismAlert extends AbstractAlert {
     return success.get();
   }
 
-  protected void addConditionsTo(Query query) {
+  protected void addQueryConditionsTo(Query query) {
     query.addCondition(FieldCondition.of(
         DataQueries.Player,
         MatchRule.EQUALS,

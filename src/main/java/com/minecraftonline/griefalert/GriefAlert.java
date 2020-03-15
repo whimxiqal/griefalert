@@ -11,7 +11,7 @@ import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.commands.LegacyCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.commands.DeprecatedCommands;
+import com.minecraftonline.griefalert.commands.LegacyCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.holograms.HologramManager;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
@@ -54,9 +54,7 @@ import org.spongepowered.api.plugin.PluginContainer;
     name = Reference.NAME,
     version = VERSION,
     description = Reference.DESCRIPTION,
-    dependencies = {@Dependency(id = "prism"),
-        @Dependency(id = "worldedit"),
-        @Dependency(id = "holograms")})
+    dependencies = {@Dependency(id = "prism"), @Dependency(id = "holograms")})
 public final class GriefAlert {
 
   public static final String VERSION = Reference.VERSION;
@@ -184,7 +182,7 @@ public final class GriefAlert {
         this,
         griefAlertCommand.buildCommandSpec(),
         griefAlertCommand.getAliases());
-    for (LegacyCommand command : DeprecatedCommands.get()) {
+    for (LegacyCommand command : LegacyCommands.get()) {
       Sponge.getCommandManager().register(
           this,
           command.buildCommandSpec(),
