@@ -136,13 +136,13 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
     officer.sendMessage(Text.of(TextColors.YELLOW, alert.getMessageText().toPlain()));
     Text.Builder panel = Text.builder().append(Text.of(
         Format.bonus("=="),
-        Format.space(),
+        Format.space(1),
         Format.getTagRecent(alert.getGriefer().getName()),
-        Format.space(),
+        Format.space(2),
         Format.getTagShow(alert.getCacheIndex()),
-        Format.space(),
+        Format.space(2),
         Format.getTagInfo(alert.getCacheIndex()),
-        Format.space(),
+        Format.space(2),
         Format.getTagReturn()));
 
     if (alert instanceof PrismAlert) {
@@ -153,13 +153,13 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
             "ROLLED BACK"));
       } else {
         panel.append(Text.of(
-            Format.space(),
+            Format.space(2),
             Format.getTagRollback(alert.getCacheIndex())));
       }
     }
 
     panel.append(Text.of(
-        Format.space(),
+        Format.space(1),
         Format.bonus("==")));
     officer.sendMessage(panel.build());
 

@@ -4,6 +4,7 @@ package com.minecraftonline.griefalert.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
 import com.minecraftonline.griefalert.GriefAlert;
 
 import java.net.MalformedURLException;
@@ -234,7 +235,7 @@ public final class Format {
                              @Nonnull Text hoverMessage) {
     return Text.builder()
         .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
-            Text.of(TextColors.GRAY, label), "] "))
+            Text.of(TextColors.GRAY, label), "]"))
         .onClick(TextActions.runCommand(command))
         .onHover(TextActions.showText(Text.of(
             (hoverMessage.isEmpty() ? hoverMessage : Text.join(hoverMessage, Format.endLine())),
@@ -369,7 +370,11 @@ public final class Format {
   }
 
   public static Text space() {
-    return Text.of(" ");
+    return space(1);
+  }
+
+  public static Text space(int count) {
+    return Text.of(Strings.repeat(" ", count));
   }
 
   /**

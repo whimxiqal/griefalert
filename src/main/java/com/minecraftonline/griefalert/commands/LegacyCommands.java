@@ -20,6 +20,9 @@ public final class LegacyCommands {
   private LegacyCommands() {
   }
 
+  /**
+   * Immutable list of deprecated commands.
+   */
   private static final List<LegacyCommand> list = Lists.newArrayList(
       LegacyCommand.of(Permissions.GRIEFALERT_COMMAND_CHECK, "gcheck", "griefalert check"),
       LegacyCommand.of(Permissions.GRIEFALERT_COMMAND_QUERY, "grecent", "griefalert query")

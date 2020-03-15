@@ -35,6 +35,24 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
     }
   }
 
+  /**
+   * Constructor to convert an array directly into a rotating array list.
+   *
+   * @param inputData The input array
+   * @param capacity The capacity of the desired array
+   */
+  public RotatingArrayList(ArrayList<P> inputData, int capacity) {
+    this.capacity = capacity;
+    data = new ArrayList<>(capacity);
+    for (int i = 0; i < capacity; i++) {
+      if (i < inputData.size()) {
+        data.set(i, inputData.get(i));
+      } else {
+        data.set(i, null);
+      }
+    }
+  }
+
   @Override
   public int capacity() {
     return capacity;

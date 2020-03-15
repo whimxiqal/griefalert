@@ -5,6 +5,7 @@ package com.minecraftonline.griefalert.commands;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
@@ -15,6 +16,9 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -46,7 +50,26 @@ class GriefAlertShowCommand extends AbstractCommand {
           Alert alert = GriefAlert.getInstance()
               .getRotatingAlertList()
               .get(args.<Integer>getOne("index").get());
+
+          // Create temporary hologram of grief
           GriefAlert.getInstance().getHologramManager().createTemporaryHologram(alert);
+
+          // Apply night vision
+          player.getOrCreate(PotionEffectData.class)
+              .map(ths -> ths.addElement(
+                  PotionEffect.builder()
+                      .potionType(PotionEffectTypes.NIGHT_VISION)
+                      .duration(300)
+                      .amplifier(1)
+                      .build()))
+              .ifPresent(player::offer);
+
+          // Broadcast the attempt at command
+          Communication.getStaffBroadcastChannelWithout(player).send(Format.info(
+              Format.playerName(player),
+              " is taking a closer look at alert ",
+              Format.bonus(alert.getCacheIndex())));
+
           return CommandResult.success();
         } catch (IndexOutOfBoundsException e) {
           player.sendMessage(Format.error("That alert could not be found."));

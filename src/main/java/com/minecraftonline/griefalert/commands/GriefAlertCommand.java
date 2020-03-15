@@ -46,7 +46,9 @@ public class GriefAlertCommand extends AbstractCommand {
     src.sendMessage(Text.of(
         Format.bonus("=============")));
     src.sendMessage(Text.of(
-        Format.GRIEF_ALERT_THEME, TextStyles.BOLD, String.format("GriefAlert v&s", Reference.VERSION),
+        Format.GRIEF_ALERT_THEME, TextStyles.BOLD, String.format(
+            "GriefAlert v%s",
+            Reference.VERSION),
         Format.space(),
         TextStyles.RESET, Format.bonus("by MinecraftOnline")));
     src.sendMessage(Text.of(
@@ -62,11 +64,14 @@ public class GriefAlertCommand extends AbstractCommand {
         Format.url("source code", Reference.SOURCE),
         "."));
     src.sendMessage(Format.bonus(
-        "Try: ",
-        TextColors.YELLOW, Format.command(
-            String.format("/%s help", getAliases().get(0)),
+        "Try the",
+        Format.space(),
+        Format.command(
+            "help",
             "/griefalert help",
-            Text.EMPTY)));
+            Text.EMPTY),
+        Format.space(),
+        "command."));
     return CommandResult.success();
   }
 
