@@ -64,6 +64,9 @@ public class GriefAlertLogsCommand extends AbstractCommand {
         .valueFlag(GenericArguments.string(
             Text.of("player")),
             "-player")
+        .valueFlag(GenericArguments.string(
+            Text.of("target")),
+            "-target")
         .flag("-group")
         .buildWith(GenericArguments.none()));
   }
@@ -83,7 +86,6 @@ public class GriefAlertLogsCommand extends AbstractCommand {
       }
 
       Query query = session.newQuery();
-      src.sendMessage(Format.heading("Querying records from Prism..."));
 
       // Add location query with WE
       World world = ((Player) src).getLocation().getExtent();
@@ -123,6 +125,9 @@ public class GriefAlertLogsCommand extends AbstractCommand {
         }
       });
 
+      args.<String>getOne("target").ifPresent(str ->
+          query.addCondition(FieldCondition.of(DataQueries.Target, MatchRule.EQUALS, str)));
+
       if (args.<String>getOne("player").isPresent()) {
         String playerFlag = args.<String>getOne("player").get();
         CompletableFuture<GameProfile> future = Sponge.getServer()
@@ -131,7 +136,10 @@ public class GriefAlertLogsCommand extends AbstractCommand {
             query.addCondition(FieldCondition.of(
                 DataQueries.Player,
                 MatchRule.EQUALS,
-                profile.getUniqueId().toString()))).thenRun(() -> AsyncUtil.lookup(session));
+                profile.getUniqueId().toString()))).thenRun(() -> {
+                    src.sendMessage(Format.heading("Querying records from Prism..."));
+                    AsyncUtil.lookup(session);
+                });
       } else {
         AsyncUtil.lookup(session);
       }
