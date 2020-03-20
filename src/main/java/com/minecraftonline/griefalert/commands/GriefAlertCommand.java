@@ -36,7 +36,7 @@ public class GriefAlertCommand extends AbstractCommand {
     addChild(new GriefAlertReturnCommand());
     addChild(new GriefAlertShowCommand());
     addChild(new GriefAlertRollbackCommand());
-
+    addChild(new GriefAlertLogsCommand());
   }
 
   @Nonnull

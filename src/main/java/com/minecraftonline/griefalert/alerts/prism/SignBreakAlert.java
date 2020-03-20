@@ -6,7 +6,7 @@ import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Prism;
+import com.minecraftonline.griefalert.util.PrismUtil;
 
 public class SignBreakAlert extends PrismAlert {
 
@@ -20,22 +20,22 @@ public class SignBreakAlert extends PrismAlert {
   public SignBreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
     super(griefProfile, prismRecord);
 
-    Prism.getBrokenSignText(getPrismRecord())
+    PrismUtil.getBrokenSignText(getPrismRecord())
         .flatMap(SignText::getText1)
         .ifPresent(text ->
             addSummaryContent("Line 1", alert -> Format.bonus(text)));
 
-    Prism.getBrokenSignText(getPrismRecord())
+    PrismUtil.getBrokenSignText(getPrismRecord())
         .flatMap(SignText::getText2)
         .ifPresent(text ->
             addSummaryContent("Line 2", alert -> Format.bonus(text)));
 
-    Prism.getBrokenSignText(getPrismRecord())
+    PrismUtil.getBrokenSignText(getPrismRecord())
         .flatMap(SignText::getText3)
         .ifPresent(text ->
             addSummaryContent("Line 3", alert -> Format.bonus(text)));
 
-    Prism.getBrokenSignText(getPrismRecord())
+    PrismUtil.getBrokenSignText(getPrismRecord())
         .flatMap(SignText::getText4)
         .ifPresent(text ->
             addSummaryContent("Line 4", alert -> Format.bonus(text)));

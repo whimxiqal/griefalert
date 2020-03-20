@@ -15,7 +15,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.AbstractAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
-import com.minecraftonline.griefalert.util.Prism;
+import com.minecraftonline.griefalert.util.PrismUtil;
 
 import java.time.Instant;
 import java.util.Date;
@@ -94,7 +94,7 @@ public abstract class PrismAlert extends AbstractAlert {
   @Nonnull
   @Override
   public Location<World> getGriefLocation() {
-    return Prism.getLocation(getPrismRecord())
+    return PrismUtil.getLocation(getPrismRecord())
         .map(location -> location.add(0.5, 0.2, 0.5))
         .orElseThrow(() ->
             new RuntimeException("Couldn't find the location in a PrismAlert"));
@@ -103,7 +103,7 @@ public abstract class PrismAlert extends AbstractAlert {
   @Nonnull
   @Override
   public Date getCreated() {
-    return Prism.getCreated(this.prismRecord).orElse(Date.from(Instant.EPOCH));
+    return PrismUtil.getCreated(this.prismRecord).orElse(Date.from(Instant.EPOCH));
   }
 
   /**

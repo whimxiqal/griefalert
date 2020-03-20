@@ -209,7 +209,7 @@ public final class Format {
   public static Text url(@Nonnull String label, @Nonnull String url) {
     Text.Builder textBuilder = Text.builder();
     textBuilder.append(Text.of(TextColors.BLUE, label));
-
+    textBuilder.onHover(TextActions.showText(Text.of(url)));
     try {
       textBuilder.onClick(TextActions.openUrl(new URL(url)));
     } catch (MalformedURLException ex) {

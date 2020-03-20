@@ -22,12 +22,12 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
-public final class Prism {
+public final class PrismUtil {
 
   /**
    * Ensure util class cannot be instantiated with private constructor.
    */
-  private Prism() {
+  private PrismUtil() {
   }
 
   /**
