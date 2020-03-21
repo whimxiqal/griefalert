@@ -6,7 +6,6 @@ import com.minecraftonline.griefalert.api.data.Permission;
 
 public final class Permissions {
 
-
   /**
    * Ensure util class cannot be instantiated with private constructor.
    */
@@ -38,6 +37,10 @@ public final class Permissions {
   public static final Permission GRIEFALERT_COMMAND_LOGS = Permission.of(
       "griefalert.command.logs"
   );
+  public static final Permission GRIEFALERT_COMMAND_ROLLBACK = Permission.of(
+      "griefalert.command.rollback"
+  );
+
 
   @SuppressWarnings("WeakerAccess")
   public static final Permission GRIEFALERT_MESSAGING = Permission.of(

@@ -280,7 +280,7 @@ public final class Format {
   public static Text getTagRollback(int index) {
     return command(
         "ROLLBACK",
-        String.format("/griefalert rollback %s", index),
+        String.format("/griefalert rollback alert %s", index),
         Text.of(TextColors.YELLOW, "Undo this event")
     );
   }

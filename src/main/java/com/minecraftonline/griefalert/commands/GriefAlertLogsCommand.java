@@ -1,49 +1,37 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.*;
+import com.helion3.prism.api.query.ConditionGroup;
+import com.helion3.prism.api.query.FieldCondition;
+import com.helion3.prism.api.query.MatchRule;
+import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.AsyncUtil;
 import com.helion3.prism.util.DataQueries;
-import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Permissions;
 import com.minecraftonline.griefalert.util.WorldEditUtil;
 import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.session.SessionOwner;
-import com.sk89q.worldedit.sponge.SpongePlayer;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
-import com.sk89q.worldedit.sponge.adapter.SpongeImplAdapter;
-import com.sk89q.worldedit.sponge.adapter.SpongeImplLoader;
-import com.sk89q.worldedit.sponge.adapter.impl.Sponge_Dev_Impl;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
-
-import javax.annotation.Nonnull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.TemporalAmount;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.CompletableFuture;
+import java.util.Optional;
+import javax.annotation.Nonnull;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.World;
 
 public class GriefAlertLogsCommand extends AbstractCommand {
 
@@ -67,6 +55,9 @@ public class GriefAlertLogsCommand extends AbstractCommand {
         .valueFlag(GenericArguments.string(
             Text.of("target")),
             "-target")
+        .valueFlag(GenericArguments.string(
+            Text.of("event")),
+            "-event")
         .flag("-group")
         .buildWith(GenericArguments.none()));
   }
@@ -88,7 +79,7 @@ public class GriefAlertLogsCommand extends AbstractCommand {
       Query query = session.newQuery();
 
       // Add location query with WE
-      World world = ((Player) src).getLocation().getExtent();
+      World world = player.getLocation().getExtent();
       SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(world);
       try {
         query.addCondition(ConditionGroup.from(
@@ -114,12 +105,18 @@ public class GriefAlertLogsCommand extends AbstractCommand {
           return Date.from(Instant.now().minus(Duration.ofDays(365)));
         }
       }).orElse(Date.from(Instant.now().minus(Duration.ofDays(365))));
-      query.addCondition(FieldCondition.of(DataQueries.Created, MatchRule.GREATER_THAN_EQUAL, sinceFlag));
+      query.addCondition(FieldCondition.of(
+          DataQueries.Created,
+          MatchRule.GREATER_THAN_EQUAL,
+          sinceFlag));
 
       args.<String>getOne("before").ifPresent(str -> {
         try {
           Date beforeFlag = dateFormat.parse(str);
-          query.addCondition(FieldCondition.of(DataQueries.Created, MatchRule.LESS_THAN_EQUAL, beforeFlag));
+          query.addCondition(FieldCondition.of(
+              DataQueries.Created,
+              MatchRule.LESS_THAN_EQUAL,
+              beforeFlag));
         } catch (ParseException e) {
           src.sendMessage(Format.error("Date format: dd-MM-yyyy"));
         }
@@ -128,21 +125,25 @@ public class GriefAlertLogsCommand extends AbstractCommand {
       args.<String>getOne("target").ifPresent(str ->
           query.addCondition(FieldCondition.of(DataQueries.Target, MatchRule.EQUALS, str)));
 
-      if (args.<String>getOne("player").isPresent()) {
-        String playerFlag = args.<String>getOne("player").get();
-        CompletableFuture<GameProfile> future = Sponge.getServer()
-            .getGameProfileManager().get(playerFlag, true);
-        future.thenAccept(profile ->
-            query.addCondition(FieldCondition.of(
-                DataQueries.Player,
-                MatchRule.EQUALS,
-                profile.getUniqueId().toString()))).thenRun(() -> {
-                    src.sendMessage(Format.heading("Querying records from Prism..."));
-                    AsyncUtil.lookup(session);
-                });
-      } else {
-        AsyncUtil.lookup(session);
-      }
+      args.<String>getOne("player").ifPresent(str -> {
+        Optional<Player> playerFlag = Sponge.getServer().getPlayer(str);
+        if (playerFlag.isPresent()) {
+          query.addCondition(FieldCondition.of(
+              DataQueries.Player,
+              MatchRule.EQUALS,
+              playerFlag.get().getUniqueId().toString()));
+        } else {
+          src.sendMessage(Format.error("Player not found: " + str));
+        }
+      });
+
+      args.<String>getOne("event").ifPresent(str ->
+          query.addCondition(FieldCondition.of(
+              DataQueries.EventName,
+              MatchRule.EQUALS,
+              str)));
+
+      AsyncUtil.lookup(session);
 
       return CommandResult.success();
     } else {

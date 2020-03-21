@@ -13,6 +13,7 @@ import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.Permissions;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -98,6 +99,7 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
    * @see Alert
    */
   public boolean check(Alert alert, Player officer) {
+    // TODO move this
     // Post an event to show that the Alert is getting checked
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
@@ -134,22 +136,34 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
     officer.sendMessage(Format.heading("Checking Grief Alert: ",
         Format.bonus(alert.getCacheIndex())));
     officer.sendMessage(Text.of(TextColors.YELLOW, alert.getMessageText().toPlain()));
-    Text.Builder panel = Text.builder().append(Text.of(
-        Format.bonus("=="),
-        Format.space(1),
-        Format.getTagRecent(alert.getGriefer().getName()),
-        Format.space(2),
-        Format.getTagShow(alert.getCacheIndex()),
-        Format.space(2),
-        Format.getTagInfo(alert.getCacheIndex()),
-        Format.space(2),
-        Format.getTagReturn()));
+    Text.Builder panel = Text.builder().append(Format.bonus("=="));
 
-    if (alert instanceof PrismAlert) {
+    if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_QUERY.toString())) {
+      panel.append(
+          Format.space(2),
+          Format.getTagRecent(alert.getGriefer().getName()));
+    }
+    if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_SHOW.toString())) {
+      panel.append(
+          Format.space(2),
+          Format.getTagShow(alert.getCacheIndex()));
+    }
+    if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_INFO.toString())) {
+      panel.append(
+          Format.space(2),
+          Format.getTagInfo(alert.getCacheIndex()));
+    }
+    panel.append(
+        Format.space(2),
+        Format.getTagReturn());
+
+    if (alert instanceof PrismAlert
+        && officer.hasPermission(Permissions.GRIEFALERT_COMMAND_ROLLBACK.toString())) {
       if (((PrismAlert) alert).isReversed()) {
         panel.append(Format.bonus(
             TextColors.DARK_GRAY,
             TextStyles.ITALIC,
+            Format.space(2),
             "ROLLED BACK"));
       } else {
         panel.append(Text.of(
@@ -159,7 +173,7 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
     }
 
     panel.append(Text.of(
-        Format.space(1),
+        Format.space(2),
         Format.bonus("==")));
     officer.sendMessage(panel.build());
 
