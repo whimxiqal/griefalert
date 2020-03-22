@@ -31,10 +31,8 @@ public class ProfileCache {
    * Reloads all {@link GriefProfile}s from the storage into this cache.
    */
   public void reload() {
-    GriefAlert.getInstance().getLogger().info("Reloading Grief Profile cache...");
     storage.clear();
     load();
-    GriefAlert.getInstance().getLogger().info("Grief Profile cache reload complete.");
   }
 
   private void load() {

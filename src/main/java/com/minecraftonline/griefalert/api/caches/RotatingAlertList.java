@@ -10,10 +10,7 @@ import com.minecraftonline.griefalert.api.structures.HashMapStack;
 import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
 import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
-import com.minecraftonline.griefalert.util.Communication;
-import com.minecraftonline.griefalert.util.Errors;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -81,7 +78,7 @@ public final class RotatingAlertList extends RotatingArrayList<Alert> {
 
     grieferRepeatHistory.push(grieferUuid, alert);
 
-    int silentAlertLimit = GriefAlert.getInstance().getConfigHelper().getHiddenRepeatedEventLimit();
+    int silentAlertLimit = Settings.MAX_HIDDEN_REPEATED_EVENTS.getValue();
     if (grieferRepeatHistory.size(grieferUuid) >= silentAlertLimit) {
       grieferRepeatHistory.clear(grieferUuid);
     }

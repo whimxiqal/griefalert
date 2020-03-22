@@ -2,22 +2,44 @@
 
 package com.minecraftonline.griefalert.storage;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 import com.minecraftonline.griefalert.GriefAlert;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.minecraftonline.griefalert.api.configuration.Setting;
+import com.minecraftonline.griefalert.util.Settings;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
+import javax.annotation.Nonnull;
 
 public class ConfigHelper {
 
-  private static final int DEFAULT_ALERTS_CODE_LIMIT = 9999;
-  private static final int DEFAULT_MAX_REPEATED_HIDDEN_ALERT = 10;
-  private static final boolean DEFAULT_SHOW_ALERTS_IN_CONSOLE = true;
+//  private static final int DEFAULT_ALERTS_CODE_LIMIT = 9999;
+//  private static final int DEFAULT_MAX_REPEATED_HIDDEN_ALERT = 10;
+//  private static final boolean DEFAULT_SHOW_ALERTS_IN_CONSOLE = true;
+//
+//  private int cachedEventLimit;
+//  private int hiddenRepeatedEventLimit;
+//  private boolean alertEventsToConsole;
 
-  private int cachedEventLimit;
-  private int hiddenRepeatedEventLimit;
-  private boolean alertEventsToConsole;
+  private final ImmutableList<Setting<?>> settings = ImmutableList.of(Settings.ALERTS_CODE_LIMIT,
+      Settings.MAX_HIDDEN_REPEATED_EVENTS,
+      Settings.SHOW_ALERTS_IN_CONSOLE,
+      Settings.STORAGE_ENGINE,
+//      Settings.MYSQL_DRIVER,
+      Settings.STORAGE_ADDRESS,
+      Settings.STORAGE_DATABASE,
+      Settings.STORAGE_USERNAME,
+      Settings.STORAGE_PASSWORD);
 
   /**
    * Create and initialize this helper class for managing the configuration data. This constructor
@@ -26,7 +48,7 @@ public class ConfigHelper {
    * @param configPath The path to the configuration
    * @param root       The root node of the configuration object
    */
-  public ConfigHelper(Path configPath, ConfigurationNode root) {
+  public ConfigHelper(Path configPath, CommentedConfigurationNode root) {
     initialize(configPath, root);
     load(root);
   }
@@ -35,14 +57,16 @@ public class ConfigHelper {
    * Initializes the configuration nodes with their appropriate values, designated as
    * local static variables.
    */
-  private void initialize(Path configPath, ConfigurationNode root) {
+  private void initialize(Path configPath, CommentedConfigurationNode root) {
     if (!configPath.toFile().exists()) {
       GriefAlert.getInstance().getLogger().info(
           "No configuration file found. Generating new one...");
       try {
-        root.getNode("alertsCodeLimit").setValue(DEFAULT_ALERTS_CODE_LIMIT);
-        root.getNode("maxHiddenRepeatedEvents").setValue(DEFAULT_MAX_REPEATED_HIDDEN_ALERT);
-        root.getNode("showAlertsInConsole").setValue(DEFAULT_SHOW_ALERTS_IN_CONSOLE);
+        settings.forEach(
+            setting -> {
+              root.getNode(setting.getName()).setComment(setting.getComment());
+              root.getNode(setting.getName()).setValue(setting.getDefaultValue());
+            });
         GriefAlert.getInstance().getConfigManager().save(root);
         GriefAlert.getInstance().getLogger().info("New configuration file created successfully");
       } catch (IOException e) {
@@ -60,24 +84,17 @@ public class ConfigHelper {
   public void load(ConfigurationNode root) {
     try {
       GriefAlert.getInstance().getConfigManager().load();
-      cachedEventLimit = root.getNode("alertsCodeLimit").getInt();
-      hiddenRepeatedEventLimit = root.getNode("maxHiddenRepeatedEvents").getInt();
-      alertEventsToConsole = root.getNode("showAlertsInConsole").getBoolean();
+      for (Setting<?> setting : settings) {
+        try {
+          setting.setValueFromConfig(root);
+        } catch (IllegalArgumentException e) {
+          GriefAlert.getInstance().getLogger().error(e.getMessage());
+        }
+      }
       GriefAlert.getInstance().getLogger().info("Configuration file loaded");
-    } catch (IOException e) {
+    } catch (Exception e) {
       GriefAlert.getInstance().getLogger().error("Exception while loading configuration", e);
     }
   }
 
-  public int getCachedEventLimit() {
-    return cachedEventLimit;
-  }
-
-  public int getHiddenRepeatedEventLimit() {
-    return hiddenRepeatedEventLimit;
-  }
-
-  public boolean isAlertEventsToConsole() {
-    return alertEventsToConsole;
-  }
 }

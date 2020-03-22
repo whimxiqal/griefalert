@@ -18,6 +18,7 @@ import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
+import com.minecraftonline.griefalert.storage.SqliteProfileStorage;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Reference;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 
+import com.minecraftonline.griefalert.util.Settings;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -79,7 +81,7 @@ public final class GriefAlert {
    * The root node of the configuration file, using the configuration manager.
    */
 
-  private ConfigurationNode rootNode;
+  private CommentedConfigurationNode rootNode;
 
   @Inject
   @ConfigDir(sharedRoot = false)
@@ -100,7 +102,7 @@ public final class GriefAlert {
   private ProfileCache profileCache;
   private RotatingAlertList rotatingAlertList;
   private ConfigHelper configHelper;
-  private MySqlProfileStorage profileStorage;
+  private ProfileStorage profileStorage;
   private HologramManager hologramManager;
 
   @Listener
@@ -133,13 +135,19 @@ public final class GriefAlert {
     }
 
     try {
-      profileStorage = new MySqlProfileStorage();
+      if (Settings.STORAGE_ENGINE.getValue().equalsIgnoreCase("mysql")) {
+        GriefAlert.getInstance().getLogger().debug("Using MySQL storage engine.");
+        profileStorage = new MySqlProfileStorage();
+      } else {
+        GriefAlert.getInstance().getLogger().debug("Using SQLite storage engine.");
+        profileStorage = new SqliteProfileStorage();
+      }
     } catch (SQLException e) {
-      e.printStackTrace();
+      GriefAlert.getInstance().getLogger().error("Error while creating storage engine for profiles.");
     }
 
     profileCache = new ProfileCache();
-    rotatingAlertList = new RotatingAlertList(configHelper.getCachedEventLimit());
+    rotatingAlertList = new RotatingAlertList(Settings.ALERTS_CODE_LIMIT.getValue());
 
     // Register all the commands with Sponge
     registerCommands();

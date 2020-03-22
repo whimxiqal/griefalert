@@ -51,7 +51,7 @@ public final class Communication {
           staff.add(player);
         }
       }
-      if (GriefAlert.getInstance().getConfigHelper().isAlertEventsToConsole()) {
+      if (Settings.SHOW_ALERTS_IN_CONSOLE.getValue()) {
         staff.add(Sponge.getServer().getConsole());
       }
       return staff;

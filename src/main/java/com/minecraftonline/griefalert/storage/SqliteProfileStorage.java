@@ -1,37 +1,45 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.storage;
 
-import com.helion3.prism.Prism;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import com.minecraftonline.griefalert.util.Settings;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.DimensionTypes;
 
-import javax.annotation.Nonnull;
-import java.sql.*;
-import java.util.*;
-
-public class MySqlProfileStorage implements ProfileStorage {
+/**
+ * Implementation of persistent storage for {@link GriefProfile}s using MySQL.
+ *
+ * @author PietElite
+ */
+public class SqliteProfileStorage implements ProfileStorage {
 
   private static final String TABLE_NAME = "GriefAlertProfiles";
   private final String address;
-  private final Properties databaseProperties;
+  private Connection connection;
 
   /**
    * General constructor.
    *
    * @throws SQLException if error with SQL
    */
-  public MySqlProfileStorage() throws SQLException {
-    address = String.format("jdbc:mysql://%s@%s/%s",
-        Settings.STORAGE_USERNAME.getValue(),
-        Settings.STORAGE_ADDRESS.getValue(),
-        Settings.STORAGE_DATABASE.getValue());
-    databaseProperties = new Properties();
-    databaseProperties.setProperty("password", Settings.STORAGE_PASSWORD.getValue());
+  public SqliteProfileStorage() throws SQLException {
+    address = "jdbc:sqlite:" + GriefAlert.getInstance().getDataDirectory()
+        .getPath() + "/griefalert.db";
     createTable();
   }
 
@@ -53,8 +61,8 @@ public class MySqlProfileStorage implements ProfileStorage {
       return false;
     }
 
-    Connection connection = DriverManager.getConnection(address, databaseProperties);
-    PreparedStatement statement = connection.prepareStatement(command);
+    connect();
+    PreparedStatement statement = getConnection().prepareStatement(command);
 
     statement.setString(1, profile.getGriefEvent().getId());
     statement.setString(2, profile.getTarget());
@@ -75,7 +83,7 @@ public class MySqlProfileStorage implements ProfileStorage {
         .getString(GriefProfileDataQueries.DIMENSION_COLOR).orElse(null));
 
     statement.execute();
-    connection.close();
+    close();
     return true;
   }
 
@@ -86,21 +94,21 @@ public class MySqlProfileStorage implements ProfileStorage {
       return false;
     }
 
-    Connection connection = DriverManager.getConnection(address, databaseProperties);
+    connect();
     String command = "DELETE FROM "
         + TABLE_NAME + " WHERE "
         + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
         + GriefProfileDataQueries.TARGET + " = '" + target + "';";
 
-    connection.prepareStatement(command).execute();
-    connection.close();
+    getConnection().prepareStatement(command).execute();
+    close();
     return true;
   }
 
   @Nonnull
   @Override
   public List<GriefProfile> retrieve() throws SQLException {
-    Connection connection = DriverManager.getConnection(address, databaseProperties);
+    connect();
     List<GriefProfile> profiles = new LinkedList<>();
 
     String command = "SELECT * FROM " + TABLE_NAME + ";";
@@ -133,14 +141,26 @@ public class MySqlProfileStorage implements ProfileStorage {
       }
       profiles.add(GriefProfile.of(container));
     }
-    rs.close();
-    connection.close();
+    close();
     return profiles;
 
   }
 
+  private void connect() throws SQLException {
+    try {
+      Class.forName("org.sqlite.JDBC");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    connection = DriverManager.getConnection(address);
+  }
+
+  private void close() throws SQLException {
+    getConnection().close();
+  }
+
   private void createTable() throws SQLException {
-    Connection connection = DriverManager.getConnection(address, databaseProperties);
+    connect();
     String profiles = "CREATE TABLE IF NOT EXISTS "
         + TABLE_NAME + " ("
         + GriefProfileDataQueries.EVENT + " varchar(16) NOT NULL, "
@@ -152,23 +172,27 @@ public class MySqlProfileStorage implements ProfileStorage {
         + GriefProfileDataQueries.TARGET_COLOR + " varchar(16), "
         + GriefProfileDataQueries.DIMENSION_COLOR + " varchar(16) "
         + ");";
-    connection.prepareStatement(profiles).execute();
-    connection.close();
+    getConnection().prepareStatement(profiles).execute();
+    close();
   }
 
   private boolean exists(GriefEvent griefEvent, String target) throws SQLException {
-    Connection connection = DriverManager.getConnection(address, databaseProperties);
+    connect();
     String command = "SELECT * FROM "
         + TABLE_NAME + " WHERE "
         + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
         + GriefProfileDataQueries.TARGET + " = '" + target + "';";
 
-    ResultSet rs = connection.prepareStatement(command).executeQuery();
+    ResultSet rs = getConnection().prepareStatement(command).executeQuery();
     boolean hasResult = rs.next();
 
-    connection.close();
+    close();
     return hasResult;
 
+  }
+
+  private Connection getConnection() {
+    return connection;
   }
 
 }
