@@ -3,39 +3,22 @@
 package com.minecraftonline.griefalert.storage;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.api.configuration.Setting;
+import com.minecraftonline.griefalert.util.Settings;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.minecraftonline.griefalert.api.configuration.Setting;
-import com.minecraftonline.griefalert.util.Settings;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-
-import javax.annotation.Nonnull;
 
 public class ConfigHelper {
-
-//  private static final int DEFAULT_ALERTS_CODE_LIMIT = 9999;
-//  private static final int DEFAULT_MAX_REPEATED_HIDDEN_ALERT = 10;
-//  private static final boolean DEFAULT_SHOW_ALERTS_IN_CONSOLE = true;
-//
-//  private int cachedEventLimit;
-//  private int hiddenRepeatedEventLimit;
-//  private boolean alertEventsToConsole;
 
   private final ImmutableList<Setting<?>> settings = ImmutableList.of(Settings.ALERTS_CODE_LIMIT,
       Settings.MAX_HIDDEN_REPEATED_EVENTS,
       Settings.SHOW_ALERTS_IN_CONSOLE,
       Settings.STORAGE_ENGINE,
-//      Settings.MYSQL_DRIVER,
       Settings.STORAGE_ADDRESS,
       Settings.STORAGE_DATABASE,
       Settings.STORAGE_USERNAME,

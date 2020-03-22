@@ -11,8 +11,8 @@ import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.commands.LegacyCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.commands.LegacyCommands;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
+import com.minecraftonline.griefalert.commands.LegacyCommands;
 import com.minecraftonline.griefalert.holograms.HologramManager;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;
@@ -22,14 +22,13 @@ import com.minecraftonline.griefalert.storage.SqliteProfileStorage;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.GriefEvents;
 import com.minecraftonline.griefalert.util.Reference;
+import com.minecraftonline.griefalert.util.Settings;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 
-import com.minecraftonline.griefalert.util.Settings;
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
@@ -143,7 +142,9 @@ public final class GriefAlert {
         profileStorage = new SqliteProfileStorage();
       }
     } catch (SQLException e) {
-      GriefAlert.getInstance().getLogger().error("Error while creating storage engine for profiles.");
+      GriefAlert.getInstance().getLogger().error(
+          "Error while creating storage engine for profiles."
+      );
     }
 
     profileCache = new ProfileCache();

@@ -1,18 +1,24 @@
 package com.minecraftonline.griefalert.storage;
 
-import com.helion3.prism.Prism;
-import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import com.minecraftonline.griefalert.util.Settings;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import javax.annotation.Nonnull;
+
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.world.DimensionTypes;
-
-import javax.annotation.Nonnull;
-import java.sql.*;
-import java.util.*;
 
 public class MySqlProfileStorage implements ProfileStorage {
 

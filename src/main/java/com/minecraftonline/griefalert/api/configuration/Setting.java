@@ -1,11 +1,9 @@
 package com.minecraftonline.griefalert.api.configuration;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
+import javax.annotation.Nonnull;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-
-import javax.annotation.Nonnull;
 
 public class Setting<T> {
 

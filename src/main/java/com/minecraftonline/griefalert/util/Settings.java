@@ -1,13 +1,11 @@
 package com.minecraftonline.griefalert.util;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.configuration.Setting;
 
 public final class Settings {
 
   /**
-   * Private constructor to prevent instantiation
+   * Private constructor to prevent instantiation.
    */
   private Settings() {
   }
