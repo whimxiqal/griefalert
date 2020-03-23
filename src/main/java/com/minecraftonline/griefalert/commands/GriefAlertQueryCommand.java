@@ -13,6 +13,7 @@ import com.minecraftonline.griefalert.util.Permissions;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.command.CommandResult;
@@ -47,6 +48,7 @@ public class GriefAlertQueryCommand extends AbstractCommand {
         .valueFlag(
             GenericArguments.integer(Text.of("maximum")),
             "-max", "m")
+        .flag("-group")
         .buildWith(
             GenericArguments.none()));
   }
@@ -55,7 +57,6 @@ public class GriefAlertQueryCommand extends AbstractCommand {
   @Nonnull
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) {
-    List<Alert> matching = new LinkedList<>();
 
     List<Alert> cacheReversed = GriefAlert.getInstance()
         .getAlertManager()
@@ -64,38 +65,25 @@ public class GriefAlertQueryCommand extends AbstractCommand {
     Collections.reverse(cacheReversed);
 
     int max = (int) args.getOne("maximum").orElse(DEFAULT_MAXIMUM_QUERIES);
-
     // ensure the result count isn't astronomical
     if (max > MAXIMUM_MAXIMUM_QUERIES) {
       src.sendMessage(Format.error("Search shortened to ", MAXIMUM_MAXIMUM_QUERIES, " results."));
       max = MAXIMUM_MAXIMUM_QUERIES;
     }
 
-    for (Alert alert : cacheReversed) {
-      if (matching.size() >= max) {
-        break;
-      }
+    final boolean group = args.hasAny("group");
 
-      if (args.getOne("player").isPresent()
-          && !((String) args.getOne("player").get()).equalsIgnoreCase(alert
-          .getGriefer()
-          .getName())) {
-        continue;
-      }
-
-      if (args.getOne("event").isPresent()
-          && !args.getOne("event").get().equals(alert.getGriefEvent())) {
-        continue;
-      }
-
-      if (args.getOne("target").isPresent() && !args.getOne("target").map(
-          (s) -> General.ensureIdFormat((String) s))
-          .get().equals(alert.getTarget())) {
-        continue;
-      }
-
-      matching.add(alert);
-    }
+    List<Alert> matching = cacheReversed
+        .stream()
+        .filter(alert ->
+            args.<String>getOne("player").map(player ->
+                player.equalsIgnoreCase(alert.getGriefer().getName())).orElse(true)
+                && args.<GriefEvent>getOne("event").map(event ->
+                event.equals(alert.getGriefEvent())).orElse(true)
+                && args.<String>getOne("target").map(target ->
+                General.ensureIdFormat(target).equalsIgnoreCase(alert.getTarget())).orElse(true))
+        .limit(max)
+        .collect(Collectors.toList());
 
     if (matching.isEmpty()) {
       src.sendMessage(Format.info("No alerts matching those parameters"));
@@ -104,26 +92,34 @@ public class GriefAlertQueryCommand extends AbstractCommand {
     }
     Collections.reverse(matching);
 
-    LinkedList<Integer> indices = new LinkedList<>();
+    LinkedList<LinkedList<Alert>> nested = new LinkedList<>();
+    nested.add(new LinkedList<>());
     for (Alert alert : matching) {
-      if (!indices.isEmpty()
-          && !GriefAlert.getInstance()
-          .getAlertManager().getAlertCache()
-          .get(indices.getLast())
-          .isRepeatOf(alert)) {
-
-        src.sendMessage(GriefAlert.getInstance()
-            .getAlertManager().getAlertCache()
-            .get(indices.getFirst()).getTextWithIndices(indices));
-        indices.clear();
+      LinkedList<Alert> curr = nested.getLast();
+      if (curr.isEmpty() || curr.getLast().isRepeatOf(alert)) {
+        curr.add(alert);
+      } else {
+        LinkedList<Alert> next = new LinkedList<>();
+        next.add(alert);
+        nested.add(next);
       }
-      indices.add(alert.getCacheIndex());
     }
 
-    if (!indices.isEmpty()) {
-      src.sendMessage(GriefAlert.getInstance()
-          .getAlertManager().getAlertCache()
-          .get(indices.getFirst()).getTextWithIndices(indices));
+    if (group) {
+      nested.stream()
+          .filter(list -> !list.isEmpty())
+          .forEach(list -> src.sendMessage(list.getFirst()
+          .getMessageText().concat(Format.bonus(
+              Format.space(),
+              "x",
+              list.size()))));
+    } else {
+      nested.stream()
+          .filter(list -> !list.isEmpty())
+          .forEach(list -> src.sendMessage(list.getFirst().getTextWithIndices(
+          list.stream()
+              .map(Alert::getCacheIndex)
+              .collect(Collectors.toList()))));
     }
 
     return CommandResult.success();
