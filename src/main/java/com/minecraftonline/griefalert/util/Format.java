@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
@@ -380,11 +381,15 @@ public final class Format {
   /**
    * Format the grief checker's name to include prefix and suffix.
    *
-   * @param player The grief checker
+   * @param user The grief checker
    * @return The Text form of the grief checker's name
    */
-  public static Text playerName(Player player) {
-    return player.getDisplayNameData().displayName().get();
+  public static Text playerName(User user) {
+    if (user instanceof Player) {
+      return ((Player) user).getDisplayNameData().displayName().get();
+    } else {
+      return Text.of(user.getName());
+    }
   }
 
   /**

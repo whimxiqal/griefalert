@@ -32,6 +32,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -70,7 +72,7 @@ public abstract class PrismAlert extends AbstractAlert {
 
   @Nonnull
   @Override
-  public Player getGriefer() {
+  public User getGriefer() {
     Optional<String> uuidOptional = prismRecord.getDataContainer().getString(DataQueries.Player);
     if (!uuidOptional.isPresent()) {
       GriefAlert.getInstance().getLogger().error("Could not get griefer UUID "
@@ -78,9 +80,9 @@ public abstract class PrismAlert extends AbstractAlert {
       GriefAlert.getInstance().getLogger().error(prismRecord.getDataContainer().toString());
       throw new NoSuchElementException();
     }
-    Optional<Player> playerOptional = Sponge
-        .getServer()
-        .getPlayer(UUID.fromString(uuidOptional.get()));
+    Optional<User> playerOptional = Sponge
+        .getServiceManager().provide(UserStorageService.class)
+        .flatMap(userStorageService -> userStorageService.get(UUID.fromString(uuidOptional.get())));
     if (!playerOptional.isPresent()) {
       GriefAlert.getInstance()
           .getLogger()

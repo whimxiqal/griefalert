@@ -66,20 +66,20 @@ public class SqliteProfileStorage implements ProfileStorage {
 
     statement.setString(1, profile.getGriefEvent().getId());
     statement.setString(2, profile.getTarget());
-    statement.setBoolean(3, profile.getDataContainer()
+    statement.setBoolean(3, profile.toContainer()
         .getList(GriefProfileDataQueries.IGNORED)
         .map((list) -> list.contains(DimensionTypes.OVERWORLD.getId())).orElse(false));
-    statement.setBoolean(4, profile.getDataContainer()
+    statement.setBoolean(4, profile.toContainer()
         .getList(GriefProfileDataQueries.IGNORED)
         .map((list) -> list.contains(DimensionTypes.NETHER.getId())).orElse(false));
-    statement.setBoolean(5, profile.getDataContainer()
+    statement.setBoolean(5, profile.toContainer()
         .getList(GriefProfileDataQueries.IGNORED)
         .map((list) -> list.contains(DimensionTypes.THE_END.getId())).orElse(false));
-    statement.setString(6, profile.getDataContainer()
+    statement.setString(6, profile.toContainer()
         .getString(GriefProfileDataQueries.EVENT_COLOR).orElse(null));
-    statement.setString(7, profile.getDataContainer()
+    statement.setString(7, profile.toContainer()
         .getString(GriefProfileDataQueries.TARGET_COLOR).orElse(null));
-    statement.setString(8, profile.getDataContainer()
+    statement.setString(8, profile.toContainer()
         .getString(GriefProfileDataQueries.DIMENSION_COLOR).orElse(null));
 
     statement.execute();

@@ -64,6 +64,11 @@ public class HashMapStack<K, V> implements MapStack<K, V> {
     data.get(key).clear();
   }
 
+  @Override
+  public void clearAll() {
+    data.clear();
+  }
+
   private void ensurePresent(@Nonnull final K key) {
     data.putIfAbsent(key, new Stack<>());
   }

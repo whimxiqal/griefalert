@@ -4,9 +4,11 @@ package com.minecraftonline.griefalert.api.data;
 
 import com.helion3.prism.api.data.PrismEvent;
 import com.minecraftonline.griefalert.util.GriefEvents;
+import java.io.Serializable;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.util.annotation.CatalogedBy;
+
 
 /**
  * An object to describe a specific action. This is one of the factors which match
@@ -16,7 +18,7 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
  * @author PietElite
  */
 @CatalogedBy(GriefEvents.class)
-public class GriefEvent implements CatalogType {
+public class GriefEvent implements CatalogType, Serializable {
 
   private final String id;
   private final String name;

@@ -2,7 +2,6 @@
 
 package com.minecraftonline.griefalert.api.alerts;
 
-import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
@@ -10,8 +9,10 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.Nonnull;
 
+import com.minecraftonline.griefalert.api.structures.RotatingList;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.Location;
@@ -27,12 +28,20 @@ import org.spongepowered.api.world.World;
 public interface Alert extends Runnable {
 
   /**
-   * Get the <code>Player</code> responsible for triggering the <code>Alert</code>.
+   * Get the <code>GriefProfile</code> which was used to flag this <code>Alert</code>.
+   *
+   * @return The GriefProfile
+   */
+  @Nonnull
+  GriefProfile getGriefProfile();
+
+  /**
+   * Get the <code>User</code> responsible for triggering the <code>Alert</code>.
    *
    * @return The griefer
    */
   @Nonnull
-  Player getGriefer();
+  User getGriefer();
 
   /**
    * Get the <code>Transform</code> of the griefer when the griefer
@@ -117,7 +126,7 @@ public interface Alert extends Runnable {
 
   /**
    * Get the number which correlates this <code>Alert</code> to the
-   * {@link RotatingAlertList} for
+   * {@link RotatingList} for
    * retrieval.
    *
    * @return The index within the <code>AlertStack</code>
@@ -129,7 +138,7 @@ public interface Alert extends Runnable {
    * <code>Alert</code>'s stack index appended to the end.
    *
    * @return The <code>Text</code>
-   * @see RotatingAlertList
+   * @see RotatingList
    */
   @Nonnull
   Text getTextWithIndex();
@@ -156,7 +165,7 @@ public interface Alert extends Runnable {
 
   /**
    * Setter for the index corresponding to the index in the
-   * {@link RotatingAlertList} which
+   * {@link RotatingList} which
    * can retrieve this <code>Alert</code>.
    *
    * @param cacheIndex the stack index

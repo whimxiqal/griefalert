@@ -38,7 +38,7 @@ public class GriefAlertInfoCommand extends AbstractCommand {
     if (args.<Integer>getOne("alert code").isPresent()) {
       try {
         Alert alert = GriefAlert.getInstance()
-            .getRotatingAlertList()
+            .getAlertManager().getAlertCache()
             .get(args.<Integer>getOne("alert code").get());
         player.sendMessage(Format.heading("Alert Info: ", Format.bonus(alert.getCacheIndex())));
         player.sendMessage(alert.getSummaryAll());

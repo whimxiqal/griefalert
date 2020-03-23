@@ -40,9 +40,9 @@ public class GriefAlertCheckCommand extends AbstractCommand {
         try {
 
           Alert alert = GriefAlert.getInstance()
-              .getRotatingAlertList()
+              .getAlertManager().getAlertCache()
               .get(args.<Integer>getOne("index").get());
-          GriefAlert.getInstance().getRotatingAlertList().check(alert, player);
+          GriefAlert.getInstance().getAlertManager().check(alert, player);
 
         } catch (IndexOutOfBoundsException e) {
           player.sendMessage(Format.error("That alert could not be found."));

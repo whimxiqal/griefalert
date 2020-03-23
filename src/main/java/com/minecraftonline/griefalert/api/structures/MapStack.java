@@ -80,4 +80,8 @@ public interface MapStack<K, V> {
    */
   void clear(@Nonnull final K key);
 
+  /**
+   * Remove all data.
+   */
+  void clearAll();
 }

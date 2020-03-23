@@ -38,7 +38,7 @@ public class GriefAlertReturnCommand extends AbstractCommand {
       Player player = (Player) src;
 
       Optional<Integer> revertsRemaining = GriefAlert.getInstance()
-          .getRotatingAlertList()
+          .getAlertManager()
           .revertOfficerTransform(player);
 
       if (!revertsRemaining.isPresent()) {

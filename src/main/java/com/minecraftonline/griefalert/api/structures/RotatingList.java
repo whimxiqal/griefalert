@@ -3,6 +3,7 @@
 package com.minecraftonline.griefalert.api.structures;
 
 import java.util.List;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 /**
@@ -61,7 +62,7 @@ public interface RotatingList<P> {
 
   /**
    * Get the stored values in chronological order, with the
-   * oldest first.
+   * oldest first. Does not contain null objects.
    *
    * @return A <code>List</code> of all stored values
    */
@@ -70,12 +71,22 @@ public interface RotatingList<P> {
 
   /**
    * Get the stored values in index order, with the
-   * lowest index first.
+   * lowest index first. Does not contain null objects.
    *
    * @return A <code>List</code> of all stored values
    */
   @Nonnull
   List<P> getDataByIndex();
+
+  /**
+   * Map a rotating list to store a different type of data.
+   *
+   * @param converter The converting Function
+   * @param <S>       The new generic type
+   * @return The new RotatingList
+   */
+  @Nonnull
+  <S> RotatingList<S> map(Function<P, S> converter);
 
   /**
    * Return whether the structure has as many items as
@@ -84,4 +95,12 @@ public interface RotatingList<P> {
    * @return true if the size is equal to the capacity
    */
   boolean isFull();
+
+  /**
+   * Remove all objects and reset cursor.
+   */
+  void clear();
+
+  @Nonnull
+  <Z extends java.io.Serializable> Object serialize(Function<P, Z> converter);
 }

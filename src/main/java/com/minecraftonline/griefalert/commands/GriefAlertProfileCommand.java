@@ -127,7 +127,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       } catch (Exception e) {
         GriefAlert.getInstance().getLogger().error("An Exception thrown when trying to "
             + "add a profile: "
-            + toAdd.getDataContainer().getValues(true).toString());
+            + toAdd.toContainer().getValues(true).toString());
         General.printStackTraceToDebugLogger(e);
         return CommandResult.empty();
       }
@@ -219,7 +219,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
       console.sendMessage(Format.heading("=== Grief Profiles ==="));
       for (GriefProfile profile : GriefAlert.getInstance().getProfileCache().getProfiles()) {
-        console.sendMessage(Format.bonus(profile.getDataContainer().getValues(true).toString()));
+        console.sendMessage(Format.bonus(profile.toContainer().getValues(true).toString()));
       }
       return CommandResult.success();
     }

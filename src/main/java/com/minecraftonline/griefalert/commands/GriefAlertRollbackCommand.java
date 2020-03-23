@@ -84,7 +84,8 @@ public class GriefAlertRollbackCommand extends AbstractCommand {
 
       PrismAlert alert;
       try {
-        Alert alertGeneral = GriefAlert.getInstance().getRotatingAlertList()
+        Alert alertGeneral = GriefAlert.getInstance()
+            .getAlertManager().getAlertCache()
             .get(args.<Integer>getOne("index").get());
         if (alertGeneral instanceof PrismAlert) {
           alert = (PrismAlert) alertGeneral;

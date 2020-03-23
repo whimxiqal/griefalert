@@ -48,7 +48,7 @@ class GriefAlertShowCommand extends AbstractCommand {
         try {
 
           Alert alert = GriefAlert.getInstance()
-              .getRotatingAlertList()
+              .getAlertManager().getAlertCache()
               .get(args.<Integer>getOne("index").get());
 
           // Create temporary hologram of grief

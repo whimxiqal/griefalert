@@ -4,10 +4,10 @@ package com.minecraftonline.griefalert.api.alerts;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.structures.RotatingList;
 import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Format;
@@ -65,6 +65,12 @@ public abstract class AbstractAlert implements Alert {
     summaryContents.add(new Tuple<>("Location", alert ->
         Format.bonusLocation(alert.getGriefLocation())));
 
+  }
+
+  @Nonnull
+  @Override
+  public final GriefProfile getGriefProfile() {
+    return griefProfile;
   }
 
   @Nonnull
@@ -164,7 +170,7 @@ public abstract class AbstractAlert implements Alert {
 
   /**
    * Run this <code>Alert</code>. This constitutes pushing this <code>Alert</code>
-   * to the {@link RotatingAlertList} followed by
+   * to the {@link RotatingList} followed by
    * broadcasting the <code>ALert</code> to staff members if the <code>Alert</code>
    * is not silent. This can only be done once.
    */
@@ -185,7 +191,7 @@ public abstract class AbstractAlert implements Alert {
       }
     }
 
-    GriefAlert.getInstance().getRotatingAlertList().push(this);
+    GriefAlert.getInstance().getAlertManager().push(this);
     pushed = true;
 
   }
@@ -216,7 +222,7 @@ public abstract class AbstractAlert implements Alert {
   }
 
   @Override
-  public final int getCacheIndex() {
+  public int getCacheIndex() {
     return cacheIndex;
   }
 
@@ -245,7 +251,7 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   @Override
   public final TextColor getEventColor() {
-    return griefProfile.getDataContainer()
+    return griefProfile.toContainer()
         .getString(GriefProfileDataQueries.EVENT_COLOR).map((s) ->
             Sponge.getRegistry().getType(TextColor.class, s)
                 .orElse(Format.ALERT_EVENT_COLOR))
@@ -255,7 +261,7 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   @Override
   public final TextColor getTargetColor() {
-    return griefProfile.getDataContainer()
+    return griefProfile.toContainer()
         .getString(GriefProfileDataQueries.TARGET_COLOR).map((s) ->
             Sponge.getRegistry().getType(TextColor.class, s)
                 .orElse(Format.ALERT_TARGET_COLOR))
@@ -265,7 +271,7 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   @Override
   public final TextColor getDimensionColor() {
-    return griefProfile.getDataContainer()
+    return griefProfile.toContainer()
         .getString(GriefProfileDataQueries.DIMENSION_COLOR).map((s) ->
             Sponge.getRegistry().getType(TextColor.class, s)
                 .orElse(Format.ALERT_DIMENSION_COLOR))

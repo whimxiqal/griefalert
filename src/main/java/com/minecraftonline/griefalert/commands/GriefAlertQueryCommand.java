@@ -57,7 +57,10 @@ public class GriefAlertQueryCommand extends AbstractCommand {
                                @Nonnull CommandContext args) {
     List<Alert> matching = new LinkedList<>();
 
-    List<Alert> cacheReversed = GriefAlert.getInstance().getRotatingAlertList().getDataByTime();
+    List<Alert> cacheReversed = GriefAlert.getInstance()
+        .getAlertManager()
+        .getAlertCache()
+        .getDataByTime();
     Collections.reverse(cacheReversed);
 
     int max = (int) args.getOne("maximum").orElse(DEFAULT_MAXIMUM_QUERIES);
@@ -105,12 +108,12 @@ public class GriefAlertQueryCommand extends AbstractCommand {
     for (Alert alert : matching) {
       if (!indices.isEmpty()
           && !GriefAlert.getInstance()
-          .getRotatingAlertList()
+          .getAlertManager().getAlertCache()
           .get(indices.getLast())
           .isRepeatOf(alert)) {
 
         src.sendMessage(GriefAlert.getInstance()
-            .getRotatingAlertList()
+            .getAlertManager().getAlertCache()
             .get(indices.getFirst()).getTextWithIndices(indices));
         indices.clear();
       }
@@ -119,7 +122,7 @@ public class GriefAlertQueryCommand extends AbstractCommand {
 
     if (!indices.isEmpty()) {
       src.sendMessage(GriefAlert.getInstance()
-          .getRotatingAlertList()
+          .getAlertManager().getAlertCache()
           .get(indices.getFirst()).getTextWithIndices(indices));
     }
 

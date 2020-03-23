@@ -6,8 +6,8 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
+import com.minecraftonline.griefalert.api.caches.AlertManager;
 import com.minecraftonline.griefalert.api.caches.ProfileCache;
-import com.minecraftonline.griefalert.api.caches.RotatingAlertList;
 import com.minecraftonline.griefalert.api.commands.LegacyCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
@@ -40,6 +40,8 @@ import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -99,7 +101,7 @@ public final class GriefAlert {
 
   // Custom classes to help manage plugin
   private ProfileCache profileCache;
-  private RotatingAlertList rotatingAlertList;
+  private AlertManager alertManager;
   private ConfigHelper configHelper;
   private ProfileStorage profileStorage;
   private HologramManager hologramManager;
@@ -147,17 +149,26 @@ public final class GriefAlert {
       );
     }
 
-    profileCache = new ProfileCache();
-    rotatingAlertList = new RotatingAlertList(Settings.ALERTS_CODE_LIMIT.getValue());
 
-    // Register all the commands with Sponge
-    registerCommands();
     registerListeners();
   }
 
   @Listener
   public void onLoadComplete(GameLoadCompleteEvent event) {
     hologramManager = new HologramManager();
+  }
+
+  /**
+   * Listener for {@link GameStartingServerEvent}.
+   *
+   * @param event the event
+   */
+  @Listener
+  public void onStartingServer(GameStartingServerEvent event) {
+    // Register all the commands with Sponge
+    registerCommands();
+    alertManager = new AlertManager();
+    profileCache = new ProfileCache();
   }
 
   /**
@@ -168,6 +179,11 @@ public final class GriefAlert {
   @Listener
   public void onReload(GameReloadEvent event) {
     reload();
+  }
+
+  @Listener
+  public void onStoppingServer(GameStoppingServerEvent event) {
+    getAlertManager().saveAlerts();
   }
 
   /**
@@ -224,8 +240,8 @@ public final class GriefAlert {
     return configManager;
   }
 
-  public RotatingAlertList getRotatingAlertList() {
-    return rotatingAlertList;
+  public AlertManager getAlertManager() {
+    return alertManager;
   }
 
   public ConfigHelper getConfigHelper() {

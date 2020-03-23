@@ -6,6 +6,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.world.DimensionType;
 
 
@@ -19,7 +20,7 @@ import org.spongepowered.api.world.DimensionType;
  *
  * @author PietElite
  */
-public class GriefProfile {
+public class GriefProfile implements DataSerializable {
 
   private final DataContainer dataContainer;
 
@@ -30,17 +31,6 @@ public class GriefProfile {
   @Nonnull
   public static GriefProfile of(@Nonnull final DataContainer dataContainer) {
     return new GriefProfile(dataContainer);
-  }
-
-  /**
-   * A getter for the <code>DataContainer</code> which holds all information about this
-   * <code>GriefProfile</code>.
-   *
-   * @return the <code>DataContainer</code>
-   */
-  @Nonnull
-  public DataContainer getDataContainer() {
-    return dataContainer;
   }
 
   /**
@@ -95,6 +85,17 @@ public class GriefProfile {
 
   private String printData() {
     return dataContainer.getValues(true).toString();
+  }
+
+  @Override
+  public int getContentVersion() {
+    return 0;
+  }
+
+  @Nonnull
+  @Override
+  public DataContainer toContainer() {
+    return dataContainer.copy();
   }
 
   public static class MalformedProfileException extends IllegalStateException {

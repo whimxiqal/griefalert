@@ -91,7 +91,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
         GriefAlert.getInstance().getLogger().error(PrismUtil.printRecord(record));
         GriefAlert.getInstance().getLogger().error(profileOptional
             .get()
-            .getDataContainer()
+            .toContainer()
             .getValues(true)
             .toString());
         return;

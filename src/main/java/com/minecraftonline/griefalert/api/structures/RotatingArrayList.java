@@ -2,22 +2,25 @@
 
 package com.minecraftonline.griefalert.api.structures;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 /**
- * An abstract implementation of <code>RotatingList</code>.
+ * An implementation of <code>RotatingList</code>.
  *
  * @param <P> The type to store in the data structure
  * @author PietElite
  */
-public abstract class RotatingArrayList<P> implements RotatingList<P> {
+public class RotatingArrayList<P> implements RotatingList<P> {
 
   private final int capacity;
   private int cursor;
-  private int size;
   private ArrayList<P> data;
 
   /**
@@ -28,7 +31,6 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
   public RotatingArrayList(int capacity) {
     this.capacity = capacity;
     cursor = 0;
-    size = 0;
     data = new ArrayList<>(capacity);
     for (int i = 0; i < capacity; i++) {
       data.add(null);
@@ -39,16 +41,17 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
    * Constructor to convert an array directly into a rotating array list.
    *
    * @param inputData The input array
-   * @param capacity The capacity of the desired array
+   * @param capacity  The capacity of the desired array
    */
-  public RotatingArrayList(ArrayList<P> inputData, int capacity) {
+  public RotatingArrayList(ArrayList<P> inputData, int capacity, int cursor) {
     this.capacity = capacity;
+    this.cursor = cursor;
     data = new ArrayList<>(capacity);
     for (int i = 0; i < capacity; i++) {
       if (i < inputData.size()) {
-        data.set(i, inputData.get(i));
+        data.add(i, inputData.get(i));
       } else {
-        data.set(i, null);
+        data.add(i, null);
       }
     }
   }
@@ -60,7 +63,7 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
 
   @Override
   public int size() {
-    return size;
+    return data.size();
   }
 
   @Override
@@ -68,7 +71,6 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
     data.set(cursor, value);
     int output = cursor;
     incrementCursor();
-    incrementSize();
     return output;
   }
 
@@ -84,9 +86,9 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
   @Nonnull
   @Override
   public List<P> getDataByTime() {
-    List<P> output = new LinkedList<>();
+    ArrayList<P> output = new ArrayList<>();
     if (!isFull()) {
-      output.addAll(data.subList(0, size));
+      output.addAll(data);
     } else {
       int localCursor = cursor;
       for (int i = 0; i < capacity; i++) {
@@ -94,18 +96,48 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
         localCursor = (localCursor + 1) % capacity;
       }
     }
+    output.removeIf(Objects::isNull);
+    output.trimToSize();
     return output;
   }
 
   @Nonnull
   @Override
   public List<P> getDataByIndex() {
-    return data.subList(0, size);
+    ArrayList<P> output = new ArrayList<>(capacity);
+    output.addAll(data);
+    output.removeIf(Objects::isNull);
+    output.trimToSize();
+    return output;
+  }
+
+  @Nonnull
+  @Override
+  public <S> RotatingList<S> map(Function<P, S> converter) {
+    RotatingArrayList<S> output = new RotatingArrayList<>(this.capacity);
+    output.cursor = this.cursor;
+    output.data = this.data
+        .stream()
+        .map(item -> {
+          if (item == null) {
+            return null;
+          } else {
+            return converter.apply(item);
+          }
+        })
+        .collect(Collectors.toCollection(Lists::newArrayList));
+    return output;
   }
 
   @Override
   public boolean isFull() {
-    return size == capacity;
+    return data.size() == capacity;
+  }
+
+  @Override
+  public void clear() {
+    this.data.clear();
+    this.cursor = 0;
   }
 
   /**
@@ -121,8 +153,31 @@ public abstract class RotatingArrayList<P> implements RotatingList<P> {
     cursor = (cursor + 1) % capacity;
   }
 
-  private void incrementSize() {
-    size = Math.min(size + 1, capacity);
+  @Nonnull
+  @Override
+  public <Z extends java.io.Serializable>
+      RotatingArrayList.Serializable<Z> serialize(Function<P, Z> converter) {
+    return new Serializable<>(this, converter);
+  }
+
+  public static class Serializable<S extends java.io.Serializable> implements java.io.Serializable {
+    private final int capacity;
+    private final int cursor;
+    private final ArrayList<S> data;
+
+    <Z> Serializable(RotatingArrayList<Z> alertList, Function<Z, S> converter) {
+      this.capacity = alertList.capacity();
+      this.cursor = alertList.cursor();
+      this.data = alertList.getDataByIndex()
+          .stream()
+          .filter(Objects::nonNull)
+          .map(converter)
+          .collect(Collectors.toCollection(Lists::newArrayList));
+    }
+
+    public RotatingArrayList<S> deserialize() {
+      return new RotatingArrayList<>(data, capacity, cursor);
+    }
   }
 
 }
