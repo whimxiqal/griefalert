@@ -2,9 +2,10 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
+import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.SpongeEvents;
 
 import java.util.stream.Collectors;
@@ -42,20 +43,24 @@ public class AttackEntityAlert extends EntityAlert {
     this.griefTransform = griefer.getTransform();
 
     if (griefProfile.getTarget().equals("minecraft:item_frame")) {
-      addSummaryContent(
+      addDetail(Detail.of(
           "Content",
+          "The item in this item frame at the time of the event.",
           SpongeEvents.getItemFrameContent(getEntitySnapshot())
               .map(Format::item)
-              .orElse(Format.bonus("none")));
+              .orElse(Format.bonus("none"))));
     }
     if (griefProfile.getTarget().equals("minecraft:armor_stand")) {
-      addSummaryContent("Contents", SpongeEvents.getArmorStandContent(getEntitySnapshot())
-          .map(list -> list.stream()
-              .map(Format::item)
-              .collect(Collectors.toList()))
-          .filter(list -> !list.isEmpty())
-          .map(list -> Text.joinWith(Text.of(", ", list)))
-          .orElse(Format.bonus("none")));
+      addDetail(Detail.of(
+          "Contents",
+          "All the items in the armor stand at the time of the event.",
+          SpongeEvents.getArmorStandContent(getEntitySnapshot())
+              .map(list -> list.stream()
+                  .map(Format::item)
+                  .collect(Collectors.toList()))
+              .filter(list -> !list.isEmpty())
+              .map(list -> Text.joinWith(Text.of(", ", list)))
+              .orElse(Format.bonus("none"))));
     }
 
   }
@@ -65,7 +70,10 @@ public class AttackEntityAlert extends EntityAlert {
                            @Nonnull final Player griefer,
                            @Nonnull final String tool) {
     this(griefProfile, event, griefer);
-    addSummaryContent("Tool", Format.item(tool));
+    addDetail(Detail.of(
+        "Tool",
+        "The item in the hand of the player at the time of the event.",
+        Format.item(tool)));
   }
 
 

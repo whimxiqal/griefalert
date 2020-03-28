@@ -4,16 +4,16 @@ import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.util.DataQueries;
+import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.enums.Details;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.regex.Pattern;
-
-import org.spongepowered.api.data.type.HandTypes;
 
 
 public class ReplaceAlert extends PrismAlert {
@@ -33,11 +33,11 @@ public class ReplaceAlert extends PrismAlert {
                       String replacementBlockId) {
     super(griefProfile, prismRecord);
     this.replacementBlockId = replacementBlockId;
-    addSummaryContent("Replacement", Format.item(replacementBlockId));
-    addSummaryContent("Tool", Format.item(getGriefer()
-        .getItemInHand(HandTypes.MAIN_HAND)
-        .map(itemStack -> itemStack.getType().getId())
-        .orElse("none")));
+    addDetail(Detail.of(
+        "Replacement",
+        "The object which replaced the original object.",
+        Format.item(replacementBlockId)));
+    addDetail(Details.IN_HAND);
   }
 
   @Override

@@ -97,7 +97,12 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   public final Text getMessageText() {
     Text.Builder builder = getMessageTextBuilder();
-    Text hoverText = getSummaryExtra();
+    Text hoverText = Text.joinWith(
+        Format.endLine(),
+        secondaryDetails.stream()
+            .map(detail -> detail.get(this))
+            .flatMap(optional -> optional.map(Stream::of).orElseGet(Stream::empty))
+            .collect(Collectors.toList()));
     if (!hoverText.toPlain().isEmpty()) {
       builder.onHover(TextActions.showText(hoverText));
     }
@@ -126,24 +131,14 @@ public abstract class AbstractAlert implements Alert {
   private Text getSummaryExtra() {
     return Text.joinWith(
         Format.endLine(),
-        extraSummaryContents.stream()
-            .map(pair -> Text.of(
-                TextColors.DARK_AQUA, pair.getFirst(), ": ",
-                TextColors.RESET, pair.getSecond().apply(this)))
+        allDetails.stream()
+            .map(detail -> detail.get(this))
+            .flatMap(optional -> optional.map(Stream::of).orElseGet(Stream::empty))
             .collect(Collectors.toList()));
   }
 
-  protected void addSummaryContent(String title, Function<Alert, Text> descriptionFunction) {
-    this.extraSummaryContents.add(new Tuple<>(title, descriptionFunction.andThen(Format::bonus)));
-  }
-
-  protected void addSummaryContent(String title, Text description) {
-    this.extraSummaryContents.add(new Tuple<>(title, alert -> Format.bonus(description)));
-  }
-
-  @SuppressWarnings("unused")
-  protected void addSummaryContent(String title, String description) {
-    this.extraSummaryContents.add(new Tuple<>(title, alert -> Format.bonus(description)));
+  protected void addDetail(Detail detail) {
+    this.secondaryDetails.add(detail);
   }
 
   @Override
