@@ -31,10 +31,7 @@ public class RotatingArrayList<P> implements RotatingList<P> {
   public RotatingArrayList(int capacity) {
     this.capacity = capacity;
     cursor = 0;
-    data = new ArrayList<>(capacity);
-    for (int i = 0; i < capacity; i++) {
-      data.add(null);
-    }
+    initializeDataArray();
   }
 
   /**
@@ -46,13 +43,9 @@ public class RotatingArrayList<P> implements RotatingList<P> {
   public RotatingArrayList(ArrayList<P> inputData, int capacity, int cursor) {
     this.capacity = capacity;
     this.cursor = cursor;
-    data = new ArrayList<>(capacity);
-    for (int i = 0; i < capacity; i++) {
-      if (i < inputData.size()) {
-        data.add(i, inputData.get(i));
-      } else {
-        data.add(i, null);
-      }
+    initializeDataArray();
+    for (int i = 0; i < Math.min(capacity, inputData.size()); i++) {
+      data.set(i, inputData.get(i));
     }
   }
 
@@ -137,6 +130,7 @@ public class RotatingArrayList<P> implements RotatingList<P> {
   @Override
   public void clear() {
     this.data.clear();
+    initializeDataArray();
     this.cursor = 0;
   }
 
@@ -151,6 +145,13 @@ public class RotatingArrayList<P> implements RotatingList<P> {
 
   private void incrementCursor() {
     cursor = (cursor + 1) % capacity;
+  }
+
+  private void initializeDataArray() {
+    data = new ArrayList<>(capacity);
+    for (int i = 0; i < capacity; i++) {
+      data.add(null);
+    }
   }
 
   @Nonnull
