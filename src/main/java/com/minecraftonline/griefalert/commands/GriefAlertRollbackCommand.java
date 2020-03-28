@@ -132,26 +132,27 @@ public class GriefAlertRollbackCommand extends AbstractCommand {
     RegionCommand() {
       super(
           Permissions.GRIEFALERT_COMMAND_ROLLBACK,
-          Text.of("Use a region to rollback everything inside")
+          Text.of("Use a region to rollback everything inside. "
+              + "Use full target id for all except entities.")
       );
       addAlias("region");
       addAlias("r");
       setCommandElement(GenericArguments.flags()
           .valueFlag(GenericArguments.string(
               Text.of("since")),
-              "-since")
+              "-since", "s")
           .valueFlag(GenericArguments.string(
               Text.of("before")),
-              "-before")
+              "-before", "b")
           .valueFlag(GenericArguments.string(
               Text.of("player")),
-              "-player")
+              "-player", "p")
           .valueFlag(GenericArguments.string(
               Text.of("target")),
-              "-target")
+              "-target", "t")
           .valueFlag(GenericArguments.string(
               Text.of("event")),
-              "-event")
+              "-event", "e")
           .buildWith(GenericArguments.none()));
     }
 
@@ -232,7 +233,7 @@ public class GriefAlertRollbackCommand extends AbstractCommand {
                 MatchRule.EQUALS,
                 str)));
 
-        ApplierCommand.runApplier(src, session, Sort.NEWEST_FIRST);
+        ApplierCommand.runApplier(session, Sort.NEWEST_FIRST);
 
         return CommandResult.success();
       } else {

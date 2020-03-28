@@ -7,15 +7,23 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 import javax.annotation.Nonnull;
+
+import com.minecraftonline.griefalert.util.enums.Settings;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+
+import java.util.concurrent.TimeUnit;
 
 public class GriefAlertCheckCommand extends AbstractCommand {
 
@@ -42,7 +50,30 @@ public class GriefAlertCheckCommand extends AbstractCommand {
           Alert alert = GriefAlert.getInstance()
               .getAlertManager().getAlertCache()
               .get(args.<Integer>getOne("index").get());
+
+          // Give invulnerability
+          EventListener<DamageEntityEvent> cancelDamage = event -> {
+            if (event.getTargetEntity().getUniqueId().equals(player.getUniqueId())) {
+              event.setCancelled(true);
+            }
+          };
+          Sponge.getEventManager().registerListener(
+              GriefAlert.getInstance(),
+              DamageEntityEvent.class,
+              cancelDamage);
+          Task.builder().delay(Settings.CHECK_INVULNERABILITY.getValue(), TimeUnit.SECONDS)
+              .execute(() -> {
+                Sponge.getEventManager().unregisterListeners(cancelDamage);
+                player.sendMessage(Format.info("Invulnerability revoked"));
+              })
+              .name("Remove invulnerability for player " + player.getName())
+              .submit(GriefAlert.getInstance());
+
           GriefAlert.getInstance().getAlertManager().check(alert, player);
+
+          player.sendMessage(Format.info(String.format(
+              "You have been given %d seconds of invulnerability",
+              Settings.CHECK_INVULNERABILITY.getValue())));
 
         } catch (IndexOutOfBoundsException e) {
           player.sendMessage(Format.error("That alert could not be found."));

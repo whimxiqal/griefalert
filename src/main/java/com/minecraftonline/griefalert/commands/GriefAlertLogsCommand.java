@@ -32,27 +32,27 @@ public class GriefAlertLogsCommand extends AbstractCommand {
   GriefAlertLogsCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_LOGS,
-        Text.of("Query the logs from PrismUtil. Parameters are PrismUtil syntax.")
+        Text.of("Query the logs from Prism. Use full target id for all except entities.")
     );
     addAlias("logs");
     addAlias("l");
     setCommandElement(GenericArguments.flags()
         .valueFlag(GenericArguments.string(
             Text.of("since")),
-            "-since")
+            "-since", "s")
         .valueFlag(GenericArguments.string(
             Text.of("before")),
-            "-before")
+            "-before", "b")
         .valueFlag(GenericArguments.string(
             Text.of("player")),
-            "-player")
+            "-player", "p")
         .valueFlag(GenericArguments.string(
             Text.of("target")),
-            "-target")
+            "-target", "t")
         .valueFlag(GenericArguments.string(
             Text.of("event")),
-            "-event")
-        .flag("-group")
+            "-event", "e")
+        .flag("-group", "g")
         .buildWith(GenericArguments.none()));
   }
 
@@ -95,7 +95,9 @@ public class GriefAlertLogsCommand extends AbstractCommand {
         try {
           return dateFormat.parse(str);
         } catch (ParseException e) {
-          src.sendMessage(Format.error("Date format: dd-MM-yyyy. Using a year ago."));
+          src.sendMessage(Format.error(String.format(
+              "Date format: dd-MM-yyyy. Using a %s",
+              dateFormat.format(Date.from(Instant.now().minus(Duration.ofDays(365)))))));
           return Date.from(Instant.now().minus(Duration.ofDays(365)));
         }
       }).orElse(Date.from(Instant.now().minus(Duration.ofDays(365))));
@@ -117,7 +119,10 @@ public class GriefAlertLogsCommand extends AbstractCommand {
       });
 
       args.<String>getOne("target").ifPresent(str ->
-          query.addCondition(FieldCondition.of(DataQueries.Target, MatchRule.EQUALS, str)));
+          query.addCondition(FieldCondition.of(
+              DataQueries.Target,
+              MatchRule.EQUALS,
+              str.replaceAll("_", " "))));
 
       args.<String>getOne("player").ifPresent(str -> {
         Optional<Player> playerFlag = Sponge.getServer().getPlayer(str);

@@ -31,7 +31,14 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
   GriefAlertProfileCommand() {
     super(Permissions.GRIEFALERT_COMMAND_PROFILE,
-        Text.of("Perform alterations to the profiles used for flagging alerts"));
+        Text.of("Perform alterations to the profiles used for flagging alerts. Event types: ",
+    Text.joinWith(
+        Format.bonus(", "),
+        GriefEvents.REGISTRY_MODULE.getAll()
+            .stream()
+            .map(griefEvent ->
+                Format.hover(griefEvent.getId(), griefEvent.getDescription()))
+            .collect(Collectors.toList()))));
     addAlias("profile");
     addAlias("p");
     addChild(new AddCommand());
@@ -50,15 +57,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
   public static class AddCommand extends AbstractCommand {
 
     AddCommand() {
-      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of(
-          "Add a profile to the database. Events: ",
-          Text.joinWith(
-              Format.bonus(", "),
-              GriefEvents.REGISTRY_MODULE.getAll()
-                  .stream()
-                  .map(griefEvent ->
-                      Format.hover(griefEvent.getId(), griefEvent.getDescription()))
-                  .collect(Collectors.toList()))));
+      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Add a profile to the database."));
       addAlias("add");
       addAlias("a");
       setCommandElement(GenericArguments.seq(
@@ -211,17 +210,27 @@ public class GriefAlertProfileCommand extends AbstractCommand {
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
+      if (src instanceof ConsoleSource) {
 
-      if (!(src instanceof ConsoleSource)) {
-        src.sendMessage(Format.error("Only the console can use this command"));
-        return CommandResult.empty();
-      }
-
-      ConsoleSource console = (ConsoleSource) src;
-
-      console.sendMessage(Format.heading("=== Grief Profiles ==="));
-      for (GriefProfile profile : GriefAlert.getInstance().getProfileCache().getProfiles()) {
-        console.sendMessage(Format.bonus(profile.toContainer().getValues(true).toString()));
+        ConsoleSource console = (ConsoleSource) src;
+        console.sendMessage(Format.heading("=== Grief Profiles ==="));
+        for (GriefProfile profile : GriefAlert.getInstance().getProfileCache().getProfiles()) {
+          console.sendMessage(Format.bonus(profile.toContainer().getValues(true).toString()));
+        }
+      } else {
+        PaginationList.builder()
+            .header(Text.of(TextColors.YELLOW, "Grief Profiles"))
+            .padding(Text.of(TextColors.GRAY, "="))
+            .contents(GriefAlert.getInstance()
+                .getProfileCache()
+                .getProfiles()
+                .stream()
+                .map(profile -> Text.of(
+                    Format.bonus(profile.toContainer().getValues(true))))
+                .collect(Collectors.toList()))
+            .footer(Text.of(TextColors.YELLOW, "Formatting for list command is in progress"))
+            .build()
+            .sendTo(src);
       }
       return CommandResult.success();
     }

@@ -16,9 +16,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
-import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -54,15 +51,15 @@ class GriefAlertShowCommand extends AbstractCommand {
           // Create temporary hologram of grief
           GriefAlert.getInstance().getHologramManager().createTemporaryHologram(alert);
 
-          // Apply night vision
-          player.getOrCreate(PotionEffectData.class)
-              .map(ths -> ths.addElement(
-                  PotionEffect.builder()
-                      .potionType(PotionEffectTypes.NIGHT_VISION)
-                      .duration(300)
-                      .amplifier(1)
-                      .build()))
-              .ifPresent(player::offer);
+//          // Apply night vision
+//          player.getOrCreate(PotionEffectData.class)
+//              .map(ths -> ths.addElement(
+//                  PotionEffect.builder()
+//                      .potionType(PotionEffectTypes.NIGHT_VISION)
+//                      .duration(300)
+//                      .amplifier(1)
+//                      .build()))
+//              .ifPresent(player::offer);
 
           // Broadcast the attempt at command
           Communication.getStaffBroadcastChannelWithout(player).send(Format.info(
