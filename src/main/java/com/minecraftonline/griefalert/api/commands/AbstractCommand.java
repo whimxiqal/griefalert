@@ -5,8 +5,10 @@ package com.minecraftonline.griefalert.api.commands;
 import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.util.Format;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
@@ -16,6 +18,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.Tuple;
 
 /**
  * An abstract class for all MinecraftOnline commands from which to extend. This
@@ -100,14 +103,14 @@ public abstract class AbstractCommand implements CommandExecutor {
         Format.space(),
         Format.space(),
         TextColors.YELLOW, getDescription()));
-    getChildren().forEach((command) -> {
-      if (source.hasPermission(command.getPermission().toString())) {
-        source.sendMessage(Text.of(
-            TextColors.AQUA,
-            String.join(",", command.getAliases()),
-            TextColors.GRAY, " - ", command.getDescription()));
-      }
-    });
+
+    // Print the descriptions of the different subcommands, and add necessary spaces after alias names to
+    // format better
+    getChildren().stream()
+        .filter(command -> source.hasPermission(command.getPermission().toString()))
+        .forEach(command -> source.sendMessage(Text.of(
+            TextColors.AQUA, String.join(", ", command.getAliases()),
+            TextColors.GRAY, " - ", command.getDescription())));
   }
 
   /**

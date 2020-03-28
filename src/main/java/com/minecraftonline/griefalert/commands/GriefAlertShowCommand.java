@@ -8,7 +8,7 @@ import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import javax.annotation.Nonnull;
 
@@ -66,7 +66,7 @@ class GriefAlertShowCommand extends AbstractCommand {
 
           // Broadcast the attempt at command
           Communication.getStaffBroadcastChannelWithout(player).send(Format.info(
-              Format.playerName(player),
+              Format.userName(player),
               " is taking a closer look at alert ",
               Format.bonus(alert.getCacheIndex())));
 

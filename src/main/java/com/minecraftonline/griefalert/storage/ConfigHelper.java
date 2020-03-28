@@ -5,7 +5,7 @@ package com.minecraftonline.griefalert.storage;
 import com.google.common.collect.ImmutableList;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.configuration.Setting;
-import com.minecraftonline.griefalert.util.Settings;
+import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,9 +15,12 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
 public class ConfigHelper {
 
-  private final ImmutableList<Setting<?>> settings = ImmutableList.of(Settings.ALERTS_CODE_LIMIT,
+  private final ImmutableList<Setting<?>> settings = ImmutableList.of(
+      Settings.ALERTS_CODE_LIMIT,
       Settings.MAX_HIDDEN_REPEATED_EVENTS,
       Settings.SHOW_ALERTS_IN_CONSOLE,
+      Settings.CHECK_INVULNERABILITY,
+      Settings.DATE_FORMAT,
       Settings.STORAGE_ENGINE,
       Settings.STORAGE_ADDRESS,
       Settings.STORAGE_DATABASE,

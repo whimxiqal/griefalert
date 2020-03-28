@@ -85,7 +85,7 @@ public interface Alert extends Runnable {
    * @return Text representing a cohesive summary of the <code>Alert</code>
    */
   @Nonnull
-  Text getSummaryAll();
+  Text getSummary();
 
   /**
    * Returns whether this <code>Alert</code> is silent.

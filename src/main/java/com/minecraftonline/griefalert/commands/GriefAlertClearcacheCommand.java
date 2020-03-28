@@ -2,7 +2,7 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;

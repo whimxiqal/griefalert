@@ -1,6 +1,6 @@
 /* Created by PietElite */
 
-package com.minecraftonline.griefalert.util;
+package com.minecraftonline.griefalert.util.enums;
 
 import com.minecraftonline.griefalert.api.data.Permission;
 

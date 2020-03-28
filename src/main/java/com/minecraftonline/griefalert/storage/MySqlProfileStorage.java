@@ -4,7 +4,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import com.minecraftonline.griefalert.util.Settings;
+import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

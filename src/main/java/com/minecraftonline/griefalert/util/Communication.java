@@ -2,14 +2,13 @@
 
 package com.minecraftonline.griefalert.util;
 
-import com.minecraftonline.griefalert.GriefAlert;
-
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.minecraftonline.griefalert.util.enums.Permissions;
+import com.minecraftonline.griefalert.util.enums.Settings;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageChannel;

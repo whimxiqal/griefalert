@@ -8,12 +8,13 @@ import com.minecraftonline.griefalert.alerts.sponge.UseAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.AttackEntityAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.InteractEntityAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;

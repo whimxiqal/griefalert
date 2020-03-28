@@ -16,7 +16,7 @@ import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.WorldEditUtil;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.sponge.SpongeWorld;
@@ -107,7 +107,7 @@ public class GriefAlertRollbackCommand extends AbstractCommand {
         src.sendMessage(Format.success("Rollback successful!"));
         Communication.getStaffBroadcastChannelWithout(src).send(
             Format.info(
-                (src instanceof Player) ? Format.playerName((Player) src) : src.getName(),
+                (src instanceof Player) ? Format.userName((Player) src) : src.getName(),
                 Format.space(),
                 "just rolled back alert number",
                 Format.space(),

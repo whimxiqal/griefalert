@@ -1,18 +1,12 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.FieldCondition;
-import com.helion3.prism.api.query.MatchRule;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.query.*;
 import com.helion3.prism.util.AsyncUtil;
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
-import com.minecraftonline.griefalert.util.Errors;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
-import com.minecraftonline.griefalert.util.WorldEditUtil;
+import com.minecraftonline.griefalert.util.*;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;

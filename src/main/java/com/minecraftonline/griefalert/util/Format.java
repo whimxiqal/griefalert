@@ -9,8 +9,14 @@ import com.minecraftonline.griefalert.GriefAlert;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
+import com.minecraftonline.griefalert.util.enums.Settings;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -19,6 +25,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -251,10 +258,10 @@ public final class Format {
    * @return the formatted text
    */
   public static Text getTagInfo(int index) {
-    return command(
+    return Format.command(
         "INFO",
         String.format("/griefalert info %s", index),
-        Text.of(TextColors.YELLOW, "Get a summary of information about this alert")
+        Text.of("Get a summary of information about this alert")
     );
   }
 
@@ -265,10 +272,10 @@ public final class Format {
    * @return the formatted text
    */
   public static Text getTagCheck(int index) {
-    return command(
+    return Format.command(
         "CHECK",
         String.format("/griefalert check %s", index),
-        Text.of(TextColors.YELLOW, "Teleport to this location")
+        Text.of("Teleport to this location")
     );
   }
 
@@ -279,10 +286,10 @@ public final class Format {
    * @return the formatted text
    */
   public static Text getTagRollback(int index) {
-    return command(
+    return Format.command(
         "ROLLBACK",
         String.format("/griefalert rollback alert %s", index),
-        Text.of(TextColors.YELLOW, "Undo this event")
+        Text.of("Undo this event")
     );
   }
 
@@ -292,10 +299,10 @@ public final class Format {
    * @return the formatted text
    */
   public static Text getTagReturn() {
-    return command(
+    return Format.command(
         "RETURN",
         "/griefalert return",
-        Text.of(TextColors.YELLOW, "Return to last saved location before checking an alert")
+        Text.of("Return to last saved location before checking an alert")
     );
   }
 
@@ -350,6 +357,12 @@ public final class Format {
     return textBuilder.build();
   }
 
+  @Nonnull
+  public static Text date(@Nonnull Date date) {
+    DateFormat dateFormat = new SimpleDateFormat(Settings.DATE_FORMAT.getValue());
+    return Text.of(dateFormat.format(date));
+  }
+
   /**
    * Format a readable location.
    *
@@ -379,12 +392,13 @@ public final class Format {
   }
 
   /**
-   * Format the grief checker's name to include prefix and suffix.
+   * Format the grief checker's name to include prefix and suffix. The function is not implemented
+   * correctly yet because it requires an API call to an API not yet developed (MCOUtils).
    *
    * @param user The grief checker
    * @return The Text form of the grief checker's name
    */
-  public static Text playerName(User user) {
+  public static Text userName(User user) {
     if (user instanceof Player) {
       return ((Player) user).getDisplayNameData().displayName().get();
     } else {

@@ -4,7 +4,7 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.Reference;
 
 import javax.annotation.Nonnull;

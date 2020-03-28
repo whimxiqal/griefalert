@@ -1,4 +1,4 @@
-package com.minecraftonline.griefalert.util;
+package com.minecraftonline.griefalert.util.enums;
 
 import com.minecraftonline.griefalert.api.configuration.Setting;
 
@@ -21,6 +21,12 @@ public final class Settings {
       10,
       "Maximum number of repeated events to hide if they occurred in a row",
       Integer.class);
+
+  public static final Setting<String> DATE_FORMAT = Setting.of(
+      "date_format",
+      "dd MMM yyyy HH:mm:ss z",
+      "The date format used to display time records",
+      String.class);
 
   public static final Setting<Boolean> SHOW_ALERTS_IN_CONSOLE = Setting.of(
       "show_alerts_in_console",
@@ -58,5 +64,11 @@ public final class Settings {
       "",
       "The storage password to be used if storage type requires it",
       String.class);
+
+  public static final Setting<Integer> CHECK_INVULNERABILITY = Setting.of(
+      "check_invulnerability",
+      10,
+      "The number of seconds of invulnerability staff get when they check alerts",
+      Integer.class);
 
 }

@@ -1,6 +1,6 @@
 /* Created by PietElite */
 
-package com.minecraftonline.griefalert.util;
+package com.minecraftonline.griefalert.util.enums;
 
 import com.google.common.collect.Lists;
 import com.helion3.prism.util.PrismEvents;
@@ -34,19 +34,24 @@ public final class GriefEvents {
 
   public static final GriefEvent ITEM_USE = GriefEvent
       .of("use", "Item Use", "used",
-          "Secondarily interact with an item in main hand");
+          "Secondarily interact with the target item in main hand "
+              + "while looking at nothing or at an entity.");
+
+  public static final GriefEvent ITEM_APPLY = GriefEvent
+      .of("apply", "Item Apply", "applied",
+          "Secondarily interact with a block while holding the target item in main hand.");
 
   public static final GriefEvent INTERACT = GriefEvent
       .of("interact", "Interact", "interacted with",
-          "Secondarily interact with an object in the world with main hand");
+          "Secondarily interact with a target object in the world with main hand");
 
   public static final GriefEvent ATTACK = GriefEvent
       .of("attack", "Entity Attack", "attacked",
-          "Primarily interact with an entity with main hand");
+          "Primarily interact with a target entity with main hand");
 
   public static final GriefEvent REPLACE = GriefEvent
       .of("replace", "Block Replace", "replaced",
-          "Change a block from one non-air block to another block");
+          "Change a block from one non-air target block to a different non-air block");
 
   public static final CatalogRegistryModule<GriefEvent> REGISTRY_MODULE = new
       CatalogRegistryModule<GriefEvent>() {
@@ -66,11 +71,12 @@ public final class GriefEvents {
           return Lists.newArrayList(
               BREAK,
               PLACE,
+              REPLACE,
               DEATH,
               ITEM_USE,
+              ITEM_APPLY,
               INTERACT,
-              ATTACK,
-              REPLACE
+              ATTACK
           );
         }
       };

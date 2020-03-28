@@ -77,7 +77,7 @@ public abstract class AbstractAlert implements Alert {
   protected Text.Builder getMessageTextBuilder() {
     Text.Builder builder = Text.builder();
     builder.append(Text.of(
-        Format.playerName(getGriefer()),
+        Format.userName(getGriefer()),
         Format.space(),
         getEventColor(), getGriefEvent().getPreterite(),
         Format.space(),

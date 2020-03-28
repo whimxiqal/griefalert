@@ -15,8 +15,8 @@ import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
-import com.minecraftonline.griefalert.util.Settings;
+import com.minecraftonline.griefalert.util.enums.Permissions;
+import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -114,7 +114,6 @@ public final class AlertManager {
    * @see Alert
    */
   public boolean check(Alert alert, Player officer) {
-    // TODO move this
     // Post an event to show that the Alert is getting checked
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
@@ -142,7 +141,7 @@ public final class AlertManager {
 
     // Send the messages
     Communication.getStaffBroadcastChannelWithout(officer).send(Format.info(
-        Format.playerName(officer),
+        Format.userName(officer),
         " is checking alert number ",
         Format.bonus(GriefAlertCheckCommand.clickToCheck(alert.getCacheIndex()))));
 
@@ -249,7 +248,7 @@ public final class AlertManager {
   }
 
   /**
-   * Save the alert list to a seralized file for later access.
+   * Save the alert list to a serialized file for later access.
    */
   public void saveAlerts() {
     try {

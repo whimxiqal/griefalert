@@ -8,7 +8,7 @@ import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.Collections;
 import java.util.LinkedList;

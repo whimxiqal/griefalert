@@ -15,7 +15,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.PrismUtil;
 import java.util.Optional;
 

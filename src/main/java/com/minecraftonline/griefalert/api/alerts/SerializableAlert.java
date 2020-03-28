@@ -1,6 +1,7 @@
 package com.minecraftonline.griefalert.api.alerts;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.minecraftonline.griefalert.api.caches.AlertManager;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import java.io.IOException;
@@ -17,6 +18,10 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * A helper class to store a serialized version of an {@link Alert} for storage.
+ * The {@link AlertManager} is used to serialize and store all alerts.
+ */
 public class SerializableAlert implements Serializable {
 
   private final String griefProfileJson;
@@ -49,6 +54,12 @@ public class SerializableAlert implements Serializable {
     return new SerializableAlert(alert);
   }
 
+  /**
+   * Return a {@link SerializableAlert} back to an {@link Alert} with all its original information.
+   *
+   * @return an alert
+   * @throws Exception if the deserialization process fails
+   */
   public Alert deserialize() throws Exception {
     GriefProfile griefProfile = GriefProfile.of(DataFormats.JSON.read(griefProfileJson));
     User griefer = Sponge.getServiceManager()

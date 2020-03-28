@@ -20,9 +20,9 @@ import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.storage.SqliteProfileStorage;
 import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.GriefEvents;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.Reference;
-import com.minecraftonline.griefalert.util.Settings;
+import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.File;
 import java.io.IOException;

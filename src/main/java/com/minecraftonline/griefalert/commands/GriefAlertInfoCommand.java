@@ -7,7 +7,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import javax.annotation.Nonnull;
 
@@ -41,7 +41,7 @@ public class GriefAlertInfoCommand extends AbstractCommand {
             .getAlertManager().getAlertCache()
             .get(args.<Integer>getOne("alert code").get());
         player.sendMessage(Format.heading("Alert Info: ", Format.bonus(alert.getCacheIndex())));
-        player.sendMessage(alert.getSummaryAll());
+        player.sendMessage(alert.getSummary());
       } catch (IndexOutOfBoundsException e) {
         player.sendMessage(Format.error("That alert could not be found."));
       }

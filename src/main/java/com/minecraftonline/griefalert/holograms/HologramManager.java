@@ -59,7 +59,7 @@ public class HologramManager {
         .createMultilineHologram(
             alert.getGriefLocation(),
             Lists.newArrayList(
-                Format.playerName(alert.getGriefer()),
+                Format.userName(alert.getGriefer()),
                 Format.bonus(
                     alert.getGriefEvent().getPreterite(),
                     Format.space(),
