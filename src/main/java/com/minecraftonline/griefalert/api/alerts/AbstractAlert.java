@@ -9,20 +9,18 @@ import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
 import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
-import com.minecraftonline.griefalert.util.Communication;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.Grammar;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
-import com.minecraftonline.griefalert.util.Permissions;
+import com.minecraftonline.griefalert.util.*;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
+import com.minecraftonline.griefalert.util.enums.Details;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
@@ -32,7 +30,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Tuple;
 
 
 /**
@@ -45,9 +42,10 @@ public abstract class AbstractAlert implements Alert {
 
   private int cacheIndex;
   private final GriefProfile griefProfile;
-  private final List<Tuple<String, Function<Alert, Text>>> summaryContents =
+
+  private final List<Detail> primaryDetails =
       new LinkedList<>();
-  private final List<Tuple<String, Function<Alert, Text>>> extraSummaryContents =
+  private final List<Detail> secondaryDetails =
       new LinkedList<>();
   private boolean silent = false;
   private boolean pushed = false;
@@ -56,15 +54,11 @@ public abstract class AbstractAlert implements Alert {
   protected AbstractAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
     created = new Date();
-    summaryContents.add(new Tuple<>("Player", alert ->
-        Format.playerName(alert.getGriefer())));
-    summaryContents.add(new Tuple<>("Event", alert ->
-        Format.bonus(alert.getGriefEvent().getName())));
-    summaryContents.add(new Tuple<>("Target", alert ->
-        Format.bonus(Format.item(alert.getTarget()))));
-    summaryContents.add(new Tuple<>("Location", alert ->
-        Format.bonusLocation(alert.getGriefLocation())));
-
+    primaryDetails.add(Details.PLAYER);
+    primaryDetails.add(Details.EVENT);
+    primaryDetails.add(Details.TARGET);
+    primaryDetails.add(Details.LOCATION);
+    secondaryDetails.add(Details.TIME);
   }
 
   @Nonnull
@@ -111,24 +105,10 @@ public abstract class AbstractAlert implements Alert {
 
   @Nonnull
   @Override
-  public final Text getSummaryAll() {
-    Text.Builder builder = Text.builder();
-    builder.append(Text.joinWith(
-        Format.endLine(),
-        summaryContents.stream()
-            .map(pair -> Text.of(
-                TextColors.DARK_AQUA, pair.getFirst(), ": ",
-                TextColors.RESET, pair.getSecond().apply(this)))
-            .collect(Collectors.toList())));
-    Text summaryExtra = getSummaryExtra();
-    if (!summaryExtra.toPlain().isEmpty()) {
-      builder.append(Format.endLine());
-      builder.append(summaryExtra);
-    }
-    return builder.build();
-  }
-
-  private Text getSummaryExtra() {
+  public final Text getSummary() {
+    List<Detail> allDetails = new LinkedList<>();
+    allDetails.addAll(primaryDetails);
+    allDetails.addAll(secondaryDetails);
     return Text.joinWith(
         Format.endLine(),
         allDetails.stream()
