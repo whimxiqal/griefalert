@@ -3,6 +3,7 @@
 package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.alerts.sponge.ApplyAlert;
 import com.minecraftonline.griefalert.alerts.sponge.InteractBlockAlert;
 import com.minecraftonline.griefalert.alerts.sponge.UseAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.AttackEntityAlert;
@@ -12,7 +13,6 @@ import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -49,7 +49,7 @@ public final class SpongeListeners {
               event.getItemStack().getType().getId(),
               player.getLocation().getExtent().getDimension().getType());
 
-      optionalProfile.ifPresent((profile) -> new UseAlert(profile, event).run());
+      optionalProfile.ifPresent((profile) -> UseAlert.of(profile, event).run());
     }
   }
 
@@ -63,13 +63,20 @@ public final class SpongeListeners {
     if (event.getCause().root() instanceof Player) {
       Player player = (Player) event.getCause().root();
 
-      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
+      GriefAlert.getInstance()
           .getProfileCache().getProfileOf(
-              GriefEvents.INTERACT,
-              event.getTargetBlock().getState().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType());
+          GriefEvents.INTERACT,
+          event.getTargetBlock().getState().getType().getId(),
+          player.getLocation().getExtent().getDimension().getType())
+          .ifPresent(profile -> InteractBlockAlert.of(profile, event).run());
 
-      optionalProfile.ifPresent((profile) -> InteractBlockAlert.of(profile, event).run());
+      player.getItemInHand(HandTypes.MAIN_HAND)
+          .flatMap(stack -> GriefAlert.getInstance()
+              .getProfileCache().getProfileOf(
+                  GriefEvents.ITEM_APPLY,
+                  stack.getType().getId(),
+                  player.getLocation().getExtent().getDimension().getType()))
+          .ifPresent(profile -> ApplyAlert.of(profile, event).run());
     }
   }
 
