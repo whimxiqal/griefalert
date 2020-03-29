@@ -2,6 +2,7 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandResult;
@@ -24,6 +25,7 @@ public class GriefAlertClearcacheCommand extends AbstractCommand {
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) {
     GriefAlert.getInstance().getAlertManager().clearAll();
+    src.sendMessage(Format.success("Alert cache cleared"));
     return CommandResult.success();
   }
 

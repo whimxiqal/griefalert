@@ -2,71 +2,82 @@
 
 package com.minecraftonline.griefalert.api.records;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nonnull;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataSerializable;
+
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
 
 
 /**
- * A holder for all information about a <code>GriefProfile</code>. To store data about what a
- * <code>GriefProfile</code> has, it stores data in a {@link DataContainer} using
- * {@link org.spongepowered.api.data.DataQuery} as keys for the data. The queries for the
- * <code>GriefAlert</code>s are held in the {@link GriefProfileDataQueries} utility class.
- * If a <code>GriefProfile</code> doesn't have the necessary data when it's queried from a
- * given method, it might throw a {@link MalformedProfileException}.
+ * A holder for all information about a <code>GriefProfile</code>, which informs
+ * <code>GriefAlert</code> of which events to watch and send into {@link Alert}s for
+ * notifying staff members.
  *
  * @author PietElite
  */
-public class GriefProfile implements DataSerializable {
+public class GriefProfile implements Serializable {
 
-  private final DataContainer dataContainer;
+  private final GriefEvent event;
+  private final String target;
+  private final Set<DimensionType> ignored = Sets.newHashSet();
+  private final Map<Colored, TextColor> colors = Maps.newHashMap();
 
-  private GriefProfile(@Nonnull final DataContainer dataContainer) {
-    this.dataContainer = dataContainer;
+  public enum Colored {
+    EVENT,
+    TARGET,
+    DIMENSION
+  }
+
+  private GriefProfile(@Nonnull GriefEvent event, @Nonnull String target) {
+    this.event = event;
+    this.target = target;
   }
 
   @Nonnull
-  public static GriefProfile of(@Nonnull final DataContainer dataContainer) {
-    return new GriefProfile(dataContainer);
+  public static GriefProfile of(@Nonnull GriefEvent event, @Nonnull String target) {
+    return new GriefProfile(event, target);
   }
 
-  /**
-   * Tester for validity.
-   *
-   * @return true if this <code>GriefProfile</code> has all necessary parts
-   */
-  public boolean isValid() {
-    return dataContainer.getString(GriefProfileDataQueries.EVENT).isPresent()
-        && dataContainer.getString(GriefProfileDataQueries.TARGET).isPresent();
-  }
-
-  /**
-   * Getter for the <code>GriefEvent</code>.
-   *
-   * @return the <code>GriefEvent</code>
-   * @see MalformedProfileException
-   */
   @Nonnull
   public GriefEvent getGriefEvent() {
-    return dataContainer.getCatalogType(GriefProfileDataQueries.EVENT, GriefEvent.class)
-        .orElseThrow(() ->
-            new MalformedProfileException("No GriefEvent found in GriefProfile: \n" + printData()));
+    return event;
+  }
+
+  @Nonnull
+  public String getTarget() {
+    return target;
   }
 
   /**
-   * Getter for the target.
+   * Add the {@link DimensionType} to the set of ignored dimensions for this alert.
    *
-   * @return the target
-   * @see MalformedProfileException
+   * @param dimension the dimension
+   * @return false if the set already contains the dimension
    */
-  @Nonnull
-  public String getTarget() {
-    return dataContainer.getString(GriefProfileDataQueries.TARGET)
-        .orElseThrow(() ->
-            new MalformedProfileException("No Target found in GriefProfile: \n" + printData()));
+  public boolean addIgnored(@Nonnull DimensionType dimension) {
+    return ignored.add(dimension);
+  }
+
+  /**
+   * Map a {@link TextColor} to the enumerated colored components of this
+   * {@link GriefProfile} for printing the {@link Text} of {@link Alert}s.
+   *
+   * @param component the portion of the print message
+   * @param color     the color
+   * @return false if this component already has a color
+   */
+  public boolean putColored(@Nonnull Colored component, @Nonnull TextColor color) {
+    return colors.putIfAbsent(component, color) != null;
   }
 
   /**
@@ -79,29 +90,16 @@ public class GriefProfile implements DataSerializable {
    *         matching this <code>GriefProfile</code>
    */
   public boolean isIgnoredIn(@Nonnull final DimensionType dimensionType) {
-    return dataContainer.getCatalogTypeList(GriefProfileDataQueries.IGNORED, DimensionType.class)
-        .map((list) -> list.contains(dimensionType)).orElse(false);
+    return ignored.contains(dimensionType);
   }
 
-  private String printData() {
-    return dataContainer.getValues(true).toString();
+  public Optional<TextColor> getColored(@Nonnull Colored component) {
+    return Optional.ofNullable(colors.get(component));
   }
 
-  @Override
-  public int getContentVersion() {
-    return 0;
-  }
-
-  @Nonnull
-  @Override
-  public DataContainer toContainer() {
-    return dataContainer.copy();
-  }
-
-  public static class MalformedProfileException extends IllegalStateException {
-    MalformedProfileException(String s) {
-      super(s);
-    }
+  public Text print() {
+    // TODO implement
+    return Text.EMPTY;
   }
 
 }

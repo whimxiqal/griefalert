@@ -198,7 +198,7 @@ public final class AlertManager {
    *
    * @param officer The officer to teleport
    * @return An optional of how many saved locations are left. Return an empty
-   *         Optional if there were no transforms left to begin with.
+   * Optional if there were no transforms left to begin with.
    */
   public Optional<Integer> revertOfficerTransform(Player officer) {
 
@@ -254,14 +254,7 @@ public final class AlertManager {
     try {
       FileOutputStream fos = new FileOutputStream(alertStorageFile, false);
       ObjectOutputStream oos = new ObjectOutputStream(fos);
-      oos.writeObject(alertCache.serialize(alert -> {
-        try {
-          return SerializableAlert.of(alert);
-        } catch (IOException e) {
-          e.printStackTrace();
-          return null;
-        }
-      }));
+      oos.writeObject(alertCache.serialize(SerializableAlert::of));
       oos.close();
       fos.close();
     } catch (IOException ioe) {

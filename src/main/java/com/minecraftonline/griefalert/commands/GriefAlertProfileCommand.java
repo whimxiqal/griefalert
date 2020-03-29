@@ -82,41 +82,22 @@ public class GriefAlertProfileCommand extends AbstractCommand {
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
-      DataContainer dataContainer = DataContainer.createNew();
 
-      dataContainer.set(
-          GriefProfileDataQueries.EVENT,
-          ((GriefEvent) args.getOne("event").get()).getId());
-      dataContainer.set(
-          GriefProfileDataQueries.TARGET,
-          args.getOne("target").map((s) -> General.ensureIdFormat((String) s)).get());
+      GriefEvent event = ((GriefEvent) args.getOne("event").get());
+      String target = args.<String>getOne("target").map(General::ensureIdFormat).get();
+      GriefProfile profile = GriefProfile.of(event, target);
 
-      if (args.getOne("event_color").isPresent()) {
-        dataContainer.set(GriefProfileDataQueries.EVENT_COLOR,
-            args.getOne("event_color").get());
-      }
+      args.<TextColor>getOne("event_color")
+          .ifPresent(color -> profile.putColored(GriefProfile.Colored.EVENT, color));
 
-      if (args.getOne("target_color").isPresent()) {
-        dataContainer.set(GriefProfileDataQueries.TARGET_COLOR,
-            args.getOne("target_color").get());
-      }
+      args.<TextColor>getOne("target_color")
+          .ifPresent(color -> profile.putColored(GriefProfile.Colored.TARGET, color));
 
-      if (args.getOne("dimension_color").isPresent()) {
-        dataContainer.set(GriefProfileDataQueries.DIMENSION_COLOR,
-            args.getOne("dimension_color").get());
-      }
-
-      dataContainer.set(GriefProfileDataQueries.IGNORED,
-          Lists.newArrayList(args.getAll("dimension")));
-
-      GriefProfile toAdd = GriefProfile.of(dataContainer);
-      if (!toAdd.isValid()) {
-        src.sendMessage(Format.error("It looks like you're missing some necessary components!"));
-        return CommandResult.empty();
-      }
+      args.<TextColor>getOne("dimension_color")
+          .ifPresent(color -> profile.putColored(GriefProfile.Colored.DIMENSION, color));
 
       try {
-        if (GriefAlert.getInstance().getProfileStorage().write(toAdd)) {
+        if (GriefAlert.getInstance().getProfileStorage().write(profile)) {
           src.sendMessage(Format.success("GriefProfile added"));
           GriefAlert.getInstance().getProfileCache().reload();
           return CommandResult.success();
@@ -128,7 +109,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       } catch (Exception e) {
         GriefAlert.getInstance().getLogger().error("An Exception thrown when trying to "
             + "add a profile: "
-            + toAdd.toContainer().getValues(true).toString());
+            + profile.print().toPlain());
         General.printStackTraceToDebugLogger(e);
         return CommandResult.empty();
       }
@@ -152,11 +133,11 @@ public class GriefAlertProfileCommand extends AbstractCommand {
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
-      GriefEvent griefEvent = (GriefEvent) args.getOne("event").get();
+      GriefEvent event = (GriefEvent) args.getOne("event").get();
       String target = args.getOne("target").map((s) -> General.ensureIdFormat((String) s)).get();
 
       try {
-        if (GriefAlert.getInstance().getProfileStorage().remove(griefEvent, target)) {
+        if (GriefAlert.getInstance().getProfileStorage().remove(event, target)) {
           GriefAlert.getInstance().getProfileCache().reload();
           src.sendMessage(Format.success("Removed a Grief Profile"));
           return CommandResult.success();
@@ -167,7 +148,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
       } catch (Exception e) {
         GriefAlert.getInstance().getLogger().error("An Exception was thrown when trying to "
             + "remove a profile: "
-            + griefEvent.getId() + ", "
+            + event.getId() + ", "
             + target);
         General.printStackTraceToDebugLogger(e);
         return CommandResult.empty();
@@ -215,7 +196,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
         ConsoleSource console = (ConsoleSource) src;
         console.sendMessage(Format.heading("=== Grief Profiles ==="));
         for (GriefProfile profile : GriefAlert.getInstance().getProfileCache().getProfiles()) {
-          console.sendMessage(Format.bonus(profile.toContainer().getValues(true).toString()));
+          console.sendMessage(profile.print());
         }
       } else {
         PaginationList.builder()
@@ -225,8 +206,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
                 .getProfileCache()
                 .getProfiles()
                 .stream()
-                .map(profile -> Text.of(
-                    Format.bonus(profile.toContainer().getValues(true))))
+                .map(GriefProfile::print)
                 .collect(Collectors.toList()))
             .footer(Text.of(TextColors.YELLOW, "Formatting for list command is in progress"))
             .build()

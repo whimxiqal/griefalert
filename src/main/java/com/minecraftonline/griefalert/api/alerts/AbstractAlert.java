@@ -9,7 +9,11 @@ import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
 import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
-import com.minecraftonline.griefalert.util.*;
+import com.minecraftonline.griefalert.util.Communication;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.enums.Details;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -19,8 +23,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.util.enums.Details;
-import com.minecraftonline.griefalert.util.enums.Permissions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
@@ -226,30 +228,21 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   @Override
   public final TextColor getEventColor() {
-    return griefProfile.toContainer()
-        .getString(GriefProfileDataQueries.EVENT_COLOR).map((s) ->
-            Sponge.getRegistry().getType(TextColor.class, s)
-                .orElse(Format.ALERT_EVENT_COLOR))
+    return griefProfile.getColored(GriefProfile.Colored.EVENT)
         .orElse(Format.ALERT_EVENT_COLOR);
   }
 
   @Nonnull
   @Override
   public final TextColor getTargetColor() {
-    return griefProfile.toContainer()
-        .getString(GriefProfileDataQueries.TARGET_COLOR).map((s) ->
-            Sponge.getRegistry().getType(TextColor.class, s)
-                .orElse(Format.ALERT_TARGET_COLOR))
+    return griefProfile.getColored(GriefProfile.Colored.TARGET)
         .orElse(Format.ALERT_TARGET_COLOR);
   }
 
   @Nonnull
   @Override
   public final TextColor getDimensionColor() {
-    return griefProfile.toContainer()
-        .getString(GriefProfileDataQueries.DIMENSION_COLOR).map((s) ->
-            Sponge.getRegistry().getType(TextColor.class, s)
-                .orElse(Format.ALERT_DIMENSION_COLOR))
+    return griefProfile.getColored(GriefProfile.Colored.DIMENSION)
         .orElse(Format.ALERT_DIMENSION_COLOR);
   }
 

@@ -4,14 +4,12 @@ import com.flowpowered.math.vector.Vector3d;
 import com.minecraftonline.griefalert.api.caches.AlertManager;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -24,7 +22,7 @@ import org.spongepowered.api.world.World;
  */
 public class SerializableAlert implements Serializable {
 
-  private final String griefProfileJson;
+  private final GriefProfile griefProfile;
   private final UUID grieferUuid;
   private final UUID grieferExtentUuid;
   private final Vector3d grieferPosition;
@@ -36,8 +34,8 @@ public class SerializableAlert implements Serializable {
   private final boolean silent;
   private int cacheIndex;
 
-  private SerializableAlert(@Nonnull Alert alert) throws IOException {
-    this.griefProfileJson = DataFormats.JSON.write(alert.getGriefProfile().toContainer());
+  private SerializableAlert(@Nonnull Alert alert) {
+    this.griefProfile = alert.getGriefProfile();
     this.grieferUuid = alert.getGriefer().getUniqueId();
     this.grieferExtentUuid = alert.getGrieferTransform().getExtent().getUniqueId();
     this.grieferPosition = alert.getGrieferTransform().getPosition();
@@ -50,7 +48,7 @@ public class SerializableAlert implements Serializable {
     this.cacheIndex = alert.getCacheIndex();
   }
 
-  public static SerializableAlert of(Alert alert) throws IOException {
+  public static SerializableAlert of(Alert alert) {
     return new SerializableAlert(alert);
   }
 
@@ -58,10 +56,8 @@ public class SerializableAlert implements Serializable {
    * Return a {@link SerializableAlert} back to an {@link Alert} with all its original information.
    *
    * @return an alert
-   * @throws Exception if the deserialization process fails
    */
-  public Alert deserialize() throws Exception {
-    GriefProfile griefProfile = GriefProfile.of(DataFormats.JSON.read(griefProfileJson));
+  public Alert deserialize() {
     User griefer = Sponge.getServiceManager()
         .provide(UserStorageService.class)
         .flatMap(userStorageService -> userStorageService.get(grieferUuid))
