@@ -5,14 +5,21 @@ package com.minecraftonline.griefalert.api.records;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
@@ -30,7 +37,7 @@ public class GriefProfile implements Serializable {
   private final GriefEvent event;
   private final String target;
   private final Set<DimensionType> ignored = Sets.newHashSet();
-  private final Map<Colored, TextColor> colors = Maps.newHashMap();
+  private final Map<Colored, String> colors = Maps.newHashMap();
 
   public enum Colored {
     EVENT,
@@ -77,7 +84,7 @@ public class GriefProfile implements Serializable {
    * @return false if this component already has a color
    */
   public boolean putColored(@Nonnull Colored component, @Nonnull TextColor color) {
-    return colors.putIfAbsent(component, color) != null;
+    return colors.putIfAbsent(component, color.getId()) != null;
   }
 
   /**
@@ -94,12 +101,66 @@ public class GriefProfile implements Serializable {
   }
 
   public Optional<TextColor> getColored(@Nonnull Colored component) {
-    return Optional.ofNullable(colors.get(component));
+    return Optional.ofNullable(colors.get(component))
+        .flatMap(s -> Sponge.getRegistry().getType(TextColor.class, s));
   }
 
+  public boolean isColored() {
+    return !colors.isEmpty();
+  }
+
+  /**
+   * Generate a {@link Text} object to represent the contents of this GriefProfile.
+   *
+   * @return a {@link Text}
+   */
   public Text print() {
-    // TODO implement
-    return Text.EMPTY;
+    List<Text> details = new LinkedList<>();
+    Detail.of(
+        "Event",
+        "The event type for this profile; one of: "
+            + GriefEvents.REGISTRY_MODULE.getAll()
+            .stream().map(GriefEvent::getId)
+            .collect(Collectors.joining(", ")),
+        Format.hover(getGriefEvent().getId(), getGriefEvent().getDescription()))
+        .get(this).ifPresent(details::add);
+    Detail.of(
+        "Target",
+        "The ID for the target object of this grief event.",
+        Format.item(getTarget()))
+        .get(this).ifPresent(details::add);
+    Optional.of(ignored).filter(ignored -> !ignored.isEmpty())
+        .flatMap(ignored -> Detail.of(
+            "Ignored",
+            "All dimension types in which events with this profile are ignored.",
+            Format.bonus(Text.joinWith(
+                Text.of(", "),
+                ignored.stream()
+                    .map(dimension -> Format.item(dimension.getId()))
+                    .collect(Collectors.toList()))))
+            .get(this)).ifPresent(details::add);
+    Optional.of(colors).filter(colors -> !colors.isEmpty())
+        .flatMap(colors -> Detail.of(
+            "Colored",
+            "Any components of the alert messages flagged by this alert "
+                + "and their corresponding specified colors",
+            Format.bonus(Text.joinWith(
+                Text.of(", "),
+                colors.entrySet()
+                    .stream()
+                    .map(entry -> Text.of(
+                        "{",
+                        entry.getKey().toString().toLowerCase(),
+                        ", ",
+                        Text.of(
+                            Sponge.getRegistry()
+                                .getType(TextColor.class, entry.getValue())
+                                .orElseThrow(RuntimeException::new),
+                            entry.getValue().toLowerCase()),
+                        "}"))
+                    .collect(Collectors.toList()))))
+            .get(this)).ifPresent(details::add);
+    return Text.joinWith(Format.bonus(", "), details);
   }
 
 }

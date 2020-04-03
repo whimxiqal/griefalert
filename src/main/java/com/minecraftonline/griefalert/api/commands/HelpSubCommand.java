@@ -10,14 +10,14 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.text.Text;
 
 /**
- * A sub-command for any {@link AbstractCommand} which allows for the viewing of
+ * A sub-command for any {@link GeneralCommand} which allows for the viewing of
  * other sub-commands for usage.
  */
-public class HelpSubCommand extends AbstractCommand {
+public class HelpSubCommand extends GeneralCommand {
 
-  private final AbstractCommand parentCommand;
+  private final GeneralCommand parentCommand;
 
-  HelpSubCommand(AbstractCommand parent) {
+  HelpSubCommand(GeneralCommand parent) {
     super(parent.getPermission(), Text.of("Show all sub-commands"));
     this.parentCommand = parent;
     addAlias("help");

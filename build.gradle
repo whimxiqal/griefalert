@@ -36,11 +36,11 @@ repositories {
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '1.1.1' // Project Version
+version = '1.1.5' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-ext.sponge_version = '7.1.0' // SpongeAPI version
+ext.sponge_version = '7.2.0' // SpongeAPI version
 ext.authors = ['PietElite', 'darkdiplomat', 'BastetFurry', '14mRh4X0r'] // Separate with commas (e.g. ['SlowRiot', 'FliPPeh', '14mRh4X0r', 'techkid6'])
 
 compileJava {
@@ -48,7 +48,7 @@ compileJava {
 }
 
 dependencies {
-    implementation 'org.spongepowered:spongeapi:7.1.0'
+    implementation 'org.spongepowered:spongeapi:7.2.0'
     implementation 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     implementation 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
     implementation fileTree(dir: 'libs', include: '*.jar')

@@ -6,7 +6,6 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.sql.Connection;
@@ -50,14 +49,14 @@ public class SqliteProfileStorage implements ProfileStorage {
     String command = String.format(
         "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) values (?, ?, ?, ?, ?, ?, ?, ?);",
         TABLE_NAME,
-        GriefProfileDataQueries.EVENT,
-        GriefProfileDataQueries.TARGET,
+        "event",
+        "target",
         "ignore_overworld",
         "ignore_nether",
         "ignore_the_end",
-        GriefProfileDataQueries.EVENT_COLOR,
-        GriefProfileDataQueries.TARGET_COLOR,
-        GriefProfileDataQueries.DIMENSION_COLOR);
+        "event_color",
+        "target_color",
+        "dimension_color");
 
     if (exists(profile.getGriefEvent(), profile.getTarget())) {
       return false;
@@ -104,8 +103,8 @@ public class SqliteProfileStorage implements ProfileStorage {
     connect();
     String command = "DELETE FROM "
         + TABLE_NAME + " WHERE "
-        + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
-        + GriefProfileDataQueries.TARGET + " = '" + target + "';";
+        + "event" + " = '" + griefEvent.getId() + "' AND "
+        + "target" + " = '" + target + "';";
 
     getConnection().prepareStatement(command).execute();
     close();
@@ -159,6 +158,7 @@ public class SqliteProfileStorage implements ProfileStorage {
 
       profiles.add(profile);
     }
+    rs.close();
     close();
     return profiles;
 
@@ -198,12 +198,12 @@ public class SqliteProfileStorage implements ProfileStorage {
     connect();
     String command = "SELECT * FROM "
         + TABLE_NAME + " WHERE "
-        + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
-        + GriefProfileDataQueries.TARGET + " = '" + target + "';";
+        + "event" + " = '" + griefEvent.getId() + "' AND "
+        + "target" + " = '" + target + "';";
 
     ResultSet rs = getConnection().prepareStatement(command).executeQuery();
     boolean hasResult = rs.next();
-
+    rs.close();
     close();
     return hasResult;
 

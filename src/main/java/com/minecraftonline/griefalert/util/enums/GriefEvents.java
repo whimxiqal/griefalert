@@ -30,12 +30,11 @@ public final class GriefEvents {
 
   public static final GriefEvent DEATH = GriefEvent.of(
       PrismEvents.ENTITY_DEATH,
-      "An entity death directly caused by a player");
+      "Directly cause the death of an entity");
 
   public static final GriefEvent ITEM_USE = GriefEvent
       .of("use", "Item Use", "used",
-          "Secondarily interact with the target item in main hand "
-              + "while looking at nothing or at an entity.");
+          "Secondarily interact with the target item in main hand");
 
   public static final GriefEvent ITEM_APPLY = GriefEvent
       .of("apply", "Item Apply", "applied",

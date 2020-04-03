@@ -7,7 +7,6 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.util.General;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -45,9 +44,7 @@ public class ProfileCache {
       GriefAlert.getInstance().getLogger().info("Grief Profiles were loaded into cache.");
     } catch (Exception e) {
       GriefAlert.getInstance().getLogger()
-          .error("Could not load Grief Profiles from SQL database. "
-              + "See debug logger for more info.");
-      General.printStackTraceToDebugLogger(e);
+          .error("Could not load Grief Profiles from SQL database.");
     }
   }
 

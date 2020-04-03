@@ -4,12 +4,12 @@ package com.minecraftonline.griefalert.api.alerts;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.structures.RotatingList;
 
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.api.structures.RotatingList;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -198,4 +198,5 @@ public interface Alert extends Runnable {
    */
   @Nonnull
   TextColor getDimensionColor();
+
 }

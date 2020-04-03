@@ -27,29 +27,9 @@ public final class SpongeEvents {
    * @return an optional of the content id
    */
   public static Optional<String> getItemFrameContent(EntitySnapshot entitySnapshot) {
-    DataContainer container = entitySnapshot.toContainer();
-
-    Optional<DataView> unsafeOptional = container.getView(DataQuery.of("UnsafeData"));
-    if (!unsafeOptional.isPresent()) {
-      return Optional.empty();
-    }
-
-    Optional<DataView> itemOptional = unsafeOptional.get().getView(DataQuery.of("Item"));
-    if (!itemOptional.isPresent()) {
-      return Optional.empty();
-    }
-
-    return itemOptional.get().getString(DataQuery.of("id"));
-  }
-
-  /**
-   * Get the message associated with the content of an item frame.
-   *
-   * @param entitySnapshot the entity snapshot of type item frame
-   * @return the message
-   */
-  public static String getItemFrameContentMessage(EntitySnapshot entitySnapshot) {
-    return getItemFrameContent(entitySnapshot).map((id) -> "containing " + id).orElse("empty");
+    return entitySnapshot.toContainer().getView(DataQuery.of("UnsafeData"))
+        .flatMap(unsafeView -> unsafeView.getView(DataQuery.of("Item")))
+        .flatMap(itemView -> itemView.getString(DataQuery.of("id")));
   }
 
   /**
@@ -59,6 +39,7 @@ public final class SpongeEvents {
    * @return an optional of the list of content ids
    */
   public static Optional<List<String>> getArmorStandContent(EntitySnapshot entitySnapshot) {
+    // TODO simplify optional logic
     DataContainer container = entitySnapshot.toContainer();
 
     Optional<DataView> unsafeOptional = container.getView(DataQuery.of("UnsafeData"));
@@ -80,19 +61,6 @@ public final class SpongeEvents {
       }
     }
     return Optional.of(output);
-  }
-
-  /**
-   * Get the message associated with the content of an armor stand.
-   *
-   * @param entitySnapshot the entity snapshot of type armor stand
-   * @return the message
-   */
-  @SuppressWarnings("unused")
-  public static String getArmorStandContentMessage(EntitySnapshot entitySnapshot) {
-    return getArmorStandContent(entitySnapshot).map(
-        (list) -> String.join(", ", list))
-        .orElse("empty");
   }
 
 }

@@ -8,7 +8,6 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.PrismUtil;
-import org.spongepowered.api.text.Text;
 
 public class SignBreakAlert extends PrismAlert {
 

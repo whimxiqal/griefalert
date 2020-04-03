@@ -19,8 +19,8 @@ public final class Optionals {
    * @return true if any of the optionals are present
    */
   @SuppressWarnings("unused")
-  public static boolean anyPresent(Optional... optionals) {
-    for (Optional optional : optionals) {
+  public static boolean anyPresent(Optional<?>... optionals) {
+    for (Optional<?> optional : optionals) {
       if (optional.isPresent()) {
         return true;
       }
@@ -35,8 +35,8 @@ public final class Optionals {
    * @return false if any of the optionals are absent
    */
   @SuppressWarnings("WeakerAccess")
-  public static boolean allPresent(Optional... optionals) {
-    for (Optional optional : optionals) {
+  public static boolean allPresent(Optional<?>... optionals) {
+    for (Optional<?> optional : optionals) {
       if (!optional.isPresent()) {
         return false;
       }

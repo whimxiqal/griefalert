@@ -5,7 +5,6 @@ package com.minecraftonline.griefalert.storage;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
@@ -36,11 +35,11 @@ public class MySqlProfileStorage implements ProfileStorage {
    * @throws SQLException if error with SQL
    */
   public MySqlProfileStorage() throws SQLException {
-    address = String.format("jdbc:mysql://%s@%s/%s",
-        Settings.STORAGE_USERNAME.getValue(),
+    address = String.format("jdbc:mysql://%s/%s",
         Settings.STORAGE_ADDRESS.getValue(),
         Settings.STORAGE_DATABASE.getValue());
     databaseProperties = new Properties();
+    databaseProperties.setProperty("user", Settings.STORAGE_USERNAME.getValue());
     databaseProperties.setProperty("password", Settings.STORAGE_PASSWORD.getValue());
     createTable();
   }
@@ -50,14 +49,14 @@ public class MySqlProfileStorage implements ProfileStorage {
     String command = String.format(
         "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) values (?, ?, ?, ?, ?, ?, ?, ?);",
         TABLE_NAME,
-        GriefProfileDataQueries.EVENT,
-        GriefProfileDataQueries.TARGET,
+        "event",
+        "target",
         "ignore_overworld",
         "ignore_nether",
         "ignore_the_end",
-        GriefProfileDataQueries.EVENT_COLOR,
-        GriefProfileDataQueries.TARGET_COLOR,
-        GriefProfileDataQueries.DIMENSION_COLOR);
+        "event_color",
+        "target_color",
+        "dimension_color");
 
     if (exists(profile.getGriefEvent(), profile.getTarget())) {
       return false;
@@ -104,8 +103,8 @@ public class MySqlProfileStorage implements ProfileStorage {
     Connection connection = DriverManager.getConnection(address, databaseProperties);
     String command = "DELETE FROM "
         + TABLE_NAME + " WHERE "
-        + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
-        + GriefProfileDataQueries.TARGET + " = '" + target + "';";
+        + "event" + " = '" + griefEvent.getId() + "' AND "
+        + "target" + " = '" + target + "';";
 
     connection.prepareStatement(command).execute();
     connection.close();
@@ -186,12 +185,12 @@ public class MySqlProfileStorage implements ProfileStorage {
     Connection connection = DriverManager.getConnection(address, databaseProperties);
     String command = "SELECT * FROM "
         + TABLE_NAME + " WHERE "
-        + GriefProfileDataQueries.EVENT + " = '" + griefEvent.getId() + "' AND "
-        + GriefProfileDataQueries.TARGET + " = '" + target + "';";
+        + "event" + " = '" + griefEvent.getId() + "' AND "
+        + "target" + " = '" + target + "';";
 
     ResultSet rs = connection.prepareStatement(command).executeQuery();
     boolean hasResult = rs.next();
-
+    rs.close();
     connection.close();
     return hasResult;
 

@@ -4,19 +4,37 @@ package com.minecraftonline.griefalert.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.helion3.prism.api.query.ConditionGroup;
+import com.helion3.prism.api.query.FieldCondition;
+import com.helion3.prism.api.query.MatchRule;
+import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
+import com.minecraftonline.griefalert.util.enums.CommandKeys;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.sponge.SpongeWorld;
+import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -42,6 +60,105 @@ public final class PrismUtil {
 
   public static Optional<String> getTarget(PrismRecordArchived record) {
     return record.getDataContainer().getString(DataQueries.Target);
+  }
+
+  /**
+   * Using a {@link Player} as an extension of a
+   * {@link org.spongepowered.api.command.CommandSource},
+   * build a <code>Prism</code> session to query through Prism. This is used for querying records
+   * and rollback.
+   *
+   * @param player the player executing the command
+   * @param args   the arguments of the commmand
+   * @param flags  the map of flags to store information about what command was run
+   * @return An optional of the built {@link QuerySession}. Empty if it couldn't be created.
+   */
+  public static Optional<QuerySession> buildSession(Player player,
+                                                    CommandContext args,
+                                                    Map<Text, Text> flags) {
+    final QuerySession session = new QuerySession(player);
+
+    Query query = session.newQuery();
+    // Add location query with WE
+    World world = player.getLocation().getExtent();
+    SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(world);
+    try {
+      query.addCondition(ConditionGroup.from(
+          world,
+          WorldEditUtil.convertVector(
+              SpongeWorldEdit.inst().getSession(player)
+                  .getSelection(spongeWorld).getMinimumPoint()),
+          WorldEditUtil.convertVector(
+              SpongeWorldEdit.inst().getSession(player)
+                  .getSelection(spongeWorld).getMaximumPoint())));
+    } catch (IncompleteRegionException e) {
+      player.sendMessage(Format.error("No region selected"));
+      return Optional.empty();
+    }
+
+    // Parse the 'since' with the given date format, or just do a year ago
+    Date since = args.<String>getOne(CommandKeys.SINCE.get()).flatMap(str -> {
+      try {
+        Date out = DateUtil.parseAnyDate(str);
+        flags.put(CommandKeys.SINCE.get(), Text.of(Format.date(out)));
+        return Optional.of(out);
+      } catch (IllegalArgumentException e) {
+        player.sendMessage(Format.error(e.getMessage()));
+        return Optional.empty();
+      }
+    }).orElseGet(() -> {
+      Date out = Date.from(Instant.now().minus(Duration.ofDays(5)));
+      flags.put(CommandKeys.SINCE.get(), Format.date(out));
+      return out;
+    });
+    query.addCondition(FieldCondition.of(
+        DataQueries.Created,
+        MatchRule.GREATER_THAN_EQUAL,
+        since));
+
+    args.<String>getOne(CommandKeys.BEFORE.get()).ifPresent(str -> {
+      Date before = DateUtil.parseAnyDate(str);
+      flags.put(CommandKeys.BEFORE.get(), Text.of(Format.date(before)));
+      query.addCondition(FieldCondition.of(
+          DataQueries.Created,
+          MatchRule.LESS_THAN_EQUAL,
+          before));
+    });
+
+    args.<String>getOne(CommandKeys.PRISM_TARGET.get()).ifPresent(str -> {
+      flags.put(CommandKeys.PRISM_TARGET.get(), Text.of(str));
+      query.addCondition(FieldCondition.of(
+          DataQueries.Target,
+          MatchRule.EQUALS,
+          str.replaceAll("_", " ")));
+    });
+
+    Optional<String> playerOptional = args.getOne(CommandKeys.PLAYER.get());
+    if (playerOptional.isPresent()) {
+      Optional<User> userOptional = Sponge.getServiceManager().provide(UserStorageService.class)
+          .flatMap(users -> users.get(playerOptional.get()));
+      if (userOptional.isPresent()) {
+        flags.put(CommandKeys.PLAYER.get(), Text.of(playerOptional.get()));
+        query.addCondition(FieldCondition.of(
+            DataQueries.Player,
+            MatchRule.EQUALS,
+            userOptional.get().getUniqueId().toString()));
+      } else {
+        player.sendMessage(Format.error("Player not found."));
+        return Optional.empty();
+      }
+    }
+
+    args.<String>getOne(CommandKeys.PRISM_EVENT.get()).ifPresent(str -> {
+      flags.put(CommandKeys.PRISM_EVENT.get(), Text.of(str));
+      query.addCondition(FieldCondition.of(
+          DataQueries.EventName,
+          MatchRule.EQUALS,
+          str));
+    });
+
+    return Optional.of(session);
+
   }
 
   /**

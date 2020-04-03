@@ -3,10 +3,10 @@
 package com.minecraftonline.griefalert.api.events;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.structures.RotatingList;
 
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.api.structures.RotatingList;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 

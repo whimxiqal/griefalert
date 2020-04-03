@@ -5,7 +5,6 @@ package com.minecraftonline.griefalert.api.commands;
 import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.util.Format;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,20 +14,19 @@ import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.Tuple;
 
 /**
  * An abstract class for all MinecraftOnline commands from which to extend. This
  * class provides consistency to commands structure and visuals.
  */
-public abstract class AbstractCommand implements CommandExecutor {
+public abstract class GeneralCommand implements CommandExecutor {
 
   private final Permission permission;
   private final Text description;
-  private final List<AbstractCommand> commandChildren = new LinkedList<>();
+  private final List<GeneralCommand> commandChildren = new LinkedList<>();
   private final List<String> aliases = new LinkedList<>();
   private CommandElement commandElement = GenericArguments.none();
 
@@ -38,8 +36,8 @@ public abstract class AbstractCommand implements CommandExecutor {
    * @param permission  The permission which is required for this command
    * @param description The general description of this command functionality
    */
-  public AbstractCommand(Permission permission,
-                         Text description) {
+  public GeneralCommand(Permission permission,
+                        Text description) {
     this.permission = permission;
     this.description = description;
     if (!(this instanceof HelpSubCommand)) {
@@ -47,9 +45,9 @@ public abstract class AbstractCommand implements CommandExecutor {
     }
   }
 
-  public AbstractCommand(Permission permission,
-                         Text description,
-                         String primaryAlias) {
+  public GeneralCommand(Permission permission,
+                        Text description,
+                        String primaryAlias) {
     this(permission, description);
     addAlias(primaryAlias);
   }
@@ -58,8 +56,8 @@ public abstract class AbstractCommand implements CommandExecutor {
     this.aliases.add(alias);
   }
 
-  protected final void addChild(AbstractCommand abstractCommand) {
-    this.commandChildren.add(abstractCommand);
+  protected final void addChild(GeneralCommand generalCommand) {
+    this.commandChildren.add(generalCommand);
   }
 
   protected final void setCommandElement(CommandElement commandElement) {
@@ -67,7 +65,7 @@ public abstract class AbstractCommand implements CommandExecutor {
   }
 
   @SuppressWarnings("WeakerAccess")
-  protected final List<AbstractCommand> getChildren() {
+  protected final List<GeneralCommand> getChildren() {
     return this.commandChildren;
   }
 
@@ -86,31 +84,33 @@ public abstract class AbstractCommand implements CommandExecutor {
    * @param source The source of the help message
    */
   protected final void sendHelp(CommandSource source) {
-    source.sendMessage(Text.of(
-        Format.heading("Command Help : "),
-        Format.bonus(
-            "{",
-            Text.of(TextColors.GREEN, String.join(", ", getAliases())),
-            "}"
-        )));
-    source.sendMessage(Text.of(
-        TextColors.LIGHT_PURPLE, "USAGE",
-        Format.space(),
-        TextColors.GRAY, TextStyles.ITALIC,
-        buildCommandSpec().getUsage(source)));
-    source.sendMessage(Text.of(
-        TextColors.LIGHT_PURPLE, "DESC",
-        Format.space(),
-        Format.space(),
-        TextColors.YELLOW, getDescription()));
-
-    // Print the descriptions of the different subcommands, and add necessary spaces after alias names to
-    // format better
-    getChildren().stream()
-        .filter(command -> source.hasPermission(command.getPermission().toString()))
-        .forEach(command -> source.sendMessage(Text.of(
-            TextColors.AQUA, String.join(", ", command.getAliases()),
-            TextColors.GRAY, " - ", command.getDescription())));
+    PaginationList.builder().title(Format.info("Command Help : ", Format.bonus(
+        "{",
+        Text.joinWith(
+            Text.of(", "),
+            getAliases().stream().map(Text::of).collect(Collectors.toList())),
+        "}")))
+        .header(Text.of(
+            TextColors.LIGHT_PURPLE, "Parameters:",
+            Format.space(),
+            TextColors.GRAY,
+            buildCommandSpec().getUsage(source),
+            Format.endLine(),
+            TextColors.LIGHT_PURPLE, "Description:",
+            Format.space(),
+            TextColors.YELLOW, getDescription()))
+        .contents(getChildren().stream()
+            .filter(command -> source.hasPermission(command.getPermission().toString()))
+            .map(command -> Text.of(
+                TextColors.AQUA, Format.hover(
+                    command.getAliases().get(0),
+                    "Aliases: " + String.join(", ", command.getAliases())),
+                Format.space(),
+                TextColors.WHITE, command.getDescription()))
+            .collect(Collectors.toList()))
+        .padding(Format.bonus("="))
+        .build()
+        .sendTo(source);
   }
 
   /**

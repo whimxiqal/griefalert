@@ -6,17 +6,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Strings;
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.util.enums.Settings;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -25,7 +23,6 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -344,15 +341,14 @@ public final class Format {
    */
   @Nonnull
   public static Text item(@Nonnull String id) {
-
-    Text.Builder textBuilder = Text.builder().append(Text.of(TextStyles.ITALIC));
+    Text.Builder textBuilder = Text.builder();
     if (StringUtils.contains(id, ":")) {
-      textBuilder.append(Text.of(StringUtils.substringAfter(id, ":")));
+      textBuilder.append(Text.of(StringUtils.substringAfter(id, ":").replaceAll("_", " ")));
     } else {
-      textBuilder.append(Text.of(id));
+      textBuilder.append(Text.of(id.replaceAll("_", " ")));
     }
 
-    textBuilder.onHover(TextActions.showText(Text.of(id)));
+    textBuilder.onHover(TextActions.showText(Format.bonus(id)));
 
     return textBuilder.build();
   }

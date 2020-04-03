@@ -15,8 +15,8 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.PrismUtil;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
@@ -34,31 +34,24 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
     GriefAlert.getInstance().getLogger().debug(PrismUtil.printRecord(record));
 
     // See if this record matches any GriefProfiles
-
     if (!Sponge.getRegistry().getType(GriefEvent.class, record.getEvent()).isPresent()) {
-      GriefAlert.getInstance().getLogger().debug(String.format(
-          "PrismEvent passed: Prism Event '%s' is not being checked.",
-          record.getEvent()));
       return;
     }
 
     // Replace spaces with underscores because for some reason PrismUtil removes them...
     Optional<String> targetOptional = PrismUtil.getTarget(record).map(General::ensureIdFormat);
     if (!targetOptional.isPresent()) {
-      GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no target found.");
       return;
     }
 
     Optional<DimensionType> dimensionTypeOptional = PrismUtil.getLocation(record)
         .map((location) -> location.getExtent().getDimension().getType());
     if (!dimensionTypeOptional.isPresent()) {
-      GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no dimension type found.");
       return;
     }
 
     Optional<String> playerUuidOptional = PrismUtil.getPlayerUuid(record);
     if (!playerUuidOptional.isPresent()) {
-      GriefAlert.getInstance().getLogger().debug("PrismEvent passed: no player found.");
       return;
     }
 

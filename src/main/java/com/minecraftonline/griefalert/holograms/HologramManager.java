@@ -1,6 +1,9 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.holograms;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.util.Format;
@@ -8,6 +11,7 @@ import de.randombyte.holograms.api.HologramsService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -24,6 +28,7 @@ public class HologramManager {
   private Logger log = GriefAlert.getInstance().getLogger();
   private HologramsService hologramsService;
   private boolean error;
+  private Set<HologramsService.Hologram> alertHolograms = Sets.newHashSet();
 
   /**
    * General constructor.
@@ -67,12 +72,22 @@ public class HologramManager {
             DISTANCE_BETWEEN_LINES)
         .orElseThrow(() -> new RuntimeException("Failed to create MultiLine Hologram"));
 
+    alertHolograms.addAll(holograms);
+
     Task.builder()
         .execute(() ->
-            holograms.forEach(HologramsService.Hologram::remove))
+            holograms.forEach(hologram -> {
+              hologram.remove();
+              alertHolograms.remove(hologram);
+            }))
         .delayTicks(HOLOGRAM_LIFETIME)
         .submit(GriefAlert.getInstance());
 
+  }
+
+  public void deleteAllHolograms() {
+    alertHolograms.forEach(HologramsService.Hologram::remove);
+    alertHolograms.clear();
   }
 
 }

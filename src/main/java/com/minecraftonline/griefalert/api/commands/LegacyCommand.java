@@ -8,21 +8,29 @@ import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 
 /**
  * A command class for an old command on MinecraftOnline. The command will be
  * generated but it will simply route the user to a new command.
  */
-public final class LegacyCommand extends AbstractCommand {
+public final class LegacyCommand extends GeneralCommand {
 
   private final String newCommand;
 
   private LegacyCommand(Permission permission, String oldCommand, String newCommand) {
     super(
         permission,
-        Text.of("Replaced with /" + newCommand),
+        Text.of(
+            "The command was replaced with ",
+            Format.command(
+                "/" + newCommand,
+                "/" + newCommand + " help", Text.of("Run help command"))),
         oldCommand);
+    setCommandElement(GenericArguments.optional(
+        GenericArguments.remainingJoinedStrings(
+            Text.of("arguments"))));
     this.newCommand = newCommand;
   }
 
@@ -42,7 +50,9 @@ public final class LegacyCommand extends AbstractCommand {
   @Nonnull
   @Override
   public CommandResult execute(CommandSource src, @Nonnull CommandContext args) {
-    src.sendMessage(Format.info("This command was replaced with /" + newCommand));
+    src.sendMessage(Format.info(
+        "The command was replaced with ",
+        Format.command("/" + newCommand, "/" + newCommand + " help", Text.of("Run help command"))));
     return CommandResult.success();
   }
 

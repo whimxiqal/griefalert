@@ -11,7 +11,6 @@ import com.minecraftonline.griefalert.api.caches.ProfileCache;
 import com.minecraftonline.griefalert.api.commands.LegacyCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.commands.LegacyCommands;
 import com.minecraftonline.griefalert.commands.RootCommand;
 import com.minecraftonline.griefalert.holograms.HologramManager;
@@ -21,8 +20,8 @@ import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.storage.SqliteProfileStorage;
 import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.Reference;
+import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.File;
@@ -146,8 +145,9 @@ public final class GriefAlert {
       }
     } catch (SQLException e) {
       GriefAlert.getInstance().getLogger().error(
-          "Error while creating storage engine for profiles."
-      );
+          "Error while creating storage engine for profiles.");
+      e.printStackTrace();
+      // TODO add enable/disable feature for entire plugin
     }
 
 
@@ -185,6 +185,7 @@ public final class GriefAlert {
   @Listener
   public void onStoppingServer(GameStoppingServerEvent event) {
     getAlertManager().saveAlerts();
+    getHologramManager().deleteAllHolograms();
   }
 
   /**
@@ -203,11 +204,11 @@ public final class GriefAlert {
 
 
   private void registerCommands() {
-    GriefAlertCommand griefAlertCommand = new GriefAlertCommand();
+    RootCommand rootCommand = new RootCommand();
     Sponge.getCommandManager().register(
         this,
-        griefAlertCommand.buildCommandSpec(),
-        griefAlertCommand.getAliases());
+        rootCommand.buildCommandSpec(),
+        rootCommand.getAliases());
     for (LegacyCommand command : LegacyCommands.get()) {
       Sponge.getCommandManager().register(
           this,
