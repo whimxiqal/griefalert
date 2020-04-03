@@ -71,11 +71,7 @@ public class ConfigHelper {
     try {
       GriefAlert.getInstance().getConfigManager().load();
       for (Setting<?> setting : settings) {
-        try {
-          setting.setValueFromConfig(root);
-        } catch (IllegalArgumentException e) {
-          GriefAlert.getInstance().getLogger().error(e.getMessage());
-        }
+        setting.setValueFromConfig(root);
       }
       GriefAlert.getInstance().getLogger().info("Configuration file loaded");
     } catch (Exception e) {
