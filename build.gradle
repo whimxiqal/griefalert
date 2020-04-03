@@ -27,6 +27,7 @@ repositories {
 	mavenCentral()
     google()
     maven { url "http://maven.sk89q.com/repo/" }
+    maven { url "https://jitpack.io" }
     jcenter()
     flatDir {
         dirs 'libs'
@@ -51,7 +52,8 @@ dependencies {
     implementation 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     implementation 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
     implementation fileTree(dir: 'libs', include: '*.jar')
-    shadow fileTree(dir: 'libs', include: 'shadow/*.jar')
+//    shadow fileTree(dir: 'libs', include: 'shadow/*.jar')
+    implementation 'com.github.randombyte-developer:holograms:v3.2.0'
     implementation 'org.xerial:sqlite-jdbc:3.8.11.2'
     implementation 'mysql:mysql-connector-java:8.0.19'
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.5.4'
