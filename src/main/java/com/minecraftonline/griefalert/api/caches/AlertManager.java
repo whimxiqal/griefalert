@@ -242,18 +242,16 @@ public final class AlertManager {
     if (alertStorageFile.exists()) {
       try {
         return restoreAlerts().map(serializableAlert -> {
-          try {
-            if (serializableAlert == null) {
-              return null;
-            }
-            return serializableAlert.deserialize();
-          } catch (Exception e) {
-            e.printStackTrace();
+          if (serializableAlert == null) {
             return null;
           }
+          return serializableAlert.deserialize();
         });
       } catch (Exception e) {
-        e.printStackTrace();
+        GriefAlert.getInstance().getLogger().error(
+            "An error occurred while loading the latest Alert cache. "
+            + "The serialized items are likely outdated. "
+            + "A fresh cache was created.");
       }
     }
     return new RotatingArrayList<>(Settings.ALERTS_CODE_LIMIT.getValue());
@@ -269,8 +267,9 @@ public final class AlertManager {
       oos.writeObject(alertCache.serialize(SerializableAlert::of));
       oos.close();
       fos.close();
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
+    } catch (IOException e) {
+      GriefAlert.getInstance().getLogger().error("Alert cache could not be serialized and saved.");
+      e.printStackTrace();
     }
   }
 

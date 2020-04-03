@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.api.alerts;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -6,6 +8,8 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
@@ -33,6 +37,7 @@ public class SerializableAlert implements Serializable {
   private final Date created;
   private final boolean silent;
   private int cacheIndex;
+  private final List<Detail.SerializedDetail> details = new LinkedList<>();
 
   private SerializableAlert(@Nonnull Alert alert) {
     this.griefProfile = alert.getGriefProfile();
@@ -46,6 +51,10 @@ public class SerializableAlert implements Serializable {
     this.created = alert.getCreated();
     this.silent = alert.isSilent();
     this.cacheIndex = alert.getCacheIndex();
+    if (alert instanceof GeneralAlert) {
+      GeneralAlert generalAlert = (GeneralAlert) alert;
+      generalAlert.getDetails().forEach(detail -> details.add(detail.serialize(alert)));
+    }
   }
 
   public static SerializableAlert of(Alert alert) {
@@ -63,7 +72,7 @@ public class SerializableAlert implements Serializable {
         .flatMap(userStorageService -> userStorageService.get(grieferUuid))
         .orElseThrow(IllegalArgumentException::new);
 
-    return new AbstractAlert(griefProfile) {
+    GeneralAlert generalAlert = new GeneralAlert(griefProfile) {
 
       private boolean silent0 = silent;
 
@@ -116,6 +125,18 @@ public class SerializableAlert implements Serializable {
         return cacheIndex;
       }
     };
+
+    generalAlert.getDetails().clear();
+    details.forEach(detail -> {
+      try {
+        generalAlert.getDetails().add(detail.deserialize(Alert.class));
+      } catch (ClassCastException e) {
+        // This shouldn't happen
+        e.printStackTrace();
+      }
+    });
+
+    return generalAlert;
   }
 
 
