@@ -12,9 +12,11 @@ import com.helion3.prism.api.records.Actionable;
 import com.helion3.prism.api.records.Result;
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.alerts.AbstractAlert;
+import com.minecraftonline.griefalert.api.alerts.Detail;
+import com.minecraftonline.griefalert.api.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
+import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.PrismUtil;
 
 import java.time.Instant;
@@ -29,11 +31,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -41,7 +46,7 @@ import org.spongepowered.api.world.World;
 /**
  * <code>Alert</code> for all which derive from Prism.
  */
-public abstract class PrismAlert extends AbstractAlert {
+public abstract class PrismAlert extends GeneralAlert {
 
   static final long PRISM_BUFFER_MILLISECONDS = 2000L;
 
@@ -58,6 +63,28 @@ public abstract class PrismAlert extends AbstractAlert {
             Sponge.getServer()
                 .getPlayer(UUID.fromString(s))
                 .map(Player::getTransform)).orElseThrow(RuntimeException::new);
+
+    // And block details
+    prismRecord.getDataContainer()
+        .get(DataQueries.OriginalBlock)
+        .flatMap(view -> ((DataView) view).get(DataQueries.BlockState))
+        .flatMap(blockStateDataView ->
+            Sponge.getDataManager().deserialize(BlockState.class, (DataView) blockStateDataView))
+        .map(BlockState::getTraitMap)
+        .ifPresent(map -> map.forEach((key, value) -> addDetail(Detail.of(
+            "(Original) " + General.capitalize(key.getName()),
+            "The " + key.getName() + " trait of the original block of this transaction.",
+            Text.of(value.toString())))));
+    prismRecord.getDataContainer()
+        .get(DataQueries.ReplacementBlock)
+        .flatMap(view -> ((DataView) view).get(DataQueries.BlockState))
+        .flatMap(blockStateDataView ->
+            Sponge.getDataManager().deserialize(BlockState.class, (DataView) blockStateDataView))
+        .map(BlockState::getTraitMap)
+        .ifPresent(map -> map.forEach((key, value) -> addDetail(Detail.of(
+            "(New) " + General.capitalize(key.getName()),
+            "The " + key.getName() + " trait of the newly created block of this transaction.",
+            Text.of(value.toString())))));
   }
 
   PrismRecordArchived getPrismRecord() {

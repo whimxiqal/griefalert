@@ -34,33 +34,33 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 
+
 /**
  * An object to hold all information about an Alert caused by an
  * event matching a {@link GriefProfile}.
  *
  * @author PietElite
  */
-public abstract class AbstractAlert implements Alert {
+public abstract class GeneralAlert implements Alert {
 
   private int cacheIndex;
   private final GriefProfile griefProfile;
 
-  private final List<Detail> primaryDetails =
-      new LinkedList<>();
-  private final List<Detail> secondaryDetails =
+  private final List<Detail<Alert>> details =
       new LinkedList<>();
   private boolean silent = false;
   private boolean pushed = false;
   private final Date created;
 
-  protected AbstractAlert(GriefProfile griefProfile) {
+  protected GeneralAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
     created = new Date();
-    primaryDetails.add(Details.PLAYER);
-    primaryDetails.add(Details.EVENT);
-    primaryDetails.add(Details.TARGET);
-    primaryDetails.add(Details.LOCATION);
-    secondaryDetails.add(Details.TIME);
+    details.add(Details.PLAYER);
+    details.add(Details.EVENT);
+    details.add(Details.TARGET);
+    details.add(Details.LOCATION);
+    details.add(Details.TIME);
+    details.add(Details.IN_HAND);
   }
 
   @Nonnull
@@ -93,12 +93,13 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   public final Text getMessageText() {
     Text.Builder builder = getMessageTextBuilder();
-    Text hoverText = Text.joinWith(
+    Text hoverText = Text.of(Format.prefix(), Format.endLine(), Text.joinWith(
         Format.endLine(),
-        secondaryDetails.stream()
+        details.stream()
+            .filter(detail -> !detail.isPrimary())
             .map(detail -> detail.get(this))
             .flatMap(optional -> optional.map(Stream::of).orElseGet(Stream::empty))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())));
     if (!hoverText.toPlain().isEmpty()) {
       builder.onHover(TextActions.showText(hoverText));
     }
@@ -108,19 +109,16 @@ public abstract class AbstractAlert implements Alert {
   @Nonnull
   @Override
   public final Text getSummary() {
-    List<Detail> allDetails = new LinkedList<>();
-    allDetails.addAll(primaryDetails);
-    allDetails.addAll(secondaryDetails);
     return Text.joinWith(
         Format.endLine(),
-        allDetails.stream()
+        details.stream()
             .map(detail -> detail.get(this))
             .flatMap(optional -> optional.map(Stream::of).orElseGet(Stream::empty))
             .collect(Collectors.toList()));
   }
 
-  protected void addDetail(Detail detail) {
-    this.secondaryDetails.add(detail);
+  protected void addDetail(Detail<Alert> detail) {
+    this.details.add(detail);
   }
 
   @Override
@@ -251,5 +249,7 @@ public abstract class AbstractAlert implements Alert {
     this.cacheIndex = cacheIndex;
   }
 
-
+  public List<Detail<Alert>> getDetails() {
+    return details;
+  }
 }

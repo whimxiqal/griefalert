@@ -1,3 +1,5 @@
+/* Created by PietElite */
+
 package com.minecraftonline.griefalert.alerts.prism;
 
 import com.helion3.prism.api.query.FieldCondition;
@@ -8,7 +10,6 @@ import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.enums.Details;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.time.Instant;
@@ -34,10 +35,9 @@ public class ReplaceAlert extends PrismAlert {
     super(griefProfile, prismRecord);
     this.replacementBlockId = replacementBlockId;
     addDetail(Detail.of(
-        "Replacement",
+        "New Block",
         "The object which replaced the original object.",
         Format.item(replacementBlockId)));
-    addDetail(Details.IN_HAND);
   }
 
   @Override

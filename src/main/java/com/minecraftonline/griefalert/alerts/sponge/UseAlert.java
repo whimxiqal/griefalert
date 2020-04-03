@@ -3,14 +3,12 @@
 package com.minecraftonline.griefalert.alerts.sponge;
 
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.util.enums.Details;
 
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.enums.Details;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
-import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

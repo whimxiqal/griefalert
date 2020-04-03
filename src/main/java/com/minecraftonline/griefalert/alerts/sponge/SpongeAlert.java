@@ -2,7 +2,7 @@
 
 package com.minecraftonline.griefalert.alerts.sponge;
 
-import com.minecraftonline.griefalert.api.alerts.AbstractAlert;
+import com.minecraftonline.griefalert.api.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import javax.annotation.Nonnull;
@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 
-public abstract class SpongeAlert extends AbstractAlert {
+public abstract class SpongeAlert extends GeneralAlert {
 
   private final Event event;
 
