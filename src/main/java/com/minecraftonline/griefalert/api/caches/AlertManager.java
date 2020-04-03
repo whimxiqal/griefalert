@@ -11,7 +11,7 @@ import com.minecraftonline.griefalert.api.structures.HashMapStack;
 import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
-import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
+import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
@@ -110,10 +110,11 @@ public final class AlertManager {
    *
    * @param alert   the <code>Alert</code> to check.
    * @param officer The staff member
+   * @param force whether the teleportation is performed regardless if it's safe
    * @return true if the player teleported correctly
    * @see Alert
    */
-  public boolean check(Alert alert, Player officer) {
+  public boolean check(Alert alert, Player officer, boolean force) {
     // Post an event to show that the Alert is getting checked
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
@@ -131,9 +132,13 @@ public final class AlertManager {
     // CheckEvent
 
     // Teleport the officer
-    if (!officer.setTransformSafely(alert.getGrieferTransform())) {
-      Errors.sendCannotTeleportSafely(officer, alert.getGrieferTransform());
-      return false;
+    if (force) {
+      officer.setTransform(alert.getGrieferTransform());
+    } else {
+      if (!officer.setTransformSafely(alert.getGrieferTransform())) {
+        Errors.sendCannotTeleportSafely(officer, alert.getGrieferTransform());
+        return false;
+      }
     }
 
     // The officer has teleported successfully, so save their previous location in the history
@@ -143,7 +148,7 @@ public final class AlertManager {
     Communication.getStaffBroadcastChannelWithout(officer).send(Format.info(
         Format.userName(officer),
         " is checking alert number ",
-        Format.bonus(GriefAlertCheckCommand.clickToCheck(alert.getCacheIndex()))));
+        Format.bonus(CheckCommand.clickToCheck(alert.getCacheIndex()))));
 
     officer.sendMessage(Format.heading("Checking Grief Alert: ",
         Format.bonus(alert.getCacheIndex())));
@@ -198,22 +203,29 @@ public final class AlertManager {
    *
    * @param officer The officer to teleport
    * @return An optional of how many saved locations are left. Return an empty
-   * Optional if there were no transforms left to begin with.
+   *         Optional if there were no transforms left to begin with.
    */
   public Optional<Integer> revertOfficerTransform(Player officer) {
 
     Optional<Transform<World>> previousTransformOptional = officerCheckHistory
         .pop(officer.getUniqueId());
+    int revertsRemaining = officerCheckHistory.size(officer.getUniqueId());
 
     if (!previousTransformOptional.isPresent()) {
+      officer.sendMessage(Format.info("You have no previous location."));
       return Optional.empty();
     }
 
     if (!officer.setTransformSafely(previousTransformOptional.get())) {
       Errors.sendCannotTeleportSafely(officer, previousTransformOptional.get());
+    } else {
+      officer.sendMessage(Format.success("Returned to previous location."));
     }
+    officer.sendMessage(Format.info(
+        Format.bonus(revertsRemaining),
+        " previous locations available."));
 
-    return Optional.of(officerCheckHistory.size(officer.getUniqueId()));
+    return Optional.of(revertsRemaining);
   }
 
   private void addOfficerTransform(UUID officerUuid, Transform<World> transform) {

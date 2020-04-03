@@ -2,10 +2,10 @@
 
 package com.minecraftonline.griefalert.commands;
 
-import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.api.commands.GeneralCommand;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.Reference;
+import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import javax.annotation.Nonnull;
 
@@ -16,28 +16,28 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
-public class GriefAlertCommand extends AbstractCommand {
+public class RootCommand extends GeneralCommand {
 
   /**
    * The base command for all Grief Alert sub-commands.
    */
-  public GriefAlertCommand() {
+  public RootCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND,
         Text.of("The root command for all Grief Alert commands")
     );
     addAlias("griefalert");
     addAlias("ga");
-    addChild(new GriefAlertCheckCommand());
-    addChild(new GriefAlertInfoCommand());
-    addChild(new GriefAlertProfileCommand());
-    addChild(new GriefAlertQueryCommand());
-    addChild(new GriefAlertReloadCommand());
-    addChild(new GriefAlertReturnCommand());
-    addChild(new GriefAlertShowCommand());
-    addChild(new GriefAlertRollbackCommand());
-    addChild(new GriefAlertLogsCommand());
-    addChild(new GriefAlertClearcacheCommand());
+    addChild(new CheckCommand());
+    addChild(new InfoCommand());
+    addChild(new ProfileCommand());
+    addChild(new QueryCommand());
+    addChild(new ReloadCommand());
+    addChild(new ReturnCommand());
+    addChild(new ShowCommand());
+    addChild(new RollbackCommand());
+    addChild(new LogsCommand());
+    addChild(new ClearcacheCommand());
   }
 
   @Nonnull

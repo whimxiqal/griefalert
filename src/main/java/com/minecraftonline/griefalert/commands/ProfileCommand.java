@@ -2,17 +2,18 @@
 
 package com.minecraftonline.griefalert.commands;
 
-import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.api.commands.GeneralCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
-import com.minecraftonline.griefalert.util.GriefProfileDataQueries;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
@@ -21,30 +22,24 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.DimensionType;
 
-public class GriefAlertProfileCommand extends AbstractCommand {
+public class ProfileCommand extends GeneralCommand {
 
-  GriefAlertProfileCommand() {
+  ProfileCommand() {
     super(Permissions.GRIEFALERT_COMMAND_PROFILE,
-        Text.of("Perform alterations to the profiles used for flagging alerts. Event types: ",
-    Text.joinWith(
-        Format.bonus(", "),
-        GriefEvents.REGISTRY_MODULE.getAll()
-            .stream()
-            .map(griefEvent ->
-                Format.hover(griefEvent.getId(), griefEvent.getDescription()))
-            .collect(Collectors.toList()))));
+        Text.of("Alter the list of Profiles, which flag Alerts"));
     addAlias("profile");
     addAlias("p");
     addChild(new AddCommand());
     addChild(new RemoveCommand());
     addChild(new CountCommand());
     addChild(new ListCommand());
+    addChild(new EventsCommand());
   }
 
   @Nonnull
@@ -54,27 +49,27 @@ public class GriefAlertProfileCommand extends AbstractCommand {
     return CommandResult.success();
   }
 
-  public static class AddCommand extends AbstractCommand {
+  public static class AddCommand extends GeneralCommand {
 
     AddCommand() {
       super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Add a profile to the database."));
       addAlias("add");
       addAlias("a");
       setCommandElement(GenericArguments.seq(
-          GenericArguments.catalogedElement(Text.of("event"), GriefEvent.class),
-          GenericArguments.string(Text.of("target")),
+          GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+          GenericArguments.string(CommandKeys.GA_TARGET.get()),
           GenericArguments.flags()
               .valueFlag(GenericArguments.dimension(
-                  Text.of("dimension")),
+                  CommandKeys.DIMENSION.get()),
                   "-ignore", "i")
               .valueFlag(GenericArguments.catalogedElement(
-                  Text.of("event_color"), TextColor.class),
+                  CommandKeys.PROFILE_COLOR_EVENT.get(), TextColor.class),
                   "-event_color")
               .valueFlag(GenericArguments.catalogedElement(
-                  Text.of("target_color"), TextColor.class),
+                  CommandKeys.PROFILE_COLOR_TARGET.get(), TextColor.class),
                   "-target_color")
               .valueFlag(GenericArguments.catalogedElement(
-                  Text.of("dimension_color"), TextColor.class),
+                  CommandKeys.DIMENSION.get(), TextColor.class),
                   "-dimension_color")
               .buildWith(GenericArguments.none())));
     }
@@ -83,17 +78,23 @@ public class GriefAlertProfileCommand extends AbstractCommand {
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
-      GriefEvent event = ((GriefEvent) args.getOne("event").get());
-      String target = args.<String>getOne("target").map(General::ensureIdFormat).get();
+      GriefEvent event = args.<GriefEvent>getOne(CommandKeys.GA_EVENT.get())
+          .orElseThrow(() -> new RuntimeException("Requires argument"));
+      String target = args.<String>getOne(CommandKeys.GA_TARGET.get())
+          .map(General::ensureIdFormat)
+          .orElseThrow(() -> new RuntimeException("Requires argument"));
       GriefProfile profile = GriefProfile.of(event, target);
 
-      args.<TextColor>getOne("event_color")
+      args.<DimensionType>getAll(CommandKeys.DIMENSION.get())
+          .forEach(profile::addIgnored);
+
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_EVENT.get())
           .ifPresent(color -> profile.putColored(GriefProfile.Colored.EVENT, color));
 
-      args.<TextColor>getOne("target_color")
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_TARGET.get())
           .ifPresent(color -> profile.putColored(GriefProfile.Colored.TARGET, color));
 
-      args.<TextColor>getOne("dimension_color")
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_DIMENSION.get())
           .ifPresent(color -> profile.putColored(GriefProfile.Colored.DIMENSION, color));
 
       try {
@@ -118,23 +119,26 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
   }
 
-  public static class RemoveCommand extends AbstractCommand {
+  public static class RemoveCommand extends GeneralCommand {
 
     RemoveCommand() {
       super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Remove a profile from the database"));
       addAlias("remove");
       addAlias("r");
       setCommandElement(GenericArguments.seq(
-          GenericArguments.catalogedElement(Text.of("event"), GriefEvent.class),
-          GenericArguments.string(Text.of("target"))));
+          GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+          GenericArguments.string(CommandKeys.GA_TARGET.get())));
     }
 
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
-      GriefEvent event = (GriefEvent) args.getOne("event").get();
-      String target = args.getOne("target").map((s) -> General.ensureIdFormat((String) s)).get();
+      GriefEvent event = args.<GriefEvent>getOne(CommandKeys.GA_EVENT.get())
+          .orElseThrow(() -> new RuntimeException("Requires argument"));
+      String target = args.<String>getOne(CommandKeys.GA_TARGET.get())
+          .map(General::ensureIdFormat)
+          .orElseThrow(() -> new RuntimeException("Requires argument"));
 
       try {
         if (GriefAlert.getInstance().getProfileStorage().remove(event, target)) {
@@ -158,7 +162,7 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
   }
 
-  public static class CountCommand extends AbstractCommand {
+  public static class CountCommand extends GeneralCommand {
 
     CountCommand() {
       super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of(
@@ -180,38 +184,92 @@ public class GriefAlertProfileCommand extends AbstractCommand {
 
   }
 
-  public static class ListCommand extends AbstractCommand {
+  public static class ListCommand extends GeneralCommand {
 
     ListCommand() {
       super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("List every profile in use"));
       addAlias("list");
       addAlias("l");
+      setCommandElement(GenericArguments.flags()
+          .valueFlag(
+              GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+              "e")
+          .valueFlag(
+              GenericArguments.string(CommandKeys.TARGET.get()),
+              "t")
+          .valueFlag(
+              GenericArguments.dimension(CommandKeys.DIMENSION.get()),
+              "d")
+          .flag("-colored", "c")
+          .buildWith(
+              GenericArguments.none()));
     }
 
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
-      if (src instanceof ConsoleSource) {
 
+      List<Text> elements = GriefAlert.getInstance()
+          .getProfileCache()
+          .getProfiles()
+          .stream()
+          .filter(profile -> args.<GriefEvent>getOne("event")
+              .map(event -> profile.getGriefEvent()
+                  .getId().toLowerCase().contains(event.getId().toLowerCase()))
+              .orElse(true))
+          .filter(profile -> args.<String>getOne("target")
+              .map(target -> profile.getTarget()
+                  .toLowerCase().contains(target.toLowerCase()))
+              .orElse(true))
+          .filter(profile -> {
+            Collection<DimensionType> dimensions = args.getAll("dimension");
+            return dimensions.isEmpty()
+                || dimensions.stream().anyMatch(dimension -> !profile.isIgnoredIn(dimension));
+          })
+          .filter(profile -> !args.hasAny("colored") || profile.isColored())
+          .map(profile -> Text.of(
+              Format.GRIEF_ALERT_THEME,
+              " - ",
+              TextColors.RESET, profile.print()))
+          .collect(Collectors.toList());
+
+      if (elements.isEmpty()) {
+        src.sendMessage(Format.info("No profiles found with those parameters"));
+      } else if (src instanceof ConsoleSource) {
         ConsoleSource console = (ConsoleSource) src;
         console.sendMessage(Format.heading("=== Grief Profiles ==="));
-        for (GriefProfile profile : GriefAlert.getInstance().getProfileCache().getProfiles()) {
-          console.sendMessage(profile.print());
-        }
+        elements.forEach(console::sendMessage);
       } else {
         PaginationList.builder()
-            .header(Text.of(TextColors.YELLOW, "Grief Profiles"))
-            .padding(Text.of(TextColors.GRAY, "="))
-            .contents(GriefAlert.getInstance()
-                .getProfileCache()
-                .getProfiles()
-                .stream()
-                .map(GriefProfile::print)
-                .collect(Collectors.toList()))
-            .footer(Text.of(TextColors.YELLOW, "Formatting for list command is in progress"))
+            .title(Text.of(TextColors.YELLOW, "Grief Profiles"))
+            .padding(Text.of(TextColors.DARK_GRAY, "="))
+            .contents(elements)
             .build()
             .sendTo(src);
       }
+      return CommandResult.success();
+    }
+  }
+
+  public static class EventsCommand extends GeneralCommand {
+
+    EventsCommand() {
+      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("List all events used by GriefAlert"));
+      addAlias("events");
+    }
+
+    @Nonnull
+    @Override
+    public CommandResult execute(CommandSource src, @Nonnull CommandContext args) {
+      src.sendMessage(Format.info(
+          "GriefAlert Events: ",
+          Text.joinWith(
+              Format.bonus(", "),
+              GriefEvents.REGISTRY_MODULE.getAll()
+                  .stream()
+                  .map(griefEvent ->
+                      Format.hover(griefEvent.getId(), griefEvent.getDescription()))
+                  .collect(Collectors.toList()))));
       return CommandResult.success();
     }
   }

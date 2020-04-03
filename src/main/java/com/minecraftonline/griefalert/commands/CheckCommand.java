@@ -5,12 +5,17 @@ package com.minecraftonline.griefalert.commands;
 import com.minecraftonline.griefalert.GriefAlert;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.commands.AbstractCommand;
+import com.minecraftonline.griefalert.api.commands.GeneralCommand;
 import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+import com.minecraftonline.griefalert.util.enums.Settings;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
-import com.minecraftonline.griefalert.util.enums.Settings;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -23,18 +28,21 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.concurrent.TimeUnit;
 
-public class GriefAlertCheckCommand extends AbstractCommand {
+public class CheckCommand extends GeneralCommand {
 
-  GriefAlertCheckCommand() {
+  CheckCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_CHECK,
-        Text.of("Check the grief alert with the given id")
+        Text.of("Teleport to the location of event")
     );
     addAlias("check");
     addAlias("c");
-    setCommandElement(GenericArguments.onlyOne(GenericArguments.integer(Text.of("index"))));
+    setCommandElement(GenericArguments
+        .flags()
+        .flag("-force", "f")
+        .buildWith(GenericArguments.onlyOne(
+            GenericArguments.integer(CommandKeys.ALERT_INDEX.get()))));
   }
 
   @Nonnull
@@ -43,33 +51,18 @@ public class GriefAlertCheckCommand extends AbstractCommand {
                                @Nonnull CommandContext args) {
     if (src instanceof Player) {
       Player player = (Player) src;
-      if (args.<Integer>getOne("index").isPresent()) {
+      if (args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).isPresent()) {
 
         try {
 
           Alert alert = GriefAlert.getInstance()
               .getAlertManager().getAlertCache()
-              .get(args.<Integer>getOne("index").get());
+              .get(args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).get());
 
-          // Give invulnerability
-          EventListener<DamageEntityEvent> cancelDamage = event -> {
-            if (event.getTargetEntity().getUniqueId().equals(player.getUniqueId())) {
-              event.setCancelled(true);
-            }
-          };
-          Sponge.getEventManager().registerListener(
-              GriefAlert.getInstance(),
-              DamageEntityEvent.class,
-              cancelDamage);
-          Task.builder().delay(Settings.CHECK_INVULNERABILITY.getValue(), TimeUnit.SECONDS)
-              .execute(() -> {
-                Sponge.getEventManager().unregisterListeners(cancelDamage);
-                player.sendMessage(Format.info("Invulnerability revoked"));
-              })
-              .name("Remove invulnerability for player " + player.getName())
-              .submit(GriefAlert.getInstance());
-
-          GriefAlert.getInstance().getAlertManager().check(alert, player);
+          if (GriefAlert.getInstance().getAlertManager()
+              .check(alert, player, args.hasAny("force"))) {
+            giveInvulnerability(player, Settings.CHECK_INVULNERABILITY.getValue());
+          }
 
           player.sendMessage(Format.info(String.format(
               "You have been given %d seconds of invulnerability",
@@ -91,6 +84,29 @@ public class GriefAlertCheckCommand extends AbstractCommand {
     return CommandResult.success();
   }
 
+  private void giveInvulnerability(Player player, int seconds) {
+    // Give invulnerability
+    UUID playerUuid = player.getUniqueId();
+    EventListener<DamageEntityEvent> cancelDamage = event -> {
+      if (event.getTargetEntity().getUniqueId().equals(playerUuid)) {
+        event.setCancelled(true);
+      }
+    };
+    Sponge.getEventManager().registerListener(
+        GriefAlert.getInstance(),
+        DamageEntityEvent.class,
+        cancelDamage);
+    Optional<Player> playerOptional = Optional.of(player);
+    Task.builder().delay(seconds, TimeUnit.SECONDS)
+        .execute(() -> {
+          Sponge.getEventManager().unregisterListeners(cancelDamage);
+          // Garbage collection might get rid of this player? Made it optional just in case.
+          playerOptional.ifPresent(p -> p.sendMessage(Format.info("Invulnerability revoked")));
+        })
+        .name("Remove invulnerability for player " + player.getName())
+        .submit(GriefAlert.getInstance());
+  }
+
   /**
    * Get a clickable message that allows the officer to check the alert.
    *
@@ -102,6 +118,5 @@ public class GriefAlertCheckCommand extends AbstractCommand {
         String.format("/griefalert check %s", index),
         Text.of("Check this alert"));
   }
-
 
 }

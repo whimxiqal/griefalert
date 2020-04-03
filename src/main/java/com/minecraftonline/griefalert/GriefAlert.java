@@ -13,6 +13,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.commands.GriefAlertCommand;
 import com.minecraftonline.griefalert.commands.LegacyCommands;
+import com.minecraftonline.griefalert.commands.RootCommand;
 import com.minecraftonline.griefalert.holograms.HologramManager;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;

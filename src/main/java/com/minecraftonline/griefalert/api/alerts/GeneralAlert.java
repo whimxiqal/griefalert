@@ -8,7 +8,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
-import com.minecraftonline.griefalert.commands.GriefAlertCheckCommand;
+import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
@@ -215,7 +215,7 @@ public abstract class AbstractAlert implements Alert {
     Text.Builder builder = Text.builder().append(getMessageText());
     allIndices.forEach((i) -> {
       builder.append(Format.space());
-      builder.append(GriefAlertCheckCommand.clickToCheck(i));
+      builder.append(CheckCommand.clickToCheck(i));
     });
     return builder.build();
   }
