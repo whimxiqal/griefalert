@@ -86,8 +86,11 @@ Only if the specified flag requirements are satisfied will a query returned to t
 | Group            | *group*     | Return all results of a query collapsed together where possible |
 
 ### Date Format
-Dates/times can be defined in two ways: Either use the format "yyyy-MM-dd" to establish the exact day or 
-give a time period to subtract from the current time. 
+
+The output format for dates/times can be defined in the configuration file.
+
+The input syntax for dates/times can be done in one of two ways: 
+Either use the format "yyyy-MM-dd" to establish the exact day or give a time period to subtract from the current time. 
 The time period is formatted using a series of integer values, each combined with a symbol corresponding to the time unit.
 
 | Symbol | Time Unit |
@@ -105,7 +108,7 @@ The time period is formatted using a series of integer values, each combined wit
 | -----:      | :------ |
 | 1d12h       | 1 day and 12 hours ago |
 | 2w5d        | 2 weeks and 5 days ago |
-| 5y2M10m4d2m | 5 years, 2 months, 4 days, and 12 minutes ago |
+| 10m1h1d | 1 day, 1 hour and 10 minutes ago |
 
 ### Old Commands
 MinecraftOnline used to have different commands associated with the older version of GriefAlert. The following commands have been changed:
