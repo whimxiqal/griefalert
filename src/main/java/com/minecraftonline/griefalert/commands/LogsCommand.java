@@ -51,27 +51,28 @@ public class LogsCommand extends GeneralCommand {
 
       Map<Text, Text> flags = Maps.newHashMap();
 
-      PrismUtil.buildSession(player, args, flags).ifPresent(session -> {
-        // Don't group the results if specified
-        if (args.getOne("group").isPresent()) {
-          flags.put(Text.of("group"), Text.of("true"));
-        } else {
-          session.addFlag(Flag.NO_GROUP);
-          flags.put(Text.of("group"), Text.of("false"));
-        }
+      PrismUtil.buildSession(player, args, flags).thenAccept(sessionOptional ->
+          sessionOptional.ifPresent(session -> {
+            // Don't group the results if specified
+            if (args.getOne("group").isPresent()) {
+              flags.put(Text.of("group"), Text.of("true"));
+            } else {
+              session.addFlag(Flag.NO_GROUP);
+              flags.put(Text.of("group"), Text.of("false"));
+            }
 
-        player.sendMessage(Format.info(
-            "Using parameters: ",
-            Text.joinWith(
-                Format.bonus(", "),
-                flags.entrySet()
-                    .stream()
-                    .map(entry ->
-                        Format.bonus("{", entry.getKey(), ": ", entry.getValue(), "}"))
-                    .collect(Collectors.toList()))));
+            player.sendMessage(Format.info(
+                "Using parameters: ",
+                Text.joinWith(
+                    Format.bonus(", "),
+                    flags.entrySet()
+                        .stream()
+                        .map(entry ->
+                            Format.bonus("{", entry.getKey(), ": ", entry.getValue(), "}"))
+                        .collect(Collectors.toList()))));
 
-        AsyncUtil.lookup(session);
-      });
+            AsyncUtil.lookup(session);
+          }));
 
       return CommandResult.success();
     } else {
@@ -85,6 +86,7 @@ public class LogsCommand extends GeneralCommand {
     LogsInspectorCommand() {
       super(Permissions.GRIEFALERT_COMMAND_LOGS,
           Text.of("Use Prism's inspection tool. Same as '/pr i'."));
+      addAlias("inspect");
       addAlias("i");
     }
 

@@ -16,6 +16,7 @@ import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.PrismUtil;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -26,8 +27,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-
 
 
 public class RollbackCommand extends GeneralCommand {
@@ -128,7 +127,7 @@ public class RollbackCommand extends GeneralCommand {
       addAlias("r");
       setCommandElement(GenericArguments.flags()
           .valueFlag(GenericArguments.string(CommandKeys.SINCE.get()), "s")
-          .valueFlag(GenericArguments.string(CommandKeys.BEFORE.get()),"b")
+          .valueFlag(GenericArguments.string(CommandKeys.BEFORE.get()), "b")
           .valueFlag(GenericArguments.string(CommandKeys.PLAYER.get()), "p")
           .valueFlag(GenericArguments.string(CommandKeys.PRISM_TARGET.get()), "t")
           .valueFlag(GenericArguments.string(CommandKeys.PRISM_EVENT.get()), "e")
@@ -144,19 +143,20 @@ public class RollbackCommand extends GeneralCommand {
 
         Map<Text, Text> flags = Maps.newHashMap();
 
-        PrismUtil.buildSession(player, args, flags).ifPresent(session -> {
-          player.sendMessage(Format.info(
-              "Using parameters: ",
-              Text.joinWith(
-                  Format.bonus(", "),
-                  flags.entrySet()
-                      .stream()
-                      .map(entry ->
-                          Format.bonus("{", entry.getKey(), ": ", entry.getValue(), "}"))
-                      .collect(Collectors.toList()))));
-          session.addFlag(Flag.NO_GROUP);
-          ApplierCommand.runApplier(session, Sort.NEWEST_FIRST);
-        });
+        PrismUtil.buildSession(player, args, flags).thenAccept(sessionOptional ->
+            sessionOptional.ifPresent(session -> {
+              player.sendMessage(Format.info(
+                  "Using parameters: ",
+                  Text.joinWith(
+                      Format.bonus(", "),
+                      flags.entrySet()
+                          .stream()
+                          .map(entry ->
+                              Format.bonus("{", entry.getKey(), ": ", entry.getValue(), "}"))
+                          .collect(Collectors.toList()))));
+              session.addFlag(Flag.NO_GROUP);
+              ApplierCommand.runApplier(session, Sort.NEWEST_FIRST);
+            }));
 
         return CommandResult.success();
       } else {

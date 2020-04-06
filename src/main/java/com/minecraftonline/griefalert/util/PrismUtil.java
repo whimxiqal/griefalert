@@ -17,6 +17,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -33,6 +36,8 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.ProfileNotFoundException;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
@@ -73,92 +78,95 @@ public final class PrismUtil {
    * @param flags  the map of flags to store information about what command was run
    * @return An optional of the built {@link QuerySession}. Empty if it couldn't be created.
    */
-  public static Optional<QuerySession> buildSession(Player player,
-                                                    CommandContext args,
-                                                    Map<Text, Text> flags) {
-    final QuerySession session = new QuerySession(player);
+  public static CompletableFuture<Optional<QuerySession>> buildSession(Player player,
+                                                                       CommandContext args,
+                                                                       Map<Text, Text> flags) {
+    return CompletableFuture.supplyAsync(() -> {
+      final QuerySession session = new QuerySession(player);
 
-    Query query = session.newQuery();
-    // Add location query with WE
-    World world = player.getLocation().getExtent();
-    SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(world);
-    try {
-      query.addCondition(ConditionGroup.from(
-          world,
-          WorldEditUtil.convertVector(
-              SpongeWorldEdit.inst().getSession(player)
-                  .getSelection(spongeWorld).getMinimumPoint()),
-          WorldEditUtil.convertVector(
-              SpongeWorldEdit.inst().getSession(player)
-                  .getSelection(spongeWorld).getMaximumPoint())));
-    } catch (IncompleteRegionException e) {
-      player.sendMessage(Format.error("No region selected"));
-      return Optional.empty();
-    }
-
-    // Parse the 'since' with the given date format, or just do a year ago
-    Date since = args.<String>getOne(CommandKeys.SINCE.get()).flatMap(str -> {
+      Query query = session.newQuery();
+      // Add location query with WE
+      World world = player.getLocation().getExtent();
+      SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(world);
       try {
-        Date out = DateUtil.parseAnyDate(str);
-        flags.put(CommandKeys.SINCE.get(), Text.of(Format.date(out)));
-        return Optional.of(out);
-      } catch (IllegalArgumentException e) {
-        player.sendMessage(Format.error(e.getMessage()));
+        query.addCondition(ConditionGroup.from(
+            world,
+            WorldEditUtil.convertVector(
+                SpongeWorldEdit.inst().getSession(player)
+                    .getSelection(spongeWorld).getMinimumPoint()),
+            WorldEditUtil.convertVector(
+                SpongeWorldEdit.inst().getSession(player)
+                    .getSelection(spongeWorld).getMaximumPoint())));
+      } catch (IncompleteRegionException e) {
+        player.sendMessage(Format.error("No region selected"));
         return Optional.empty();
       }
-    }).orElseGet(() -> {
-      Date out = Date.from(Instant.now().minus(Duration.ofDays(5)));
-      flags.put(CommandKeys.SINCE.get(), Format.date(out));
-      return out;
-    });
-    query.addCondition(FieldCondition.of(
-        DataQueries.Created,
-        MatchRule.GREATER_THAN_EQUAL,
-        since));
 
-    args.<String>getOne(CommandKeys.BEFORE.get()).ifPresent(str -> {
-      Date before = DateUtil.parseAnyDate(str);
-      flags.put(CommandKeys.BEFORE.get(), Text.of(Format.date(before)));
+      // Parse the 'since' with the given date format, or just do a year ago
+      Date since = args.<String>getOne(CommandKeys.SINCE.get()).flatMap(str -> {
+        try {
+          Date out = DateUtil.parseAnyDate(str);
+          flags.put(CommandKeys.SINCE.get(), Text.of(Format.date(out)));
+          return Optional.of(out);
+        } catch (IllegalArgumentException e) {
+          player.sendMessage(Format.error(e.getMessage()));
+          return Optional.empty();
+        }
+      }).orElseGet(() -> {
+        Date out = Date.from(Instant.now().minus(Duration.ofDays(5)));
+        flags.put(CommandKeys.SINCE.get(), Format.date(out));
+        return out;
+      });
       query.addCondition(FieldCondition.of(
           DataQueries.Created,
-          MatchRule.LESS_THAN_EQUAL,
-          before));
-    });
+          MatchRule.GREATER_THAN_EQUAL,
+          since));
 
-    args.<String>getOne(CommandKeys.PRISM_TARGET.get()).ifPresent(str -> {
-      flags.put(CommandKeys.PRISM_TARGET.get(), Text.of(str));
-      query.addCondition(FieldCondition.of(
-          DataQueries.Target,
-          MatchRule.EQUALS,
-          str.replaceAll("_", " ")));
-    });
-
-    Optional<String> playerOptional = args.getOne(CommandKeys.PLAYER.get());
-    if (playerOptional.isPresent()) {
-      Optional<User> userOptional = Sponge.getServiceManager().provide(UserStorageService.class)
-          .flatMap(users -> users.get(playerOptional.get()));
-      if (userOptional.isPresent()) {
-        flags.put(CommandKeys.PLAYER.get(), Text.of(playerOptional.get()));
+      args.<String>getOne(CommandKeys.BEFORE.get()).ifPresent(str -> {
+        Date before = DateUtil.parseAnyDate(str);
+        flags.put(CommandKeys.BEFORE.get(), Text.of(Format.date(before)));
         query.addCondition(FieldCondition.of(
-            DataQueries.Player,
+            DataQueries.Created,
+            MatchRule.LESS_THAN_EQUAL,
+            before));
+      });
+
+      args.<String>getOne(CommandKeys.PRISM_TARGET.get()).ifPresent(str -> {
+        flags.put(CommandKeys.PRISM_TARGET.get(), Text.of(str));
+        query.addCondition(FieldCondition.of(
+            DataQueries.Target,
             MatchRule.EQUALS,
-            userOptional.get().getUniqueId().toString()));
-      } else {
-        player.sendMessage(Format.error("Player not found."));
-        return Optional.empty();
+            str.replaceAll("_", " ")));
+      });
+
+      Optional<String> playerOptional = args.getOne(CommandKeys.PLAYER.get());
+      if (playerOptional.isPresent()) {
+        try {
+          GameProfile gameProfile = Sponge.getServer().getGameProfileManager().get(playerOptional.get()).get();
+          flags.put(CommandKeys.PLAYER.get(), Text.of(playerOptional.get()));
+          query.addCondition(FieldCondition.of(
+              DataQueries.Player,
+              MatchRule.EQUALS,
+              gameProfile.getUniqueId().toString()));
+        } catch (ExecutionException e) {
+          player.sendMessage(Format.error("Player not found"));
+          return Optional.empty();
+        } catch (Exception e) {
+          player.sendMessage(Format.error("Error trying to access game profile"));
+          e.printStackTrace();
+        }
       }
-    }
 
-    args.<String>getOne(CommandKeys.PRISM_EVENT.get()).ifPresent(str -> {
-      flags.put(CommandKeys.PRISM_EVENT.get(), Text.of(str));
-      query.addCondition(FieldCondition.of(
-          DataQueries.EventName,
-          MatchRule.EQUALS,
-          str));
+      args.<String>getOne(CommandKeys.PRISM_EVENT.get()).ifPresent(str -> {
+        flags.put(CommandKeys.PRISM_EVENT.get(), Text.of(str));
+        query.addCondition(FieldCondition.of(
+            DataQueries.EventName,
+            MatchRule.EQUALS,
+            str));
+      });
+
+      return Optional.of(session);
     });
-
-    return Optional.of(session);
-
   }
 
   /**

@@ -29,7 +29,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class QueryCommand extends GeneralCommand {
 
-  private static final int DEFAULT_MAXIMUM_QUERIES = 200;
+  private static final int DEFAULT_MAXIMUM_QUERIES = 100;
+  private static final int MAXIMUM_MAXIMUM_QUERIES = 1000;
 
   QueryCommand() {
     super(
@@ -65,7 +66,9 @@ public class QueryCommand extends GeneralCommand {
         .getDataByTime();
     Collections.reverse(cacheReversed);
 
-    int max = (int) args.getOne(CommandKeys.MAXIMUM.get()).orElse(DEFAULT_MAXIMUM_QUERIES);
+    int max = args.<Integer>getOne(CommandKeys.MAXIMUM.get())
+        .map(i -> Math.max(0, Math.min(i, MAXIMUM_MAXIMUM_QUERIES)))
+        .orElse(DEFAULT_MAXIMUM_QUERIES);
     flags.put(CommandKeys.MAXIMUM.get(), Text.of(max));
 
     args.<String>getOne(CommandKeys.PLAYER.get()).ifPresent(p ->
