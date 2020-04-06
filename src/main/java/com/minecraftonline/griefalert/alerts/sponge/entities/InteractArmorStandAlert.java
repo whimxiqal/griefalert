@@ -5,7 +5,7 @@ package com.minecraftonline.griefalert.alerts.sponge.entities;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.SpongeEvents;
+import com.minecraftonline.griefalert.util.SpongeUtil;
 
 import java.util.stream.Collectors;
 
@@ -20,7 +20,7 @@ public class InteractArmorStandAlert extends InteractEntityAlert {
     addDetail(Detail.of(
         "Contents",
         "All the items in the armor stand at the time of the event.",
-        SpongeEvents.getArmorStandContent(getEntitySnapshot())
+        SpongeUtil.getArmorStandContent(getEntitySnapshot())
             .map(list -> list.stream()
                 .map(Format::item)
                 .collect(Collectors.toList()))

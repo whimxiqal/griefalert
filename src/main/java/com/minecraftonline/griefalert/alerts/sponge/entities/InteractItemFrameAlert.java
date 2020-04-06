@@ -5,7 +5,7 @@ package com.minecraftonline.griefalert.alerts.sponge.entities;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.SpongeEvents;
+import com.minecraftonline.griefalert.util.SpongeUtil;
 
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 
@@ -17,7 +17,7 @@ class InteractItemFrameAlert extends InteractEntityAlert {
     addDetail(Detail.of(
         "Content",
         "The item in this item frame at the time of the event.",
-        SpongeEvents.getItemFrameContent(getEntitySnapshot())
+        SpongeUtil.getItemFrameContent(getEntitySnapshot())
             .map(Format::item)
             .orElse(Format.bonus("none"))));
   }

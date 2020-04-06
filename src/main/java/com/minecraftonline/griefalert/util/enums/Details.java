@@ -17,6 +17,7 @@ import org.spongepowered.api.util.blockray.BlockRay;
 
 public final class Details {
 
+
   private Details() {
   }
 
@@ -29,7 +30,7 @@ public final class Details {
   public static final Detail<Alert> EVENT = Detail.of(
       "Event",
       "THe classification for this type of event.",
-      alert -> Optional.of(Format.bonus(alert.getGriefEvent().getName())),
+      alert -> Optional.of(Format.bonus(alert.getGriefEvent().toText())),
       true);
 
   public static final Detail<Alert> TARGET = Detail.of(
@@ -86,5 +87,6 @@ public final class Details {
           .getItemInHand(HandTypes.MAIN_HAND)
           .filter(stack -> !stack.getType().equals(ItemTypes.AIR))
           .map(stack -> Format.hover(stack.getTranslation().get(), stack.getType().getId())));
+
 
 }

@@ -8,6 +8,7 @@ import com.minecraftonline.griefalert.api.structures.RotatingList;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.entity.Transform;
@@ -198,5 +199,10 @@ public interface Alert extends Runnable {
    */
   @Nonnull
   TextColor getDimensionColor();
+
+  @Nonnull
+  List<AlertCheck> getChecks();
+
+  void addCheck(@Nonnull AlertCheck check);
 
 }

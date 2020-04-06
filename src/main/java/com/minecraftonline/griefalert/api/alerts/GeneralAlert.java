@@ -18,12 +18,14 @@ import com.minecraftonline.griefalert.util.enums.Permissions;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -51,6 +53,7 @@ public abstract class GeneralAlert implements Alert {
   private boolean silent = false;
   private boolean pushed = false;
   private final Date created;
+  private final List<AlertCheck> checks = Lists.newLinkedList();
 
   protected GeneralAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
@@ -144,9 +147,9 @@ public abstract class GeneralAlert implements Alert {
   }
 
   /**
-   * Run this <code>Alert</code>. This constitutes pushing this <code>Alert</code>
+   * Run this {@link Alert}. This constitutes pushing this <code>Alert</code>
    * to the {@link RotatingList} followed by
-   * broadcasting the <code>ALert</code> to staff members if the <code>Alert</code>
+   * broadcasting the <code>Alert</code> to staff members if the <code>Alert</code>
    * is not silent. This can only be done once.
    */
   @Override
@@ -251,5 +254,16 @@ public abstract class GeneralAlert implements Alert {
 
   public List<Detail<Alert>> getDetails() {
     return details;
+  }
+
+  @Nonnull
+  @Override
+  public List<AlertCheck> getChecks() {
+    return checks;
+  }
+
+  @Override
+  public void addCheck(@Nonnull AlertCheck check) {
+    checks.add(check);
   }
 }

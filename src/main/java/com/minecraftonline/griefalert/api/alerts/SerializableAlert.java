@@ -37,6 +37,7 @@ public class SerializableAlert implements Serializable {
   private final Date created;
   private final boolean silent;
   private int cacheIndex;
+  private final List<AlertCheck> checks;
   private final List<Detail.SerializedDetail> details = new LinkedList<>();
 
   private SerializableAlert(@Nonnull Alert alert) {
@@ -51,6 +52,7 @@ public class SerializableAlert implements Serializable {
     this.created = alert.getCreated();
     this.silent = alert.isSilent();
     this.cacheIndex = alert.getCacheIndex();
+    this.checks = alert.getChecks();
     if (alert instanceof GeneralAlert) {
       GeneralAlert generalAlert = (GeneralAlert) alert;
       generalAlert.getDetails().forEach(detail -> details.add(detail.serialize(alert)));
@@ -125,6 +127,8 @@ public class SerializableAlert implements Serializable {
         return cacheIndex;
       }
     };
+
+    checks.forEach(generalAlert::addCheck);
 
     generalAlert.getDetails().clear();
     details.forEach(detail -> {

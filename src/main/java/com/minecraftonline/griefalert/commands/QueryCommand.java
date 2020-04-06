@@ -2,6 +2,7 @@
 
 package com.minecraftonline.griefalert.commands;
 
+import com.google.common.collect.Maps;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.commands.GeneralCommand;
@@ -13,6 +14,7 @@ import com.minecraftonline.griefalert.util.enums.Permissions;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
@@ -27,7 +29,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class QueryCommand extends GeneralCommand {
 
-  private static final int DEFAULT_MAXIMUM_QUERIES = 1000;
+  private static final int DEFAULT_MAXIMUM_QUERIES = 200;
 
   QueryCommand() {
     super(
@@ -55,6 +57,8 @@ public class QueryCommand extends GeneralCommand {
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) {
 
+    Map<Text, Text> flags = Maps.newHashMap();
+
     List<Alert> cacheReversed = GriefAlert.getInstance()
         .getAlertManager()
         .getAlertCache()
@@ -62,8 +66,14 @@ public class QueryCommand extends GeneralCommand {
     Collections.reverse(cacheReversed);
 
     int max = (int) args.getOne(CommandKeys.MAXIMUM.get()).orElse(DEFAULT_MAXIMUM_QUERIES);
+    flags.put(CommandKeys.MAXIMUM.get(), Text.of(max));
 
-    final boolean group = args.hasAny("group");
+    args.<String>getOne(CommandKeys.PLAYER.get()).ifPresent(p ->
+        flags.put(CommandKeys.PLAYER.get(), Text.of(p)));
+    args.<GriefEvent>getOne(CommandKeys.GA_EVENT.get()).ifPresent(e ->
+        flags.put(CommandKeys.GA_EVENT.get(), e.toText()));
+    args.<String>getOne(CommandKeys.GA_TARGET.get()).ifPresent(t ->
+        flags.put(CommandKeys.GA_TARGET.get(), Text.of(t)));
 
     List<Alert> matching = cacheReversed
         .stream()
@@ -74,7 +84,7 @@ public class QueryCommand extends GeneralCommand {
                 && args.<GriefEvent>getOne(CommandKeys.GA_EVENT.get()).map(event ->
                 alert.getGriefEvent().getId().toLowerCase().contains(event.getId().toLowerCase()))
                 .orElse(true)
-                && args.<String>getOne(CommandKeys.GA_TARGET.get()).map(target ->
+                && args.<String>getOne(CommandKeys.TARGET.get()).map(target ->
                 alert.getTarget().toLowerCase().contains(target.toLowerCase()))
                 .orElse(true))
         .limit(max)
@@ -85,9 +95,14 @@ public class QueryCommand extends GeneralCommand {
       return CommandResult.empty();
     }
 
-    List<Text> contents;
-    if (args.hasAny("spread")) {
-      contents = matching.stream().map(Alert::getTextWithIndex).collect(Collectors.toList());
+    final boolean group = args.hasAny("group");
+    flags.put(Text.of("group"), Text.of(group));
+    final boolean spread = args.hasAny("spread");
+    flags.put(Text.of("spread"), Text.of(spread));
+
+    List<Text> pageContents;
+    if (spread) {
+      pageContents = matching.stream().map(Alert::getTextWithIndex).collect(Collectors.toList());
     } else {
       LinkedList<LinkedList<Alert>> nested = new LinkedList<>();
       nested.add(new LinkedList<>());
@@ -103,7 +118,7 @@ public class QueryCommand extends GeneralCommand {
         }
       }
       if (group) {
-        contents = nested.stream()
+        pageContents = nested.stream()
             .filter(list -> !list.isEmpty())
             .map(list -> list.get(0).getMessageText().concat(Format.bonus(
                 Format.space(),
@@ -111,7 +126,7 @@ public class QueryCommand extends GeneralCommand {
                 list.size())))
             .collect(Collectors.toList());
       } else {
-        contents = nested.stream()
+        pageContents = nested.stream()
             .filter(list -> !list.isEmpty())
             .map(list -> list.getFirst().getTextWithIndices(
                 list.stream()
@@ -121,12 +136,21 @@ public class QueryCommand extends GeneralCommand {
       }
     }
 
-    if (contents.isEmpty()) {
+    if (pageContents.isEmpty()) {
       src.sendMessage(Format.info("No results found with those parameters"));
     } else {
       PaginationList.builder()
-          .contents(contents)
+          .contents(pageContents)
           .title(Text.of(TextColors.YELLOW, "Alert Query"))
+          .header(Format.info(
+              "Using parameters: ",
+              Text.joinWith(
+                  Format.bonus(", "),
+                  flags.entrySet()
+                      .stream()
+                      .map(entry ->
+                          Format.bonus("{", entry.getKey(), ": ", entry.getValue(), "}"))
+                      .collect(Collectors.toList()))))
           .padding(Text.of(TextColors.DARK_GRAY, "="))
           .build()
           .sendTo(src);

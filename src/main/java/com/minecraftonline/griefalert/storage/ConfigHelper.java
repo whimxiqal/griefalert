@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class ConfigHelper {
 
@@ -20,6 +21,7 @@ public class ConfigHelper {
       Settings.MAX_HIDDEN_REPEATED_EVENTS,
       Settings.SHOW_ALERTS_IN_CONSOLE,
       Settings.CHECK_INVULNERABILITY,
+      Settings.ALERT_CHECK_TIMEOUT,
       Settings.DATE_FORMAT,
       Settings.STORAGE_ENGINE,
       Settings.STORAGE_ADDRESS,
@@ -71,11 +73,15 @@ public class ConfigHelper {
     try {
       GriefAlert.getInstance().getConfigManager().load();
       for (Setting<?> setting : settings) {
-        setting.setValueFromConfig(root);
+        try {
+          setting.setValueFromConfig(root);
+        } catch (RuntimeException | ObjectMappingException e1) {
+          GriefAlert.getInstance().getLogger().error(e1.getMessage());
+        }
       }
       GriefAlert.getInstance().getLogger().info("Configuration file loaded");
-    } catch (Exception e) {
-      GriefAlert.getInstance().getLogger().error("Exception while loading configuration", e);
+    } catch (Exception e2) {
+      e2.printStackTrace();
     }
   }
 

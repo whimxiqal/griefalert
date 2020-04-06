@@ -3,10 +3,16 @@
 package com.minecraftonline.griefalert.api.data;
 
 import com.helion3.prism.api.data.PrismEvent;
+import com.minecraftonline.griefalert.api.alerts.Detail;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
 import java.io.Serializable;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.HoverAction;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.annotation.CatalogedBy;
 
 
@@ -82,5 +88,15 @@ public class GriefEvent implements CatalogType, Serializable {
 
   public String getDescription() {
     return this.description;
+  }
+
+  public Text toText() {
+    return Text.builder(getName())
+        .onHover(TextActions.showText(Text.of(
+            Format.prefix(),
+            Format.endLine(),
+            Detail.of("ID", "", Text.of(getId())).get(this),
+            Detail.of("Description", "", Text.of(getDescription())).get(this))))
+        .build();
   }
 }

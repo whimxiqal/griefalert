@@ -5,19 +5,23 @@ package com.minecraftonline.griefalert.util;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntitySnapshot;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.user.UserStorageService;
 
 
-public final class SpongeEvents {
+public final class SpongeUtil {
 
   /**
    * Ensure util class cannot be instantiated with private constructor.
    */
-  private SpongeEvents() {
+  private SpongeUtil() {
   }
 
   /**
@@ -61,6 +65,10 @@ public final class SpongeEvents {
       }
     }
     return Optional.of(output);
+  }
+
+  public static Optional<User> getUser(UUID userUuid) {
+    return Sponge.getServiceManager().provide(UserStorageService.class).flatMap(users -> users.get(userUuid));
   }
 
 }

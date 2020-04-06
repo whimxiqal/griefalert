@@ -61,7 +61,17 @@ public class Setting<T> {
     return comment;
   }
 
-  public void setValueFromConfig(@Nonnull ConfigurationNode node) throws ObjectMappingException {
+  /**
+   * Set this setting's value based on the input {@link ConfigurationNode}
+   * @param node The configuration node
+   * @throws RuntimeException if the node does not have this setting
+   * @throws ObjectMappingException if the node contains the wrong type of value
+   */
+  public void setValueFromConfig(@Nonnull ConfigurationNode node)
+      throws RuntimeException, ObjectMappingException {
+    if (node.getNode(this.getName()).isVirtual()) {
+      throw new RuntimeException("The setting " + name + " doesn't exist in the configuration. Using default value.");
+    }
     this.value = node.getNode(this.getName()).getValue(TypeToken.of(getType()));
     verify();
   }

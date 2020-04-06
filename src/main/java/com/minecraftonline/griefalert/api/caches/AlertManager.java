@@ -2,9 +2,11 @@
 
 package com.minecraftonline.griefalert.api.caches;
 
+import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.alerts.AlertCheck;
 import com.minecraftonline.griefalert.api.alerts.SerializableAlert;
 import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
 import com.minecraftonline.griefalert.api.structures.HashMapStack;
@@ -15,6 +17,7 @@ import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
@@ -24,17 +27,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
@@ -110,26 +120,40 @@ public final class AlertManager {
    *
    * @param alert   the <code>Alert</code> to check.
    * @param officer The staff member
-   * @param force whether the teleportation is performed regardless if it's safe
-   * @return true if the player teleported correctly
+   * @param force   whether the teleportation is performed regardless if it's safe
+   * @return true if the officer correctly checked the alert
    * @see Alert
    */
   public boolean check(Alert alert, Player officer, boolean force) {
-    // Post an event to show that the Alert is getting checked
-    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
 
-    PreCheckAlertEvent preCheckAlertEvent = new PreCheckAlertEvent(
-        alert,
-        Cause.of(eventContext, plugin), officer);
+    // Perform all checks to make sure it will work
 
-    Sponge.getEventManager().post(preCheckAlertEvent);
+    // See if a staff member has already checked this alert recently
+    if (Settings.ALERT_CHECK_TIMEOUT.getValue() > 0
+        && !alert.getChecks().isEmpty()
+        && !alert.getChecks().get(0).getOfficerUuid().equals(officer.getUniqueId())) {
+      AlertCheck firstCheck = alert.getChecks().get(0);
+      double secondsSinceFirstCheck =
+          ((double) (Instant.now().toEpochMilli()
+              - firstCheck.getChecked().toInstant().toEpochMilli())
+          ) / 1000;
+      if (secondsSinceFirstCheck < Settings.ALERT_CHECK_TIMEOUT.getValue()) {
+        officer.sendMessage(Format.error(
+            SpongeUtil.getUser(firstCheck.getOfficerUuid())
+                .map(Format::userName)
+                .orElse(Text.of("An unknown officer")),
+            " is currently checking this alert. Please wait ",
+            Format.bonus(
+                Settings.ALERT_CHECK_TIMEOUT.getValue()
+                    - (int) Math.floor(secondsSinceFirstCheck)),
+            " seconds."));
+        return false;
+      }
+    }
 
     // Save the officer's previous transform and add it into the alert's database later
     // if the officer successfully teleports.
     Transform<World> officerPreviousTransform = officer.getTransform();
-
-    // CheckEvent
 
     // Teleport the officer
     if (force) {
@@ -141,6 +165,13 @@ public final class AlertManager {
       }
     }
 
+    // Post an event to show that the Alert is getting checked
+    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
+    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
+    Sponge.getEventManager()
+        .post(new PreCheckAlertEvent(alert, Cause.of(eventContext, plugin), officer));
+
+
     // The officer has teleported successfully, so save their previous location in the history
     this.addOfficerTransform(officer.getUniqueId(), officerPreviousTransform);
 
@@ -149,6 +180,25 @@ public final class AlertManager {
         Format.userName(officer),
         " is checking alert number ",
         Format.bonus(CheckCommand.clickToCheck(alert.getCacheIndex()))));
+
+    // Notify the officer of other staff members who may have checked this alert already
+    if (!alert.getChecks().isEmpty()) {
+      officer.sendMessage(Format.info(
+          "This alert has already been checked by: ",
+          Text.joinWith(
+              Format.bonus(", "),
+              Sets.newHashSet(
+                  alert.getChecks()
+                      .stream()
+                      .map(AlertCheck::getOfficerUuid)
+                      .collect(Collectors.toList()))
+                  .stream()
+                  .map(uuid -> SpongeUtil.getUser(uuid)
+                      .map(Format::userName)
+                      .orElse(Text.of("Unknown")))
+                  .limit(10)
+                  .collect(Collectors.toList()))));
+    }
 
     officer.sendMessage(Format.heading("Checking Grief Alert: ",
         Format.bonus(alert.getCacheIndex())));
@@ -188,13 +238,54 @@ public final class AlertManager {
             Format.getTagRollback(alert.getCacheIndex())));
       }
     }
-
     panel.append(Text.of(
         Format.space(2),
         Format.bonus("==")));
     officer.sendMessage(panel.build());
 
+    // Give officer invulnerability
+    if (Settings.CHECK_INVULNERABILITY.getValue() > 0) {
+      giveInvulnerability(
+          officer,
+          Settings.CHECK_INVULNERABILITY.getValue(),
+          Format.info(String.format(
+              "You have been given %d seconds of invulnerability",
+              Settings.CHECK_INVULNERABILITY.getValue())),
+          Format.info(
+              "Invulnerability from alert ",
+              Format.bonus(alert.getCacheIndex()),
+              " has been revoked"));
+    }
+
+    alert.addCheck(new AlertCheck(officer.getUniqueId(), new Date()));
     return true;
+  }
+
+  private void giveInvulnerability(Player player,
+                                   int seconds,
+                                   Text giveMessage,
+                                   Text revokeMessage) {
+    // Give invulnerability
+    player.sendMessage(giveMessage);
+    UUID playerUuid = player.getUniqueId();
+    EventListener<DamageEntityEvent> cancelDamage = event -> {
+      if (event.getTargetEntity().getUniqueId().equals(playerUuid)) {
+        event.setCancelled(true);
+      }
+    };
+    Sponge.getEventManager().registerListener(
+        GriefAlert.getInstance(),
+        DamageEntityEvent.class,
+        cancelDamage);
+    Optional<Player> playerOptional = Optional.of(player);
+    Task.builder().delay(seconds, TimeUnit.SECONDS)
+        .execute(() -> {
+          Sponge.getEventManager().unregisterListeners(cancelDamage);
+          // Garbage collection might get rid of this player? Made it optional just in case.
+          playerOptional.ifPresent(p -> p.sendMessage(revokeMessage));
+        })
+        .name("Remove invulnerability for player " + player.getName())
+        .submit(GriefAlert.getInstance());
   }
 
 
@@ -250,8 +341,8 @@ public final class AlertManager {
       } catch (Exception e) {
         GriefAlert.getInstance().getLogger().error(
             "An error occurred while loading the latest Alert cache. "
-            + "The serialized items are likely outdated. "
-            + "A fresh cache was created.");
+                + "The serialized items are likely outdated. "
+                + "A fresh cache was created.");
       }
     }
     return new RotatingArrayList<>(Settings.ALERTS_CODE_LIMIT.getValue());
