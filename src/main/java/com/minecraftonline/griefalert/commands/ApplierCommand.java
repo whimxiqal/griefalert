@@ -126,7 +126,7 @@ public final class ApplierCommand extends GeneralCommand {
       }
 
       try {
-        Alert alertGeneral = GriefAlert.getInstance().getAlertService().get(index);
+        Alert alertGeneral = GriefAlert.getInstance().getAlertService().getAlert(index);
         if (alertGeneral instanceof PrismAlert) {
           alert = (PrismAlert) alertGeneral;
         } else {

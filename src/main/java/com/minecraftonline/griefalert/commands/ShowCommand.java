@@ -78,7 +78,7 @@ class ShowCommand extends GeneralCommand {
 
       Alert alert;
       try {
-        alert = GriefAlert.getInstance().getAlertService().get(index);
+        alert = GriefAlert.getInstance().getAlertService().getAlert(index);
       } catch (IllegalArgumentException e) {
         throw Errors.noAlertException();
       }

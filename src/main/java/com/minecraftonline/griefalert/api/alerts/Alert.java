@@ -28,13 +28,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.text.Text;
 
 public interface Alert extends Serializable {
@@ -69,6 +66,7 @@ public interface Alert extends Serializable {
 
   /**
    * Get the <code>Date</code> this alert was created.
+   *
    * @return the <code>Date</code>
    */
   @Nonnull

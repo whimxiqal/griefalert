@@ -35,6 +35,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.AlertService;
+import com.minecraftonline.griefalert.api.services.Request;
 import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
@@ -455,7 +456,7 @@ public final class Format {
             CheckCommand.clickToCheck(index));
   }
 
-  public static Text formatRequest(AlertService.Request request) {
+  public static Text formatRequest(Request request) {
     List<Text> tokens = Lists.newLinkedList();
     if (!request.getPlayerUuids().isEmpty()) {
       Text.Builder builder = Text.builder();

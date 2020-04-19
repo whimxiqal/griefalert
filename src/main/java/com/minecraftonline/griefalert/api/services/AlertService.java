@@ -24,16 +24,9 @@
 
 package com.minecraftonline.griefalert.api.services;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.data.GriefEvent;
-
-import java.io.Serializable;
-import java.util.Set;
-import java.util.UUID;
+import java.util.Collection;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
@@ -46,110 +39,60 @@ public interface AlertService {
     REVERSE_INDEX
   }
 
-  int submit(Alert alert);
-
-  @Nonnull
-  Alert get(int index) throws IllegalArgumentException;
-
-  boolean inspect(int index, Player officer, boolean force) throws IndexOutOfBoundsException;
-
-  boolean unInspect(Player src);
-
-  void reset();
-
-  void lookup(MessageReceiver source, Request filters, Sort sort, boolean spread);
-
-  @Nonnull
-  @SuppressWarnings("unused")
-  static AlertService.Request.Builder requestBuilder() {
-    return AlertService.Request.builder();
-  }
+  /**
+   * Save this alert in a local cache and broadcast it to the necessary in-game players.
+   *
+   * @param alert the alert to submit
+   * @return the index used to retrieve the alert, using @{@link #getAlert(int)}
+   */
+  int submit(@Nonnull Alert alert);
 
   /**
-   * A store for all filtering information necessary to locate logged events.
+   * Retrieve an {@link Alert} by the code which was returned when it was submitted
+   * with {@link #submit(Alert)}.
+   *
+   * @param index the retrieval code
+   * @return the corresponding {@link Alert}
+   * @throws IllegalArgumentException if the given index is invalid
    */
-  class Request implements Serializable {
+  @Nonnull
+  Alert getAlert(int index) throws IllegalArgumentException;
 
-    public static Request EMPTY = Request.builder().build();
-    private static final long serialVersionUID = 4369983541428028962L;
+  /**
+   * Send the given {@link Player} to the location of the {@link Alert} found
+   * with the given retrieval code. The {@link Player} will receive the necessary
+   * information and tools to respond to an {@link Alert}.
+   *
+   * @param index the {@link Alert} retrieval code
+   * @param officer the inspecting player
+   * @param force true if the player should teleport to the location, even if it's unsafe
+   * @return true if the inspection succeeded
+   * @throws IllegalArgumentException if the given index is invalid
+   */
+  boolean inspect(int index, @Nonnull Player officer, boolean force) throws IllegalArgumentException;
 
-    private final Set<GriefEvent> events;
-    private final Set<String> targets;
-    private final Set<UUID> playerUuids;
-    private final int maximum;
+  /**
+   * Undo the inspection done by the officer by returning them back to their previous location.
+   *
+   * @param officer the inspecting player
+   * @return true if the player was returned
+   */
+  boolean unInspect(@Nonnull Player officer);
 
-    private Request(@Nonnull Set<GriefEvent> events,
-                    @Nonnull Set<String> targets,
-                    @Nonnull Set<UUID> playerUuids,
-                    int maximum) {
-      this.events = events;
-      this.targets = targets;
-      this.playerUuids = playerUuids;
-      this.maximum = maximum;
-    }
+  /**
+   * Clear all information held in the {@link AlertService}.
+   */
+  void reset();
 
-    @Nonnull
-    public Set<GriefEvent> getEvents() {
-      return events;
-    }
-
-    @Nonnull
-    public Set<String> getTargets() {
-      return targets;
-    }
-
-    @Nonnull
-    public Set<UUID> getPlayerUuids() {
-      return playerUuids;
-    }
-
-    public int getMaximum() {
-      return maximum;
-    }
-
-    @Nonnull
-    private static AlertService.Request.Builder builder() {
-      return new AlertService.Request.Builder();
-    }
-
-    public static class Builder {
-
-      private Set<GriefEvent> events = Sets.newHashSet();
-      private Set<String> targets = Sets.newHashSet();
-      private Set<UUID> playerUuids = Sets.newHashSet();
-      private int maximum;
-
-      private Builder() {
-      }
-
-      public AlertService.Request build() {
-        return new AlertService.Request(events, targets, playerUuids, maximum);
-      }
-
-      @SuppressWarnings("unused")
-      public void addEvent(@Nonnull GriefEvent event) {
-        Preconditions.checkNotNull(event);
-        this.events.add(event);
-      }
-
-      @SuppressWarnings("unused")
-      public void addTarget(@Nonnull String target) {
-        Preconditions.checkNotNull(target);
-        this.targets.add(target);
-      }
-
-      @SuppressWarnings("unused")
-      public void addPlayerUuid(@Nonnull UUID playerUuid) {
-        Preconditions.checkNotNull(playerUuid);
-        this.playerUuids.add(playerUuid);
-      }
-
-      public void setMaximum(int maximum) {
-        this.maximum = maximum;
-      }
-
-    }
-
-  }
+  /**
+   * Give all the receivers all {@link Alert}s which match the filters given in the
+   * {@link Request}.
+   * @param receivers the receivers of all the information
+   * @param filters the holder for all filters
+   * @param sort how the {@link Alert}s will be sorted for presentation
+   * @param spread true will send all {@link Alert}s individually. False will collapse similar
+   *               {@link Alert}s into singular lines.
+   */
+  void lookup(@Nonnull Collection<MessageReceiver> receivers, @Nonnull Request filters, Sort sort, boolean spread);
 
 }

@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.text.Text;
@@ -88,7 +87,9 @@ public class Detail<P extends Serializable> implements Serializable {
     description = in.readUTF();
     primary = in.readBoolean();
     try {
-      formatted = Sponge.getDataManager().deserialize(Text.class, DataFormats.JSON.read(in.readUTF())).orElse(null);
+      formatted = Sponge.getDataManager()
+              .deserialize(Text.class, DataFormats.JSON.read(in.readUTF()))
+              .orElse(null);
     } catch (IOException e) {
       // Shouldn't happen
       e.printStackTrace();
@@ -102,7 +103,9 @@ public class Detail<P extends Serializable> implements Serializable {
     out.writeUTF(description);
     out.writeBoolean(primary);
     try {
-      out.writeUTF(DataFormats.JSON.write(Optional.ofNullable(formatted).orElse(Text.EMPTY).toContainer()));
+      out.writeUTF(DataFormats.JSON.write(Optional.ofNullable(formatted)
+              .orElse(Text.EMPTY)
+              .toContainer()));
     } catch (IOException e) {
       // Shouldn't happen
       e.printStackTrace();
@@ -137,54 +140,50 @@ public class Detail<P extends Serializable> implements Serializable {
     return primary;
   }
 
-  public SerializedDetail serialize(P item) {
-    return new SerializedDetail(this, item);
-  }
-
-  public static final class SerializedDetail implements Serializable {
-
-    private final String label;
-    private final String description;
-    private final String info;
-    private final boolean primary;
-
-    private <S extends Serializable> SerializedDetail(Detail<S> detail, S item) {
-      this.label = detail.label;
-      this.description = detail.description;
-      this.info = detail.infoFunction.apply(item).map(Text::toContainer).map(data -> {
-        try {
-          return DataFormats.JSON.write(data);
-        } catch (IOException e) {
-          // Shouldn't happen
-          e.printStackTrace();
-          return null;
-        }
-      }).orElse(null);
-      this.primary = detail.primary;
-    }
-
-    /**
-     * Convert this serialized object back to a {@link Detail}.
-     *
-     * @param type The class of the type parameter of the original {@link Detail}
-     * @param <S>  The type parameter of the original {@link Detail}
-     * @return the deserialized object
-     */
-    public <S extends Serializable> Detail<S> deserialize(Class<S> type) {
-      return Detail.of(
-          label,
-          description,
-          o -> Optional.ofNullable(info).flatMap(info -> {
-            try {
-              return Sponge.getDataManager().deserialize(Text.class, DataFormats.JSON.read(info));
-            } catch (IOException e) {
-              // Shouldn't happen
-              e.printStackTrace();
-              return Optional.of(Text.EMPTY);
-            }
-          }),
-          primary);
-    }
-
-  }
+//  public static final class SerializedDetail implements Serializable {
+//
+//    private final String label;
+//    private final String description;
+//    private final String info;
+//    private final boolean primary;
+//
+//    private <S extends Serializable> SerializedDetail(Detail<S> detail, S item) {
+//      this.label = detail.label;
+//      this.description = detail.description;
+//      this.info = detail.infoFunction.apply(item).map(Text::toContainer).map(data -> {
+//        try {
+//          return DataFormats.JSON.write(data);
+//        } catch (IOException e) {
+//          // Shouldn't happen
+//          e.printStackTrace();
+//          return null;
+//        }
+//      }).orElse(null);
+//      this.primary = detail.primary;
+//    }
+//
+//    /**
+//     * Convert this serialized object back to a {@link Detail}.
+//     *
+//     * @param type The class of the type parameter of the original {@link Detail}
+//     * @param <S>  The type parameter of the original {@link Detail}
+//     * @return the deserialized object
+//     */
+//    public <S extends Serializable> Detail<S> deserialize(Class<S> type) {
+//      return Detail.of(
+//          label,
+//          description,
+//          o -> Optional.ofNullable(info).flatMap(info -> {
+//            try {
+//              return Sponge.getDataManager().deserialize(Text.class, DataFormats.JSON.read(info));
+//            } catch (IOException e) {
+//              // Shouldn't happen
+//              e.printStackTrace();
+//              return Optional.of(Text.EMPTY);
+//            }
+//          }),
+//          primary);
+//    }
+//
+//  }
 }

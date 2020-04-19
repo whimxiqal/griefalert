@@ -34,6 +34,7 @@ import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.AlertService;
+import com.minecraftonline.griefalert.api.services.Request;
 import com.minecraftonline.griefalert.api.structures.HashMapStack;
 import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
@@ -46,7 +47,6 @@ import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -55,16 +55,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -108,7 +104,7 @@ public final class AlertServiceImpl implements AlertService {
   }
 
   @Override
-  public int submit(Alert alert) {
+  public int submit(@NotNull Alert alert) {
     if (Permissions.has(Alerts.getGriefer(alert), Permissions.GRIEFALERT_SILENT)) {
       alert.setSilent(true);
     }
@@ -120,8 +116,12 @@ public final class AlertServiceImpl implements AlertService {
 
   @Nonnull
   @Override
-  public Alert get(int index) throws IllegalArgumentException {
-    return getAlert(index);
+  public Alert getAlert(int index) throws IllegalArgumentException {
+    try {
+      return alertCache.get(index).get();
+    } catch (IndexOutOfBoundsException e) {
+      throw new IllegalArgumentException(String.format("There is no Alert with index %d", index));
+    }
   }
 
   @Override
@@ -132,10 +132,10 @@ public final class AlertServiceImpl implements AlertService {
   }
 
   @Override
-  public void lookup(MessageReceiver source, Request filters, Sort sort, boolean spread) {
+  public void lookup(@NotNull Collection<MessageReceiver> receivers, @NotNull Request filters, Sort sort, boolean spread) {
     List<SavedAlert> alerts = getAlerts(filters, sort);
     if (alerts.isEmpty()) {
-      source.sendMessage(Format.info("There are no alerts matching those parameters"));
+      receivers.forEach(receiver -> receiver.sendMessage(Format.info("There are no alerts matching those parameters")));
       return;
     }
     PaginationList.builder()
@@ -144,7 +144,7 @@ public final class AlertServiceImpl implements AlertService {
         .contents(formatAlerts(alerts, spread))
         .padding(Format.bonus("="))
         .build()
-        .sendTo(source);
+        .sendTo(receivers);
   }
 
   private List<SavedAlert> getAlerts(Request filters, Sort sort) {
@@ -184,15 +184,18 @@ public final class AlertServiceImpl implements AlertService {
     }
 
     if (spread) {
-      return alerts.stream().map(alert -> Format.buildBroadcast(alert.get(), alert.index())).collect(Collectors.toList());
+      return alerts.stream().map(alert ->
+              Format.buildBroadcast(alert.get(), alert.index())).collect(Collectors.toList());
     }
 
     LinkedList<LinkedList<SavedAlert>> collapsed = Lists.newLinkedList();
     collapsed.add(Lists.newLinkedList());
     alerts.forEach(alert -> {
       if (collapsed.getLast().isEmpty()
-          || (collapsed.getLast().getLast().get().getGriefProfile().equals(alert.get().getGriefProfile())
-          && collapsed.getLast().getLast().get().getGrieferUuid().equals(alert.get().getGrieferUuid()))) {
+          || (collapsed.getLast().getLast().get().getGriefProfile()
+              .equals(alert.get().getGriefProfile())
+          && collapsed.getLast().getLast().get().getGrieferUuid()
+              .equals(alert.get().getGrieferUuid()))) {
         collapsed.getLast().add(alert);
       } else {
         LinkedList<SavedAlert> list = Lists.newLinkedList();
@@ -276,7 +279,7 @@ public final class AlertServiceImpl implements AlertService {
    * @see Alert
    */
   @Override
-  public boolean inspect(int index, Player officer, boolean force)
+  public boolean inspect(int index, @NotNull Player officer, boolean force)
       throws IndexOutOfBoundsException {
 
     // Perform all checks to make sure it will work
@@ -323,7 +326,9 @@ public final class AlertServiceImpl implements AlertService {
     // Post an event to show that the Alert is getting checked
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
     EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
-    Sponge.getEventManager().post(new PreCheckAlertEvent(savedAlert.get(), Cause.of(eventContext, plugin), officer));
+    Sponge.getEventManager().post(new PreCheckAlertEvent(
+            savedAlert.get(),
+            Cause.of(eventContext, plugin), officer));
 
 
     // The officer has teleported successfully, so save their previous location in the history
@@ -441,7 +446,7 @@ public final class AlertServiceImpl implements AlertService {
    *
    * @param officer The officer to teleport
    */
-  public boolean unInspect(Player officer) {
+  public boolean unInspect(@NotNull Player officer) {
 
     Optional<Transform<World>> previousTransformOptional = officerCheckHistory
         .pop(officer.getUniqueId());
@@ -468,6 +473,11 @@ public final class AlertServiceImpl implements AlertService {
     officerCheckHistory.push(officerUuid, transform);
   }
 
+  /**
+   * Send a {@link PreBroadcastAlertEvent} to Sponge's Event Manager.
+   *
+   * @param alert the alert to post
+   */
   public void postPreBroadcastAlertEvent(Alert alert) {
 
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
@@ -481,22 +491,25 @@ public final class AlertServiceImpl implements AlertService {
 
   }
 
-  public boolean broadcast(int index) throws IndexOutOfBoundsException {
-
-    Alert alert = alertCache.get(index).get();
+  /**
+   * Send the {@link Alert} at the given location in the alert cache.
+   *
+   * @param index the location of the {@link Alert} in the alert cache
+   * @return true if the alert was correctly broadcast
+   * @throws IndexOutOfBoundsException if the given index is invalid
+   */
+  public boolean broadcast(int index) throws IllegalArgumentException {
+    Alert alert;
+    try {
+      alert = alertCache.get(index).get();
+    } catch (IndexOutOfBoundsException e) {
+      throw new IllegalArgumentException("Could not broadcast an Alert at the index: " + index);
+    }
     if (alert.isSilent()) {
       return false;
     } else {
       Communication.getStaffBroadcastChannel().send(Format.buildBroadcast(alert, index));
       return true;
-    }
-  }
-
-  public Alert getAlert(int index) throws IllegalArgumentException {
-    try {
-      return alertCache.get(index).get();
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException(String.format("There is no Alert with index %d", index));
     }
   }
 

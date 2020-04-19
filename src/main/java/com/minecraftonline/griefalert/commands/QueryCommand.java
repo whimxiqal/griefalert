@@ -25,17 +25,17 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.services.AlertService;
+import com.minecraftonline.griefalert.api.services.Request;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
+import java.util.Collections;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -74,7 +74,7 @@ public class QueryCommand extends GeneralCommand {
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) throws CommandException {
 
-    AlertService.Request.Builder builder = AlertService.requestBuilder();
+    Request.Builder builder = Request.builder();
 
     for (String username : args.<String>getAll(CommandKeys.PLAYER.get())) {
       Optional<User> player = SpongeUtil.getUser(username);
@@ -92,7 +92,7 @@ public class QueryCommand extends GeneralCommand {
         .map(i -> Math.max(0, Math.min(i, MAXIMUM_MAXIMUM_QUERIES)))
         .orElse(DEFAULT_MAXIMUM_QUERIES));
 
-    GriefAlert.getInstance().getAlertService().lookup(src,
+    GriefAlert.getInstance().getAlertService().lookup(Collections.singleton(src),
         builder.build(),
         AlertService.Sort.REVERSE_CHRONOLOGICAL,
         args.hasAny("spread"));
