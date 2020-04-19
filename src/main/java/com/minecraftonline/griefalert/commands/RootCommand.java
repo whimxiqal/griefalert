@@ -57,7 +57,16 @@ public class RootCommand extends GeneralCommand {
     addChild(new ReloadCommand());
     addChild(new ReturnCommand());
     addChild(new ShowCommand());
-    addChild(new RollbackCommand());
+    addChild(new ApplierCommand(
+        Text.of("Rollback to previous states"),
+        ApplierCommand.ApplyType.ROLLBACK,
+        "rollback",
+        "rb"));
+    addChild(new ApplierCommand(
+        Text.of("Restore to recent states"),
+        ApplierCommand.ApplyType.RESTORE,
+        "restore",
+        "rs"));
     addChild(new LogsCommand());
     addChild(new ClearcacheCommand());
   }
@@ -67,7 +76,7 @@ public class RootCommand extends GeneralCommand {
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) {
     src.sendMessage(Text.of(
-        Format.bonus("=============")));
+        Format.bonus("==========================")));
     src.sendMessage(Text.of(
         Format.GRIEF_ALERT_THEME, TextStyles.BOLD, String.format(
             "GriefAlert v%s",

@@ -36,7 +36,7 @@ repositories {
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '1.1.6' // Project Version
+version = '1.1.9' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 

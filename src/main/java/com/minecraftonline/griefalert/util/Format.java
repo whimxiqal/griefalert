@@ -27,7 +27,13 @@ package com.minecraftonline.griefalert.util;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.alerts.Detail;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.services.AlertService;
+import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.net.MalformedURLException;
@@ -35,16 +41,19 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -417,11 +426,7 @@ public final class Format {
    * @return The Text form of the grief checker's name
    */
   public static Text userName(User user) {
-    if (user instanceof Player) {
-      return ((Player) user).getDisplayNameData().displayName().get();
-    } else {
-      return Text.of(user.getName());
-    }
+    return Text.of(user.getName());
   }
 
   /**
@@ -436,5 +441,70 @@ public final class Format {
         .append(Text.of(TextStyles.ITALIC, label))
         .onHover(TextActions.showText(Format.bonus(onHover)))
         .build();
+  }
+
+  public static Text buildBroadcast(Alert alert, int index) {
+    return Text.of(
+        alert.getMessage(),
+        Format.space(),
+        CheckCommand.clickToCheck(index));
+  }
+
+  public static Text formatRequest(AlertService.Request request) {
+    List<Text> tokens = Lists.newLinkedList();
+    if (!request.getPlayerUuids().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Players: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getPlayerUuids()
+              .stream()
+              .map(uuid -> SpongeUtil.getUser(uuid).orElseThrow(() ->
+                  new RuntimeException("Invalid UUID in Request")))
+              .map(Format::userName)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    if (!request.getEvents().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Events: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getEvents()
+              .stream()
+              .map(GriefEvent::toAction)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    if (!request.getTargets().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Targets: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getTargets()
+              .stream()
+              .map(Text::of)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    return Detail.of("Parameters", "The parameters used for this query",
+        tokens.isEmpty()
+            ? Text.of("None")
+            : Text.joinWith(Text.of(", "), tokens)).get(request).get();
+  }
+
+  public static Text dimension(DimensionType type) {
+    if (type.equals(DimensionTypes.OVERWORLD)) {
+      return Text.of("overworld");
+    } else if (type.equals(DimensionTypes.NETHER)) {
+      return Text.of("nether");
+    } else if (type.equals(DimensionTypes.THE_END)) {
+      return Text.of("end");
+    } else {
+      throw new IllegalArgumentException("Invalid dimention type");
+    }
   }
 }

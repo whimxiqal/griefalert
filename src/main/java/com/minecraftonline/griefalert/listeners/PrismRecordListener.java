@@ -24,6 +24,7 @@
 
 package com.minecraftonline.griefalert.listeners;
 
+import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.prism.BreakAlert;
@@ -35,14 +36,16 @@ import com.minecraftonline.griefalert.alerts.prism.SignBreakAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.PrismUtil;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
+
 import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.DimensionType;
 
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
@@ -50,10 +53,8 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
   @Override
   public void handle(PrismRecordPreSaveEvent event) {
-    PrismRecordArchived record = PrismRecordArchived.of(event.getPrismRecord());
-
-    // Temporary print statement to see all information within PrismRecord
-    GriefAlert.getInstance().getLogger().debug(PrismUtil.printRecord(record));
+    PrismRecord record = event.getPrismRecord();
+    DataContainer container = event.getPrismRecord().getDataContainer();
 
     // See if this record matches any GriefProfiles
     if (!Sponge.getRegistry().getType(GriefEvent.class, record.getEvent()).isPresent()) {
@@ -61,18 +62,18 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
     }
 
     // Replace spaces with underscores because for some reason PrismUtil removes them...
-    Optional<String> targetOptional = PrismUtil.getTarget(record).map(General::ensureIdFormat);
+    Optional<String> targetOptional = PrismUtil.getTarget(container).map(General::ensureIdFormat);
     if (!targetOptional.isPresent()) {
       return;
     }
 
-    Optional<DimensionType> dimensionTypeOptional = PrismUtil.getLocation(record)
+    Optional<DimensionType> dimensionTypeOptional = PrismUtil.getLocation(container)
         .map((location) -> location.getExtent().getDimension().getType());
     if (!dimensionTypeOptional.isPresent()) {
       return;
     }
 
-    Optional<String> playerUuidOptional = PrismUtil.getPlayerUuid(record);
+    Optional<String> playerUuidOptional = PrismUtil.getPlayerUuid(container);
     if (!playerUuidOptional.isPresent()) {
       return;
     }
@@ -103,20 +104,21 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       } else {
         GriefAlert.getInstance().getLogger().error("A PrismRecord matched a Grief Profile but "
             + "an Alert could not be made.");
-        GriefAlert.getInstance().getLogger().error(PrismUtil.printRecord(record));
+        GriefAlert.getInstance().getLogger().error(PrismUtil.printRecord(container));
         GriefAlert.getInstance().getLogger().error(profile.print().toPlain());
         return;
       }
 
-      // Cache the Alert and broadcast its message
-      alert.run();
+      Task.builder()
+          .execute(() -> GriefAlert.getInstance().getAlertService().submit(alert))
+          .submit(GriefAlert.getInstance());
     });
 
     // Check for replacement alerts
     if (Sponge.getRegistry().getType(GriefEvent.class,
         record.getEvent()).get().equals(GriefEvents.PLACE)) {
 
-      Optional<String> originalBlockId = PrismUtil.getOriginalBlockState(record).map(
+      Optional<String> originalBlockId = PrismUtil.getOriginalBlockState(container).map(
           (state) -> state.getType().getId());
 
       if (!originalBlockId.isPresent()) {
@@ -130,18 +132,19 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
               originalBlockId.get(),
               dimensionTypeOptional.get());
 
-      Optional<String> replacementBlockId = PrismUtil.getReplacementBlock(record)
+      Optional<String> replacementBlockId = PrismUtil.getReplacementBlock(container)
           .map((state) -> state.getType().getId());
 
       replaceOptional.ifPresent((profile) -> {
-        GriefAlert.getInstance().getLogger().debug("PrismEvent matched a GriefProfile");
 
         PrismAlert alert = new ReplaceAlert(
             profile,
             record,
             replacementBlockId.orElse("unknown block"));
 
-        alert.run();
+        Task.builder()
+            .execute(() -> GriefAlert.getInstance().getAlertService().submit(alert))
+            .submit(GriefAlert.getInstance());
       });
     }
   }

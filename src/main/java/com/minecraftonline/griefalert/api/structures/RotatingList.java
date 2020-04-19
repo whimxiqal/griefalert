@@ -24,6 +24,7 @@
 
 package com.minecraftonline.griefalert.api.structures;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
@@ -38,7 +39,7 @@ import javax.annotation.Nonnull;
  * @param <P> The type to store in the data structure
  * @author PietElite
  */
-public interface RotatingList<P> {
+public interface RotatingList<P> extends Serializable {
 
   /**
    * Get capacity.
@@ -123,6 +124,4 @@ public interface RotatingList<P> {
    */
   void clear();
 
-  @Nonnull
-  <Z extends java.io.Serializable> Object serialize(Function<P, Z> converter);
 }

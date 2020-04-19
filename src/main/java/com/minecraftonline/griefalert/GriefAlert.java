@@ -28,10 +28,12 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
+import com.helion3.prism.api.services.PrismService;
 import com.minecraftonline.griefalert.api.caches.AlertManager;
 import com.minecraftonline.griefalert.api.caches.ProfileCache;
 import com.minecraftonline.griefalert.api.commands.LegacyCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.commands.LegacyCommands;
 import com.minecraftonline.griefalert.commands.RootCommand;
@@ -61,6 +63,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
@@ -122,13 +125,17 @@ public final class GriefAlert {
   @SuppressWarnings("UnusedDeclaration")
   private PluginContainer container;
 
+  // Services
+  private PrismService prismService;
+  private AlertService alertService;
 
   // Custom classes to help manage plugin
-  private ProfileCache profileCache;
   private AlertManager alertManager;
+  private ProfileCache profileCache;
   private ConfigHelper configHelper;
   private ProfileStorage profileStorage;
   private HologramManager hologramManager;
+
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
@@ -179,6 +186,13 @@ public final class GriefAlert {
   }
 
   @Listener
+  public void onPostInitializationEvent(GamePostInitializationEvent event) {
+    alertManager = new AlertManager();
+    Sponge.getServiceManager().setProvider(GriefAlert.getInstance(), AlertService.class, alertManager);
+    alertService = Sponge.getServiceManager().provide(AlertService.class).get();
+  }
+
+  @Listener
   public void onLoadComplete(GameLoadCompleteEvent event) {
     hologramManager = new HologramManager();
   }
@@ -192,7 +206,6 @@ public final class GriefAlert {
   public void onStartingServer(GameStartingServerEvent event) {
     // Register all the commands with Sponge
     registerCommands();
-    alertManager = new AlertManager();
     profileCache = new ProfileCache();
   }
 
@@ -208,7 +221,7 @@ public final class GriefAlert {
 
   @Listener
   public void onStoppingServer(GameStoppingServerEvent event) {
-    getAlertManager().saveAlerts();
+    alertManager.saveAlerts();
     getHologramManager().deleteAllHolograms();
   }
 
@@ -266,8 +279,8 @@ public final class GriefAlert {
     return configManager;
   }
 
-  public AlertManager getAlertManager() {
-    return alertManager;
+  public AlertService getAlertService() {
+    return alertService;
   }
 
   public ConfigHelper getConfigHelper() {

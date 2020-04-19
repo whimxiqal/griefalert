@@ -2,42 +2,33 @@
 
 package com.minecraftonline.griefalert.alerts.prism;
 
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.FieldCondition;
-import com.helion3.prism.api.query.MatchRule;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.query.Sort;
-import com.helion3.prism.api.records.Actionable;
-import com.helion3.prism.api.records.Result;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.PrismUtil;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.DataFormats;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -48,91 +39,108 @@ import org.spongepowered.api.world.World;
  */
 public abstract class PrismAlert extends GeneralAlert {
 
-  static final long PRISM_BUFFER_MILLISECONDS = 2000L;
+  private final Vector3d grieferPosition;
+  private final Vector3d grieferRotation;
+  private final UUID worldUuid;
+  private final Vector3i griefPosition;
+  private final UUID grieferUuid;
+  private final Date created;
+  private final String originalBlockState;
+  private final String replacementBlockState;
 
-  private final PrismRecordArchived prismRecord;
-  private final Transform<World> grieferTransform;
-  private boolean reversed = false;
-
-  PrismAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  PrismAlert(GriefProfile griefProfile, PrismRecord prismRecord) {
     super(griefProfile);
-    this.prismRecord = prismRecord;
+    String recordString;
     // Immediately set the transform of the griefer upon triggering the Alert
-    grieferTransform = prismRecord.getDataContainer().getString(DataQueries.Player).flatMap(
-        (s) ->
-            Sponge.getServer()
-                .getPlayer(UUID.fromString(s))
-                .map(Player::getTransform)).orElseThrow(RuntimeException::new);
+
+
+    try {
+      this.grieferUuid = PrismUtil.getPlayerUuid(prismRecord.getDataContainer()).map(UUID::fromString).get();
+      Location<World> griefLocation = PrismUtil.getLocation(prismRecord.getDataContainer()).get();
+      this.worldUuid = griefLocation.getExtent().getUniqueId();
+      this.griefPosition = griefLocation.getBlockPosition();
+      this.created = PrismUtil.getCreated(prismRecord.getDataContainer()).get();
+      this.originalBlockState = DataFormats.JSON.write(PrismUtil.getOriginalBlockState(prismRecord.getDataContainer()).get().toContainer());
+      this.replacementBlockState = DataFormats.JSON.write(PrismUtil.getReplacementBlock(prismRecord.getDataContainer()).get().toContainer());
+    } catch (NoSuchElementException e) {
+      throw new IllegalArgumentException("Prism did not contain necessary information");
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new IllegalArgumentException("Prism information could not be handled");
+    }
+
+    Transform<World> grieferTransform = Sponge.getServer()
+        .getPlayer(getGrieferUuid())
+        .map(Entity::getTransform)
+        .orElseThrow(RuntimeException::new);
+    this.grieferPosition = grieferTransform.getPosition();
+    this.grieferRotation = grieferTransform.getRotation();
 
     // And block details
-    prismRecord.getDataContainer()
-        .get(DataQueries.OriginalBlock)
-        .flatMap(view -> ((DataView) view).get(DataQueries.BlockState))
-        .flatMap(blockStateDataView ->
-            Sponge.getDataManager().deserialize(BlockState.class, (DataView) blockStateDataView))
-        .map(BlockState::getTraitMap)
-        .ifPresent(map -> map.forEach((key, value) -> addDetail(Detail.of(
+    getOriginalBlockState().map(BlockState::getTraitMap).ifPresent(map ->
+        map.forEach((key, value) -> addDetail(Detail.of(
             "(Original) " + General.capitalize(key.getName()),
             "The " + key.getName() + " trait of the original block of this transaction.",
             Text.of(value.toString())))));
-    prismRecord.getDataContainer()
-        .get(DataQueries.ReplacementBlock)
-        .flatMap(view -> ((DataView) view).get(DataQueries.BlockState))
-        .flatMap(blockStateDataView ->
-            Sponge.getDataManager().deserialize(BlockState.class, (DataView) blockStateDataView))
-        .map(BlockState::getTraitMap)
-        .ifPresent(map -> map.forEach((key, value) -> addDetail(Detail.of(
+    getReplacementBlockState().map(BlockState::getTraitMap).ifPresent(map ->
+        map.forEach((key, value) -> addDetail(Detail.of(
             "(New) " + General.capitalize(key.getName()),
             "The " + key.getName() + " trait of the newly created block of this transaction.",
             Text.of(value.toString())))));
   }
 
-  PrismRecordArchived getPrismRecord() {
-    return prismRecord;
+  @Nonnull
+  @Override
+  public Vector3d getGrieferPosition() {
+    return grieferPosition;
   }
 
   @Nonnull
   @Override
-  public Transform<World> getGrieferTransform() {
-    return grieferTransform;
+  public Vector3d getGrieferRotation() {
+    return grieferRotation;
   }
 
   @Nonnull
   @Override
-  public User getGriefer() {
-    Optional<String> uuidOptional = prismRecord.getDataContainer().getString(DataQueries.Player);
-    if (!uuidOptional.isPresent()) {
-      GriefAlert.getInstance().getLogger().error("Could not get griefer UUID "
-          + "from PrismRecord in a PrismAlert");
-      GriefAlert.getInstance().getLogger().error(prismRecord.getDataContainer().toString());
-      throw new NoSuchElementException();
-    }
-    Optional<User> playerOptional = Sponge
-        .getServiceManager().provide(UserStorageService.class)
-        .flatMap(userStorageService -> userStorageService.get(UUID.fromString(uuidOptional.get())));
-    if (!playerOptional.isPresent()) {
-      GriefAlert.getInstance()
-          .getLogger()
-          .error("Could not find player using UUID: " + uuidOptional.get());
-      throw new NoSuchElementException();
-    }
-
-    return playerOptional.get();
+  public Vector3i getGriefPosition() {
+    return griefPosition;
   }
 
   @Nonnull
   @Override
-  public Location<World> getGriefLocation() {
-    return PrismUtil.getLocation(getPrismRecord())
-        .map(location -> location.add(0.5, 0.2, 0.5))
-        .orElseThrow(() ->
-            new RuntimeException("Couldn't find the location in a PrismAlert"));
+  public UUID getWorldUuid() {
+    return worldUuid;
+  }
+
+  @Nonnull
+  @Override
+  public UUID getGrieferUuid() {
+    return grieferUuid;
   }
 
   @Nonnull
   @Override
   public Date getCreated() {
-    return PrismUtil.getCreated(this.prismRecord).orElse(Date.from(Instant.EPOCH));
+    return created;
+  }
+
+  public Optional<BlockState> getOriginalBlockState() {
+    try {
+      return Sponge.getDataManager().deserialize(BlockState.class, DataFormats.JSON.read(originalBlockState));
+    } catch (IOException e) {
+      e.printStackTrace();
+      return Optional.empty();
+    }
+  }
+
+  public Optional<BlockState> getReplacementBlockState() {
+    try {
+      return Sponge.getDataManager().deserialize(BlockState.class, DataFormats.JSON.read(replacementBlockState));
+    } catch (IOException e) {
+      e.printStackTrace();
+      return Optional.empty();
+    }
   }
 
   /**
@@ -142,85 +150,49 @@ public abstract class PrismAlert extends GeneralAlert {
    * @return whether rollback was successful
    */
   public final boolean rollback(@Nonnull CommandSource src) {
-    AtomicBoolean success = new AtomicBoolean(false);
-    QuerySession session = new QuerySession(src);
-    session.setSortBy(Sort.NEWEST_FIRST);
-    session.addFlag(Flag.NO_GROUP);
-    try {
-      Query query = session.newQuery();
-      this.addQueryConditionsTo(query);
-
-      // Iterate query results
-      CompletableFuture<List<Result>> futureResults = com.helion3.prism.Prism.getInstance()
-          .getStorageAdapter()
-          .records().query(session, false);
-      futureResults.thenAccept(results -> {
-        if (results.isEmpty()) {
-          GriefAlert.getInstance().getLogger().error(String.format(
-              "Rollback query by %s return no results.",
-              src.getName()));
-        } else {
-          try {
-            // Iterate record results
-            for (Result result : results) {
-              if (result instanceof Actionable) {
-                ((Actionable) result).rollback();
-                reversed = true;
-                success.set(true);
-              }
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        }
-      });
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return success.get();
+    // TODO implement
+    src.sendMessage(Text.of("Unimplemented"));
+    GriefAlert.getInstance().getLogger().info("Unimplemented");
+    return false;
   }
 
-  protected void addQueryConditionsTo(Query query) {
-    query.addCondition(FieldCondition.of(
-        DataQueries.Player,
-        MatchRule.EQUALS,
-        this.getGriefer().getUniqueId().toString()));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Target,
-        MatchRule.EQUALS,
-        Pattern.compile(this.getTarget().replace('_', ' '))));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Created,
-        MatchRule.GREATER_THAN_EQUAL,
-        this.getCreated()));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Created,
-        MatchRule.LESS_THAN_EQUAL,
-        Date.from(Instant.ofEpochMilli(this.getCreated().getTime()
-            + PRISM_BUFFER_MILLISECONDS))));
-    query.addCondition(FieldCondition.of(
-        DataQueries.EventName,
-        MatchRule.EQUALS,
-        this.getGriefEvent().getId()));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Location.then(DataQueries.WorldUuid),
-        MatchRule.EQUALS,
-        this.getGriefLocation().getExtent().getUniqueId().toString()));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Location.then(DataQueries.X),
-        MatchRule.EQUALS,
-        this.getGriefLocation().getPosition().getFloorX()));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Location.then(DataQueries.Y),
-        MatchRule.EQUALS,
-        this.getGriefLocation().getPosition().getFloorY()));
-    query.addCondition(FieldCondition.of(
-        DataQueries.Location.then(DataQueries.Z),
-        MatchRule.EQUALS,
-        this.getGriefLocation().getPosition().getFloorZ()));
-  }
+//  protected void addQueryConditionsTo(Query query) {
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Player,
+//        MatchRule.EQUALS,
+//        this.getGrieferUuid().toString()));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Target,
+//        MatchRule.EQUALS,
+//        Pattern.compile(this.getTarget().replace('_', ' '))));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Created,
+//        MatchRule.GREATER_THAN_EQUAL,
+//        Date.from(this.getCreated().toInstant().minusSeconds(1))));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Created,
+//        MatchRule.LESS_THAN_EQUAL,
+//        Date.from(this.getCreated().toInstant().plusSeconds(1))));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.EventName,
+//        MatchRule.EQUALS,
+//        this.getGriefEvent().getId()));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Location.then(DataQueries.WorldUuid),
+//        MatchRule.EQUALS,
+//        this.getGriefLocation().getExtent().getUniqueId().toString()));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Location.then(DataQueries.X),
+//        MatchRule.EQUALS,
+//        this.getGriefLocation().getPosition().getFloorX()));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Location.then(DataQueries.Y),
+//        MatchRule.EQUALS,
+//        this.getGriefLocation().getPosition().getFloorY()));
+//    query.addCondition(FieldCondition.of(
+//        DataQueries.Location.then(DataQueries.Z),
+//        MatchRule.EQUALS,
+//        this.getGriefLocation().getPosition().getFloorZ()));
+//  }
 
-  public boolean isReversed() {
-    return reversed;
-  }
 }

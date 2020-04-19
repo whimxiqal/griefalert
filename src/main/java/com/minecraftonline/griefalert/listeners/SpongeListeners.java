@@ -26,25 +26,25 @@ package com.minecraftonline.griefalert.listeners;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.sponge.ApplyAlert;
+import com.minecraftonline.griefalert.alerts.sponge.ChangeSignAlert;
 import com.minecraftonline.griefalert.alerts.sponge.InteractBlockAlert;
 import com.minecraftonline.griefalert.alerts.sponge.UseAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.AttackEntityAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.InteractEntityAlert;
-import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
-
-import java.util.Optional;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.scheduler.Task;
 
 public final class SpongeListeners {
 
@@ -65,13 +65,16 @@ public final class SpongeListeners {
     if (event.getCause().root() instanceof Player) {
       Player player = (Player) event.getCause().root();
 
-      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
-          .getProfileCache().getProfileOf(
+      GriefAlert.getInstance()
+          .getProfileCache()
+          .getProfileOf(
               GriefEvents.ITEM_USE,
               event.getItemStack().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType());
-
-      optionalProfile.ifPresent((profile) -> UseAlert.of(profile, event).run());
+              player.getLocation().getExtent().getDimension().getType())
+          .ifPresent((profile) ->
+              GriefAlert.getInstance()
+                  .getAlertService()
+                  .submit(new UseAlert(profile, event)));
     }
   }
 
@@ -86,11 +89,17 @@ public final class SpongeListeners {
       Player player = (Player) event.getCause().root();
 
       GriefAlert.getInstance()
-          .getProfileCache().getProfileOf(
-          GriefEvents.INTERACT,
-          event.getTargetBlock().getState().getType().getId(),
-          player.getLocation().getExtent().getDimension().getType())
-          .ifPresent(profile -> InteractBlockAlert.of(profile, event).run());
+          .getProfileCache()
+          .getProfileOf(
+              GriefEvents.INTERACT,
+              event.getTargetBlock().getState().getType().getId(),
+              player.getLocation().getExtent().getDimension().getType())
+          .ifPresent(profile ->
+              Task.builder()
+                  .execute(() -> GriefAlert.getInstance()
+                      .getAlertService()
+                      .submit(new InteractBlockAlert(profile, event)))
+                  .submit(GriefAlert.getInstance()));
 
       player.getItemInHand(HandTypes.MAIN_HAND)
           .flatMap(stack -> GriefAlert.getInstance()
@@ -98,7 +107,10 @@ public final class SpongeListeners {
                   GriefEvents.ITEM_APPLY,
                   stack.getType().getId(),
                   player.getLocation().getExtent().getDimension().getType()))
-          .ifPresent(profile -> ApplyAlert.of(profile, event).run());
+          .ifPresent(profile ->
+              GriefAlert.getInstance()
+                  .getAlertService()
+                  .submit(new ApplyAlert(profile, event)));
     }
   }
 
@@ -112,13 +124,16 @@ public final class SpongeListeners {
     if (event.getCause().root() instanceof Player) {
       Player player = (Player) event.getCause().root();
 
-      Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
-          .getProfileCache().getProfileOf(
+      GriefAlert.getInstance()
+          .getProfileCache()
+          .getProfileOf(
               GriefEvents.INTERACT,
               event.getTargetEntity().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType());
-
-      optionalProfile.ifPresent((profile) -> InteractEntityAlert.of(profile, event).run());
+              player.getLocation().getExtent().getDimension().getType())
+          .ifPresent((profile) ->
+              GriefAlert.getInstance()
+                  .getAlertService()
+                  .submit(new InteractEntityAlert(profile, event)));
     }
   }
 
@@ -141,29 +156,50 @@ public final class SpongeListeners {
           Player player = (Player) indirectDamageSource.getIndirectSource();
           String directCause = damageSource.getSource().getType().getId();
 
-          Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
-              .getProfileCache().getProfileOf(
+          GriefAlert.getInstance()
+              .getProfileCache()
+              .getProfileOf(
                   GriefEvents.ATTACK,
                   event.getTargetEntity().getType().getId(),
-                  player.getLocation().getExtent().getDimension().getType());
-
-          optionalProfile.ifPresent((profile) ->
-              new AttackEntityAlert(profile, event, player, directCause).run());
+                  player.getLocation().getExtent().getDimension().getType())
+              .ifPresent(profile ->
+                  GriefAlert.getInstance()
+                      .getAlertService()
+                      .submit(new AttackEntityAlert(profile, event, player.getUniqueId(), directCause)));
         }
 
       } else if (damageSource.getSource() instanceof Player) {
         Player player = (Player) damageSource.getSource();
 
-        Optional<GriefProfile> optionalProfile = GriefAlert.getInstance()
-            .getProfileCache().getProfileOf(
+        GriefAlert.getInstance()
+            .getProfileCache()
+            .getProfileOf(
                 GriefEvents.ATTACK,
                 event.getTargetEntity().getType().getId(),
-                player.getLocation().getExtent().getDimension().getType());
-
-        optionalProfile.ifPresent((profile) ->
-            new AttackEntityAlert(profile, event, player).run());
+                player.getLocation().getExtent().getDimension().getType())
+            .ifPresent(profile ->
+                GriefAlert.getInstance()
+                    .getAlertService()
+                    .submit(new AttackEntityAlert(profile, event, player.getUniqueId())));
       }
     }
+  }
+
+  @Listener
+  public void onChangeSignEvent(ChangeSignEvent event) {
+    event.getCause()
+        .first(Player.class)
+        .flatMap(player ->
+            GriefAlert.getInstance()
+                .getProfileCache()
+                .getProfileOf(
+                    GriefEvents.PLACE,
+                    event.getTargetTile().getBlock().getType().getId(),
+                    player.getLocation().getExtent().getDimension().getType()))
+        .ifPresent(griefProfile ->
+            GriefAlert.getInstance()
+                .getAlertService()
+                .submit(new ChangeSignAlert(griefProfile, event)));
   }
 
 }

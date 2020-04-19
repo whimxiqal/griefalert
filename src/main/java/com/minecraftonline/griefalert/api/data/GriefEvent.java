@@ -28,8 +28,10 @@ import com.helion3.prism.api.data.PrismEvent;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.GriefEvents;
+
 import java.io.Serializable;
 import javax.annotation.Nonnull;
+
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.HoverAction;
@@ -99,7 +101,7 @@ public class GriefEvent implements CatalogType, Serializable {
     return name;
   }
 
-  public String getPreterite() {
+  private String getPreterite() {
     return preterite;
   }
 
@@ -112,13 +114,15 @@ public class GriefEvent implements CatalogType, Serializable {
     return this.description;
   }
 
-  public Text toText() {
-    return Text.builder(getName())
+  public Text toAction() {
+    return Text.builder(getPreterite())
         .onHover(TextActions.showText(Text.of(
             Format.prefix(),
             Format.endLine(),
-            Detail.of("ID", "", Text.of(getId())).get(this),
-            Detail.of("Description", "", Text.of(getDescription())).get(this))))
+            Text.joinWith(Format.endLine(),
+                Detail.of("Name", "", Text.of(getName())).get(this).get(),
+                Detail.of("ID", "", Text.of(getId())).get(this).get(),
+                Detail.of("Description", "", Text.of(getDescription())).get(this).get()))))
         .build();
   }
 }

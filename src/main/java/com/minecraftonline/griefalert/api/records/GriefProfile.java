@@ -185,4 +185,13 @@ public class GriefProfile implements Serializable {
     return Text.joinWith(Format.bonus(", "), details);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof GriefProfile)) {
+      return false;
+    }
+    GriefProfile other = (GriefProfile) obj;
+    return this.event.equals(other.event)
+        && this.target.equals(other.target);
+  }
 }

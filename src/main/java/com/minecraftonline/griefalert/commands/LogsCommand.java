@@ -24,26 +24,44 @@
 
 package com.minecraftonline.griefalert.commands;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
+import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.util.AsyncUtil;
+import com.helion3.prism.api.services.PrismService;
+import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.api.structures.MapList;
+import com.minecraftonline.griefalert.util.DateUtil;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.PrismUtil;
+import com.minecraftonline.griefalert.util.WorldEditUtil;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.sponge.SpongeWorld;
+import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 
-import java.util.Map;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
 public class LogsCommand extends GeneralCommand {
@@ -59,7 +77,7 @@ public class LogsCommand extends GeneralCommand {
         .valueFlag(GenericArguments.string(CommandKeys.BEFORE.get()), "b")
         .valueFlag(GenericArguments.string(CommandKeys.PLAYER.get()), "p")
         .valueFlag(GenericArguments.string(CommandKeys.PRISM_TARGET.get()), "t")
-        .valueFlag(GenericArguments.string(CommandKeys.PRISM_EVENT.get()), "e")
+        .valueFlag(GenericArguments.catalogedElement(CommandKeys.PRISM_EVENT.get(), PrismEvent.class), "e")
         .flag("-group", "g")
         .buildWith(GenericArguments.none()));
   }
@@ -67,41 +85,126 @@ public class LogsCommand extends GeneralCommand {
   @Override
   @Nonnull
   public CommandResult execute(@Nonnull CommandSource src,
-                               @Nonnull CommandContext args) {
+                               @Nonnull CommandContext args) throws CommandException {
+    MapList<Text, Text> flags = new MapList<>(Maps.newHashMap());
+
     if (src instanceof Player) {
       Player player = (Player) src;
 
-      Map<Text, Text> flags = Maps.newHashMap();
+      Task.builder().async().execute(() -> {
 
-      PrismUtil.buildSession(player, args, flags).thenAccept(sessionOptional ->
-          sessionOptional.ifPresent(session -> {
-            // Don't group the results if specified
-            if (args.getOne("group").isPresent()) {
-              flags.put(Text.of("group"), Text.of("true"));
-            } else {
-              session.addFlag(Flag.NO_GROUP);
-              flags.put(Text.of("group"), Text.of("false"));
-            }
+        PrismService.Request.Builder requestBuilder = PrismService.requestBuilder();
 
-            player.sendMessage(Format.info(
-                "Using parameters: ",
-                Text.joinWith(
-                    Format.bonus(", "),
-                    flags.entrySet()
-                        .stream()
-                        .map(entry ->
-                            Format.bonus("{", entry.getKey(), ": ", entry.getValue(), "}"))
-                        .collect(Collectors.toList()))));
+        // Add location query with WE
+        SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(player.getLocation().getExtent());
+        Region selection;
+        try {
+          selection = SpongeWorldEdit.inst().getSession(player).getSelection(spongeWorld);
+        } catch (IncompleteRegionException e) {
+          player.sendMessage(Format.error("No region selected"));
+          return;
+        }
+        Vector3i minVector = WorldEditUtil.convertVector(selection.getMinimumPoint());
+        Vector3i maxVector = WorldEditUtil.convertVector(selection.getMaximumPoint());
+        requestBuilder.setxRange(minVector.getX(), maxVector.getX());
+        requestBuilder.setyRange(minVector.getY(), maxVector.getY());
+        requestBuilder.setzRange(minVector.getZ(), maxVector.getZ());
 
-            AsyncUtil.lookup(session);
-          }));
+
+        // Parse the 'since' with the given date format, or just do a year ago
+        Date since = args.<String>getOne(CommandKeys.SINCE.get()).flatMap(str -> {
+          try {
+            return Optional.of(DateUtil.parseAnyDate(str));
+          } catch (IllegalArgumentException e) {
+            player.sendMessage(Format.error(e.getMessage()));
+            return Optional.empty();
+          }
+        }).orElseGet(() -> Date.from(Instant.now().minus(Duration.ofHours(1))));
+        flags.add(CommandKeys.SINCE.get(), Text.of(Format.date(since)));
+        requestBuilder.setEarliest(since);
+
+        args.<String>getOne(CommandKeys.BEFORE.get()).ifPresent(str -> {
+          Date before = DateUtil.parseAnyDate(str);
+          flags.add(CommandKeys.BEFORE.get(), Text.of(Format.date(before)));
+          requestBuilder.setLatest(before);
+        });
+
+        args.<String>getAll(CommandKeys.PRISM_TARGET.get()).forEach(str -> {
+          flags.add(CommandKeys.PRISM_TARGET.get(), Text.of(str));
+          requestBuilder.addTarget(str);
+        });
+
+        args.<String>getAll(CommandKeys.PLAYER.get()).forEach(name -> {
+          try {
+            GameProfile gameProfile = Sponge.getServer()
+                .getGameProfileManager()
+                .get(name)
+                .get();
+            flags.add(CommandKeys.PLAYER.get(), Text.of(name));
+            requestBuilder.addPlayerUuid(gameProfile.getUniqueId());
+          } catch (ExecutionException e) {
+            player.sendMessage(Format.error(String.format("Player %s not found", name)));
+          } catch (Exception e) {
+            player.sendMessage(Format.error("Error trying to access game profile for " + name));
+            e.printStackTrace();
+          }
+        });
+
+        Collection<PrismEvent> events = args.getAll(CommandKeys.PRISM_EVENT.get());
+        if (events.isEmpty()) {
+          flags.add(CommandKeys.PRISM_EVENT.get(), Text.of(PrismEvents.BLOCK_BREAK.getId()));
+          requestBuilder.addEvent(PrismEvents.BLOCK_BREAK);
+        } else {
+          events.forEach(event -> {
+            flags.add(CommandKeys.PRISM_EVENT.get(), Text.of(event.getId()));
+            requestBuilder.addEvent(event);
+          });
+        }
+
+        if (args.hasAny("group")) {
+          flags.add(Text.of("group"), Text.of("true"));
+        } else {
+          flags.add(Text.of("group"), Text.of("false"));
+          requestBuilder.addFlag(Flag.NO_GROUP);
+        }
+
+        PrismService.Request request = requestBuilder.build();
+
+        player.sendMessage(Format.info(
+            "Using parameters: ",
+            Text.joinWith(
+                Format.bonus(", "),
+                flags.getMap().entrySet()
+                    .stream()
+                    .map(entry ->
+                        Format.bonus(
+                            "{",
+                            entry.getKey(),
+                            ": ",
+                            Text.joinWith(
+                                Text.of(","),
+                                entry.getValue()),
+                            "}"))
+                    .collect(Collectors.toList()))));
+        Optional<PrismService> prism = Sponge.getServiceManager().provide(PrismService.class);
+        try {
+          if (prism.isPresent()) {
+            prism.get().lookup(player, request);
+          } else {
+            throw new RuntimeException("Could not get PrismService from Sponge Service Manager");
+          }
+        } catch (Exception e) {
+          player.sendMessage(Format.error("An error occurred communicating with Prism"));
+          e.printStackTrace();
+        }
+      }).submit(GriefAlert.getInstance());
 
       return CommandResult.success();
     } else {
-      Errors.sendPlayerOnlyCommand(src);
-      return CommandResult.empty();
+      throw Errors.playerOnlyException();
     }
   }
+
 
   public static class LogsInspectorCommand extends GeneralCommand {
 

@@ -47,6 +47,10 @@ public class Permission {
     return new Permission(perm);
   }
 
+  public String get() {
+    return perm;
+  }
+
   @Override
   public String toString() {
     return perm;

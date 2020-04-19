@@ -22,23 +22,27 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.util;
+package com.minecraftonline.griefalert.api.structures;
 
-public abstract class Reference {
+import com.google.common.collect.Lists;
 
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private Reference() {
+import java.util.List;
+import java.util.Map;
+
+public class MapList<P, S> {
+
+  private final Map<P, List<S>> mapList;
+
+  public MapList(Map<P, List<S>> mapList) {
+    this.mapList = mapList;
   }
 
-  public static final String ID = "griefalert";
-  public static final String NAME = "GriefAlert";
-  public static final String VERSION = "1.1.9";
-  public static final String DESCRIPTION = "A 'Grief' alerting tool.";
-  public static final String[] AUTHORS = {"PietElite"};
-  public static final String WEBSITE = "https://www.minecraftonline.com";
-  public static final String SOURCE = "https://github.com/pietelite/griefalert";
-  public static final String MC_VERSION = "1.12.2";
+  public Map<? extends P, List<S>> getMap() {
+    return mapList;
+  }
 
+  public void add(P key, S item) {
+    mapList.putIfAbsent(key, Lists.newLinkedList());
+    mapList.get(key).add(item);
+  }
 }

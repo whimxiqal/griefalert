@@ -2,12 +2,14 @@
 
 package com.minecraftonline.griefalert.alerts.prism;
 
+import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.api.records.PrismRecordArchived;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.PrismUtil;
+
+import java.util.Optional;
 
 public class SignBreakAlert extends PrismAlert {
 
@@ -18,35 +20,33 @@ public class SignBreakAlert extends PrismAlert {
    * @param griefProfile the grief profile for this alert
    * @param prismRecord  the prism record triggering this alert
    */
-  public SignBreakAlert(GriefProfile griefProfile, PrismRecordArchived prismRecord) {
+  public SignBreakAlert(GriefProfile griefProfile, PrismRecord prismRecord) {
     super(griefProfile, prismRecord);
 
-    PrismUtil.getBrokenSignText(getPrismRecord())
-        .flatMap(SignText::getText1)
+    Optional<SignText> signText = PrismUtil.getBrokenSignText(prismRecord.getDataContainer());
+
+    signText.flatMap(SignText::getText1)
         .ifPresent(text ->
             addDetail(Detail.of(
                 "Line 1",
                 null,
                 Format.bonus(text))));
 
-    PrismUtil.getBrokenSignText(getPrismRecord())
-        .flatMap(SignText::getText2)
+    signText.flatMap(SignText::getText2)
         .ifPresent(text ->
             addDetail(Detail.of(
                 "Line 2",
                 null,
                 Format.bonus(text))));
 
-    PrismUtil.getBrokenSignText(getPrismRecord())
-        .flatMap(SignText::getText3)
+    signText.flatMap(SignText::getText3)
         .ifPresent(text ->
             addDetail(Detail.of(
                 "Line 3",
                 null,
                 Format.bonus(text))));
 
-    PrismUtil.getBrokenSignText(getPrismRecord())
-        .flatMap(SignText::getText4)
+    signText.flatMap(SignText::getText4)
         .ifPresent(text ->
             addDetail(Detail.of(
                 "Line 4",

@@ -145,7 +145,7 @@ public abstract class GeneralCommand implements CommandExecutor {
         .description(this.description)
         .permission(this.permission.toString())
         .executor(this)
-        .arguments(commandElement);
+        .arguments(GenericArguments.optional(commandElement));
     commandChildren.forEach(
         (child) ->
             commandSpecBuilder.child(child.buildCommandSpec(), child.getAliases()));

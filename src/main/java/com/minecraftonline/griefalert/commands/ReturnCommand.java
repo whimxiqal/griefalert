@@ -31,6 +31,7 @@ import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -53,13 +54,15 @@ public class ReturnCommand extends GeneralCommand {
   @Override
   @Nonnull
   public CommandResult execute(@Nonnull CommandSource src,
-                               @Nonnull CommandContext args) {
+                               @Nonnull CommandContext args) throws CommandException {
     if (src instanceof Player) {
-      GriefAlert.getInstance().getAlertManager().revertOfficerTransform((Player) src);
-      return CommandResult.success();
+      if (GriefAlert.getInstance().getAlertService().unInspect((Player) src)) {
+        return CommandResult.success();
+      } else {
+        return CommandResult.empty();
+      }
     } else {
-      Errors.sendPlayerOnlyCommand(src);
-      return CommandResult.empty();
+      throw Errors.playerOnlyException();
     }
   }
 }

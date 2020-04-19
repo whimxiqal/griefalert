@@ -26,21 +26,22 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 
-import com.minecraftonline.griefalert.api.caches.AlertManager;
 import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+
+import java.util.NoSuchElementException;
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-
 
 public class CheckCommand extends GeneralCommand {
 
@@ -51,39 +52,34 @@ public class CheckCommand extends GeneralCommand {
     );
     addAlias("check");
     addAlias("c");
-    setCommandElement(GenericArguments
-        .flags()
-        .flag("-force", "f")
-        .buildWith(GenericArguments.onlyOne(
-            GenericArguments.integer(CommandKeys.ALERT_INDEX.get()))));
+    setCommandElement(GenericArguments.seq(
+        GenericArguments.integer(CommandKeys.ALERT_INDEX.get()),
+        GenericArguments.flags().flag("-force", "f").buildWith(GenericArguments.none())));
   }
 
   @Nonnull
   @Override
   public CommandResult execute(@Nonnull CommandSource src,
-                               @Nonnull CommandContext args) {
+                               @Nonnull CommandContext args) throws CommandException {
     if (src instanceof Player) {
       Player player = (Player) src;
-      args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).ifPresent(i -> {
-        try {
-          AlertManager manager = GriefAlert.getInstance().getAlertManager();
-          manager.check(
-              manager.getAlertCache().get(i),
-              player,
-              args.hasAny("force"));
-
-        } catch (IndexOutOfBoundsException e) {
-          player.sendMessage(Format.error("That alert could not be found."));
-        }
-      });
+      int index;
+      try {
+        index = args.requireOne(CommandKeys.ALERT_INDEX.get());
+      } catch (NoSuchElementException e) {
+        sendHelp(src);
+        return CommandResult.success();
+      }
+      try {
+        GriefAlert.getInstance().getAlertService().inspect(index, player, args.hasAny("force"));
+        return CommandResult.success();
+      } catch (IndexOutOfBoundsException e) {
+        throw Errors.noAlertException();
+      }
     } else {
-      src.sendMessage(Format.error(Text.of(
-          TextColors.RED,
-          "Only players may execute this command")));
+      throw Errors.playerOnlyException();
     }
-    return CommandResult.success();
   }
-
 
 
   /**

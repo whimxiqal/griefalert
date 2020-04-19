@@ -2,47 +2,37 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
+import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.util.Format;
 
 import javax.annotation.Nonnull;
 
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.world.World;
 
 public class InteractEntityAlert extends EntityAlert {
 
-  private final Transform<World> grieferTransform;
-
-  InteractEntityAlert(GriefProfile griefProfile, InteractEntityEvent.Secondary event) {
+  public InteractEntityAlert(@Nonnull GriefProfile griefProfile,
+                             @Nonnull InteractEntityEvent.Secondary event) {
     super(griefProfile, event);
-    this.grieferTransform = getGriefer().getTransform();
-  }
 
-  /**
-   * Generator for the appropriate InteractEntityAlert.
-   *
-   * @param griefProfile The GriefProfile flagging this event
-   * @param event        The event
-   * @return The appropriate InteractEntityAlert
-   */
-  public static InteractEntityAlert of(
-      GriefProfile griefProfile,
-      InteractEntityEvent.Secondary event) {
-
-    switch (griefProfile.getTarget()) {
-      case "minecraft:item_frame":
-        return new InteractItemFrameAlert(griefProfile, event);
-      case "minecraft:armor_stand":
-        return new InteractArmorStandAlert(griefProfile, event);
-      default:
-        return new InteractEntityAlert(griefProfile, event);
+    if (griefProfile.getTarget().equals("minecraft:item_frame")) {
+      addDetail(getItemFrameDetail());
     }
+    if (griefProfile.getTarget().equals("minecraft:armor_stand")) {
+      addDetail(getArmorStandDetail());
+    }
+
   }
 
-  @Nonnull
-  @Override
-  public Transform<World> getGrieferTransform() {
-    return grieferTransform;
+  public InteractEntityAlert(@Nonnull GriefProfile griefProfile,
+                             @Nonnull InteractEntityEvent.Secondary event,
+                             @Nonnull final String tool) {
+    this(griefProfile, event);
+    addDetail(Detail.of(
+        "Tool",
+        "The item in the hand of the player at the time of the event.",
+        Format.item(tool)));
   }
+
 }

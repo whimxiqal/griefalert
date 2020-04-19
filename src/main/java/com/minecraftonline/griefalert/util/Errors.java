@@ -24,7 +24,10 @@
 
 package com.minecraftonline.griefalert.util;
 
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatTypes;
@@ -55,14 +58,19 @@ public final class Errors {
                 transform.getLocation())));
   }
 
-  /**
-   * Send a receiver an error message conveying the inability of performing a command
-   * because only players may execute the command.
-   *
-   * @param receiver the receiver
-   */
-  public static void sendPlayerOnlyCommand(MessageReceiver receiver) {
-    receiver.sendMessage(Format.error("Only players may execute this command"));
+  public static CommandException playerOnlyException() {
+    return new CommandException(Format.error("Only players may execute this command"));
   }
 
+  public static CommandException noPlayerFoundException(String username) {
+    return new CommandException(Format.error("Cannot find player: " + username));
+  }
+
+  public static CommandException parseException() {
+    return new CommandException(Format.error("Argument couldn't be parsed"));
+  }
+
+  public static CommandException noAlertException() {
+    return new CommandException(Format.error("No alert could be found with that index"));
+  }
 }

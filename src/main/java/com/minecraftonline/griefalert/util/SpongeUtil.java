@@ -93,4 +93,7 @@ public final class SpongeUtil {
     return Sponge.getServiceManager().provide(UserStorageService.class).flatMap(users -> users.get(userUuid));
   }
 
+  public static Optional<User> getUser(String username) {
+    return Sponge.getServiceManager().provide(UserStorageService.class).flatMap(users -> users.get(username));
+  }
 }

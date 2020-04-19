@@ -48,7 +48,7 @@ public class ClearcacheCommand extends GeneralCommand {
   @Nonnull
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) {
-    GriefAlert.getInstance().getAlertManager().clearAll();
+    GriefAlert.getInstance().getAlertService().reset();
     src.sendMessage(Format.success("Alert cache cleared"));
     return CommandResult.success();
   }

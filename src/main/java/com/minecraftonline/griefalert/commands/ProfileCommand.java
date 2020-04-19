@@ -36,6 +36,7 @@ import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
@@ -100,11 +101,15 @@ public class ProfileCommand extends GeneralCommand {
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
 
-      GriefEvent event = args.<GriefEvent>getOne(CommandKeys.GA_EVENT.get())
-          .orElseThrow(() -> new RuntimeException("Requires argument"));
-      String target = args.<String>getOne(CommandKeys.GA_TARGET.get())
-          .map(General::ensureIdFormat)
-          .orElseThrow(() -> new RuntimeException("Requires argument"));
+      GriefEvent event;
+      String target;
+      try {
+        event = args.requireOne(CommandKeys.GA_EVENT.get());
+        target = General.ensureIdFormat(args.requireOne(CommandKeys.GA_TARGET.get()));
+      } catch (NoSuchElementException e) {
+        sendHelp(src);
+        return CommandResult.success();
+      }
       GriefProfile profile = GriefProfile.of(event, target);
 
       args.<DimensionType>getAll(CommandKeys.DIMENSION.get())

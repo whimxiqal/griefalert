@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 import de.randombyte.holograms.api.HologramsService;
 
@@ -38,6 +39,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.world.Location;
 
 /**
  * A managing class for creating holograms for the purposes of GriefAlert.
@@ -78,17 +80,19 @@ public class HologramManager {
     if (error) {
       log.error(String.format(
           "Error creating a hologram at %s",
-          alert.getGriefLocation().toString()));
+          alert.getGriefPosition().toString()));
       return;
     }
 
     List<HologramsService.Hologram> holograms = hologramsService
         .createMultilineHologram(
-            alert.getGriefLocation(),
+            new Location<>(
+                Alerts.getWorld(alert),
+                alert.getGriefPosition().toDouble().add(0.5, 0.2, 0.5)),
             Lists.newArrayList(
-                Format.userName(alert.getGriefer()),
+                Format.userName(Alerts.getGriefer(alert)),
                 Format.bonus(
-                    alert.getGriefEvent().getPreterite(),
+                    alert.getGriefEvent().toAction(),
                     Format.space(),
                     Format.item(alert.getTarget()))),
             DISTANCE_BETWEEN_LINES)

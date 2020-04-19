@@ -25,6 +25,7 @@
 package com.minecraftonline.griefalert.util.enums;
 
 import com.minecraftonline.griefalert.api.data.Permission;
+import org.spongepowered.api.entity.living.player.User;
 
 public final class Permissions {
 
@@ -34,6 +35,9 @@ public final class Permissions {
   private Permissions() {
   }
 
+  public static final boolean has(User user, Permission permission) {
+    return user.hasPermission(permission.get());
+  }
 
   public static final Permission GRIEFALERT_COMMAND = Permission.of(
       "griefalert.command"

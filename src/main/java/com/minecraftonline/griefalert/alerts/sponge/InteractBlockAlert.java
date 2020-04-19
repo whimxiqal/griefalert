@@ -2,6 +2,7 @@
 
 package com.minecraftonline.griefalert.alerts.sponge;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import javax.annotation.Nonnull;
@@ -13,30 +14,17 @@ import org.spongepowered.api.world.World;
 
 public class InteractBlockAlert extends SpongeAlert {
 
-  private final Location<World> griefLocation;
-  private final Transform<World> grieferTransform;
+  private final Vector3i griefLocation;
 
-  private InteractBlockAlert(GriefProfile griefProfile, InteractBlockEvent event) {
+  public InteractBlockAlert(GriefProfile griefProfile, InteractBlockEvent event) {
     super(griefProfile, event);
-    griefLocation = event.getTargetBlock().getLocation().orElseThrow(() ->
+    griefLocation = event.getTargetBlock().getLocation().map(Location::getBlockPosition).orElseThrow(() ->
         new RuntimeException("Couldn't find the location of a block in an IneteractBlockAlert"));
-    this.grieferTransform = getGriefer().getTransform();
-  }
-
-  public static InteractBlockAlert of(GriefProfile griefProfile, InteractBlockEvent event) {
-    return new InteractBlockAlert(griefProfile, event);
   }
 
   @Nonnull
   @Override
-  public Transform<World> getGrieferTransform() {
-    return grieferTransform;
+  public Vector3i getGriefPosition() {
+    return griefLocation;
   }
-
-  @Nonnull
-  @Override
-  public Location<World> getGriefLocation() {
-    return griefLocation.add(0.5, 0.5, 0.5);
-  }
-
 }
