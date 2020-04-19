@@ -25,7 +25,7 @@
 //package com.minecraftonline.griefalert.api.alerts;
 //
 //import com.flowpowered.math.vector.Vector3d;
-//import com.minecraftonline.griefalert.api.caches.AlertManager;
+//import com.minecraftonline.griefalert.caches.AlertManager;
 //import com.minecraftonline.griefalert.api.records.GriefProfile;
 //
 //import java.io.Serializable;

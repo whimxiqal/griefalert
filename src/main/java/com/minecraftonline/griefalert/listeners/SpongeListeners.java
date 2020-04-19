@@ -31,7 +31,7 @@ import com.minecraftonline.griefalert.alerts.sponge.InteractBlockAlert;
 import com.minecraftonline.griefalert.alerts.sponge.UseAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.AttackEntityAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.InteractEntityAlert;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;

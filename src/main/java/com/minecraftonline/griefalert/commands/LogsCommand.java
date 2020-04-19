@@ -31,7 +31,7 @@ import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.services.PrismService;
 import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.structures.MapList;
 import com.minecraftonline.griefalert.util.DateUtil;
 import com.minecraftonline.griefalert.util.Errors;

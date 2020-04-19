@@ -43,7 +43,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-
 public final class PrismUtil {
 
   /**
@@ -180,4 +179,5 @@ public final class PrismUtil {
     Optional<Object> dateOptional = prismRecord.get(DataQueries.Created);
     return dateOptional.map(object -> (Date) object);
   }
+
 }

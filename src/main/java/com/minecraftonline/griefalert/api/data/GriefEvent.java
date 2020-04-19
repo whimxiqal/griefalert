@@ -25,20 +25,12 @@
 package com.minecraftonline.griefalert.api.data;
 
 import com.helion3.prism.api.data.PrismEvent;
-import com.minecraftonline.griefalert.api.alerts.Detail;
-import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
 
 import java.io.Serializable;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.HoverAction;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.annotation.CatalogedBy;
-
 
 /**
  * An object to describe a specific action. This is one of the factors which match
@@ -70,7 +62,10 @@ public class GriefEvent implements CatalogType, Serializable {
    * @param preterite The past tense version of this event
    * @return The corresponding generated <code>GriefEvent</code>
    */
-  public static GriefEvent of(String id, String name, String preterite, String description) {
+  public static GriefEvent of(@Nonnull String id,
+                              @Nonnull String name,
+                              @Nonnull String preterite,
+                              @Nonnull String description) {
     return new GriefEvent(id, name, preterite, description);
   }
 
@@ -101,7 +96,8 @@ public class GriefEvent implements CatalogType, Serializable {
     return name;
   }
 
-  private String getPreterite() {
+  @Nonnull
+  public String getPreterite() {
     return preterite;
   }
 
@@ -114,15 +110,4 @@ public class GriefEvent implements CatalogType, Serializable {
     return this.description;
   }
 
-  public Text toAction() {
-    return Text.builder(getPreterite())
-        .onHover(TextActions.showText(Text.of(
-            Format.prefix(),
-            Format.endLine(),
-            Text.joinWith(Format.endLine(),
-                Detail.of("Name", "", Text.of(getName())).get(this).get(),
-                Detail.of("ID", "", Text.of(getId())).get(this).get(),
-                Detail.of("Description", "", Text.of(getDescription())).get(this).get()))))
-        .build();
-  }
 }

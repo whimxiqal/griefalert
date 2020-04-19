@@ -36,9 +36,10 @@ import com.minecraftonline.griefalert.alerts.prism.SignBreakAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.PrismUtil;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 
 import java.util.Optional;
 
@@ -105,7 +106,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
         GriefAlert.getInstance().getLogger().error("A PrismRecord matched a Grief Profile but "
             + "an Alert could not be made.");
         GriefAlert.getInstance().getLogger().error(PrismUtil.printRecord(container));
-        GriefAlert.getInstance().getLogger().error(profile.print().toPlain());
+        GriefAlert.getInstance().getLogger().error(Format.profile(profile).toPlain());
         return;
       }
 

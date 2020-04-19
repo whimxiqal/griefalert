@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.util.enums;
+package com.minecraftonline.griefalert.api.data;
 
 import com.google.common.collect.Lists;
 import com.helion3.prism.util.PrismEvents;
-import com.minecraftonline.griefalert.api.data.GriefEvent;
 
 import java.util.Collection;
 import java.util.Optional;

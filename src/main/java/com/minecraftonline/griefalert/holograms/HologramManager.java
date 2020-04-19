@@ -92,7 +92,7 @@ public class HologramManager {
             Lists.newArrayList(
                 Format.userName(Alerts.getGriefer(alert)),
                 Format.bonus(
-                    alert.getGriefEvent().toAction(),
+                    Format.action(alert.getGriefEvent()),
                     Format.space(),
                     Format.item(alert.getTarget()))),
             DISTANCE_BETWEEN_LINES)

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.caches;
+package com.minecraftonline.griefalert.caches;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -59,7 +59,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -90,7 +89,7 @@ import org.spongepowered.api.world.World;
  * @see Alert
  * @see RotatingArrayList
  */
-public final class AlertManager implements AlertService {
+public final class AlertServiceImpl implements AlertService {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
   private final MapStack<UUID, GriefProfile> grieferRepeatHistory = new HashMapStack<>();
@@ -101,7 +100,7 @@ public final class AlertManager implements AlertService {
   /**
    * Default constructor.
    */
-  public AlertManager() {
+  public AlertServiceImpl() {
     alertStorageFile = new File(
         GriefAlert.getInstance().getDataDirectory().getAbsolutePath()
             + "/alerts.ser");
@@ -209,7 +208,7 @@ public final class AlertManager implements AlertService {
           tokens.add(Text.of(firstAlert.get().getGriefProfile()
                   .getColored(GriefProfile.Colored.EVENT)
                   .orElse(Format.ALERT_EVENT_COLOR),
-              firstAlert.get().getGriefEvent().toAction()));
+              Format.action(firstAlert.get().getGriefEvent())));
           tokens.add(Text.of(firstAlert.get().getGriefProfile()
                   .getColored(GriefProfile.Colored.TARGET)
                   .orElse(Format.ALERT_TARGET_COLOR),

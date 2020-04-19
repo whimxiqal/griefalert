@@ -24,7 +24,7 @@
 
 package com.minecraftonline.griefalert.util.enums;
 
-import com.minecraftonline.griefalert.api.commands.CommandKey;
+import com.minecraftonline.griefalert.commands.common.CommandKey;
 import org.spongepowered.api.text.Text;
 
 public final class CommandKeys {

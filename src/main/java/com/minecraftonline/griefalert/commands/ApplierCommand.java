@@ -33,7 +33,7 @@ import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.structures.MapList;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.DateUtil;

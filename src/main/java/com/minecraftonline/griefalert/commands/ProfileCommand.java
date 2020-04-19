@@ -25,13 +25,13 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.Collection;
@@ -137,7 +137,7 @@ public class ProfileCommand extends GeneralCommand {
       } catch (Exception e) {
         GriefAlert.getInstance().getLogger().error("An Exception thrown when trying to "
             + "add a profile: "
-            + profile.print().toPlain());
+            + Format.profile(profile).toPlain());
         General.printStackTraceToDebugLogger(e);
         return CommandResult.empty();
       }
@@ -257,7 +257,7 @@ public class ProfileCommand extends GeneralCommand {
           .map(profile -> Text.of(
               Format.GRIEF_ALERT_THEME,
               " - ",
-              TextColors.RESET, profile.print()))
+              TextColors.RESET, Format.profile(profile)))
           .collect(Collectors.toList());
 
       if (elements.isEmpty()) {

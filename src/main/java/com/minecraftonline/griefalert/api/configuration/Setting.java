@@ -25,7 +25,6 @@
 package com.minecraftonline.griefalert.api.configuration;
 
 import com.google.common.reflect.TypeToken;
-import com.minecraftonline.griefalert.GriefAlert;
 
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
@@ -101,13 +100,10 @@ public class Setting<T> {
   /**
    * Ensure that this setting has a valid value.
    */
-  public void verify() {
+  public void verify() throws IllegalStateException {
     if (!verification.test(value)) {
-      GriefAlert.getInstance().getLogger().error(
-          errorMessage
-              + "Using default value: "
-              + defaultValue.toString());
       value = defaultValue;
+      throw new IllegalStateException(String.format("%s Using default value: %s", errorMessage, defaultValue.toString()));
     }
   }
 

@@ -98,7 +98,7 @@ public abstract class GeneralAlert implements Alert {
         Format.userName(Alerts.getGriefer(this)),
         Format.space(),
         this.getGriefProfile().getColored(GriefProfile.Colored.EVENT).orElse(Format.ALERT_EVENT_COLOR),
-        this.getGriefEvent().toAction(),
+        Format.action(this.getGriefEvent()),
         Format.space(),
         this.getGriefProfile().getColored(GriefProfile.Colored.TARGET).orElse(Format.ALERT_TARGET_COLOR),
         Grammar.addIndefiniteArticle(Format.item(this.getTarget())),

@@ -5,7 +5,7 @@ package com.minecraftonline.griefalert.alerts.sponge.entities;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 
 import java.util.UUID;
 import javax.annotation.Nonnull;

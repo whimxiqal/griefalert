@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.caches;
+package com.minecraftonline.griefalert.caches;
 
 import com.google.common.collect.HashBasedTable;
 import com.minecraftonline.griefalert.GriefAlert;

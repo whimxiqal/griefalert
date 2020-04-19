@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.commands;
+package com.minecraftonline.griefalert.commands.common;
 
 import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.util.Format;

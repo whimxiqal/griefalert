@@ -28,7 +28,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.alerts.GeneralAlert;
-import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;

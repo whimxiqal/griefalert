@@ -54,7 +54,7 @@ public final class Details {
     return Detail.of(
         "Event",
         "THe classification for this type of event.",
-        alert -> Optional.of(Format.bonus(alert.getGriefEvent().toAction())),
+        alert -> Optional.of(Format.bonus(Format.action(alert.getGriefEvent()))),
         true);
   }
 

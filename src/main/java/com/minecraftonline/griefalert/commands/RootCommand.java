@@ -24,7 +24,7 @@
 
 package com.minecraftonline.griefalert.commands;
 
-import com.minecraftonline.griefalert.api.commands.GeneralCommand;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Reference;
 import com.minecraftonline.griefalert.util.enums.Permissions;

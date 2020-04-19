@@ -32,6 +32,8 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.enums.Settings;
@@ -41,12 +43,14 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -252,7 +256,7 @@ public final class Format {
     } catch (MalformedURLException ex) {
       textBuilder.onClick(TextActions.suggestCommand(url));
       GriefAlert.getInstance().getLogger().error("A url was not formed correctly for a"
-          + " click action: " + url);
+              + " click action: " + url);
     }
 
     return textBuilder.build();
@@ -271,13 +275,13 @@ public final class Format {
                              @Nonnull String command,
                              @Nonnull Text hoverMessage) {
     return Text.builder()
-        .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
-            Text.of(TextColors.GRAY, label), "]"))
-        .onClick(TextActions.runCommand(command))
-        .onHover(TextActions.showText(Text.of(
-            (hoverMessage.isEmpty() ? hoverMessage : Text.join(hoverMessage, Format.endLine())),
-            Format.bonus(command))))
-        .build();
+            .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
+                    Text.of(TextColors.GRAY, label), "]"))
+            .onClick(TextActions.runCommand(command))
+            .onHover(TextActions.showText(Text.of(
+                    (hoverMessage.isEmpty() ? hoverMessage : Text.join(hoverMessage, Format.endLine())),
+                    Format.bonus(command))))
+            .build();
   }
 
   /**
@@ -288,9 +292,9 @@ public final class Format {
    */
   public static Text getTagInfo(int index) {
     return Format.command(
-        "INFO",
-        String.format("/griefalert info %s", index),
-        Text.of("Get a summary of information about this alert")
+            "INFO",
+            String.format("/griefalert info %s", index),
+            Text.of("Get a summary of information about this alert")
     );
   }
 
@@ -302,9 +306,9 @@ public final class Format {
    */
   public static Text getTagCheck(int index) {
     return Format.command(
-        "CHECK",
-        String.format("/griefalert check %s", index),
-        Text.of("Teleport to this location")
+            "CHECK",
+            String.format("/griefalert check %s", index),
+            Text.of("Teleport to this location")
     );
   }
 
@@ -316,9 +320,9 @@ public final class Format {
    */
   public static Text getTagRollback(int index) {
     return Format.command(
-        "ROLLBACK",
-        String.format("/griefalert rollback alert %s", index),
-        Text.of("Undo this event")
+            "ROLLBACK",
+            String.format("/griefalert rollback alert %s", index),
+            Text.of("Undo this event")
     );
   }
 
@@ -329,9 +333,9 @@ public final class Format {
    */
   public static Text getTagReturn() {
     return Format.command(
-        "RETURN",
-        "/griefalert return",
-        Text.of("Return to last saved location before checking an alert")
+            "RETURN",
+            "/griefalert return",
+            Text.of("Return to last saved location before checking an alert")
     );
   }
 
@@ -343,9 +347,9 @@ public final class Format {
    */
   public static Text getTagRecent(String playerName) {
     return Format.command(
-        "RECENT",
-        String.format("/griefalert query -p %s", playerName),
-        Text.of("Search for recent events caused by this player")
+            "RECENT",
+            String.format("/griefalert query -p %s", playerName),
+            Text.of("Search for recent events caused by this player")
     );
   }
 
@@ -357,9 +361,9 @@ public final class Format {
    */
   public static Text getTagShow(int index) {
     return Format.command(
-        "SHOW",
-        String.format("/griefalert show %s", index),
-        Text.of("Show the alert location in the world")
+            "SHOW",
+            String.format("/griefalert show %s", index),
+            Text.of("Show the alert location in the world")
     );
   }
 
@@ -400,11 +404,11 @@ public final class Format {
   @Nonnull
   public static Text bonusLocation(Location<World> location) {
     return Format.bonus(String.format(
-        "(%s, %s, %s, %s)",
-        location.getBlockX(),
-        location.getBlockY(),
-        location.getBlockZ(),
-        location.getExtent().getDimension().getType().getName()));
+            "(%s, %s, %s, %s)",
+            location.getBlockX(),
+            location.getBlockY(),
+            location.getBlockZ(),
+            location.getExtent().getDimension().getType().getName()));
   }
 
   public static Text endLine() {
@@ -439,16 +443,16 @@ public final class Format {
    */
   public static Text hover(String label, String onHover) {
     return Text.builder()
-        .append(Text.of(TextStyles.ITALIC, label))
-        .onHover(TextActions.showText(Format.bonus(onHover)))
-        .build();
+            .append(Text.of(TextStyles.ITALIC, label))
+            .onHover(TextActions.showText(Format.bonus(onHover)))
+            .build();
   }
 
   public static Text buildBroadcast(Alert alert, int index) {
     return Text.of(
-        alert.getMessage(),
-        Format.space(),
-        CheckCommand.clickToCheck(index));
+            alert.getMessage(),
+            Format.space(),
+            CheckCommand.clickToCheck(index));
   }
 
   public static Text formatRequest(AlertService.Request request) {
@@ -458,12 +462,12 @@ public final class Format {
       builder.append(Text.of("Players: "));
       builder.append(Text.of("{"));
       builder.append(Text.joinWith(Text.of(","),
-          request.getPlayerUuids()
-              .stream()
-              .map(uuid -> SpongeUtil.getUser(uuid).orElseThrow(() ->
-                  new RuntimeException("Invalid UUID in Request")))
-              .map(Format::userName)
-              .collect(Collectors.toList())));
+              request.getPlayerUuids()
+                      .stream()
+                      .map(uuid -> SpongeUtil.getUser(uuid).orElseThrow(() ->
+                              new RuntimeException("Invalid UUID in Request")))
+                      .map(Format::userName)
+                      .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
@@ -472,10 +476,10 @@ public final class Format {
       builder.append(Text.of("Events: "));
       builder.append(Text.of("{"));
       builder.append(Text.joinWith(Text.of(","),
-          request.getEvents()
-              .stream()
-              .map(GriefEvent::toAction)
-              .collect(Collectors.toList())));
+              request.getEvents()
+                      .stream()
+                      .map(Format::action)
+                      .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
@@ -484,17 +488,17 @@ public final class Format {
       builder.append(Text.of("Targets: "));
       builder.append(Text.of("{"));
       builder.append(Text.joinWith(Text.of(","),
-          request.getTargets()
-              .stream()
-              .map(Text::of)
-              .collect(Collectors.toList())));
+              request.getTargets()
+                      .stream()
+                      .map(Text::of)
+                      .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
     return Detail.of("Parameters", "The parameters used for this query",
-        tokens.isEmpty()
-            ? Text.of("None")
-            : Text.joinWith(Text.of(", "), tokens)).get(request).get();
+            tokens.isEmpty()
+                    ? Text.of("None")
+                    : Text.joinWith(Text.of(", "), tokens)).get(request).get();
   }
 
   public static Text dimension(@Nonnull DimensionType type) {
@@ -507,6 +511,67 @@ public final class Format {
     } else {
       throw new IllegalArgumentException("Invalid dimention type");
     }
+  }
+
+  public static Text action(@Nonnull GriefEvent event) {
+    return Text.builder(event.getPreterite())
+            .onHover(TextActions.showText(Text.of(
+                    Format.prefix(),
+                    Format.endLine(),
+                    Text.joinWith(Format.endLine(),
+                            Detail.of("Name", "", Text.of(event.getName())).get(event).get(),
+                            Detail.of("ID", "", Text.of(event.getId())).get(event).get(),
+                            Detail.of("Description", "", Text.of(event.getDescription())).get(event).get()))))
+            .build();
+  }
+
+  public static Text profile(@Nonnull GriefProfile griefProfile) {
+    List<Text> details = new LinkedList<>();
+    Detail.of(
+            "Event",
+            "The event type for this profile; one of: "
+                    + GriefEvents.REGISTRY_MODULE.getAll()
+                    .stream().map(GriefEvent::getId)
+                    .collect(Collectors.joining(", ")),
+            Format.hover(griefProfile.getGriefEvent().getId(), griefProfile.getGriefEvent().getDescription()))
+            .get(griefProfile).ifPresent(details::add);
+    Detail.of(
+            "Target",
+            "The ID for the target object of this grief event.",
+            Format.item(griefProfile.getTarget()))
+            .get(griefProfile).ifPresent(details::add);
+    Optional.of(griefProfile.getIgnored()).filter(ignored -> !ignored.isEmpty())
+            .flatMap(ignored -> Detail.of(
+                    "Ignored",
+                    "All dimension types in which events with this profile are ignored.",
+                    Format.bonus(Text.joinWith(
+                            Text.of(", "),
+                            ignored.stream()
+                                    .map(dimension -> Format.item(dimension.getId()))
+                                    .collect(Collectors.toList()))))
+                    .get(griefProfile)).ifPresent(details::add);
+    Optional.of(griefProfile.getColored()).filter(colors -> !colors.isEmpty())
+            .flatMap(colors -> Detail.of(
+                    "Colored",
+                    "Any components of the alert messages flagged by this alert "
+                            + "and their corresponding specified colors",
+                    Format.bonus(Text.joinWith(
+                            Text.of(", "),
+                            colors.entrySet()
+                                    .stream()
+                                    .map(entry -> Text.of(
+                                            "{",
+                                            entry.getKey().toString().toLowerCase(),
+                                            ", ",
+                                            Text.of(
+                                                    Sponge.getRegistry()
+                                                            .getType(TextColor.class, entry.getValue())
+                                                            .orElseThrow(RuntimeException::new),
+                                                    entry.getValue().toLowerCase()),
+                                            "}"))
+                                    .collect(Collectors.toList()))))
+                    .get(griefProfile)).ifPresent(details::add);
+    return Text.joinWith(Format.bonus(", "), details);
   }
 
 }

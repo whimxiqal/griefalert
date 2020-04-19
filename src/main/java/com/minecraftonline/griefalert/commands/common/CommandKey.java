@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.commands;
+package com.minecraftonline.griefalert.commands.common;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;

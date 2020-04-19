@@ -25,7 +25,7 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.google.common.collect.Lists;
-import com.minecraftonline.griefalert.api.commands.LegacyCommand;
+import com.minecraftonline.griefalert.commands.common.LegacyCommand;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.List;

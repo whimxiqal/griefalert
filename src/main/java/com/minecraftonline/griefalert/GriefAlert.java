@@ -29,9 +29,9 @@ import static com.minecraftonline.griefalert.GriefAlert.VERSION;
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.helion3.prism.api.services.PrismService;
-import com.minecraftonline.griefalert.api.caches.AlertManager;
-import com.minecraftonline.griefalert.api.caches.ProfileCache;
-import com.minecraftonline.griefalert.api.commands.LegacyCommand;
+import com.minecraftonline.griefalert.caches.AlertServiceImpl;
+import com.minecraftonline.griefalert.caches.ProfileCache;
+import com.minecraftonline.griefalert.commands.common.LegacyCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
@@ -45,7 +45,7 @@ import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
 import com.minecraftonline.griefalert.storage.SqliteProfileStorage;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.Reference;
-import com.minecraftonline.griefalert.util.enums.GriefEvents;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.File;
@@ -130,7 +130,7 @@ public final class GriefAlert {
   private AlertService alertService;
 
   // Custom classes to help manage plugin
-  private AlertManager alertManager;
+  private AlertServiceImpl alertServiceImpl;
   private ProfileCache profileCache;
   private ConfigHelper configHelper;
   private ProfileStorage profileStorage;
@@ -186,8 +186,8 @@ public final class GriefAlert {
 
   @Listener
   public void onPostInitializationEvent(GamePostInitializationEvent event) {
-    alertManager = new AlertManager();
-    Sponge.getServiceManager().setProvider(GriefAlert.getInstance(), AlertService.class, alertManager);
+    alertServiceImpl = new AlertServiceImpl();
+    Sponge.getServiceManager().setProvider(GriefAlert.getInstance(), AlertService.class, alertServiceImpl);
   }
 
   @Listener
@@ -221,7 +221,7 @@ public final class GriefAlert {
 
   @Listener
   public void onStoppingServer(GameStoppingServerEvent event) {
-    alertManager.saveAlerts();
+    alertServiceImpl.saveAlerts();
     getHologramManager().deleteAllHolograms();
   }
 
