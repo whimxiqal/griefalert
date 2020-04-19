@@ -24,8 +24,6 @@
 
 package com.minecraftonline.griefalert.api.alerts;
 
-import com.minecraftonline.griefalert.util.Format;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -38,6 +36,7 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 public class Detail<P extends Serializable> implements Serializable {
@@ -46,7 +45,7 @@ public class Detail<P extends Serializable> implements Serializable {
   private String description;
   private Function<P, Optional<Text>> infoFunction;
   private boolean primary;
-  private Text result;
+  private Text formatted = null;
 
   private Detail(@Nonnull String label,
                  @Nullable String description,
@@ -89,13 +88,13 @@ public class Detail<P extends Serializable> implements Serializable {
     description = in.readUTF();
     primary = in.readBoolean();
     try {
-      result = Sponge.getDataManager().deserialize(Text.class, DataFormats.JSON.read(in.readUTF())).orElse(null);
+      formatted = Sponge.getDataManager().deserialize(Text.class, DataFormats.JSON.read(in.readUTF())).orElse(null);
     } catch (IOException e) {
       // Shouldn't happen
       e.printStackTrace();
-      result = null;
+      formatted = null;
     }
-    infoFunction = item -> Optional.ofNullable(result);
+    infoFunction = item -> Optional.empty();
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException {
@@ -103,7 +102,7 @@ public class Detail<P extends Serializable> implements Serializable {
     out.writeUTF(description);
     out.writeBoolean(primary);
     try {
-      out.writeUTF(DataFormats.JSON.write(Optional.ofNullable(result).orElse(Text.EMPTY).toContainer()));
+      out.writeUTF(DataFormats.JSON.write(Optional.ofNullable(formatted).orElse(Text.EMPTY).toContainer()));
     } catch (IOException e) {
       // Shouldn't happen
       e.printStackTrace();
@@ -118,15 +117,20 @@ public class Detail<P extends Serializable> implements Serializable {
    * @return the formatted {@link Text}
    */
   public Optional<Text> get(@Nonnull P item) {
-    result = infoFunction.apply(item)
+    if (formatted != null) {
+      return Optional.of(formatted);
+    }
+    formatted = infoFunction.apply(item)
         .map(info -> Text.joinWith(
-            Format.bonus(": "),
+            Text.of(TextColors.GRAY, ": "),
             Text.of(
                 TextColors.DARK_AQUA,
-                description == null ? Text.of(label) : Format.hover(label, description)),
-            Format.bonus(info)))
+                description == null
+                        ? Text.of(label)
+                        : Text.builder(label).onHover(TextActions.showText(Text.of(description))),
+            Text.of(TextColors.GRAY, info))))
         .orElse(null);
-    return Optional.ofNullable(result);
+    return Optional.ofNullable(formatted);
   }
 
   public boolean isPrimary() {

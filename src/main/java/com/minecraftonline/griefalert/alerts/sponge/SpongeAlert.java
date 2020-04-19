@@ -3,7 +3,7 @@
 package com.minecraftonline.griefalert.alerts.sponge;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.minecraftonline.griefalert.api.alerts.GeneralAlert;
+import com.minecraftonline.griefalert.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import javax.annotation.Nonnull;

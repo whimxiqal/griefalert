@@ -52,10 +52,8 @@ public final class SpongeUtil {
    * @param entitySnapshot the entity snapshot of type item frame
    * @return an optional of the content id
    */
-  public static Optional<String> getItemFrameContent(EntitySnapshot entitySnapshot) {
-    return entitySnapshot.toContainer().getView(DataQuery.of("UnsafeData"))
-        .flatMap(unsafeView -> unsafeView.getView(DataQuery.of("Item")))
-        .flatMap(itemView -> itemView.getString(DataQuery.of("id")));
+  public static Optional<String> getItemFrameContent(DataContainer entitySnapshot) {
+    return entitySnapshot.getString(DataQuery.of("UnsafeData").then("Item").then("id"));
   }
 
   /**
@@ -64,23 +62,14 @@ public final class SpongeUtil {
    * @param entitySnapshot the entity snapshot of type item frame
    * @return an optional of the list of content ids
    */
-  public static Optional<List<String>> getArmorStandContent(EntitySnapshot entitySnapshot) {
-    // TODO simplify optional logic
-    DataContainer container = entitySnapshot.toContainer();
+  public static Optional<List<String>> getArmorStandContent(DataContainer entitySnapshot) {
 
-    Optional<DataView> unsafeOptional = container.getView(DataQuery.of("UnsafeData"));
-    if (!unsafeOptional.isPresent()) {
-      return Optional.empty();
-    }
-
-    Optional<List<DataView>> attributesOptional = unsafeOptional.get()
-        .getViewList(DataQuery.of("ArmorItems"));
+    Optional<List<DataView>> attributesOptional = entitySnapshot.getViewList(DataQuery.of("UnsafeData").then("ArmorItems"));
     if (!attributesOptional.isPresent()) {
       return Optional.empty();
     }
 
     List<String> output = new LinkedList<>();
-
     for (DataView view : attributesOptional.get()) {
       if (view.contains(DataQuery.of("id"))) {
         view.getString(DataQuery.of("id")).ifPresent(output::add);

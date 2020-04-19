@@ -79,12 +79,12 @@ import org.spongepowered.api.plugin.PluginContainer;
  * @author PietElite
  */
 @Plugin(id = Reference.ID,
-    name = Reference.NAME,
-    version = VERSION,
-    description = Reference.DESCRIPTION,
-    dependencies = {@Dependency(id = "prism"),
-        @Dependency(id = "holograms"),
-        @Dependency(id = "worldedit")})
+        name = Reference.NAME,
+        version = VERSION,
+        description = Reference.DESCRIPTION,
+        dependencies = {@Dependency(id = "prism"),
+                @Dependency(id = "holograms"),
+                @Dependency(id = "worldedit")})
 public final class GriefAlert {
 
   public static final String VERSION = Reference.VERSION;
@@ -176,9 +176,8 @@ public final class GriefAlert {
       }
     } catch (SQLException e) {
       GriefAlert.getInstance().getLogger().error(
-          "Error while creating storage engine for profiles.");
+              "Error while creating storage engine for profiles.");
       e.printStackTrace();
-      // TODO add enable/disable feature for entire plugin
     }
 
 
@@ -189,7 +188,6 @@ public final class GriefAlert {
   public void onPostInitializationEvent(GamePostInitializationEvent event) {
     alertManager = new AlertManager();
     Sponge.getServiceManager().setProvider(GriefAlert.getInstance(), AlertService.class, alertManager);
-    alertService = Sponge.getServiceManager().provide(AlertService.class).get();
   }
 
   @Listener
@@ -207,6 +205,8 @@ public final class GriefAlert {
     // Register all the commands with Sponge
     registerCommands();
     profileCache = new ProfileCache();
+    alertService = Sponge.getServiceManager().provide(AlertService.class).get();
+    prismService = Sponge.getServiceManager().provide(PrismService.class).get();
   }
 
   /**
@@ -243,22 +243,22 @@ public final class GriefAlert {
   private void registerCommands() {
     RootCommand rootCommand = new RootCommand();
     Sponge.getCommandManager().register(
-        this,
-        rootCommand.buildCommandSpec(),
-        rootCommand.getAliases());
+            this,
+            rootCommand.buildCommandSpec(),
+            rootCommand.getAliases());
     for (LegacyCommand command : LegacyCommands.get()) {
       Sponge.getCommandManager().register(
-          this,
-          command.buildCommandSpec(),
-          command.getAliases());
+              this,
+              command.buildCommandSpec(),
+              command.getAliases());
     }
   }
 
   private void registerListeners() {
     Sponge.getEventManager().registerListener(
-        this,
-        PrismRecordPreSaveEvent.class,
-        new PrismRecordListener()
+            this,
+            PrismRecordPreSaveEvent.class,
+            new PrismRecordListener()
     );
     SpongeListeners.register(this);
   }
@@ -281,6 +281,10 @@ public final class GriefAlert {
 
   public AlertService getAlertService() {
     return alertService;
+  }
+
+  public PrismService getPrismService() {
+    return prismService;
   }
 
   public ConfigHelper getConfigHelper() {

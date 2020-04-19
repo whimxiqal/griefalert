@@ -2,6 +2,7 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.alerts.sponge.SpongeAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
@@ -13,6 +14,7 @@ import com.minecraftonline.griefalert.util.enums.Details;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.event.entity.TargetEntityEvent;
@@ -26,9 +28,11 @@ import java.util.stream.Collectors;
 public abstract class EntityAlert extends SpongeAlert {
 
   private String entitySnapshotContainer;
+  private Vector3i griefPosition;
 
   EntityAlert(GriefProfile griefProfile, TargetEntityEvent event) {
     super(griefProfile, event);
+    this.griefPosition = event.getTargetEntity().getLocation().getBlockPosition();
     try {
       entitySnapshotContainer = DataFormats.JSON.write(event.getTargetEntity().createSnapshot().toContainer());
     } catch (IOException e) {
@@ -38,21 +42,19 @@ public abstract class EntityAlert extends SpongeAlert {
     addDetail(Details.lookingAt());
   }
 
-  public EntitySnapshot getEntitySnapshot() {
+  public DataContainer getEntitySnapshot() {
     try {
-      return Sponge.getDataManager().deserialize(EntitySnapshot.class, DataFormats.JSON.read(entitySnapshotContainer)).get();
+      return DataFormats.JSON.read(entitySnapshotContainer);
     } catch (IOException | ClassCastException e) {
       e.printStackTrace();
-      return EntitySnapshot.builder().build();
+      return DataContainer.createNew();
     }
   }
 
   @Nonnull
   @Override
   public Vector3i getGriefPosition() {
-    return getEntitySnapshot().getLocation().map(Location::getBlockPosition)
-        .orElseThrow(() ->
-            new RuntimeException("Couldn't find an entities location for an Entity Alert"));
+    return griefPosition;
   }
 
   protected Detail<Alert> getItemFrameDetail() {

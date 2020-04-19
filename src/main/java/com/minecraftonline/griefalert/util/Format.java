@@ -42,6 +42,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
@@ -496,7 +497,7 @@ public final class Format {
             : Text.joinWith(Text.of(", "), tokens)).get(request).get();
   }
 
-  public static Text dimension(DimensionType type) {
+  public static Text dimension(@Nonnull DimensionType type) {
     if (type.equals(DimensionTypes.OVERWORLD)) {
       return Text.of("overworld");
     } else if (type.equals(DimensionTypes.NETHER)) {
@@ -507,4 +508,5 @@ public final class Format {
       throw new IllegalArgumentException("Invalid dimention type");
     }
   }
+
 }

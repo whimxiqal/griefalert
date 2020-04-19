@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
-
 public class AlertCheck implements Serializable {
 
   private final UUID officerUuid;

@@ -22,9 +22,12 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.alerts;
+package com.minecraftonline.griefalert.alerts;
 
 import com.google.common.collect.Lists;
+import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.alerts.AlertCheck;
+import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Alerts;
