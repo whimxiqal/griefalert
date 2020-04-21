@@ -30,6 +30,7 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -79,8 +80,11 @@ public final class Request implements Serializable {
     return playerUuids;
   }
 
-  public int getMaximum() {
-    return maximum;
+  public Optional<Integer> getMaximum() {
+    if (maximum < 0) {
+      return Optional.empty();
+    }
+    return Optional.of(maximum);
   }
 
   public static class Builder {
@@ -88,7 +92,7 @@ public final class Request implements Serializable {
     private final Set<GriefEvent> events = Sets.newHashSet();
     private final Set<String> targets = Sets.newHashSet();
     private final Set<UUID> playerUuids = Sets.newHashSet();
-    private int maximum;
+    private int maximum = -1;
 
     private Builder() {
     }
@@ -138,11 +142,16 @@ public final class Request implements Serializable {
 
     /**
      * Set the maximum number of results to get from this request.
+     * Input cannot be negative.
      *
      * @param maximum limit of results
      * @return the current builder for chaining
+     * @throws IllegalArgumentException if input is negative
      */
     public Builder setMaximum(int maximum) {
+      if (maximum < 0) {
+        throw new IllegalArgumentException("Maximum for Request cannot be negative");
+      }
       this.maximum = maximum;
       return this;
     }

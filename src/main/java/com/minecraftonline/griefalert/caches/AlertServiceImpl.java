@@ -31,6 +31,7 @@ import com.minecraftonline.griefalert.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.AlertInspection;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.events.PreInspectAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
@@ -67,6 +68,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.SerializationException;
@@ -195,14 +197,17 @@ public final class AlertServiceImpl implements AlertService {
       default:
         throw new RuntimeException("Unsupported Sort type");
     }
-    return allAlerts.stream()
+    Stream<AlertItem> stream = allAlerts.stream()
         .filter(alert -> filters.getPlayerUuids().isEmpty()
             || filters.getPlayerUuids().contains(alert.get().getGrieferUuid()))
         .filter(alert -> filters.getEvents().isEmpty()
-            || filters.getEvents().contains(alert.get().getGriefEvent()))
+            || filters.getEvents().stream().map(GriefEvent::getId).anyMatch(id -> id.equals(alert.get().getGriefEvent().getId())))
         .filter(alert -> filters.getTargets().isEmpty()
-            || filters.getTargets().stream().anyMatch(str -> alert.get().getTarget().contains(str)))
-        .collect(Collectors.toList());
+            || filters.getTargets().stream().anyMatch(str -> alert.get().getTarget().contains(str)));
+    if (filters.getMaximum().isPresent()) {
+      stream = stream.limit(filters.getMaximum().get());
+    }
+    return stream.collect(Collectors.toList());
   }
 
   @Override

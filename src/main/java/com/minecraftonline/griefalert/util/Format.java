@@ -395,7 +395,8 @@ public final class Format {
       builder.append(Text.joinWith(Text.of(","),
               request.getEvents()
                       .stream()
-                      .map(Format::action)
+                      .map(GriefEvent::getId)
+                      .map(Text::of)
                       .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
@@ -412,6 +413,7 @@ public final class Format {
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
+    request.getMaximum().ifPresent(max -> tokens.add(Text.of("Maximum: ", max)));
     return Detail.of("Parameters", "The parameters used for this query",
             tokens.isEmpty()
                     ? Text.of("None")

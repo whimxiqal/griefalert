@@ -110,4 +110,11 @@ public final class GriefEvent implements CatalogType, Serializable {
     return this.description;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof GriefEvent)) {
+      return false;
+    }
+    return this.getId().equals(((GriefEvent) obj).getId());
+  }
 }
