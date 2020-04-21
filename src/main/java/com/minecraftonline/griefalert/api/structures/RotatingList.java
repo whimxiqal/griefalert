@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 
 /**
  * An interface for a data structure for managing a stack of items with a fixed capacity.
- * Elements of type <code>P</code> can be added to the list and if the capacity
+ * Elements of type {@link P} can be added to the list and if the capacity
  * is reached, then the location at which the element is added is wrapped around to
  * the beginning. The previous element at that index is removed and future elements are
  * added sequentially, replacing previous elements in the list.

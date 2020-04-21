@@ -25,14 +25,13 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Maps;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.services.PrismService;
+import com.helion3.prism.api.services.Request;
 import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
-import com.minecraftonline.griefalert.api.structures.MapList;
 import com.minecraftonline.griefalert.util.DateUtil;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
@@ -50,7 +49,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
@@ -77,7 +75,11 @@ public class LogsCommand extends GeneralCommand {
         .valueFlag(GenericArguments.string(CommandKeys.BEFORE.get()), "b")
         .valueFlag(GenericArguments.string(CommandKeys.PLAYER.get()), "p")
         .valueFlag(GenericArguments.string(CommandKeys.PRISM_TARGET.get()), "t")
-        .valueFlag(GenericArguments.catalogedElement(CommandKeys.PRISM_EVENT.get(), PrismEvent.class), "e")
+        .valueFlag(GenericArguments
+                .catalogedElement(
+                    CommandKeys.PRISM_EVENT.get(),
+                    PrismEvent.class),
+            "e")
         .flag("-group", "g")
         .buildWith(GenericArguments.none()));
   }
@@ -86,14 +88,12 @@ public class LogsCommand extends GeneralCommand {
   @Nonnull
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) throws CommandException {
-    MapList<Text, Text> flags = new MapList<>(Maps.newHashMap());
-
     if (src instanceof Player) {
       Player player = (Player) src;
 
       Task.builder().async().execute(() -> {
 
-        PrismService.Request.Builder requestBuilder = PrismService.requestBuilder();
+        Request.Builder builder = Request.builder();
 
         // Add location query with WE
         SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(player.getLocation().getExtent());
@@ -106,9 +106,9 @@ public class LogsCommand extends GeneralCommand {
         }
         Vector3i minVector = WorldEditUtil.convertVector(selection.getMinimumPoint());
         Vector3i maxVector = WorldEditUtil.convertVector(selection.getMaximumPoint());
-        requestBuilder.setxRange(minVector.getX(), maxVector.getX());
-        requestBuilder.setyRange(minVector.getY(), maxVector.getY());
-        requestBuilder.setzRange(minVector.getZ(), maxVector.getZ());
+        builder.setxRange(minVector.getX(), maxVector.getX());
+        builder.setyRange(minVector.getY(), maxVector.getY());
+        builder.setzRange(minVector.getZ(), maxVector.getZ());
 
 
         // Parse the 'since' with the given date format, or just do a year ago
@@ -120,19 +120,12 @@ public class LogsCommand extends GeneralCommand {
             return Optional.empty();
           }
         }).orElseGet(() -> Date.from(Instant.now().minus(Duration.ofHours(1))));
-        flags.add(CommandKeys.SINCE.get(), Text.of(Format.date(since)));
-        requestBuilder.setEarliest(since);
+        builder.setEarliest(since);
 
-        args.<String>getOne(CommandKeys.BEFORE.get()).ifPresent(str -> {
-          Date before = DateUtil.parseAnyDate(str);
-          flags.add(CommandKeys.BEFORE.get(), Text.of(Format.date(before)));
-          requestBuilder.setLatest(before);
-        });
+        args.<String>getOne(CommandKeys.BEFORE.get()).ifPresent(str ->
+            builder.setLatest(DateUtil.parseAnyDate(str)));
 
-        args.<String>getAll(CommandKeys.PRISM_TARGET.get()).forEach(str -> {
-          flags.add(CommandKeys.PRISM_TARGET.get(), Text.of(str));
-          requestBuilder.addTarget(str);
-        });
+        args.<String>getAll(CommandKeys.PRISM_TARGET.get()).forEach(builder::addTarget);
 
         args.<String>getAll(CommandKeys.PLAYER.get()).forEach(name -> {
           try {
@@ -140,8 +133,7 @@ public class LogsCommand extends GeneralCommand {
                 .getGameProfileManager()
                 .get(name)
                 .get();
-            flags.add(CommandKeys.PLAYER.get(), Text.of(name));
-            requestBuilder.addPlayerUuid(gameProfile.getUniqueId());
+            builder.addPlayerUuid(gameProfile.getUniqueId());
           } catch (ExecutionException e) {
             player.sendMessage(Format.error(String.format("Player %s not found", name)));
           } catch (Exception e) {
@@ -152,40 +144,18 @@ public class LogsCommand extends GeneralCommand {
 
         Collection<PrismEvent> events = args.getAll(CommandKeys.PRISM_EVENT.get());
         if (events.isEmpty()) {
-          flags.add(CommandKeys.PRISM_EVENT.get(), Text.of(PrismEvents.BLOCK_BREAK.getId()));
-          requestBuilder.addEvent(PrismEvents.BLOCK_BREAK);
+          builder.addEvent(PrismEvents.BLOCK_BREAK);
         } else {
-          events.forEach(event -> {
-            flags.add(CommandKeys.PRISM_EVENT.get(), Text.of(event.getId()));
-            requestBuilder.addEvent(event);
-          });
+          events.forEach(builder::addEvent);
         }
 
-        if (args.hasAny("group")) {
-          flags.add(Text.of("group"), Text.of("true"));
-        } else {
-          flags.add(Text.of("group"), Text.of("false"));
-          requestBuilder.addFlag(Flag.NO_GROUP);
+        if (!args.hasAny("group")) {
+          builder.addFlag(Flag.NO_GROUP);
         }
 
-        PrismService.Request request = requestBuilder.build();
+        Request request = builder.build();
 
-        player.sendMessage(Format.info(
-            "Using parameters: ",
-            Text.joinWith(
-                Format.bonus(", "),
-                flags.getMap().entrySet()
-                    .stream()
-                    .map(entry ->
-                        Format.bonus(
-                            "{",
-                            entry.getKey(),
-                            ": ",
-                            Text.joinWith(
-                                Text.of(","),
-                                entry.getValue()),
-                            "}"))
-                    .collect(Collectors.toList()))));
+        player.sendMessage(Format.request(request));
         Optional<PrismService> prism = Sponge.getServiceManager().provide(PrismService.class);
         try {
           if (prism.isPresent()) {

@@ -36,6 +36,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.world.World;
 
 
 public final class SpongeUtil {
@@ -84,5 +85,9 @@ public final class SpongeUtil {
 
   public static Optional<User> getUser(String username) {
     return Sponge.getServiceManager().provide(UserStorageService.class).flatMap(users -> users.get(username));
+  }
+
+  public static Optional<World> getWorld(UUID worldUuid) {
+    return Sponge.getServer().getWorld(worldUuid);
   }
 }

@@ -27,6 +27,7 @@ package com.minecraftonline.griefalert.alerts.prism;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.services.PrismService;
+import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
@@ -34,7 +35,7 @@ import org.spongepowered.api.Sponge;
 
 import java.util.Date;
 
-public class ReplaceAlert extends PrismAlert {
+public class ReplaceAlert extends BlockAlert {
 
   // the original block id is saved in getTarget()
   private final String replacementBlockId;
@@ -58,8 +59,8 @@ public class ReplaceAlert extends PrismAlert {
   }
 
   @Override
-  protected PrismService.Request getRollbackRequest() {
-    PrismService.Request.Builder builder = PrismService.requestBuilder();
+  protected Request getRollbackRequest() {
+    Request.Builder builder = Request.builder();
 
     builder.addPlayerUuid(getGrieferUuid());
     builder.addTarget(this.replacementBlockId);

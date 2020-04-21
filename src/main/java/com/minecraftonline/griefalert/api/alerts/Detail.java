@@ -32,13 +32,14 @@ import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-public class Detail<P extends Serializable> implements Serializable {
+public final class Detail<P extends Serializable> implements Serializable {
 
   private String label;
   private String description;
@@ -88,8 +89,8 @@ public class Detail<P extends Serializable> implements Serializable {
     primary = in.readBoolean();
     try {
       formatted = Sponge.getDataManager()
-              .deserialize(Text.class, DataFormats.JSON.read(in.readUTF()))
-              .orElse(null);
+          .deserialize(Text.class, DataFormats.JSON.read(in.readUTF()))
+          .orElse(null);
     } catch (IOException e) {
       // Shouldn't happen
       e.printStackTrace();
@@ -100,12 +101,12 @@ public class Detail<P extends Serializable> implements Serializable {
 
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.writeUTF(label);
-    out.writeUTF(description);
+    out.writeUTF(Optional.ofNullable(description).orElse(""));
     out.writeBoolean(primary);
     try {
       out.writeUTF(DataFormats.JSON.write(Optional.ofNullable(formatted)
-              .orElse(Text.EMPTY)
-              .toContainer()));
+          .orElse(Text.EMPTY)
+          .toContainer()));
     } catch (IOException e) {
       // Shouldn't happen
       e.printStackTrace();
@@ -124,14 +125,12 @@ public class Detail<P extends Serializable> implements Serializable {
       return Optional.of(formatted);
     }
     formatted = infoFunction.apply(item)
-        .map(info -> Text.joinWith(
-            Text.of(TextColors.GRAY, ": "),
-            Text.of(
-                TextColors.DARK_AQUA,
-                description == null
-                        ? Text.of(label)
-                        : Text.builder(label).onHover(TextActions.showText(Text.of(description))),
-            Text.of(TextColors.GRAY, info))))
+        .map(info -> Text.of(
+            TextColors.DARK_AQUA,
+            description == null
+                ? Text.of(label)
+                : Text.builder(label).onHover(TextActions.showText(Text.of(description))),
+            TextColors.GRAY, ": ", info))
         .orElse(null);
     return Optional.ofNullable(formatted);
   }
@@ -140,50 +139,4 @@ public class Detail<P extends Serializable> implements Serializable {
     return primary;
   }
 
-//  public static final class SerializedDetail implements Serializable {
-//
-//    private final String label;
-//    private final String description;
-//    private final String info;
-//    private final boolean primary;
-//
-//    private <S extends Serializable> SerializedDetail(Detail<S> detail, S item) {
-//      this.label = detail.label;
-//      this.description = detail.description;
-//      this.info = detail.infoFunction.apply(item).map(Text::toContainer).map(data -> {
-//        try {
-//          return DataFormats.JSON.write(data);
-//        } catch (IOException e) {
-//          // Shouldn't happen
-//          e.printStackTrace();
-//          return null;
-//        }
-//      }).orElse(null);
-//      this.primary = detail.primary;
-//    }
-//
-//    /**
-//     * Convert this serialized object back to a {@link Detail}.
-//     *
-//     * @param type The class of the type parameter of the original {@link Detail}
-//     * @param <S>  The type parameter of the original {@link Detail}
-//     * @return the deserialized object
-//     */
-//    public <S extends Serializable> Detail<S> deserialize(Class<S> type) {
-//      return Detail.of(
-//          label,
-//          description,
-//          o -> Optional.ofNullable(info).flatMap(info -> {
-//            try {
-//              return Sponge.getDataManager().deserialize(Text.class, DataFormats.JSON.read(info));
-//            } catch (IOException e) {
-//              // Shouldn't happen
-//              e.printStackTrace();
-//              return Optional.of(Text.EMPTY);
-//            }
-//          }),
-//          primary);
-//    }
-//
-//  }
 }

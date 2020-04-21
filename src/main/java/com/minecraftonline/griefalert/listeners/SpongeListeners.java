@@ -193,7 +193,7 @@ public final class SpongeListeners {
             GriefAlert.getInstance()
                 .getProfileCache()
                 .getProfileOf(
-                    GriefEvents.PLACE,
+                    GriefEvents.EDIT,
                     event.getTargetTile().getBlock().getType().getId(),
                     player.getLocation().getExtent().getDimension().getType()))
         .ifPresent(griefProfile ->

@@ -30,12 +30,30 @@ import javax.annotation.Nonnull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
+/**
+ * A general service to handle generated {@link Alert}s.
+ * An implementation for this is provided by <code>GriefAlert</code>.
+ *
+ * @author PietElite
+ */
 public interface AlertService {
 
   enum Sort {
+    /**
+     * Sorts earliest first.
+     */
     CHRONOLOGICAL,
+    /**
+     * Sorts latest first.
+     */
     REVERSE_CHRONOLOGICAL,
+    /**
+     * Sorts by {@link Alert} retrieval code. Lowest first.
+     */
     INDEX,
+    /**
+     * Sorts by {@link Alert} retrieval code. Highest first.
+     */
     REVERSE_INDEX
   }
 
@@ -69,7 +87,9 @@ public interface AlertService {
    * @return true if the inspection succeeded
    * @throws IllegalArgumentException if the given index is invalid
    */
-  boolean inspect(int index, @Nonnull Player officer, boolean force) throws IllegalArgumentException;
+  boolean inspect(int index,
+                  @Nonnull Player officer,
+                  boolean force) throws IllegalArgumentException;
 
   /**
    * Undo the inspection done by the officer by returning them back to their previous location.
@@ -93,6 +113,9 @@ public interface AlertService {
    * @param spread true will send all {@link Alert}s individually. False will collapse similar
    *               {@link Alert}s into singular lines.
    */
-  void lookup(@Nonnull Collection<MessageReceiver> receivers, @Nonnull Request filters, Sort sort, boolean spread);
+  void lookup(@Nonnull Collection<MessageReceiver> receivers,
+              @Nonnull Request filters,
+              @Nonnull Sort sort,
+              boolean spread);
 
 }

@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
  *
  * @author PietElite
  */
-public class SignText {
+public final class SignText {
 
   private final String text1;
   private final String text2;
@@ -40,10 +40,10 @@ public class SignText {
   private final String text4;
 
   private SignText(
-      @Nullable String text1,
-      @Nullable String text2,
-      @Nullable String text3,
-      @Nullable String text4) {
+      @Nullable final String text1,
+      @Nullable final String text2,
+      @Nullable final String text3,
+      @Nullable final String text4) {
     this.text1 = text1;
     this.text2 = text2;
     this.text3 = text3;
@@ -60,10 +60,10 @@ public class SignText {
    * @return The corresponding <code>SignText</code>
    */
   public static SignText of(
-      @Nullable String text1,
-      @Nullable String text2,
-      @Nullable String text3,
-      @Nullable String text4) {
+      @Nullable final String text1,
+      @Nullable final String text2,
+      @Nullable final String text3,
+      @Nullable final String text4) {
     return new SignText(text1, text2, text3, text4);
   }
 

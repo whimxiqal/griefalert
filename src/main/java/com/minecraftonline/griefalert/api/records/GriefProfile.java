@@ -28,6 +28,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.services.AlertService;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -41,32 +42,41 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
 
 /**
- * A holder for all information about a <code>GriefProfile</code>, which informs
- * <code>GriefAlert</code> of which events to watch and send into {@link Alert}s for
- * notifying staff members.
+ * The information in a {@link GriefProfile} informs the {@link AlertService}
+ * of which events to watch.
+ * If an event matches a {@link GriefProfile}, then an {@link Alert} is generated.
  *
  * @author PietElite
  */
-public class GriefProfile implements Serializable {
+public final class GriefProfile implements Serializable {
 
   private final GriefEvent event;
   private final String target;
   private final Set<DimensionType> ignored = Sets.newHashSet();
-  private final Map<Colored, String> colors = Maps.newHashMap();
+  private final Map<Colorable, String> colors = Maps.newHashMap();
 
-  public enum Colored {
+  public enum Colorable {
     EVENT,
     TARGET,
     DIMENSION
   }
 
-  private GriefProfile(@Nonnull GriefEvent event, @Nonnull String target) {
+  private GriefProfile(@Nonnull final GriefEvent event,
+                       @Nonnull final String target) {
     this.event = event;
     this.target = target;
   }
 
+  /**
+   * Factory method for a {@link GriefProfile}.
+   *
+   * @param event  the event describing the type of action performed by a player
+   * @param target the minecraft id for the target of this action
+   * @return the generated {@link GriefProfile}
+   */
   @Nonnull
-  public static GriefProfile of(@Nonnull GriefEvent event, @Nonnull String target) {
+  public static GriefProfile of(@Nonnull final GriefEvent event,
+                                @Nonnull final String target) {
     return new GriefProfile(event, target);
   }
 
@@ -83,7 +93,7 @@ public class GriefProfile implements Serializable {
   /**
    * Add the {@link DimensionType} to the set of ignored dimensions for this alert.
    *
-   * @param dimension the dimension
+   * @param dimension the dimension type
    * @return false if the set already contains the dimension
    */
   public boolean addIgnored(@Nonnull DimensionType dimension) {
@@ -98,30 +108,27 @@ public class GriefProfile implements Serializable {
    * @param color     the color
    * @return false if this component already has a color
    */
-  public boolean putColored(@Nonnull Colored component, @Nonnull TextColor color) {
+  public boolean putColored(@Nonnull Colorable component, @Nonnull TextColor color) {
     return colors.putIfAbsent(component, color.getId()) != null;
   }
 
-  @Nonnull
-  public Map<Colored, String> getColored() {
-    Map<Colored, String> out = Maps.newHashMap();
-    out.putAll(colors);
-    return out;
-  }
-
   /**
-   * Return whether this <code>GriefProfile</code> is configured such that an
-   * event occurring in the given <code>DimensionType</code> would be ignored
-   * by alert construction.
+   * Return whether this profile is configured such that an
+   * event occurring in the given {@link DimensionType} would be ignored
+   * by {@link Alert} construction.
    *
-   * @param dimensionType the <code>DimensionType</code>
-   * @return true if this <code>DimensionType</code> is ignored by occurrences
-   * matching this <code>GriefProfile</code>
+   * @param dimensionType the dimension
+   * @return true if ignored
    */
   public boolean isIgnoredIn(@Nonnull final DimensionType dimensionType) {
     return ignored.contains(dimensionType);
   }
 
+  /**
+   * Get a copy of all ignored dimensions for this profile.
+   *
+   * @return ignored dimensions
+   */
   @Nonnull
   public Set<DimensionType> getIgnored() {
     Set<DimensionType> out = Sets.newHashSet();
@@ -129,15 +136,47 @@ public class GriefProfile implements Serializable {
     return out;
   }
 
-  public Optional<TextColor> getColored(@Nonnull Colored component) {
-    return Optional.ofNullable(colors.get(component))
-            .flatMap(s -> Sponge.getRegistry().getType(TextColor.class, s));
-  }
-
+  /**
+   * Gets whether this profile has any specified colored components.
+   *
+   * @return true if there exists a special colored component
+   */
   public boolean isColored() {
     return !colors.isEmpty();
   }
 
+  /**
+   * Get the {@link TextColor} for the given component.
+   *
+   * @param component the component of an profile
+   * @return an optional possibly containing the {@link TextColor}
+   */
+  @Nonnull
+  public Optional<TextColor> getColored(@Nonnull Colorable component) {
+    return Optional.ofNullable(colors.get(component))
+        .flatMap(s -> Sponge.getRegistry().getType(TextColor.class, s));
+  }
+
+  /**
+   * Return a copy of the map of colored components.
+   *
+   * @return the mapped components
+   */
+  @Nonnull
+  public Map<Colorable, TextColor> getAllColored() {
+    Map<Colorable, TextColor> out = Maps.newHashMap();
+    colors.forEach((colored, s) ->
+        out.put(colored, Sponge.getRegistry().getType(TextColor.class, s).get()));
+    return out;
+  }
+
+  /**
+   * Gives whether or not the other object is a {@link GriefProfile}
+   * and has the same {@link GriefEvent} and target.
+   *
+   * @param obj the other object
+   * @return true if matches the above criteria
+   */
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof GriefProfile)) {
@@ -145,6 +184,6 @@ public class GriefProfile implements Serializable {
     }
     GriefProfile other = (GriefProfile) obj;
     return this.event.equals(other.event)
-            && this.target.equals(other.target);
+        && this.target.equals(other.target);
   }
 }

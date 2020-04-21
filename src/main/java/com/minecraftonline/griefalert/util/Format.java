@@ -28,13 +28,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.helion3.prism.api.services.PrismService;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.api.services.Request;
 import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.enums.Settings;
@@ -286,89 +286,6 @@ public final class Format {
   }
 
   /**
-   * Get a tag allowing the user to immediately use the info command.
-   *
-   * @param index The alert index
-   * @return the formatted text
-   */
-  public static Text getTagInfo(int index) {
-    return Format.command(
-            "INFO",
-            String.format("/griefalert info %s", index),
-            Text.of("Get a summary of information about this alert")
-    );
-  }
-
-  /**
-   * Get a tag allowing the user to immediately use the check command.
-   *
-   * @param index The alert index
-   * @return the formatted text
-   */
-  public static Text getTagCheck(int index) {
-    return Format.command(
-            "CHECK",
-            String.format("/griefalert check %s", index),
-            Text.of("Teleport to this location")
-    );
-  }
-
-  /**
-   * Get a tag allowing the user to immediately use the rollback command.
-   *
-   * @param index The alert index
-   * @return the formatted text
-   */
-  public static Text getTagRollback(int index) {
-    return Format.command(
-            "ROLLBACK",
-            String.format("/griefalert rollback alert %s", index),
-            Text.of("Undo this event")
-    );
-  }
-
-  /**
-   * Get a tag allowing the user to immediately use the return command.
-   *
-   * @return the formatted text
-   */
-  public static Text getTagReturn() {
-    return Format.command(
-            "RETURN",
-            "/griefalert return",
-            Text.of("Return to last saved location before checking an alert")
-    );
-  }
-
-  /**
-   * Get a tag allowing the user to immediately use a simple query command.
-   *
-   * @param playerName The name of the player to query
-   * @return the formatted text
-   */
-  public static Text getTagRecent(String playerName) {
-    return Format.command(
-            "RECENT",
-            String.format("/griefalert query -p %s", playerName),
-            Text.of("Search for recent events caused by this player")
-    );
-  }
-
-  /**
-   * Get a tag allowing the user to immediately use the show command.
-   *
-   * @param index The alert index
-   * @return the formatted text
-   */
-  public static Text getTagShow(int index) {
-    return Format.command(
-            "SHOW",
-            String.format("/griefalert show %s", index),
-            Text.of("Show the alert location in the world")
-    );
-  }
-
-  /**
    * Returns content formatted with an Item name.
    * Optionally a hover action can be added to display
    * the full Item id.
@@ -456,7 +373,7 @@ public final class Format {
             CheckCommand.clickToCheck(index));
   }
 
-  public static Text formatRequest(Request request) {
+  public static Text request(Request request) {
     List<Text> tokens = Lists.newLinkedList();
     if (!request.getPlayerUuids().isEmpty()) {
       Text.Builder builder = Text.builder();
@@ -502,6 +419,68 @@ public final class Format {
                     : Text.joinWith(Text.of(", "), tokens)).get(request).get();
   }
 
+  public static Text request(com.helion3.prism.api.services.Request request) {
+    List<Text> tokens = Lists.newLinkedList();
+    if (!request.getPlayerUuids().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Players: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getPlayerUuids()
+              .stream()
+              .map(uuid -> SpongeUtil.getUser(uuid).orElseThrow(() ->
+                  new RuntimeException("Invalid UUID in Request")))
+              .map(Format::userName)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    if (!request.getEvents().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Events: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getEvents()
+              .stream()
+              .map(Text::of)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    if (!request.getTargets().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Targets: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getTargets()
+              .stream()
+              .map(Text::of)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    if (!request.getWorldUuids().isEmpty()) {
+      Text.Builder builder = Text.builder();
+      builder.append(Text.of("Worlds: "));
+      builder.append(Text.of("{"));
+      builder.append(Text.joinWith(Text.of(","),
+          request.getWorldUuids()
+              .stream()
+              .map(uuid -> SpongeUtil.getWorld(uuid).orElseThrow(() ->
+                  new RuntimeException("Invalid UUID in Request")))
+              .map(Text::of)
+              .collect(Collectors.toList())));
+      builder.append(Text.of("}"));
+      tokens.add(builder.build());
+    }
+    request.getEarliest().ifPresent(date -> tokens.add(Text.of("Earliest: ", Format.date(date))));
+    request.getLatest().ifPresent(date -> tokens.add(Text.of("Latest: ", Format.date(date))));
+    return Detail.of("Parameters", "The parameters used for this query",
+        tokens.isEmpty()
+            ? Text.of("None")
+            : Text.joinWith(Text.of(", "), tokens)).get(request).get();
+  }
+
   public static Text dimension(@Nonnull DimensionType type) {
     if (type.equals(DimensionTypes.OVERWORLD)) {
       return Text.of("overworld");
@@ -515,14 +494,23 @@ public final class Format {
   }
 
   public static Text action(@Nonnull GriefEvent event) {
-    return Text.builder(event.getPreterite())
+    return Text.builder(event.getPreterit())
             .onHover(TextActions.showText(Text.of(
-                    Format.prefix(),
+                    Format.heading("Event"),
                     Format.endLine(),
                     Text.joinWith(Format.endLine(),
-                            Detail.of("Name", "", Text.of(event.getName())).get(event).get(),
-                            Detail.of("ID", "", Text.of(event.getId())).get(event).get(),
-                            Detail.of("Description", "", Text.of(event.getDescription())).get(event).get()))))
+                            Detail.of(
+                                "Name",
+                                "",
+                                Text.of(event.getName())).get(event).get(),
+                            Detail.of(
+                                "ID",
+                                "",
+                                Text.of(event.getId())).get(event).get(),
+                            Detail.of(
+                                "Description",
+                                "",
+                                Text.of(event.getDescription())).get(event).get()))))
             .build();
   }
 
@@ -534,7 +522,9 @@ public final class Format {
                     + GriefEvents.REGISTRY_MODULE.getAll()
                     .stream().map(GriefEvent::getId)
                     .collect(Collectors.joining(", ")),
-            Format.hover(griefProfile.getGriefEvent().getId(), griefProfile.getGriefEvent().getDescription()))
+            Format.hover(
+                griefProfile.getGriefEvent().getId(),
+                griefProfile.getGriefEvent().getDescription()))
             .get(griefProfile).ifPresent(details::add);
     Detail.of(
             "Target",
@@ -551,12 +541,13 @@ public final class Format {
                                     .map(dimension -> Format.item(dimension.getId()))
                                     .collect(Collectors.toList()))))
                     .get(griefProfile)).ifPresent(details::add);
-    Optional.of(griefProfile.getColored()).filter(colors -> !colors.isEmpty())
+    Optional.of(griefProfile.getAllColored()).filter(colors -> !colors.isEmpty())
             .flatMap(colors -> Detail.of(
                     "Colored",
                     "Any components of the alert messages flagged by this alert "
                             + "and their corresponding specified colors",
-                    Format.bonus(Text.joinWith(
+                    Format.bonus(
+                        Text.joinWith(
                             Text.of(", "),
                             colors.entrySet()
                                     .stream()
@@ -564,11 +555,7 @@ public final class Format {
                                             "{",
                                             entry.getKey().toString().toLowerCase(),
                                             ", ",
-                                            Text.of(
-                                                    Sponge.getRegistry()
-                                                            .getType(TextColor.class, entry.getValue())
-                                                            .orElseThrow(RuntimeException::new),
-                                                    entry.getValue().toLowerCase()),
+                                            entry.getValue().getName(),
                                             "}"))
                                     .collect(Collectors.toList()))))
                     .get(griefProfile)).ifPresent(details::add);

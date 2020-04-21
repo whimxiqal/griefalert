@@ -29,21 +29,29 @@ import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
-public class AlertCheck implements Serializable {
+/**
+ * Stores the information the time someone inspected an {@link Alert}.
+ *
+ * @author PietElite
+ */
+public final class AlertInspection implements Serializable {
 
   private final UUID officerUuid;
   private final Date checked;
 
-  public AlertCheck(@Nonnull UUID officerUuid, @Nonnull Date checked) {
+  public AlertInspection(@Nonnull final UUID officerUuid, @Nonnull final Date checked) {
     this.officerUuid = officerUuid;
     this.checked = checked;
   }
 
+  @Nonnull
   public Date getChecked() {
     return checked;
   }
 
+  @Nonnull
   public UUID getOfficerUuid() {
     return officerUuid;
   }
+
 }

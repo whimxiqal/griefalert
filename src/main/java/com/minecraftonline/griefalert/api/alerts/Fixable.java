@@ -22,27 +22,33 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.structures;
+package com.minecraftonline.griefalert.api.alerts;
 
-import com.google.common.collect.Lists;
+import javax.annotation.Nonnull;
 
-import java.util.List;
-import java.util.Map;
+import org.spongepowered.api.command.CommandSource;
 
-public class MapList<P, S> {
+/**
+ * An object which can has the ability to be turned into a previous
+ * "fixed" state.
+ *
+ * @author PietElite
+ */
+public interface Fixable {
 
-  private final Map<P, List<S>> mapList;
+  /**
+   * Put this {@link Fixable} back to a previous state.
+   *
+   * @param src The originator for this action
+   * @return true if the action was correctly fixed
+   */
+  boolean fix(@Nonnull final CommandSource src);
 
-  public MapList(Map<P, List<S>> mapList) {
-    this.mapList = mapList;
-  }
+  /**
+   * Check whether this alert has already been fixed with {@link #fix(CommandSource)}.
+   *
+   * @return true if fixed
+   */
+  boolean fixed();
 
-  public Map<? extends P, List<S>> getMap() {
-    return mapList;
-  }
-
-  public void add(P key, S item) {
-    mapList.putIfAbsent(key, Lists.newLinkedList());
-    mapList.get(key).add(item);
-  }
 }

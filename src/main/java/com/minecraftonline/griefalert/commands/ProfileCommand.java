@@ -116,13 +116,13 @@ public class ProfileCommand extends GeneralCommand {
           .forEach(profile::addIgnored);
 
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_EVENT.get())
-          .ifPresent(color -> profile.putColored(GriefProfile.Colored.EVENT, color));
+          .ifPresent(color -> profile.putColored(GriefProfile.Colorable.EVENT, color));
 
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_TARGET.get())
-          .ifPresent(color -> profile.putColored(GriefProfile.Colored.TARGET, color));
+          .ifPresent(color -> profile.putColored(GriefProfile.Colorable.TARGET, color));
 
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_DIMENSION.get())
-          .ifPresent(color -> profile.putColored(GriefProfile.Colored.DIMENSION, color));
+          .ifPresent(color -> profile.putColored(GriefProfile.Colorable.DIMENSION, color));
 
       try {
         if (GriefAlert.getInstance().getProfileStorage().write(profile)) {

@@ -24,29 +24,32 @@
 
 package com.minecraftonline.griefalert.api.data;
 
+import javax.annotation.Nonnull;
+
 /**
  * An object to describe a permission to track which commands and actions can
  * be completed by people with certain levels of privilege.
  *
  * @author PietElite
  */
-public class Permission {
+public final class Permission {
 
   private final String perm;
 
-  private Permission(String perm) {
+  private Permission(@Nonnull final String perm) {
     this.perm = perm;
   }
 
   /**
-   * Factory method of a <code>Permission</code>.
-   * @param perm The string representation of the <code>Permission</code>
-   * @return The generated <code>Permission</code>
+   * Factory method of a {@link Permission}.
+   * @param perm the string representation
+   * @return generated {@link Permission}
    */
-  public static Permission of(String perm) {
+  public static Permission of(@Nonnull final String perm) {
     return new Permission(perm);
   }
 
+  @Nonnull
   public String get() {
     return perm;
   }

@@ -94,15 +94,15 @@ public class SqlProfileStorage implements ProfileStorage {
       statement.setBoolean(5,
           profile.isIgnoredIn(DimensionTypes.THE_END));
       statement.setString(6,
-          profile.getColored(GriefProfile.Colored.EVENT)
+          profile.getColored(GriefProfile.Colorable.EVENT)
               .map(TextColor::getName)
               .orElse(null));
       statement.setString(7,
-          profile.getColored(GriefProfile.Colored.TARGET)
+          profile.getColored(GriefProfile.Colorable.TARGET)
               .map(TextColor::getName)
               .orElse(null));
       statement.setString(8,
-          profile.getColored(GriefProfile.Colored.DIMENSION)
+          profile.getColored(GriefProfile.Colorable.DIMENSION)
               .map(TextColor::getName)
               .orElse(null));
 
@@ -161,19 +161,19 @@ public class SqlProfileStorage implements ProfileStorage {
             .getType(
                 TextColor.class,
                 Optional.ofNullable(rs.getString(6)).orElse(""))
-            .ifPresent(color -> profile.putColored(GriefProfile.Colored.EVENT, color));
+            .ifPresent(color -> profile.putColored(GriefProfile.Colorable.EVENT, color));
 
         Sponge.getRegistry()
             .getType(
                 TextColor.class,
                 Optional.ofNullable(rs.getString(7)).orElse(""))
-            .ifPresent(color -> profile.putColored(GriefProfile.Colored.TARGET, color));
+            .ifPresent(color -> profile.putColored(GriefProfile.Colorable.TARGET, color));
 
         Sponge.getRegistry()
             .getType(
                 TextColor.class,
                 Optional.ofNullable(rs.getString(8)).orElse(""))
-            .ifPresent(color -> profile.putColored(GriefProfile.Colored.DIMENSION, color));
+            .ifPresent(color -> profile.putColored(GriefProfile.Colorable.DIMENSION, color));
 
         profiles.add(profile);
       }

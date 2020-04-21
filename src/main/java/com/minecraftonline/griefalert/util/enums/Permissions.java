@@ -25,7 +25,7 @@
 package com.minecraftonline.griefalert.util.enums;
 
 import com.minecraftonline.griefalert.api.data.Permission;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.permission.Subject;
 
 public final class Permissions {
 
@@ -35,7 +35,7 @@ public final class Permissions {
   private Permissions() {
   }
 
-  public static final boolean has(User user, Permission permission) {
+  public static boolean has(Subject user, Permission permission) {
     return user.hasPermission(permission.get());
   }
 
@@ -51,11 +51,14 @@ public final class Permissions {
   public static final Permission GRIEFALERT_COMMAND_QUERY = Permission.of(
       "griefalert.command.query"
   );
-  public static final Permission GRIEFALERT_COMMAND_PROFILE = Permission.of(
-      "griefalert.command.profile"
+  public static final Permission GRIEFALERT_COMMAND_FIX = Permission.of(
+      "griefalert.command.fix"
   );
   public static final Permission GRIEFALERT_COMMAND_SHOW = Permission.of(
       "griefalert.command.show"
+  );
+  public static final Permission GRIEFALERT_COMMAND_PROFILE = Permission.of(
+      "griefalert.command.profile"
   );
   public static final Permission GRIEFALERT_COMMAND_RELOAD = Permission.of(
       "griefalert.command.reload"

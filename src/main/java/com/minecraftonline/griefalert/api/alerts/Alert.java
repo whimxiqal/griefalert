@@ -28,12 +28,22 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.services.AlertService;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+
 import org.spongepowered.api.text.Text;
 
+/**
+ * An {@link Alert} is the primary object stored and handled in GriefAlert.
+ * Submit an {@link Alert} to be sent out to staff by submitting it to an
+ * {@link AlertService}.
+ *
+ * @author PietElite
+ */
 public interface Alert extends Serializable {
 
   /**
@@ -52,62 +62,82 @@ public interface Alert extends Serializable {
   @Nonnull
   UUID getGrieferUuid();
 
+  /**
+   * The position of the griefer when they performed the grief.
+   *
+   * @return the vector representation of the griefer's position
+   */
   @Nonnull
   Vector3d getGrieferPosition();
 
+  /**
+   * The rotation of the griefer when they performed the grief.
+   *
+   * @return the vector representation of the griefer's rotation
+   */
   @Nonnull
   Vector3d getGrieferRotation();
 
+  /**
+   * The block position of the grief event. For block related events, this is
+   * the position of the block.
+   *
+   * @return the vector representation of the grief position
+   */
   @Nonnull
   Vector3i getGriefPosition();
 
+  /**
+   * The unique identifier for the world in which the grief occurred.
+   *
+   * @return the unique identifier
+   */
   @Nonnull
   UUID getWorldUuid();
 
   /**
-   * Get the <code>Date</code> this alert was created.
+   * Get the {@link Date} this alert was created.
    *
-   * @return the <code>Date</code>
+   * @return the {@link Date}
    */
   @Nonnull
   Date getCreated();
 
   /**
-   * Construct the main message body for this <code>Alert</code>. This
-   * is the main body of the text which is sent when the <code>Alert</code>
-   * is checked.
+   * Construct the main broadcast message body for this {@link Alert}.
    *
-   * @return the main <code>Text</code> for this <code>Alert</code>
+   * @return the message
    */
   @Nonnull
   Text getMessage();
 
   /**
-   * Get summary text for this <code>Alert</code>.
+   * Get summary for all important information about this {@link Alert}.
    *
-   * @return Text representing a cohesive summary of the <code>Alert</code>
+   * @return the summary text
    */
   @Nonnull
   Text getSummary();
 
   /**
-   * Returns whether this <code>Alert</code> is silent.
+   * Returns whether this {@link Alert} is silent.
+   * Silent alerts are not broadcast to staff.
    *
-   * @return true if silent and staff are not notified of the <code>Alert</code>
+   * @return true if silent
    */
   boolean isSilent();
 
   /**
-   * Sets whether this Alert will be silent when run.
+   * Sets whether this {@link Alert} will be silent when run.
+   * Silent alerts are not broadcast to staff.
    *
-   * @param silent true if <code>Alert</code> is to be silent. False if
-   *               <code>Alert</code> is to not be silent.
+   * @param silent true if silent
    */
   void setSilent(boolean silent);
 
   /**
-   * Get the <code>GriefEvent</code> associated with this <code>Alert</code>.
-   * This is always the <code>GriefEvent</code> associated with the
+   * Get the {@link GriefEvent} associated with this {@link Alert}
+   * This is normally the {@link GriefEvent} associated with the
    * {@link GriefProfile}.
    *
    * @return The GriefEvent
@@ -116,14 +146,12 @@ public interface Alert extends Serializable {
   GriefEvent getGriefEvent();
 
   /**
-   * Get the target of the alert. This is always the target associated with
+   * Get the target of the alert. This is usually the target associated with
    * the {@link GriefProfile}.
    *
-   * @return The String ID of the target
+   * @return The full string id of the target
    */
   @Nonnull
   String getTarget();
-
-  boolean muteRepeatProfiles();
 
 }

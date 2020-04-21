@@ -29,27 +29,23 @@ import com.flowpowered.math.vector.Vector3i;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.services.PrismService;
+import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.alerts.GeneralAlert;
+import com.minecraftonline.griefalert.api.alerts.Fixable;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.PrismUtil;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -57,7 +53,7 @@ import org.spongepowered.api.world.World;
 /**
  * <code>Alert</code> for all which derive from Prism.
  */
-public abstract class PrismAlert extends GeneralAlert {
+public abstract class PrismAlert extends GeneralAlert implements Fixable {
 
   private final Vector3d grieferPosition;
   private final Vector3d grieferRotation;
@@ -65,14 +61,12 @@ public abstract class PrismAlert extends GeneralAlert {
   private final Vector3i griefPosition;
   private final UUID grieferUuid;
   private final Date created;
-  private final String originalBlockState;
-  private final String replacementBlockState;
+
+  private boolean fixed = false;
 
   PrismAlert(GriefProfile griefProfile, PrismRecord prismRecord) {
     super(griefProfile);
-    String recordString;
     // Immediately set the transform of the griefer upon triggering the Alert
-
 
     try {
       this.grieferUuid = PrismUtil.getPlayerUuid(prismRecord.getDataContainer()).map(UUID::fromString).get();
@@ -80,13 +74,8 @@ public abstract class PrismAlert extends GeneralAlert {
       this.worldUuid = griefLocation.getExtent().getUniqueId();
       this.griefPosition = griefLocation.getBlockPosition();
       this.created = PrismUtil.getCreated(prismRecord.getDataContainer()).get();
-      this.originalBlockState = DataFormats.JSON.write(PrismUtil.getOriginalBlockState(prismRecord.getDataContainer()).get().toContainer());
-      this.replacementBlockState = DataFormats.JSON.write(PrismUtil.getReplacementBlock(prismRecord.getDataContainer()).get().toContainer());
     } catch (NoSuchElementException e) {
       throw new IllegalArgumentException("Prism did not contain necessary information");
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new IllegalArgumentException("Prism information could not be handled");
     }
 
     Transform<World> grieferTransform = Sponge.getServer()
@@ -96,17 +85,6 @@ public abstract class PrismAlert extends GeneralAlert {
     this.grieferPosition = grieferTransform.getPosition();
     this.grieferRotation = grieferTransform.getRotation();
 
-    // And block details
-    getOriginalBlockState().map(BlockState::getTraitMap).ifPresent(map ->
-        map.forEach((key, value) -> addDetail(Detail.of(
-            "(Original) " + General.capitalize(key.getName()),
-            "The " + key.getName() + " trait of the original block of this transaction.",
-            Text.of(value.toString())))));
-    getReplacementBlockState().map(BlockState::getTraitMap).ifPresent(map ->
-        map.forEach((key, value) -> addDetail(Detail.of(
-            "(New) " + General.capitalize(key.getName()),
-            "The " + key.getName() + " trait of the newly created block of this transaction.",
-            Text.of(value.toString())))));
   }
 
   @Nonnull
@@ -145,26 +123,8 @@ public abstract class PrismAlert extends GeneralAlert {
     return created;
   }
 
-  public Optional<BlockState> getOriginalBlockState() {
-    try {
-      return Sponge.getDataManager().deserialize(BlockState.class, DataFormats.JSON.read(originalBlockState));
-    } catch (IOException e) {
-      e.printStackTrace();
-      return Optional.empty();
-    }
-  }
-
-  public Optional<BlockState> getReplacementBlockState() {
-    try {
-      return Sponge.getDataManager().deserialize(BlockState.class, DataFormats.JSON.read(replacementBlockState));
-    } catch (IOException e) {
-      e.printStackTrace();
-      return Optional.empty();
-    }
-  }
-
-  protected PrismService.Request getRollbackRequest() {
-    PrismService.Request.Builder builder = PrismService.requestBuilder();
+  protected Request getRollbackRequest() {
+    Request.Builder builder = Request.builder();
 
     builder.addPlayerUuid(getGrieferUuid());
     builder.addTarget(getTarget());
@@ -180,15 +140,36 @@ public abstract class PrismAlert extends GeneralAlert {
     return builder.build();
   }
 
-  /**
-   * Rollback the event which caused this alert.
-   *
-   * @param src the source of the rollback request
-   * @return whether rollback was successful
-   */
-  public final boolean rollback(@Nonnull CommandSource src) {
+  @Override
+  public boolean fix(@Nonnull CommandSource src) {
     try {
-      GriefAlert.getInstance().getPrismService().rollback(src, getRollbackRequest());
+      Request request = getRollbackRequest();
+      StringBuilder builder = new StringBuilder()
+          .append("PlayerUuids: ")
+          .append(request.getPlayerUuids().stream().map(UUID::toString).collect(Collectors.joining(",")))
+          .append("\n")
+          .append("Targets: ")
+          .append(String.join(",", request.getTargets()))
+          .append("\n")
+          .append("Earliest: ")
+          .append(request.getEarliest().map(Date::toString).orElse("None"))
+          .append("\n")
+          .append("Latest: ")
+          .append(request.getLatest().map(Date::toString).orElse("None"))
+          .append("\n")
+          .append("WorldUuids: ")
+          .append(request.getWorldUuids().stream().map(UUID::toString).collect(Collectors.joining(",")))
+          .append("xRange: ")
+          .append(request.getxRange().map(range -> range.lowerEndpoint() + " -> " + range.upperEndpoint()))
+          .append("\n")
+          .append("yRange: ")
+          .append(request.getyRange().map(range -> range.lowerEndpoint() + " -> " + range.upperEndpoint()))
+          .append("\n")
+          .append("zRange: ")
+          .append(request.getzRange().map(range -> range.lowerEndpoint() + " -> " + range.upperEndpoint()));
+      GriefAlert.getInstance().getLogger().info(builder.toString());
+      GriefAlert.getInstance().getPrismService().rollback(src, request);
+      fixed = true;
       return true;
     } catch (Exception e) {
       GriefAlert.getInstance().getLogger().error("Rollback with PrismService failed");
@@ -197,7 +178,12 @@ public abstract class PrismAlert extends GeneralAlert {
     }
   }
 
-//  protected void addQueryConditionsTo(Query query) {
+  @Override
+  public boolean fixed() {
+    return fixed;
+  }
+
+  //  protected void addQueryConditionsTo(Query query) {
 //    query.addCondition(FieldCondition.of(
 //        DataQueries.Player,
 //        MatchRule.EQUALS,

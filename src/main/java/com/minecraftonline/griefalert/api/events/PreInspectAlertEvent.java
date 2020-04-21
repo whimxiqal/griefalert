@@ -26,38 +26,58 @@ package com.minecraftonline.griefalert.api.events;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 
+import java.util.UUID;
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.impl.AbstractEvent;
+import org.spongepowered.api.plugin.PluginContainer;
+
 
 /**
  * An event posted directly before an {@link Alert} has been checked by an officer.
  *
  * @author PietElite
  */
-public class PreCheckAlertEvent extends AbstractEvent {
+public final class PreInspectAlertEvent extends AbstractEvent {
 
   private final Alert alert;
   private final Cause cause;
-  private final Player officer;
+  private final UUID officerUuid;
 
   /**
-   * The primary constructor for a <code>PreCheckAlertEvent</code>. This is made
-   * to send information about an <code>Alert</code> which will be imminently checked,
-   * and not made for any of the information within this event to be changed.
+   * Post a new {@link PreInspectAlertEvent} to Sponge's event manager.
    *
-   * @param alert   The <code>Alert</code> to be checked
-   * @param cause   The cause of the <code>Alert</code>
-   * @param officer The officer checking the <code>Alert</code>
+   * @param alert  the alert being inspected
+   * @param source the generator of this inspection
+   * @param plugin the container representing the handling plugin
    */
-  public PreCheckAlertEvent(final Alert alert, final Cause cause, final Player officer) {
-    this.alert = alert;
-    this.cause = cause;
-    this.officer = officer;
+  public static void post(@Nonnull final Alert alert,
+                          @Nonnull final Player source,
+                          @Nonnull final PluginContainer plugin) {
+    Sponge.getEventManager().post(new PreInspectAlertEvent(
+        alert,
+        Cause.builder()
+            .append(source)
+            .build(EventContext.builder()
+                .add(EventContextKeys.PLUGIN, plugin)
+                .build()),
+        source.getUniqueId()));
   }
 
+  private PreInspectAlertEvent(@Nonnull final Alert alert,
+                               @Nonnull final Cause cause,
+                               @Nonnull final UUID officerUuid) {
+    this.alert = alert;
+    this.cause = cause;
+    this.officerUuid = officerUuid;
+  }
+
+  @Nonnull
   public Alert getAlert() {
     return alert;
   }
@@ -68,9 +88,10 @@ public class PreCheckAlertEvent extends AbstractEvent {
     return cause;
   }
 
+  @Nonnull
   @SuppressWarnings("unused")
-  public Player getOfficer() {
-    return officer;
+  public UUID getOfficer() {
+    return officerUuid;
   }
 
 }

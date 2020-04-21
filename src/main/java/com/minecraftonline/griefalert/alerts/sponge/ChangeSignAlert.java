@@ -11,7 +11,6 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
 
 import java.io.IOException;
 import java.util.Date;
@@ -44,9 +43,16 @@ public class ChangeSignAlert implements Alert {
   private final String target;
   private boolean silent;
 
+  /**
+   * An alert to throw when someone throws a {@link ChangeSignEvent}.
+   *
+   * @param griefProfile the profile flagging this event
+   * @param event the event triggering this alert
+   */
   public ChangeSignAlert(GriefProfile griefProfile, ChangeSignEvent event) {
     this.griefProfile = griefProfile;
-    Player griefer = event.getCause().first(Player.class).orElseThrow(() -> new RuntimeException("Could not find player in ChangeSignEvent"));
+    Player griefer = event.getCause().first(Player.class).orElseThrow(() ->
+        new RuntimeException("Could not find player in ChangeSignEvent"));
     this.grieferUuid = griefer.getUniqueId();
     Transform<World> grieferTransform = griefer.getTransform();
     this.grieferPosition = grieferTransform.getPosition();
@@ -111,18 +117,28 @@ public class ChangeSignAlert implements Alert {
   @Nonnull
   @Override
   public Text getMessage() {
-    return Text.builder()
+    Text.Builder builder = Text.builder()
         .append(Format.userName(Alerts.getGriefer(this)))
-        .append(Text.of(TextColors.RED, " edited the contents of a sign."))
+        .append(Text.of(TextColors.RED, " applied changes to a sign"));
+    List<Text> lines = formatLines().stream().map(alertDetail ->
+        alertDetail.get(this).get()).collect(Collectors.toList());
+    Text content;
+    if (!lines.isEmpty()) {
+      content = Text.joinWith(
+          Format.endLine(),
+          formatLines().stream()
+              .map(alertDetail -> alertDetail.get(this).get())
+              .collect(Collectors.toList()));
+    } else {
+      content = Format.bonus("Empty");
+    }
+    Text ellipses = Text.builder().append(Format.bonus("(...)"))
         .onHover(TextActions.showText(Text.of(
             Format.prefix(),
             Format.endLine(),
-            Text.joinWith(
-                Format.endLine(),
-                formatLines().stream()
-                    .map(alertDetail -> alertDetail.get(this).get())
-                    .collect(Collectors.toList())))))
+            content)))
         .build();
+    return builder.append(Format.space()).append(ellipses).build();
   }
 
   @Nonnull
@@ -148,18 +164,13 @@ public class ChangeSignAlert implements Alert {
   @Nonnull
   @Override
   public GriefEvent getGriefEvent() {
-    return GriefEvents.PLACE;
+    return griefProfile.getGriefEvent();
   }
 
   @Nonnull
   @Override
   public String getTarget() {
     return target;
-  }
-
-  @Override
-  public boolean muteRepeatProfiles() {
-    return false;
   }
 
   private List<Detail<Alert>> formatLines() {

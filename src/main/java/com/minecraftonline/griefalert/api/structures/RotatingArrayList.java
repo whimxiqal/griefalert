@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 /**
- * An implementation of <code>RotatingList</code>.
+ * An implementation of {@link RotatingList} using an
+ * {@link ArrayList} as its primary data structure.
  *
  * @param <P> The type to store in the data structure
  * @author PietElite
@@ -175,32 +176,5 @@ public class RotatingArrayList<P> implements RotatingList<P> {
       data.add(null);
     }
   }
-
-//  @Nonnull
-//  @Override
-//  public <Z extends java.io.Serializable>
-//      RotatingArrayList.Serializable<Z> serialize(Function<P, Z> converter) {
-//    return new Serializable<>(this, converter);
-//  }
-
-//  public static class Serializable<S extends java.io.Serializable> implements java.io.Serializable {
-//    private final int capacity;
-//    private final int cursor;
-//    private final ArrayList<S> data;
-//
-//    <Z> Serializable(RotatingArrayList<Z> alertList, Function<Z, S> converter) {
-//      this.capacity = alertList.capacity();
-//      this.cursor = alertList.cursor();
-//      this.data = alertList.getDataByIndex()
-//          .stream()
-//          .filter(Objects::nonNull)
-//          .map(converter)
-//          .collect(Collectors.toCollection(Lists::newArrayList));
-//    }
-//
-//    public RotatingArrayList<S> deserialize() {
-//      return new RotatingArrayList<>(data, capacity, cursor);
-//    }
-//  }
 
 }

@@ -40,17 +40,17 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
  * @author PietElite
  */
 @CatalogedBy(GriefEvents.class)
-public class GriefEvent implements CatalogType, Serializable {
+public final class GriefEvent implements CatalogType, Serializable {
 
   private final String id;
   private final String name;
-  private final String preterite;
+  private final String preterit;
   private final String description;
 
-  private GriefEvent(String id, String name, String preterite, String description) {
+  private GriefEvent(String id, String name, String preterit, String description) {
     this.id = id;
     this.name = name;
-    this.preterite = preterite;
+    this.preterit = preterit;
     this.description = description;
   }
 
@@ -59,14 +59,14 @@ public class GriefEvent implements CatalogType, Serializable {
    *
    * @param id        The identifier
    * @param name      The human-readable name
-   * @param preterite The past tense version of this event
+   * @param preterit The past tense version of this event
    * @return The corresponding generated <code>GriefEvent</code>
    */
   public static GriefEvent of(@Nonnull String id,
                               @Nonnull String name,
-                              @Nonnull String preterite,
+                              @Nonnull String preterit,
                               @Nonnull String description) {
-    return new GriefEvent(id, name, preterite, description);
+    return new GriefEvent(id, name, preterit, description);
   }
 
   /**
@@ -97,8 +97,8 @@ public class GriefEvent implements CatalogType, Serializable {
   }
 
   @Nonnull
-  public String getPreterite() {
-    return preterite;
+  public String getPreterit() {
+    return preterit;
   }
 
   @Override

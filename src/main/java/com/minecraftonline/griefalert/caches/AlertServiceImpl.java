@@ -27,11 +27,12 @@ package com.minecraftonline.griefalert.caches;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.alerts.AlertCheck;
+import com.minecraftonline.griefalert.api.alerts.AlertInspection;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
-import com.minecraftonline.griefalert.api.events.PreCheckAlertEvent;
+import com.minecraftonline.griefalert.api.events.PreInspectAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.api.services.Request;
@@ -45,8 +46,10 @@ import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.SpongeUtil;
+import com.minecraftonline.griefalert.util.enums.AlertTags;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -55,19 +58,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang3.SerializationException;
+import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -77,20 +85,12 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
-/**
- * The ongoing queue for all <code>Alert</code>s. This is only local storage. Someone
- * can access each alert by their 'cachecode' using the <code>RotatingQueue</code>
- * API.
- *
- * @see Alert
- * @see RotatingArrayList
- */
 public final class AlertServiceImpl implements AlertService {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
   private final MapStack<UUID, GriefProfile> grieferRepeatHistory = new HashMapStack<>();
   private final MapStack<UUID, Transform<World>> officerCheckHistory = new HashMapStack<>();
-  private final RotatingList<SavedAlert> alertCache;
+  private final RotatingList<AlertItem> alertCache;
   private final File alertStorageFile;
 
   /**
@@ -105,13 +105,64 @@ public final class AlertServiceImpl implements AlertService {
 
   @Override
   public int submit(@NotNull Alert alert) {
+
     if (Permissions.has(Alerts.getGriefer(alert), Permissions.GRIEFALERT_SILENT)) {
       alert.setSilent(true);
     }
+
+    try {
+      SerializationUtils.serialize(alert);
+    } catch (SerializationException e) {
+      GriefAlert.getInstance().getLogger().error(
+          "An alert that was submitted to the AlertService does not correctly implement "
+              + "java.io.Serializable. The saved Alerts might not be recoverable on restart.");
+    }
     int index = push(alert);
-    postPreBroadcastAlertEvent(alert);
+
+    PreBroadcastAlertEvent.post(
+        alert,
+        Alerts.getGriefer(alert),
+        GriefAlert.getInstance().getPluginContainer());
+
     broadcast(index);
+
     return index;
+  }
+
+  /**
+   * Add the given alert to local storage and update the alert repeat history.
+   *
+   * @param alert the alert to push
+   * @return the retrieval code for this alert
+   */
+  public int push(@Nonnull final Alert alert) {
+    // Push the alert to the RotatingQueue
+    int output = alertCache.push(AlertItem.of(alert, alertCache.cursor()));
+
+    // Load the info for all alerts
+    if (alert instanceof GeneralAlert) {
+      GeneralAlert generalAlert = (GeneralAlert) alert;
+      generalAlert.getDetails().forEach(detail -> detail.get(alert));
+    }
+
+    updateRepeatHistory(alert);
+    return output;
+  }
+
+  private void updateRepeatHistory(@Nonnull final Alert alert) {
+    UUID grieferUuid = alert.getGrieferUuid();
+    if (grieferRepeatHistory.peek(grieferUuid)
+        .filter(griefProfile -> alert.getGriefProfile().equals(griefProfile))
+        .isPresent()) {
+      alert.setSilent(true);
+    } else {
+      grieferRepeatHistory.clear(grieferUuid);
+    }
+    grieferRepeatHistory.push(grieferUuid, alert.getGriefProfile());
+    int silentAlertLimit = Settings.MAX_HIDDEN_REPEATED_EVENTS.getValue();
+    if (grieferRepeatHistory.size(grieferUuid) >= silentAlertLimit) {
+      grieferRepeatHistory.clear(grieferUuid);
+    }
   }
 
   @Nonnull
@@ -124,31 +175,8 @@ public final class AlertServiceImpl implements AlertService {
     }
   }
 
-  @Override
-  public void reset() {
-    this.alertCache.clear();
-    this.grieferRepeatHistory.clearAll();
-    this.officerCheckHistory.clearAll();
-  }
-
-  @Override
-  public void lookup(@NotNull Collection<MessageReceiver> receivers, @NotNull Request filters, Sort sort, boolean spread) {
-    List<SavedAlert> alerts = getAlerts(filters, sort);
-    if (alerts.isEmpty()) {
-      receivers.forEach(receiver -> receiver.sendMessage(Format.info("There are no alerts matching those parameters")));
-      return;
-    }
-    PaginationList.builder()
-        .title(Text.of(TextColors.YELLOW, "Alert Lookup"))
-        .header(Format.formatRequest(filters))
-        .contents(formatAlerts(alerts, spread))
-        .padding(Format.bonus("="))
-        .build()
-        .sendTo(receivers);
-  }
-
-  private List<SavedAlert> getAlerts(Request filters, Sort sort) {
-    List<SavedAlert> allAlerts;
+  private List<AlertItem> getAlerts(Request filters, Sort sort) {
+    List<AlertItem> allAlerts;
     switch (sort) {
       case CHRONOLOGICAL:
         allAlerts = alertCache.getDataByTime();
@@ -177,7 +205,34 @@ public final class AlertServiceImpl implements AlertService {
         .collect(Collectors.toList());
   }
 
-  private List<Text> formatAlerts(List<SavedAlert> alerts, boolean spread) {
+  @Override
+  public void lookup(@NotNull Collection<MessageReceiver> receivers,
+                     @NotNull Request filters,
+                     @Nonnull Sort sort,
+                     boolean spread) {
+    List<AlertItem> alerts = getAlerts(filters, sort);
+    if (alerts.isEmpty()) {
+      receivers.forEach(receiver -> receiver.sendMessage(
+          Format.info("There are no alerts matching those parameters")));
+      return;
+    }
+    PaginationList.builder()
+        .title(Text.of(TextColors.YELLOW, "Alert Lookup"))
+        .header(Format.request(filters))
+        .contents(formatAlerts(alerts, spread))
+        .padding(Format.bonus("="))
+        .build()
+        .sendTo(receivers);
+  }
+
+  @Override
+  public void reset() {
+    this.alertCache.clear();
+    this.grieferRepeatHistory.clearAll();
+    this.officerCheckHistory.clearAll();
+  }
+
+  private List<Text> formatAlerts(List<AlertItem> alerts, boolean spread) {
 
     if (alerts.isEmpty()) {
       return Lists.newLinkedList();
@@ -185,39 +240,39 @@ public final class AlertServiceImpl implements AlertService {
 
     if (spread) {
       return alerts.stream().map(alert ->
-              Format.buildBroadcast(alert.get(), alert.index())).collect(Collectors.toList());
+          Format.buildBroadcast(alert.get(), alert.index())).collect(Collectors.toList());
     }
 
-    LinkedList<LinkedList<SavedAlert>> collapsed = Lists.newLinkedList();
+    LinkedList<LinkedList<AlertItem>> collapsed = Lists.newLinkedList();
     collapsed.add(Lists.newLinkedList());
     alerts.forEach(alert -> {
       if (collapsed.getLast().isEmpty()
           || (collapsed.getLast().getLast().get().getGriefProfile()
-              .equals(alert.get().getGriefProfile())
+          .equals(alert.get().getGriefProfile())
           && collapsed.getLast().getLast().get().getGrieferUuid()
-              .equals(alert.get().getGrieferUuid()))) {
+          .equals(alert.get().getGrieferUuid()))) {
         collapsed.getLast().add(alert);
       } else {
-        LinkedList<SavedAlert> list = Lists.newLinkedList();
+        LinkedList<AlertItem> list = Lists.newLinkedList();
         list.add(alert);
         collapsed.add(list);
       }
     });
     return collapsed.stream()
         .map(list -> {
-          SavedAlert firstAlert = list.getFirst();
+          AlertItem firstAlert = list.getFirst();
           List<Text> tokens = Lists.newLinkedList();
           tokens.add(Format.userName(Alerts.getGriefer(firstAlert.get())));
           tokens.add(Text.of(firstAlert.get().getGriefProfile()
-                  .getColored(GriefProfile.Colored.EVENT)
+                  .getColored(GriefProfile.Colorable.EVENT)
                   .orElse(Format.ALERT_EVENT_COLOR),
               Format.action(firstAlert.get().getGriefEvent())));
           tokens.add(Text.of(firstAlert.get().getGriefProfile()
-                  .getColored(GriefProfile.Colored.TARGET)
+                  .getColored(GriefProfile.Colorable.TARGET)
                   .orElse(Format.ALERT_TARGET_COLOR),
               Format.item(firstAlert.get().getTarget())));
           tokens.add(Text.of(firstAlert.get().getGriefProfile()
-                  .getColored(GriefProfile.Colored.DIMENSION)
+                  .getColored(GriefProfile.Colorable.DIMENSION)
                   .orElse(Format.ALERT_DIMENSION_COLOR),
               Format.dimension(Alerts.getWorld(firstAlert.get()).getDimension().getType())));
           if (list.size() < 5) {
@@ -237,59 +292,18 @@ public final class AlertServiceImpl implements AlertService {
         }).collect(Collectors.toList());
   }
 
-  /**
-   * Adds an alert to the queue. This method will replace the old <code>Alert</code> at
-   * that location, if it already exists, with the new one. Also, the given <code>alert
-   * </code> will also be assigned the corresponding index for retrieval.
-   *
-   * @param alert The alert to add
-   * @return The retrieval index
-   */
-  public int push(@Nonnull final Alert alert) {
-    // Push the alert to the RotatingQueue
-    int output = alertCache.push(SavedAlert.of(alert, alertCache.cursor()));
-    updateRepeatHistory(alert);
-    return output;
-  }
-
-  private void updateRepeatHistory(@Nonnull final Alert alert) {
-    UUID grieferUuid = alert.getGrieferUuid();
-    if (alert.muteRepeatProfiles()
-        && grieferRepeatHistory.peek(grieferUuid)
-        .filter(griefProfile -> alert.getGriefProfile().equals(griefProfile))
-        .isPresent()) {
-      alert.setSilent(true);
-    } else {
-      grieferRepeatHistory.clear(grieferUuid);
-    }
-    grieferRepeatHistory.push(grieferUuid, alert.getGriefProfile());
-    int silentAlertLimit = Settings.MAX_HIDDEN_REPEATED_EVENTS.getValue();
-    if (grieferRepeatHistory.size(grieferUuid) >= silentAlertLimit) {
-      grieferRepeatHistory.clear(grieferUuid);
-    }
-  }
-
-  /**
-   * Check the <code>Alert</code> with the given <code>Player</code>.
-   *
-   * @param index   the index for the <code>Alert</code> to check.
-   * @param officer The staff member
-   * @param force   whether the teleportation is performed regardless if it's safe
-   * @return true if the officer correctly checked the alert
-   * @see Alert
-   */
   @Override
   public boolean inspect(int index, @NotNull Player officer, boolean force)
       throws IndexOutOfBoundsException {
 
     // Perform all checks to make sure it will work
-    SavedAlert savedAlert = alertCache.get(index);
+    AlertItem alertItem = alertCache.get(index);
 
     // See if a staff member has already checked this alert recently
     if (Settings.ALERT_CHECK_TIMEOUT.getValue() > 0
-        && !savedAlert.getChecks().isEmpty()
-        && !savedAlert.getChecks().get(0).getOfficerUuid().equals(officer.getUniqueId())) {
-      AlertCheck firstCheck = savedAlert.getChecks().get(0);
+        && !alertItem.getChecks().isEmpty()
+        && !alertItem.getChecks().get(0).getOfficerUuid().equals(officer.getUniqueId())) {
+      AlertInspection firstCheck = alertItem.getChecks().get(0);
       double secondsSinceFirstCheck =
           ((double) (Instant.now().toEpochMilli()
               - firstCheck.getChecked().toInstant().toEpochMilli())
@@ -313,7 +327,7 @@ public final class AlertServiceImpl implements AlertService {
     Transform<World> officerPreviousTransform = officer.getTransform();
 
     // Teleport the officer
-    Transform<World> grieferTransform = Alerts.buildTransform(savedAlert.get());
+    Transform<World> grieferTransform = Alerts.buildTransform(alertItem.get());
     if (force) {
       officer.setTransform(grieferTransform);
     } else {
@@ -325,11 +339,7 @@ public final class AlertServiceImpl implements AlertService {
 
     // Post an event to show that the Alert is getting checked
     PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
-    Sponge.getEventManager().post(new PreCheckAlertEvent(
-            savedAlert.get(),
-            Cause.of(eventContext, plugin), officer));
-
+    PreInspectAlertEvent.post(alertItem.get(), officer, plugin);
 
     // The officer has teleported successfully, so save their previous location in the history
     this.addOfficerTransform(officer.getUniqueId(), officerPreviousTransform);
@@ -340,16 +350,20 @@ public final class AlertServiceImpl implements AlertService {
         " is checking alert number ",
         Format.bonus(CheckCommand.clickToCheck(index))));
 
+    officer.sendMessage(Format.heading("Checking Alert: ",
+        Format.bonus(index)));
+    officer.sendMessage(alertItem.get().getMessage());
+
     // Notify the officer of other staff members who may have checked this alert already
-    if (!savedAlert.getChecks().isEmpty()) {
+    if (!alertItem.getChecks().isEmpty()) {
       officer.sendMessage(Format.info(
           "This alert has already been checked by: ",
           Text.joinWith(
               Format.bonus(", "),
               Sets.newHashSet(
-                  savedAlert.getChecks()
+                  alertItem.getChecks()
                       .stream()
-                      .map(AlertCheck::getOfficerUuid)
+                      .map(AlertInspection::getOfficerUuid)
                       .collect(Collectors.toList()))
                   .stream()
                   .map(uuid -> SpongeUtil.getUser(uuid)
@@ -359,35 +373,32 @@ public final class AlertServiceImpl implements AlertService {
                   .collect(Collectors.toList()))));
     }
 
-    officer.sendMessage(Format.heading("Checking Grief Alert: ",
-        Format.bonus(index)));
-    officer.sendMessage(Text.of(TextColors.YELLOW, savedAlert.get().getMessage().toPlain()));
+    // Build a panel for the officer with useful commands
     Text.Builder panel = Text.builder().append(Format.bonus("=="));
-
     if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_QUERY.toString())) {
       panel.append(
           Format.space(2),
-          Format.getTagRecent(Alerts.getGriefer(savedAlert.get()).getName()));
+          AlertTags.getTagRecent(Alerts.getGriefer(alertItem.get()).getName()));
     }
     if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_SHOW.toString())) {
       panel.append(
           Format.space(2),
-          Format.getTagShow(index));
+          AlertTags.getTagShow(index));
     }
     if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_INFO.toString())) {
       panel.append(
           Format.space(2),
-          Format.getTagInfo(index));
+          AlertTags.getTagInfo(index));
     }
     panel.append(
         Format.space(2),
-        Format.getTagReturn());
+        AlertTags.getTagReturn());
 
-    if (savedAlert.get() instanceof PrismAlert
+    if (alertItem.get() instanceof PrismAlert
         && officer.hasPermission(Permissions.GRIEFALERT_COMMAND_ROLLBACK.toString())) {
       panel.append(Text.of(
           Format.space(2),
-          Format.getTagRollback(index)));
+          AlertTags.getTagFix(index)));
 
     }
     panel.append(Text.of(
@@ -409,7 +420,7 @@ public final class AlertServiceImpl implements AlertService {
               " has been revoked"));
     }
 
-    savedAlert.addCheck(new AlertCheck(officer.getUniqueId(), new Date()));
+    alertItem.addCheck(new AlertInspection(officer.getUniqueId(), new Date()));
     return true;
   }
 
@@ -474,24 +485,6 @@ public final class AlertServiceImpl implements AlertService {
   }
 
   /**
-   * Send a {@link PreBroadcastAlertEvent} to Sponge's Event Manager.
-   *
-   * @param alert the alert to post
-   */
-  public void postPreBroadcastAlertEvent(Alert alert) {
-
-    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
-
-    PreBroadcastAlertEvent preBroadcastAlertEvent = new PreBroadcastAlertEvent(
-        alert,
-        Cause.of(eventContext, plugin));
-
-    Sponge.getEventManager().post(preBroadcastAlertEvent);
-
-  }
-
-  /**
    * Send the {@link Alert} at the given location in the alert cache.
    *
    * @param index the location of the {@link Alert} in the alert cache
@@ -513,31 +506,13 @@ public final class AlertServiceImpl implements AlertService {
     }
   }
 
-//  @Nonnull
-//  @Override
-//  public final Text getTextWithIndex() {
-//    return getTextWithIndices(Lists.newArrayList(getCacheIndex()));
-//  }
-//
-//  @Nonnull
-//  @Override
-//  public final Text getTextWithIndices(@Nonnull List<Integer> allIndices) {
-//    Text.Builder builder = Text.builder().append(getMessageText());
-//    allIndices.forEach((i) -> {
-//      builder.append(Format.space());
-//      builder.append(CheckCommand.clickToCheck(i));
-//    });
-//    return builder.build();
-//  }
-
-
   /**
    * Give a {@link RotatingList}, generated by either a temporary file
    * or a completely new one if the storage file doesn't exist.
    *
    * @return the new list
    */
-  public RotatingList<SavedAlert> generateAlertList() {
+  public RotatingList<AlertItem> generateAlertList() {
     if (alertStorageFile.exists()) {
       try {
         return restoreAlerts();
@@ -574,11 +549,12 @@ public final class AlertServiceImpl implements AlertService {
    * @throws Exception if an issue with creating a list
    */
   @SuppressWarnings("unchecked")
-  public RotatingList<SavedAlert> restoreAlerts() throws Exception {
+  public RotatingList<AlertItem> restoreAlerts() throws Exception {
     FileInputStream fis = new FileInputStream(alertStorageFile);
     ObjectInputStream ois = new ObjectInputStream(fis);
 
-    final RotatingArrayList<SavedAlert> rotatingArrayList = (RotatingArrayList<SavedAlert>) ois.readObject();
+    final RotatingArrayList<AlertItem> rotatingArrayList =
+        (RotatingArrayList<AlertItem>) ois.readObject();
 
     ois.close();
     fis.close();
@@ -588,18 +564,18 @@ public final class AlertServiceImpl implements AlertService {
     return rotatingArrayList;
   }
 
-  private static class SavedAlert implements Serializable {
+  private static class AlertItem implements Serializable {
     private final Alert alert;
-    private final List<AlertCheck> checks = Lists.newLinkedList();
+    private final List<AlertInspection> checks = Lists.newLinkedList();
     private final int index;
 
-    private SavedAlert(Alert alert, int index) {
+    private AlertItem(Alert alert, int index) {
       this.alert = alert;
       this.index = index;
     }
 
-    static SavedAlert of(Alert alert, int index) {
-      return new SavedAlert(alert, index);
+    static AlertItem of(Alert alert, int index) {
+      return new AlertItem(alert, index);
     }
 
     public Alert get() {
@@ -610,12 +586,12 @@ public final class AlertServiceImpl implements AlertService {
       return index;
     }
 
-    public void addCheck(@Nonnull AlertCheck check) {
+    public void addCheck(@Nonnull AlertInspection check) {
       checks.add(check);
     }
 
     @Nonnull
-    public List<AlertCheck> getChecks() {
+    public List<AlertInspection> getChecks() {
       return checks;
     }
 

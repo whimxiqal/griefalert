@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+
 import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
@@ -36,6 +37,8 @@ import javax.annotation.Nonnull;
 /**
  * A store for all filtering information necessary to locate stored {@link Alert}s.
  * Used in combination with an {@link AlertService}.
+ *
+ * @author PietElite
  */
 public final class Request implements Serializable {
 
@@ -94,26 +97,54 @@ public final class Request implements Serializable {
       return new Request(events, targets, playerUuids, maximum);
     }
 
-    @SuppressWarnings("unused")
-    public void addEvent(@Nonnull GriefEvent event) {
+    /**
+     * Adjusts Request to only get objects containing the given {@link GriefEvent}
+     * or any other added one.
+     *
+     * @param event the event for filtering
+     * @return the current builder for chaining
+     */
+    public Builder addEvent(@Nonnull final GriefEvent event) {
       Preconditions.checkNotNull(event);
       this.events.add(event);
+      return this;
     }
 
-    @SuppressWarnings("unused")
-    public void addTarget(@Nonnull String target) {
+    /**
+     * Adjusts Request to only get objects containing the given target id
+     * or any other added one.
+     *
+     * @param target the target id for filtering
+     * @return the current builder for chaining
+     */
+    public Builder addTarget(@Nonnull final String target) {
       Preconditions.checkNotNull(target);
       this.targets.add(target);
+      return this;
     }
 
-    @SuppressWarnings("unused")
-    public void addPlayerUuid(@Nonnull UUID playerUuid) {
+    /**
+     * Adjusts Request to only get objects containing the given {@link UUID}
+     * or any other added one.
+     *
+     * @param playerUuid the player uuid for filtering
+     * @return the current builder for chaining
+     */
+    public Builder addPlayerUuid(@Nonnull final UUID playerUuid) {
       Preconditions.checkNotNull(playerUuid);
       this.playerUuids.add(playerUuid);
+      return this;
     }
 
-    public void setMaximum(int maximum) {
+    /**
+     * Set the maximum number of results to get from this request.
+     *
+     * @param maximum limit of results
+     * @return the current builder for chaining
+     */
+    public Builder setMaximum(int maximum) {
       this.maximum = maximum;
+      return this;
     }
 
   }

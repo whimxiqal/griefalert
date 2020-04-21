@@ -27,6 +27,7 @@ package com.minecraftonline.griefalert.api.storage;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
+import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nonnull;
 
@@ -38,11 +39,11 @@ import javax.annotation.Nonnull;
 public interface ProfileStorage {
 
   /**
-   * Write a GriefProfile into persistent storage.
+   * Write a {@link GriefProfile} into persistent storage.
    *
    * @param profile The GriefProfile to add
-   * @return false if a <code>GriefProfile</code> already exists too similar to the
-   *         input <code>GriefProfile</code>
+   * @return false if a {@link GriefProfile} already exists too similar to the
+   *         input {@link GriefProfile}
    * @throws Exception if error
    */
   boolean write(@Nonnull final GriefProfile profile) throws Exception;
@@ -50,21 +51,21 @@ public interface ProfileStorage {
   /**
    * Remove the {@link GriefProfile} from persistent storage.
    *
-   * @param griefEvent The <code>GriefEvent</code> of this profile to remove
+   * @param griefEvent The {@link GriefEvent} of this profile to remove
    * @param target     The target id of this profile to remove
-   * @return false if a <code>GriefProfile</code> was not found
+   * @return false if a {@link GriefProfile} was not found
    * @throws Exception if error
    */
   boolean remove(@Nonnull final GriefEvent griefEvent, @Nonnull final String target)
       throws Exception;
 
   /**
-   * Get all <code>GriefProfile</code>s saved in persistent storage.
+   * Get all {@link GriefProfile}s saved in persistent storage.
    *
-   * @return a list of <code>GriefProfile</code>s
+   * @return a collection of {@link GriefProfile}s
    * @throws Exception if error
    */
   @Nonnull
-  List<GriefProfile> retrieve() throws Exception;
+  Collection<GriefProfile> retrieve() throws Exception;
 
 }

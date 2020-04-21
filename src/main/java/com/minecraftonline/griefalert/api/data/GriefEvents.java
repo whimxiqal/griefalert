@@ -73,6 +73,10 @@ public final class GriefEvents {
       .of("replace", "Block Replace", "replaced",
           "Change a block from one non-air target block to a different non-air block");
 
+  public static final GriefEvent EDIT = GriefEvent
+      .of("edit", "Edit", "edited",
+          "Edit the contents or internal state of an object");
+
   public static final CatalogRegistryModule<GriefEvent> REGISTRY_MODULE = new
       CatalogRegistryModule<GriefEvent>() {
         @Nonnull
@@ -93,6 +97,7 @@ public final class GriefEvents {
               PLACE,
               REPLACE,
               DEATH,
+              EDIT,
               ITEM_USE,
               ITEM_APPLY,
               INTERACT,

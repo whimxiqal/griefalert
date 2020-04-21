@@ -29,8 +29,14 @@ import com.minecraftonline.griefalert.api.structures.RotatingList;
 
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.impl.AbstractEvent;
+import org.spongepowered.api.plugin.PluginContainer;
 
 /**
  * An event posted before an {@link Alert} has been broadcast to staff. At the point of
@@ -39,23 +45,36 @@ import org.spongepowered.api.event.impl.AbstractEvent;
  *
  * @author PietElite
  */
-public class PreBroadcastAlertEvent extends AbstractEvent {
+public final class PreBroadcastAlertEvent extends AbstractEvent {
 
   private Alert alert;
   private Cause cause;
 
   /**
-   * The primary constructor. This is made to send information about an <code>Alert</code>
-   * which is being processed and will be imminently broadcast to staff.
-   *
-   * @param alert The <code>Alert</code> being run
-   * @param cause The cause of the <code>Alert</code>
+   * Post a new {@link PreBroadcastAlertEvent}.
+   *  @param alert  the alert which is about to be broadcast
+   * @param cause  the player who triggered the alert in the first place
+   * @param plugin the container representing the handling plugin
    */
-  public PreBroadcastAlertEvent(final Alert alert, final Cause cause) {
+  public static void post(@Nonnull final Alert alert,
+                          @Nonnull final User cause,
+                          @Nonnull final PluginContainer plugin) {
+    Sponge.getEventManager().post(new PreBroadcastAlertEvent(
+        alert,
+        Cause.builder()
+            .append(cause)
+            .build(EventContext.builder()
+                .add(EventContextKeys.PLUGIN, plugin)
+                .build())));
+  }
+
+  private PreBroadcastAlertEvent(@Nonnull final Alert alert,
+                                 @Nonnull final Cause cause) {
     this.alert = alert;
     this.cause = cause;
   }
 
+  @Nonnull
   public Alert getAlert() {
     return alert;
   }

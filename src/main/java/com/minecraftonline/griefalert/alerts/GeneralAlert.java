@@ -26,7 +26,6 @@ package com.minecraftonline.griefalert.alerts;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.alerts.AlertCheck;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
@@ -36,7 +35,6 @@ import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.enums.Details;
 
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,8 +45,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-
-
 /**
  * An object to hold all information about an Alert caused by an
  * event matching a {@link GriefProfile}.
@@ -57,15 +53,11 @@ import org.spongepowered.api.text.format.TextColors;
  */
 public abstract class GeneralAlert implements Alert {
 
-  private int cacheIndex;
   private final GriefProfile griefProfile;
 
-  private final List<Detail<Alert>> details =
-      new LinkedList<>();
+  private final List<Detail<Alert>> details = Lists.newLinkedList();
   private boolean silent = false;
-  private boolean pushed = false;
   private final Date created;
-  private final List<AlertCheck> checks = Lists.newLinkedList();
 
   protected GeneralAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;
@@ -97,13 +89,19 @@ public abstract class GeneralAlert implements Alert {
     builder.append(Text.of(
         Format.userName(Alerts.getGriefer(this)),
         Format.space(),
-        this.getGriefProfile().getColored(GriefProfile.Colored.EVENT).orElse(Format.ALERT_EVENT_COLOR),
+        this.getGriefProfile()
+            .getColored(GriefProfile.Colorable.EVENT)
+            .orElse(Format.ALERT_EVENT_COLOR),
         Format.action(this.getGriefEvent()),
         Format.space(),
-        this.getGriefProfile().getColored(GriefProfile.Colored.TARGET).orElse(Format.ALERT_TARGET_COLOR),
+        this.getGriefProfile()
+            .getColored(GriefProfile.Colorable.TARGET)
+            .orElse(Format.ALERT_TARGET_COLOR),
         Grammar.addIndefiniteArticle(Format.item(this.getTarget())),
         TextColors.RED, " in the ",
-        this.getGriefProfile().getColored(GriefProfile.Colored.DIMENSION).orElse(Format.ALERT_DIMENSION_COLOR),
+        this.getGriefProfile()
+            .getColored(GriefProfile.Colorable.DIMENSION)
+            .orElse(Format.ALERT_DIMENSION_COLOR),
         Format.dimension(Alerts.getWorld(this).getDimension().getType())));
     Text.Builder ellipses = Text.builder().append(Format.bonus("(...)"));
     Text hoverText = Text.of(Format.prefix(), Format.endLine(), Text.joinWith(
@@ -154,11 +152,6 @@ public abstract class GeneralAlert implements Alert {
   @Override
   public final String getTarget() {
     return griefProfile.getTarget();
-  }
-
-  @Override
-  public boolean muteRepeatProfiles() {
-    return true;
   }
 
   public List<Detail<Alert>> getDetails() {
