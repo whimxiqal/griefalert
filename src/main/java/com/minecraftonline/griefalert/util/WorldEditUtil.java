@@ -25,16 +25,10 @@
 package com.minecraftonline.griefalert.util;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Sets;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.sponge.SpongeWorld;
-import org.spongepowered.api.world.World;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public final class WorldEditUtil {
 
@@ -48,10 +42,16 @@ public final class WorldEditUtil {
     return new Vector3i(weVector.getBlockX(), weVector.getBlockY(), weVector.getBlockZ());
   }
 
+  /**
+   * Returns whether this {@link Region} has an object with "sign" in its id.
+   *
+   * @param selection the selection
+   * @param world     the world
+   * @return true if a sign is in selection
+   */
   public static boolean containsSign(Region selection, SpongeWorld world) {
-    Iterator<BlockVector> iterator = selection.iterator();
-    while (iterator.hasNext()) {
-      if (world.getWorld().getBlock(convertVector(iterator.next())).getId().contains("sign")) {
+    for (BlockVector blockVector : selection) {
+      if (world.getWorld().getBlock(convertVector(blockVector)).getId().contains("sign")) {
         return true;
       }
     }

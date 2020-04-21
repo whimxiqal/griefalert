@@ -24,6 +24,8 @@
 
 package com.minecraftonline.griefalert.api.structures;
 
+import com.google.common.collect.Maps;
+
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Stack;
@@ -39,7 +41,7 @@ import javax.annotation.Nonnull;
  */
 public class HashMapStack<K, V> implements MapStack<K, V> {
 
-  private HashMap<K, Stack<V>> data = new HashMap<>();
+  private final HashMap<K, Stack<V>> data = Maps.newHashMap();
 
   @Nonnull
   @Override

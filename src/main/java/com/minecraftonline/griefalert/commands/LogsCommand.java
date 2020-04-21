@@ -29,7 +29,6 @@ import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.services.PrismService;
 import com.helion3.prism.api.services.Request;
-import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.DateUtil;
@@ -45,7 +44,6 @@ import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;

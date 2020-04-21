@@ -25,11 +25,8 @@
 package com.minecraftonline.griefalert.util;
 
 import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
-import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.World;
 

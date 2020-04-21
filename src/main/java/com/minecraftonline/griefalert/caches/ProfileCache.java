@@ -42,7 +42,7 @@ import org.spongepowered.api.world.DimensionType;
  */
 public class ProfileCache {
 
-  private HashBasedTable<GriefEvent, String, GriefProfile> storage = HashBasedTable.create();
+  private final HashBasedTable<GriefEvent, String, GriefProfile> storage = HashBasedTable.create();
 
   public ProfileCache() {
     this.load();
@@ -58,7 +58,7 @@ public class ProfileCache {
 
   private void load() {
 
-    // Get all other profiles from the onsite profile list
+    // Get all other profiles from the local profile list
     ProfileStorage profileStorage = GriefAlert.getInstance().getProfileStorage();
     try {
       GriefAlert.getInstance().getLogger().info("Loading Grief Profiles from SQL into cache...");

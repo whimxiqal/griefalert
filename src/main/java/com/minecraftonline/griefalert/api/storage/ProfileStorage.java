@@ -28,7 +28,6 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import java.util.Collection;
-import java.util.List;
 import javax.annotation.Nonnull;
 
 /**

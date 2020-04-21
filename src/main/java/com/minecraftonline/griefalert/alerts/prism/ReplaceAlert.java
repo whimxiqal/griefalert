@@ -26,7 +26,6 @@ package com.minecraftonline.griefalert.alerts.prism;
 
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.api.services.PrismService;
 import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;

@@ -94,7 +94,6 @@ public class InfoCommand extends GeneralCommand {
               .collect(Collectors.toList()))
           .build()
           .sendTo(src);
-      return CommandResult.success();
     } else {
       PaginationList.builder()
           .title(Text.of(
@@ -105,7 +104,7 @@ public class InfoCommand extends GeneralCommand {
           .contents(alert.getSummary())
           .build()
           .sendTo(src);
-      return CommandResult.success();
     }
+    return CommandResult.success();
   }
 }

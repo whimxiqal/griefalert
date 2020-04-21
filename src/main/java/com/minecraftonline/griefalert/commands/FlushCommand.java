@@ -28,28 +28,36 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+
 import javax.annotation.Nonnull;
+
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 
-public class ClearcacheCommand extends GeneralCommand {
+public class FlushCommand extends GeneralCommand {
 
-  ClearcacheCommand() {
+  FlushCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_RELOAD,
         Text.of("Clear the Alert cache")
     );
-    addAlias("clearcache");
+    addAlias("flush");
+    setCommandElement(GenericArguments.flags().flag("-force", "f").buildWith(GenericArguments.none()));
   }
 
   @Override
   @Nonnull
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) {
+    if (!args.hasAny("force")) {
+      src.sendMessage(Format.info("This will clear all cached Alert data! "
+          + "Use --force if you're sure."));
+    }
     GriefAlert.getInstance().getAlertService().reset();
-    src.sendMessage(Format.success("Alert cache cleared"));
+    src.sendMessage(Format.success("GriefAlert flushed!"));
     return CommandResult.success();
   }
 

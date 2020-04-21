@@ -56,6 +56,8 @@ All commands have a subcommand **help | ?** to display usage and further subcomm
     - **restore | rs** ...  
         - Filtering with specific flags and a selected WorldEdit region, restore all events stored in Prism to more recent state
         - Flags: Time Since, Time Before, Exact Username, Prism Target, and Prism Event  
+    - **flush**
+        - Removes all cached Alerts
 
 ### Argument Syntax  
 | Symbol | Meaning  |   
@@ -130,10 +132,11 @@ MinecraftOnline used to have different commands associated with the older versio
 | `griefalert.command.info`     | Access to **/ga i**                           |
 | `griefalert.command.show`     | Access to **/ga s**                           |
 | `griefalert.command.query`    | Access to **/ga q**                           |
-| `griefalert.command.reload`   | Access to **/ga reload**                      |
+| `griefalert.command.fix`      | Access to **/ga f**                           |
+| `griefalert.command.reload`   | Access to **/ga reload** and **/ga flush**    |
 | `griefalert.command.profile`  | Access to **/ga p**                           |
 | `griefalert.command.logs`     | Access to **/ga l**                           |
-| `griefalert.command.rollback` | Access to **/ga rb**                          |
+| `griefalert.command.rollback` | Access to **/ga rb** and **/ga rs**           |
 
 
 

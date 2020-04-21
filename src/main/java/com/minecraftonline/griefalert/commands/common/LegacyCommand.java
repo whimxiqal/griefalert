@@ -59,7 +59,7 @@ public final class LegacyCommand extends GeneralCommand {
   /**
    * <code>LegacyCommand</code> factory method.
    * @param permission The permission required to perform this command
-   * @param oldCommand The old command, which is what this command will be registed as.
+   * @param oldCommand The old command, which is what this command will be registered as.
    *                   Use the format "command" instead of "/command"
    * @param newCommand The new command, which will perform the function which the old
    *                   command used to perform.

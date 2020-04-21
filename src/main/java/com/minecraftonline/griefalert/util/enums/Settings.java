@@ -131,7 +131,7 @@ public final class Settings {
       5,
       "The number of seconds to wait before another staff member can check an alert after the first",
       val -> (val >= 0) && (val <= 60),
-      "The alert_checK_timeout configuration value is out ofthe acceptable range {0, 60}. ",
+      "The alert_check_timeout configuration value is out of the acceptable range {0, 60}. ",
       Integer.class);
 
 }

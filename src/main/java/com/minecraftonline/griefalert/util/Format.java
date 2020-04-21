@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.helion3.prism.api.data.PrismEvent;
-import com.helion3.prism.api.services.PrismService;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
@@ -52,7 +51,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -491,7 +489,7 @@ public final class Format {
     } else if (type.equals(DimensionTypes.THE_END)) {
       return Text.of("end");
     } else {
-      throw new IllegalArgumentException("Invalid dimention type");
+      throw new IllegalArgumentException("Invalid dimension type");
     }
   }
 

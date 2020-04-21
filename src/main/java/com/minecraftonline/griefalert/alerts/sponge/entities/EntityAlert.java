@@ -2,7 +2,6 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.alerts.sponge.SpongeAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
@@ -13,13 +12,10 @@ import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.Details;
 import javax.annotation.Nonnull;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
-import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -27,18 +23,20 @@ import java.util.stream.Collectors;
 
 public abstract class EntityAlert extends SpongeAlert {
 
-  private String entitySnapshotContainer;
-  private Vector3i griefPosition;
+  private final String entitySnapshotContainer;
+  private final Vector3i griefPosition;
 
   EntityAlert(GriefProfile griefProfile, TargetEntityEvent event) {
     super(griefProfile, event);
     this.griefPosition = event.getTargetEntity().getLocation().getBlockPosition();
+    String serialized;
     try {
-      entitySnapshotContainer = DataFormats.JSON.write(event.getTargetEntity().createSnapshot().toContainer());
+      serialized = DataFormats.JSON.write(event.getTargetEntity().createSnapshot().toContainer());
     } catch (IOException e) {
       e.printStackTrace();
-      entitySnapshotContainer = "";
+      serialized = "";
     }
+    entitySnapshotContainer = serialized;
     addDetail(Details.lookingAt());
   }
 

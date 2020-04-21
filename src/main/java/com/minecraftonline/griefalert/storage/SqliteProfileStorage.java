@@ -26,9 +26,9 @@ package com.minecraftonline.griefalert.storage;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

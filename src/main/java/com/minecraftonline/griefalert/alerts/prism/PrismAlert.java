@@ -28,7 +28,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.api.services.PrismService;
 import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.GeneralAlert;
@@ -39,7 +38,6 @@ import com.minecraftonline.griefalert.util.PrismUtil;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
@@ -124,51 +122,27 @@ public abstract class PrismAlert extends GeneralAlert implements Fixable {
   }
 
   protected Request getRollbackRequest() {
-    Request.Builder builder = Request.builder();
-
-    builder.addPlayerUuid(getGrieferUuid());
-    builder.addTarget(getTarget());
-    builder.setEarliest(Date.from(getCreated().toInstant().minusSeconds(1)));
-    builder.setLatest(Date.from(getCreated().toInstant().plusSeconds(1)));
-    builder.addEvent(Sponge.getRegistry().getType(PrismEvent.class, getGriefEvent().getId()).orElseThrow(() ->
-            new RuntimeException("PrismAlert stored an invalid GriefEvent: " + getGriefEvent().getId())));
-    builder.addWorldUuid(getWorldUuid());
-    builder.setxRange(getGriefPosition().getX(), getGriefPosition().getX());
-    builder.setyRange(getGriefPosition().getY(), getGriefPosition().getY());
-    builder.setzRange(getGriefPosition().getZ(), getGriefPosition().getZ());
-
-    return builder.build();
+    return Request.builder()
+        .addPlayerUuid(getGrieferUuid())
+        .addTarget(getTarget())
+        .setEarliest(Date.from(getCreated().toInstant().minusSeconds(1)))
+        .setLatest(Date.from(getCreated().toInstant().plusSeconds(1)))
+        .addEvent(Sponge.getRegistry()
+        .getType(PrismEvent.class, getGriefEvent().getId())
+        .orElseThrow(() ->
+            new RuntimeException(
+                "PrismAlert stored an invalid GriefEvent: "
+                    + getGriefEvent().getId())))
+        .addWorldUuid(getWorldUuid()).setxRange(getGriefPosition().getX(), getGriefPosition().getX())
+        .setyRange(getGriefPosition().getY(), getGriefPosition().getY())
+        .setzRange(getGriefPosition().getZ(), getGriefPosition().getZ())
+        .build();
   }
 
   @Override
   public boolean fix(@Nonnull CommandSource src) {
     try {
-      Request request = getRollbackRequest();
-      StringBuilder builder = new StringBuilder()
-          .append("PlayerUuids: ")
-          .append(request.getPlayerUuids().stream().map(UUID::toString).collect(Collectors.joining(",")))
-          .append("\n")
-          .append("Targets: ")
-          .append(String.join(",", request.getTargets()))
-          .append("\n")
-          .append("Earliest: ")
-          .append(request.getEarliest().map(Date::toString).orElse("None"))
-          .append("\n")
-          .append("Latest: ")
-          .append(request.getLatest().map(Date::toString).orElse("None"))
-          .append("\n")
-          .append("WorldUuids: ")
-          .append(request.getWorldUuids().stream().map(UUID::toString).collect(Collectors.joining(",")))
-          .append("xRange: ")
-          .append(request.getxRange().map(range -> range.lowerEndpoint() + " -> " + range.upperEndpoint()))
-          .append("\n")
-          .append("yRange: ")
-          .append(request.getyRange().map(range -> range.lowerEndpoint() + " -> " + range.upperEndpoint()))
-          .append("\n")
-          .append("zRange: ")
-          .append(request.getzRange().map(range -> range.lowerEndpoint() + " -> " + range.upperEndpoint()));
-      GriefAlert.getInstance().getLogger().info(builder.toString());
-      GriefAlert.getInstance().getPrismService().rollback(src, request);
+      GriefAlert.getInstance().getPrismService().rollback(src, getRollbackRequest());
       fixed = true;
       return true;
     } catch (Exception e) {

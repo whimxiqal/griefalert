@@ -49,10 +49,10 @@ public class HologramManager {
   private static final long HOLOGRAM_LIFETIME = 100;
   private static final double DISTANCE_BETWEEN_LINES = 0.3;
 
-  private Logger log = GriefAlert.getInstance().getLogger();
+  private final Logger log = GriefAlert.getInstance().getLogger();
+  private final Set<HologramsService.Hologram> alertHolograms = Sets.newHashSet();
   private HologramsService hologramsService;
-  private boolean error;
-  private Set<HologramsService.Hologram> alertHolograms = Sets.newHashSet();
+  private final boolean error;
 
   /**
    * General constructor.

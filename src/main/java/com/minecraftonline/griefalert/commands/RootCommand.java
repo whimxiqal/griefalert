@@ -69,7 +69,7 @@ public class RootCommand extends GeneralCommand {
         "restore",
         "rs"));
     addChild(new LogsCommand());
-    addChild(new ClearcacheCommand());
+    addChild(new FlushCommand());
   }
 
   @Nonnull

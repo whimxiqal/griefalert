@@ -42,7 +42,7 @@ public final class Details {
   private Details() {
   }
 
-  public static final Detail<Alert> player() {
+  public static Detail<Alert> player() {
     return Detail.of(
         "Player",
         "The name of the player who caused this event.",
@@ -50,7 +50,7 @@ public final class Details {
         true);
   }
 
-  public static final Detail<Alert> event() {
+  public static Detail<Alert> event() {
     return Detail.of(
         "Event",
         "The classification for this type of event.",
@@ -58,7 +58,7 @@ public final class Details {
         true);
   }
 
-  public static final Detail<Alert> target() {
+  public static Detail<Alert> target() {
     return Detail.of(
         "Target",
         "The targeted object.",
@@ -66,7 +66,7 @@ public final class Details {
         true);
   }
 
-  public static final Detail<Alert> location() {
+  public static Detail<Alert> location() {
     return Detail.of(
         "Location",
         "The location of the event. This could either be the players location "
@@ -75,14 +75,14 @@ public final class Details {
         true);
   }
 
-  public static final Detail<Alert> time() {
+  public static Detail<Alert> time() {
     return Detail.of(
         "Time",
         "The time of the event.",
         alert -> Optional.of(Format.date(alert.getCreated())));
   }
 
-  public static final Detail<Alert> blockCreator() {
+  public static Detail<Alert> blockCreator() {
     return Detail.of(
         "Block Creator",
         "The player who placed the block at this location before the break event. "
@@ -95,7 +95,7 @@ public final class Details {
             .map(Format::userName));
   }
 
-  public static final Detail<Alert> lookingAt() {
+  public static Detail<Alert> lookingAt() {
     return Detail.of(
         "Looking At",
         "The object in immediate view during usage of the target.",
@@ -109,7 +109,7 @@ public final class Details {
                     hit.getLocation().getBlockType().getId()))));
   }
 
-  public static final Detail<Alert> inHand() {
+  public static Detail<Alert> inHand() {
     return Detail.of(
         "In Hand",
         "The item in the hand of the player at the time of this event.",

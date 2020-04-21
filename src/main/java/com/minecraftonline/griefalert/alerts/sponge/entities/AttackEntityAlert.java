@@ -19,7 +19,7 @@ import org.spongepowered.api.event.entity.AttackEntityEvent;
  */
 public class AttackEntityAlert extends EntityAlert {
 
-  private UUID grieferUuid;
+  private final UUID grieferUuid;
 
   /**
    * General constructor.

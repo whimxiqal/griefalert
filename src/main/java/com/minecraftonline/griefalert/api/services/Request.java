@@ -85,9 +85,9 @@ public final class Request implements Serializable {
 
   public static class Builder {
 
-    private Set<GriefEvent> events = Sets.newHashSet();
-    private Set<String> targets = Sets.newHashSet();
-    private Set<UUID> playerUuids = Sets.newHashSet();
+    private final Set<GriefEvent> events = Sets.newHashSet();
+    private final Set<String> targets = Sets.newHashSet();
+    private final Set<UUID> playerUuids = Sets.newHashSet();
     private int maximum;
 
     private Builder() {

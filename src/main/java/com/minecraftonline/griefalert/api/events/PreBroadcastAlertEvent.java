@@ -30,7 +30,6 @@ import com.minecraftonline.griefalert.api.structures.RotatingList;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
@@ -47,8 +46,8 @@ import org.spongepowered.api.plugin.PluginContainer;
  */
 public final class PreBroadcastAlertEvent extends AbstractEvent {
 
-  private Alert alert;
-  private Cause cause;
+  private final Alert alert;
+  private final Cause cause;
 
   /**
    * Post a new {@link PreBroadcastAlertEvent}.
