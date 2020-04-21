@@ -22,6 +22,8 @@ All commands have a subcommand **help | ?** to display usage and further subcomm
         - Send detailed information about the Alert at *index* through chat  
     - **show | s** <*index*>
         - Display an informative hologram at the location of the Alert at *index*
+    - **fix | f** <*index*>
+        - Attempt to rollback a specific index to its previous state
     - **query | q** [flags...]
         - Filtering with specific flags, query the Alert cache
         - Flags: Partial Username, GA Event, Partial Target, Maximum, Spread, Group
@@ -47,13 +49,13 @@ All commands have a subcommand **help | ?** to display usage and further subcomm
             - Same command as Prism's "/pr i" 
         - **[flags...]**
             - Filtering with specific flags and a selected WorldEdit region, query the all Prism logs 
-            - Flags: Time Since, Time Before, Exact Username, Prism Target, and Prism Event  
+            - Flags: Time Since, Time Before, Exact Username, Prism Target, Prism Event, and Group
     - **rollback | rb** ...  
-        - **alert | a ** <*index*>  
-            - Attempt to rollback the event occurring in Alert at *index*
-        - **region | r [flags...]**
-            - Filtering with specific flags and a selected WorldEdit region, rollback all events stored in Prism
-            - Flags: Time Since, Time Before, Exact Username, Prism Target, and Prism Event  
+        - Filtering with specific flags and a selected WorldEdit region, rollback all events stored in Prism to original state
+        - Flags: Time Since, Time Before, Exact Username, Prism Target, and Prism Event  
+    - **restore | rs** ...  
+        - Filtering with specific flags and a selected WorldEdit region, restore all events stored in Prism to more recent state
+        - Flags: Time Since, Time Before, Exact Username, Prism Target, and Prism Event  
 
 ### Argument Syntax  
 | Symbol | Meaning  |   

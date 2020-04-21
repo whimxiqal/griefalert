@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.services.PrismService;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
@@ -442,6 +443,7 @@ public final class Format {
       builder.append(Text.joinWith(Text.of(","),
           request.getEvents()
               .stream()
+              .map(PrismEvent::getId)
               .map(Text::of)
               .collect(Collectors.toList())));
       builder.append(Text.of("}"));

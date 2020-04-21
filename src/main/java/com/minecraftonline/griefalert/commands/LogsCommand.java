@@ -142,12 +142,7 @@ public class LogsCommand extends GeneralCommand {
           }
         });
 
-        Collection<PrismEvent> events = args.getAll(CommandKeys.PRISM_EVENT.get());
-        if (events.isEmpty()) {
-          builder.addEvent(PrismEvents.BLOCK_BREAK);
-        } else {
-          events.forEach(builder::addEvent);
-        }
+        args.<PrismEvent>getAll(CommandKeys.PRISM_EVENT.get()).forEach(builder::addEvent);
 
         if (!args.hasAny("group")) {
           builder.addFlag(Flag.NO_GROUP);
