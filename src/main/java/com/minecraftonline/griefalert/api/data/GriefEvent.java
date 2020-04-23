@@ -29,6 +29,7 @@ import com.helion3.prism.api.data.PrismEvent;
 import java.io.Serializable;
 import javax.annotation.Nonnull;
 
+import com.minecraftonline.griefalert.util.General;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.util.annotation.CatalogedBy;
 
@@ -57,15 +58,28 @@ public final class GriefEvent implements CatalogType, Serializable {
   /**
    * Factory method for a <code>GriefEvent</code>.
    *
-   * @param id        The identifier
-   * @param name      The human-readable name
-   * @param preterit The past tense version of this event
+   * @param id          The identifier. Must be alphanumeric.
+   * @param name        The human-readable name. Must be alphabetic.
+   * @param preterit    The past tense version of this event. Must be alphabetic.
+   * @param description General information about the use of this GriefEvent
    * @return The corresponding generated <code>GriefEvent</code>
    */
   public static GriefEvent of(@Nonnull String id,
                               @Nonnull String name,
                               @Nonnull String preterit,
-                              @Nonnull String description) {
+                              @Nonnull String description) throws IllegalArgumentException {
+    if (!id.matches("^[a-zA-Z0-9]*$")) {
+      throw new IllegalArgumentException(
+          "GriefEvent id must be alphanumeric. Invalid: " + id);
+    }
+    if (!name.matches("^[a-zA-Z ]*$")) {
+      throw new IllegalArgumentException(
+          "GriefEvent name must be alphabetic. Invalid: " + name);
+    }
+    if (!preterit.matches("^[a-z ]*$")) {
+      throw new IllegalArgumentException(
+          "GriefEvent preterit must be lowercase. Invalid: " + preterit);
+    }
     return new GriefEvent(id, name, preterit, description);
   }
 

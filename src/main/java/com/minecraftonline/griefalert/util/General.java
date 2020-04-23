@@ -29,6 +29,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.regex.Pattern;
+
 /**
  * A General tools class to house static methods for small data manipulations and methods.
  *

@@ -22,23 +22,26 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.util;
+package com.minecraftonline.griefalert.api.templates;
 
-public final class Reference {
+import org.spongepowered.api.text.TextTemplate;
 
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private Reference() {
+public class Template {
+
+  private final TextTemplate textTemplate;
+  private final String regex;
+
+  public Template(TextTemplate textTemplate, String regex) {
+    this.textTemplate = textTemplate;
+    this.regex = regex;
   }
 
-  public static final String ID = "griefalert";
-  public static final String NAME = "GriefAlert";
-  public static final String VERSION = "1.2.3";
-  public static final String DESCRIPTION = "A 'Grief' alerting tool.";
-  public static final String[] AUTHORS = {"PietElite"};
-  public static final String WEBSITE = "https://www.minecraftonline.com";
-  public static final String SOURCE = "https://gitlab.com/minecraftonline/griefalert";
-  public static final String MC_VERSION = "1.12.2";
+  public TextTemplate getTextTemplate() {
+    return textTemplate;
+  }
+
+  public String getRegex() {
+    return regex;
+  }
 
 }

@@ -24,13 +24,18 @@
 
 package com.minecraftonline.griefalert.commands;
 
+import com.google.common.collect.ImmutableMap;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Fixable;
+import com.minecraftonline.griefalert.api.templates.Arg;
+import com.minecraftonline.griefalert.api.templates.Templates;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
+import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
+import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.enums.AlertTags;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
@@ -47,6 +52,8 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
+import org.spongepowered.api.text.format.TextColors;
 
 public class FixCommand extends GeneralCommand {
 
@@ -78,7 +85,6 @@ public class FixCommand extends GeneralCommand {
     }
 
     // Find PrismAlert to manipulate
-    Fixable actionable;
     try {
       Alert alert = GriefAlert.getInstance().getAlertService().getAlert(index);
       if (alert.getCreated().before(Date.from(Instant.now().minusSeconds(FIX_TIMEOUT_SECONDS)))
@@ -88,7 +94,35 @@ public class FixCommand extends GeneralCommand {
             Math.floorDiv(FIX_TIMEOUT_SECONDS, 60))));
       }
       if (alert instanceof Fixable) {
-        actionable = (Fixable) alert;
+
+        if (((Fixable) alert).fixed()) {
+          throw new CommandException(Format.error("This alert was already fixed!"));
+        }
+
+        if ((src instanceof Player) && ((Player) src).getUniqueId().equals(alert.getGrieferUuid())) {
+          throw new CommandException(Format.error("You can't undo your own actions"));
+        }
+
+        if (((Fixable) alert).fix(src)) {
+          Text message = Templates.FIX.getTextTemplate().apply(
+              ImmutableMap.<String, TextElement>builder()
+                  .put(Arg.PREFIX.name(), Format.prefix())
+                  .put(Arg.OFFICER.name(), Format.userName(Alerts.getGriefer(alert)))
+                  .put(Arg.TARGET.name(), Grammar.addIndefiniteArticle(Format.item(alert.getTarget())))
+                  .put(Arg.GRIEFER.name(), Format.userName(Alerts.getGriefer(alert)))
+                  .put(Arg.EVENT.name(), Format.action(alert.getGriefEvent()))
+                  .put(Arg.X.name(), Text.of(alert.getGriefPosition().getX()))
+                  .put(Arg.Y.name(), Text.of(alert.getGriefPosition().getY()))
+                  .put(Arg.Z.name(), Text.of(alert.getGriefPosition().getZ()))
+                  .put(Arg.DIMENSION.name(), Format.dimension(Alerts.getWorld(alert).getDimension().getType()))
+                  .put(Arg.SUFFIX.name(), Text.of(Format.space(), AlertTags.getTagInfo(index)))
+                  .build())
+              .build();
+          Communication.getStaffBroadcastChannelWithout(src).send(message);
+          return CommandResult.success();
+        } else {
+          throw new CommandException(Format.error("Operation failed."));
+        }
       } else {
         throw new CommandException(Format.error("This event cannot be automatically fixed"));
       }
@@ -96,23 +130,6 @@ public class FixCommand extends GeneralCommand {
       throw Errors.noAlertException();
     }
 
-    if (actionable.fixed()) {
-      throw new CommandException(Format.error("This alert was already fixed!"));
-    }
-
-    if (actionable.fix(src)) {
-      Communication.getStaffBroadcastChannelWithout(src).send(Format.info(
-          (src instanceof Player) ? Format.userName((Player) src) : src.getName(),
-          Format.space(),
-          "just fixed alert number",
-          Format.space(),
-          Format.bonus(index),
-          Format.space(),
-          AlertTags.getTagInfo(index)));
-      return CommandResult.success();
-    } else {
-      throw new CommandException(Format.error("Operation failed."));
-    }
   }
 
 }

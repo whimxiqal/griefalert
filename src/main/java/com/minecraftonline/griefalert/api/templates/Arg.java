@@ -22,23 +22,22 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.util;
+package com.minecraftonline.griefalert.api.templates;
 
-public final class Reference {
+public enum Arg {
 
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private Reference() {
-  }
-
-  public static final String ID = "griefalert";
-  public static final String NAME = "GriefAlert";
-  public static final String VERSION = "1.2.3";
-  public static final String DESCRIPTION = "A 'Grief' alerting tool.";
-  public static final String[] AUTHORS = {"PietElite"};
-  public static final String WEBSITE = "https://www.minecraftonline.com";
-  public static final String SOURCE = "https://gitlab.com/minecraftonline/griefalert";
-  public static final String MC_VERSION = "1.12.2";
+  PREFIX,
+  SUFFIX,
+  GRIEFER,
+  OFFICER,
+  EVENT,
+  EVENT_COLOR,
+  TARGET,
+  TARGET_COLOR,
+  DIMENSION,
+  DIMENSION_COLOR,
+  X,
+  Y,
+  Z
 
 }
