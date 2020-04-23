@@ -55,7 +55,7 @@ public class FixCommand extends GeneralCommand {
   FixCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_FIX,
-        Text.of("Use an alert id to make the desired change")
+        Text.of("Use an alert id to restore the event triggering this alert")
     );
     addAlias("fix");
     addAlias("f");

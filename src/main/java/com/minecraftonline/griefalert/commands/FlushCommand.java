@@ -26,6 +26,7 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
+import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
@@ -35,6 +36,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 
 public class FlushCommand extends GeneralCommand {
@@ -45,7 +47,8 @@ public class FlushCommand extends GeneralCommand {
         Text.of("Clear the Alert cache")
     );
     addAlias("flush");
-    setCommandElement(GenericArguments.flags().flag("-force", "f").buildWith(GenericArguments.none()));
+    setCommandElement(GenericArguments.flags().flag("-force", "f")
+        .buildWith(GenericArguments.none()));
   }
 
   @Override
@@ -55,9 +58,14 @@ public class FlushCommand extends GeneralCommand {
     if (!args.hasAny("force")) {
       src.sendMessage(Format.info("This will clear all cached Alert data! "
           + "Use --force if you're sure."));
+      return CommandResult.success();
     }
     GriefAlert.getInstance().getAlertService().reset();
     src.sendMessage(Format.success("GriefAlert flushed!"));
+    Communication.getStaffBroadcastChannelWithout(src).send(
+        Format.info(
+            (src instanceof User) ? Format.userName((User) src) : src.getName(),
+            " just cleared out all local GriefAlert data."));
     return CommandResult.success();
   }
 

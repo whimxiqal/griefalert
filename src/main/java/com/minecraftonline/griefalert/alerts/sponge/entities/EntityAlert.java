@@ -13,6 +13,8 @@ import com.minecraftonline.griefalert.util.enums.Details;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.ArtData;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.text.Text;
@@ -38,6 +40,15 @@ public abstract class EntityAlert extends SpongeAlert {
     }
     entitySnapshotContainer = serialized;
     addDetail(Details.lookingAt());
+
+    // Add Art type, in the case of paintings
+    addDetail(Detail.of(
+        "Art Type",
+        "The displayed piece of art",
+        alert -> event.getTargetEntity()
+            .get(ArtData.class)
+            .flatMap(data -> data.get(Keys.ART))
+            .map(art -> Format.hover(art.getName(), "ID: " + art.getId()))));
   }
 
   public DataContainer getEntitySnapshot() {

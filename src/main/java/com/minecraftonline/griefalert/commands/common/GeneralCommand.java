@@ -40,6 +40,8 @@ import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.annotation.Nonnull;
+
 /**
  * An abstract class for all MinecraftOnline commands from which to extend. This
  * class provides consistency to commands structure and visuals.
@@ -52,14 +54,15 @@ public abstract class GeneralCommand implements CommandExecutor {
   private final List<String> aliases = new LinkedList<>();
   private CommandElement commandElement = GenericArguments.none();
 
+
   /**
    * A general Grief Alert command object.
    *
    * @param permission  The permission which is required for this command
    * @param description The general description of this command functionality
    */
-  public GeneralCommand(Permission permission,
-                        Text description) {
+  public GeneralCommand(@Nonnull Permission permission,
+                        @Nonnull Text description) {
     this.permission = permission;
     this.description = description;
     if (!(this instanceof HelpSubCommand)) {
@@ -78,8 +81,8 @@ public abstract class GeneralCommand implements CommandExecutor {
     this.aliases.add(alias);
   }
 
-  protected final void addChild(GeneralCommand generalCommand) {
-    this.commandChildren.add(generalCommand);
+  protected final void addChild(GeneralCommand child) {
+    this.commandChildren.add(child);
   }
 
   protected final void setCommandElement(CommandElement commandElement) {
@@ -159,4 +162,5 @@ public abstract class GeneralCommand implements CommandExecutor {
   Permission getPermission() {
     return permission;
   }
+
 }

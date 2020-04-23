@@ -26,6 +26,7 @@ package com.minecraftonline.griefalert.util;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.World;
@@ -64,10 +65,13 @@ public final class Errors {
   }
 
   public static CommandException parseException() {
-    return new CommandException(Format.error("Argument couldn't be parsed"));
+    return new CommandException(Format.error(
+        "Your arguments couldn't be parsed. Try ",
+        Format.command("/ga ?", "/ga ?", null)));
   }
 
   public static CommandException noAlertException() {
     return new CommandException(Format.error("No alert could be found with that index"));
   }
+
 }

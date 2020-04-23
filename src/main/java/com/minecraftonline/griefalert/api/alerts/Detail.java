@@ -46,6 +46,7 @@ public final class Detail<P extends Serializable> implements Serializable {
   private Function<P, Optional<Text>> infoFunction;
   private boolean primary;
   private Text formatted = null;
+  private boolean got = false;
 
   private Detail(@Nonnull String label,
                  @Nullable String description,
@@ -87,6 +88,7 @@ public final class Detail<P extends Serializable> implements Serializable {
     label = in.readUTF();
     description = in.readUTF();
     primary = in.readBoolean();
+    got = in.readBoolean();
     try {
       formatted = Sponge.getDataManager()
           .deserialize(Text.class, DataFormats.JSON.read(in.readUTF()))
@@ -103,6 +105,7 @@ public final class Detail<P extends Serializable> implements Serializable {
     out.writeUTF(label);
     out.writeUTF(Optional.ofNullable(description).orElse(""));
     out.writeBoolean(primary);
+    out.writeBoolean(got);
     try {
       out.writeUTF(DataFormats.JSON.write(Optional.ofNullable(formatted)
           .orElse(Text.EMPTY)
@@ -121,8 +124,8 @@ public final class Detail<P extends Serializable> implements Serializable {
    * @return the formatted {@link Text}
    */
   public Optional<Text> get(@Nonnull P item) {
-    if (formatted != null) {
-      return Optional.of(formatted);
+    if (got) {
+      return Optional.ofNullable(formatted);
     }
     formatted = infoFunction.apply(item)
         .map(info -> Text.of(
@@ -132,6 +135,7 @@ public final class Detail<P extends Serializable> implements Serializable {
                 : Text.builder(label).onHover(TextActions.showText(Text.of(description))),
             TextColors.GRAY, ": ", info))
         .orElse(null);
+    got = true;
     return Optional.ofNullable(formatted);
   }
 

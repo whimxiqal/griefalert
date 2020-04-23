@@ -25,15 +25,18 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
+import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Reference;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
@@ -50,6 +53,7 @@ public class RootCommand extends GeneralCommand {
     );
     addAlias("griefalert");
     addAlias("ga");
+    setCommandElement(GenericArguments.remainingJoinedStrings(Text.of("all")));
     addChild(new CheckCommand());
     addChild(new InfoCommand());
     addChild(new ProfileCommand());
@@ -72,10 +76,17 @@ public class RootCommand extends GeneralCommand {
     addChild(new FlushCommand());
   }
 
+
   @Nonnull
   @Override
   public CommandResult execute(@Nonnull CommandSource src,
-                               @Nonnull CommandContext args) {
+                               @Nonnull CommandContext args) throws CommandException {
+    if (args.getOne("all").isPresent()) {
+      String all = args.<String>getOne("all").get();
+      if (!all.isEmpty()) {
+        throw Errors.parseException();
+      }
+    }
     src.sendMessage(Text.of(
         Format.bonus("==========================")));
     src.sendMessage(Text.of(

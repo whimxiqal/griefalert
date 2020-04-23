@@ -33,9 +33,11 @@ import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+
 import java.util.Collections;
 import java.util.Optional;
 import javax.annotation.Nonnull;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;

@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.User;
@@ -256,7 +257,7 @@ public final class Format {
     } catch (MalformedURLException ex) {
       textBuilder.onClick(TextActions.suggestCommand(url));
       GriefAlert.getInstance().getLogger().error("A url was not formed correctly for a"
-              + " click action: " + url);
+          + " click action: " + url);
     }
 
     return textBuilder.build();
@@ -266,22 +267,25 @@ public final class Format {
    * Returns content formatted for a clickable command.
    *
    * @param label        the visible label to click
-   * @param command      the command which is run. Format "/command arg arg arg"
+   * @param command      the command which is run. Format "/command args..."
    * @param hoverMessage the message to display when hovering over clickable item
    * @return the command <code>Text</code>
    */
   @Nonnull
   public static Text command(@Nonnull String label,
                              @Nonnull String command,
-                             @Nonnull Text hoverMessage) {
-    return Text.builder()
-            .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
-                    Text.of(TextColors.GRAY, label), "]"))
-            .onClick(TextActions.runCommand(command))
-            .onHover(TextActions.showText(Text.of(
-                    (hoverMessage.isEmpty() ? hoverMessage : Text.join(hoverMessage, Format.endLine())),
-                    Format.bonus(command))))
-            .build();
+                             @Nullable Text hoverMessage) {
+    Text.Builder builder = Text.builder()
+        .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
+            Text.of(TextColors.GRAY, label), "]"))
+        .onClick(TextActions.runCommand(command));
+    if (hoverMessage != null) {
+      builder.onHover(TextActions.showText(Text.of(
+          hoverMessage,
+          hoverMessage.isEmpty() ? Text.EMPTY : Format.endLine(),
+          Format.bonus(command))));
+    }
+    return builder.build();
   }
 
   /**
@@ -321,11 +325,11 @@ public final class Format {
   @Nonnull
   public static Text bonusLocation(Location<World> location) {
     return Format.bonus(String.format(
-            "(%s, %s, %s, %s)",
-            location.getBlockX(),
-            location.getBlockY(),
-            location.getBlockZ(),
-            location.getExtent().getDimension().getType().getName()));
+        "(%s, %s, %s, %s)",
+        location.getBlockX(),
+        location.getBlockY(),
+        location.getBlockZ(),
+        location.getExtent().getDimension().getType().getName()));
   }
 
   public static Text endLine() {
@@ -360,16 +364,16 @@ public final class Format {
    */
   public static Text hover(String label, String onHover) {
     return Text.builder()
-            .append(Text.of(TextStyles.ITALIC, label))
-            .onHover(TextActions.showText(Format.bonus(onHover)))
-            .build();
+        .append(Text.of(TextStyles.ITALIC, label))
+        .onHover(TextActions.showText(Format.bonus(onHover)))
+        .build();
   }
 
   public static Text buildBroadcast(Alert alert, int index) {
     return Text.of(
-            alert.getMessage(),
-            Format.space(),
-            CheckCommand.clickToCheck(index));
+        alert.getMessage(),
+        Format.space(),
+        CheckCommand.clickToCheck(index));
   }
 
   public static Text request(Request request) {
@@ -379,12 +383,12 @@ public final class Format {
       builder.append(Text.of("Players: "));
       builder.append(Text.of("{"));
       builder.append(Text.joinWith(Text.of(","),
-              request.getPlayerUuids()
-                      .stream()
-                      .map(uuid -> SpongeUtil.getUser(uuid).orElseThrow(() ->
-                              new RuntimeException("Invalid UUID in Request")))
-                      .map(Format::userName)
-                      .collect(Collectors.toList())));
+          request.getPlayerUuids()
+              .stream()
+              .map(uuid -> SpongeUtil.getUser(uuid).orElseThrow(() ->
+                  new RuntimeException("Invalid UUID in Request")))
+              .map(Format::userName)
+              .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
@@ -393,11 +397,11 @@ public final class Format {
       builder.append(Text.of("Events: "));
       builder.append(Text.of("{"));
       builder.append(Text.joinWith(Text.of(","),
-              request.getEvents()
-                      .stream()
-                      .map(GriefEvent::getId)
-                      .map(Text::of)
-                      .collect(Collectors.toList())));
+          request.getEvents()
+              .stream()
+              .map(GriefEvent::getId)
+              .map(Text::of)
+              .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
@@ -406,18 +410,18 @@ public final class Format {
       builder.append(Text.of("Targets: "));
       builder.append(Text.of("{"));
       builder.append(Text.joinWith(Text.of(","),
-              request.getTargets()
-                      .stream()
-                      .map(Text::of)
-                      .collect(Collectors.toList())));
+          request.getTargets()
+              .stream()
+              .map(Text::of)
+              .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
     }
     request.getMaximum().ifPresent(max -> tokens.add(Text.of("Maximum: ", max)));
     return Detail.of("Parameters", "The parameters used for this query",
-            tokens.isEmpty()
-                    ? Text.of("None")
-                    : Text.joinWith(Text.of(", "), tokens)).get(request).get();
+        tokens.isEmpty()
+            ? Text.of("None")
+            : Text.joinWith(Text.of(", "), tokens)).get(request).get();
   }
 
   public static Text request(com.helion3.prism.api.services.Request request) {
@@ -497,70 +501,70 @@ public final class Format {
 
   public static Text action(@Nonnull GriefEvent event) {
     return Text.builder(event.getPreterit())
-            .onHover(TextActions.showText(Text.of(
-                    Format.heading("Event"),
-                    Format.endLine(),
-                    Text.joinWith(Format.endLine(),
-                            Detail.of(
-                                "Name",
-                                "",
-                                Text.of(event.getName())).get(event).get(),
-                            Detail.of(
-                                "ID",
-                                "",
-                                Text.of(event.getId())).get(event).get(),
-                            Detail.of(
-                                "Description",
-                                "",
-                                Text.of(event.getDescription())).get(event).get()))))
-            .build();
+        .onHover(TextActions.showText(Text.of(
+            Format.heading("Event"),
+            Format.endLine(),
+            Text.joinWith(Format.endLine(),
+                Detail.of(
+                    "Name",
+                    "",
+                    Text.of(event.getName())).get(event).get(),
+                Detail.of(
+                    "ID",
+                    "",
+                    Text.of(event.getId())).get(event).get(),
+                Detail.of(
+                    "Description",
+                    "",
+                    Text.of(event.getDescription())).get(event).get()))))
+        .build();
   }
 
   public static Text profile(@Nonnull GriefProfile griefProfile) {
     List<Text> details = new LinkedList<>();
     Detail.of(
-            "Event",
-            "The event type for this profile; one of: "
-                    + GriefEvents.REGISTRY_MODULE.getAll()
-                    .stream().map(GriefEvent::getId)
-                    .collect(Collectors.joining(", ")),
-            Format.hover(
-                griefProfile.getGriefEvent().getId(),
-                griefProfile.getGriefEvent().getDescription()))
-            .get(griefProfile).ifPresent(details::add);
+        "Event",
+        "The event type for this profile; one of: "
+            + GriefEvents.REGISTRY_MODULE.getAll()
+            .stream().map(GriefEvent::getId)
+            .collect(Collectors.joining(", ")),
+        Format.hover(
+            griefProfile.getGriefEvent().getId(),
+            griefProfile.getGriefEvent().getDescription()))
+        .get(griefProfile).ifPresent(details::add);
     Detail.of(
-            "Target",
-            "The ID for the target object of this grief event.",
-            Format.item(griefProfile.getTarget()))
-            .get(griefProfile).ifPresent(details::add);
+        "Target",
+        "The ID for the target object of this grief event.",
+        Format.item(griefProfile.getTarget()))
+        .get(griefProfile).ifPresent(details::add);
     Optional.of(griefProfile.getIgnored()).filter(ignored -> !ignored.isEmpty())
-            .flatMap(ignored -> Detail.of(
-                    "Ignored",
-                    "All dimension types in which events with this profile are ignored.",
-                    Format.bonus(Text.joinWith(
-                            Text.of(", "),
-                            ignored.stream()
-                                    .map(dimension -> Format.item(dimension.getId()))
-                                    .collect(Collectors.toList()))))
-                    .get(griefProfile)).ifPresent(details::add);
+        .flatMap(ignored -> Detail.of(
+            "Ignored",
+            "All dimension types in which events with this profile are ignored.",
+            Format.bonus(Text.joinWith(
+                Text.of(", "),
+                ignored.stream()
+                    .map(dimension -> Format.item(dimension.getId()))
+                    .collect(Collectors.toList()))))
+            .get(griefProfile)).ifPresent(details::add);
     Optional.of(griefProfile.getAllColored()).filter(colors -> !colors.isEmpty())
-            .flatMap(colors -> Detail.of(
-                    "Colored",
-                    "Any components of the alert messages flagged by this alert "
-                            + "and their corresponding specified colors",
-                    Format.bonus(
-                        Text.joinWith(
-                            Text.of(", "),
-                            colors.entrySet()
-                                    .stream()
-                                    .map(entry -> Text.of(
-                                            "{",
-                                            entry.getKey().toString().toLowerCase(),
-                                            ", ",
-                                            entry.getValue().getName(),
-                                            "}"))
-                                    .collect(Collectors.toList()))))
-                    .get(griefProfile)).ifPresent(details::add);
+        .flatMap(colors -> Detail.of(
+            "Colored",
+            "Any components of the alert messages flagged by this alert "
+                + "and their corresponding specified colors",
+            Format.bonus(
+                Text.joinWith(
+                    Text.of(", "),
+                    colors.entrySet()
+                        .stream()
+                        .map(entry -> Text.of(
+                            "{",
+                            entry.getKey().toString().toLowerCase(),
+                            ", ",
+                            entry.getValue().getName(),
+                            "}"))
+                        .collect(Collectors.toList()))))
+            .get(griefProfile)).ifPresent(details::add);
     return Text.joinWith(Format.bonus(", "), details);
   }
 
