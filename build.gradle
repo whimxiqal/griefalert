@@ -64,14 +64,27 @@ sponge.plugin.meta {
     authors = ext.authors
 }
 
-//jar {
-//    classifier = "original"
-//}
+jar {
+    classifier = "git describe --always".execute().text.trim()
+}
 
 shadowJar {
     configurations = [project.configurations.shadow]
     baseName = 'griefalert'
     classifier = ''
+}
+
+subprojects {
+    apply plugin: 'java'
+}
+
+task apiJar(type: org.gradle.jvm.tasks.Jar) {
+    baseName = 'griefalert-api'
+    version = '0.0'
+    classifier = "git describe --always".execute().text.trim()
+    from(sourceSets.main.output) {
+        include 'com/minecraftonline/griefalert/api/**'
+    }
 }
 
 jar.manifest {
