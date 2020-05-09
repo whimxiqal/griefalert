@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Fixable;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.templates.Arg;
 import com.minecraftonline.griefalert.api.templates.Templates;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
@@ -43,17 +44,21 @@ import com.minecraftonline.griefalert.util.enums.Permissions;
 import java.time.Instant;
 import java.util.Date;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
-import org.spongepowered.api.text.format.TextColors;
 
 public class FixCommand extends GeneralCommand {
 
@@ -66,8 +71,10 @@ public class FixCommand extends GeneralCommand {
     );
     addAlias("fix");
     addAlias("f");
-    setCommandElement(GenericArguments.onlyOne(
-        GenericArguments.integer(CommandKeys.ALERT_INDEX.get())));
+    setCommandElement(GenericArguments.flags()
+        .flag("c", "-collect")
+        .buildWith(
+            GenericArguments.integer(CommandKeys.ALERT_INDEX.get())));
   }
 
 
@@ -99,15 +106,21 @@ public class FixCommand extends GeneralCommand {
           throw new CommandException(Format.error("This alert was already fixed!"));
         }
 
-        if ((src instanceof Player) && ((Player) src).getUniqueId().equals(alert.getGrieferUuid())) {
+        if ((src instanceof Player)
+            && ((Player) src).getUniqueId().equals(alert.getGrieferUuid())
+            && (!Permissions.has(src, Permissions.GRIEFALERT_UNRESTRICTED))) {
           throw new CommandException(Format.error("You can't undo your own actions"));
         }
+
+        Text officerName = src instanceof Player
+            ? Format.userName((Player) src)
+            : Text.of(src.getName());
 
         if (((Fixable) alert).fix(src)) {
           Text message = Templates.FIX.getTextTemplate().apply(
               ImmutableMap.<String, TextElement>builder()
                   .put(Arg.PREFIX.name(), Format.prefix())
-                  .put(Arg.OFFICER.name(), Format.userName(Alerts.getGriefer(alert)))
+                  .put(Arg.OFFICER.name(), officerName)
                   .put(Arg.TARGET.name(), Grammar.addIndefiniteArticle(Format.item(alert.getTarget())))
                   .put(Arg.GRIEFER.name(), Format.userName(Alerts.getGriefer(alert)))
                   .put(Arg.EVENT.name(), Format.action(alert.getGriefEvent()))
@@ -118,7 +131,32 @@ public class FixCommand extends GeneralCommand {
                   .put(Arg.SUFFIX.name(), Text.of(Format.space(), AlertTags.getTagInfo(index)))
                   .build())
               .build();
-          Communication.getStaffBroadcastChannelWithout(src).send(message);
+          Communication.getStaffBroadcastChannel().send(message);
+          if (args.hasAny("c")) {
+            if (!alert.getGriefEvent().equals(GriefEvents.BREAK)) {
+              src.sendMessage(Format.error(
+                  "You may only collect an item from someone if they ",
+                  Format.action(GriefEvents.BREAK),
+                  " it"));
+            } else {
+              if (removeItem(Alerts.getGriefer(alert), alert.getTarget())) {
+                Communication.getStaffBroadcastChannel().send(Format.success(
+                    officerName,
+                    " collected ",
+                    Grammar.addIndefiniteArticle(Format.item(alert.getTarget())),
+                    " from ",
+                    Format.userName(Alerts.getGriefer(alert)),
+                    "'s inventory"));
+              } else {
+                src.sendMessage(Format.error(
+                    "Could not remove ",
+                    Grammar.addIndefiniteArticle(Format.item(alert.getTarget())),
+                    " from ",
+                    Format.userName(Alerts.getGriefer(alert)),
+                    "'s inventory"));
+              }
+            }
+          }
           return CommandResult.success();
         } else {
           throw new CommandException(Format.error("Operation failed."));
@@ -130,6 +168,29 @@ public class FixCommand extends GeneralCommand {
       throw Errors.noAlertException();
     }
 
+  }
+
+  private boolean removeItem(User griefer, String target) {
+    Optional<ItemType> itemTypeOptional = Sponge.getRegistry().getType(ItemType.class, target);
+    if (!itemTypeOptional.isPresent()) {
+      GriefAlert.getInstance().getLogger().debug("Could not get ItemType from target id: " + target);
+      return false;
+    }
+    ItemType itemType = itemTypeOptional.get();
+
+    Inventory inventory = griefer.getInventory();
+    if (!inventory.contains(itemType)) {
+      return false;
+    }
+
+    for (Inventory slot : inventory.slots()) {
+      if (slot.peek().map(stack -> stack.getType().equals(itemType)).orElse(false)) {
+        slot.poll(1);
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }

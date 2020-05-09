@@ -78,5 +78,8 @@ public final class Permissions {
   public static final Permission GRIEFALERT_SILENT = Permission.of(
       "griefalert.silent"
   );
+  public static final Permission GRIEFALERT_UNRESTRICTED = Permission.of(
+      "griefalert.unrestricted"
+  );
 
 }
