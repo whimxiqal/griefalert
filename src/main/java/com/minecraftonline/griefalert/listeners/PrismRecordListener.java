@@ -48,6 +48,8 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
 
@@ -68,9 +70,9 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
       return;
     }
 
-    Optional<DimensionType> dimensionTypeOptional = PrismUtil.getLocation(container)
-        .map((location) -> location.getExtent().getDimension().getType());
-    if (!dimensionTypeOptional.isPresent()) {
+    Optional<World> worldOptional = PrismUtil.getLocation(container)
+        .map(Location::getExtent);
+    if (!worldOptional.isPresent()) {
       return;
     }
 
@@ -84,7 +86,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
         .getProfileOf(
             Sponge.getRegistry().getType(GriefEvent.class, record.getEvent()).get(),
             targetOptional.get(),
-            dimensionTypeOptional.get()
+            worldOptional.get()
         );
 
     // If yes, create an Alert of the appropriate type
@@ -131,7 +133,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
           .getProfileOf(
               GriefEvents.REPLACE,
               originalBlockId.get(),
-              dimensionTypeOptional.get());
+              worldOptional.get());
 
       Optional<String> replacementBlockId = PrismUtil.getReplacementBlock(container)
           .map((state) -> state.getType().getId());

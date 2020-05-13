@@ -35,7 +35,9 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 
 public final class SpongeUtil {
@@ -89,4 +91,14 @@ public final class SpongeUtil {
   public static Optional<World> getWorld(UUID worldUuid) {
     return Sponge.getServer().getWorld(worldUuid);
   }
+
+  public static Optional<WorldProperties> firstWorldWithDimension(DimensionType dimensionType) {
+    for (WorldProperties world : Sponge.getServer().getUnloadedWorlds()) {
+      if (world.getDimensionType().equals(dimensionType)) {
+        return Optional.of(world);
+      }
+    }
+    return Optional.empty();
+  }
+
 }

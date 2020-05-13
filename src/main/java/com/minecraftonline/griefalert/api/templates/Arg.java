@@ -34,8 +34,8 @@ public enum Arg {
   EVENT_COLOR,
   TARGET,
   TARGET_COLOR,
-  DIMENSION,
-  DIMENSION_COLOR,
+  WORLD,
+  WORLD_COLOR,
   X,
   Y,
   Z

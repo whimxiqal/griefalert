@@ -43,8 +43,8 @@ public class Templates {
    *   {@link Arg#EVENT}
    *   {@link Arg#TARGET_COLOR}
    *   {@link Arg#TARGET}
-   *   {@link Arg#DIMENSION_COLOR}
-   *   {@link Arg#DIMENSION}
+   *   {@link Arg#WORLD_COLOR}
+   *   {@link Arg#WORLD}
    * </li>
    */
   public static final Template ALERT = new Template(
@@ -56,9 +56,11 @@ public class Templates {
           " ",
           TextTemplate.arg(Arg.TARGET_COLOR.name()),
           TextTemplate.arg(Arg.TARGET.name()),
-          TextColors.RED, " in the ",
-          TextTemplate.arg(Arg.DIMENSION_COLOR.name()),
-          TextTemplate.arg(Arg.DIMENSION.name())),
+          TextColors.RED, " in ",
+          TextTemplate.arg(Arg.WORLD_COLOR.name()),
+          TextTemplate.arg(Arg.WORLD.name()),
+          " ",
+          TextTemplate.arg(Arg.SUFFIX.name())),
       ".* [a-z ]* .* in the .*");
 
   /**
@@ -75,7 +77,7 @@ public class Templates {
    *   <li>{@link Arg#X}
    *   <li>{@link Arg#Y}
    *   <li>{@link Arg#Z}
-   *   <li>{@link Arg#DIMENSION}
+   *   <li>{@link Arg#WORLD}
    *   <li>{@link Arg#SUFFIX}
    * </ul>
    */
@@ -96,8 +98,9 @@ public class Templates {
           TextTemplate.arg(Arg.Y.name()),
           ", ",
           TextTemplate.arg(Arg.Z.name()),
-          " in the ",
-          TextTemplate.arg(Arg.DIMENSION.name()),
+          " in ",
+          TextTemplate.arg(Arg.WORLD.name()),
+          " ",
           TextTemplate.arg(Arg.SUFFIX.name())),
       ".* .* fixed .* that .* [a-z ]* at [0-9]*, [0-9]*, [0-9]* in the .*");
 

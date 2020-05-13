@@ -127,8 +127,8 @@ public class FixCommand extends GeneralCommand {
                   .put(Arg.X.name(), Text.of(alert.getGriefPosition().getX()))
                   .put(Arg.Y.name(), Text.of(alert.getGriefPosition().getY()))
                   .put(Arg.Z.name(), Text.of(alert.getGriefPosition().getZ()))
-                  .put(Arg.DIMENSION.name(), Format.dimension(Alerts.getWorld(alert).getDimension().getType()))
-                  .put(Arg.SUFFIX.name(), Text.of(Format.space(), AlertTags.getTagInfo(index)))
+                  .put(Arg.WORLD.name(), Text.of(Alerts.getWorld(alert).getName()))
+                  .put(Arg.SUFFIX.name(), AlertTags.getTagInfo(index))
                   .build())
               .build();
           Communication.getStaffBroadcastChannel().send(message);

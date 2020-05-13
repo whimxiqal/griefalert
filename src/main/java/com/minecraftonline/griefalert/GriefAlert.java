@@ -41,17 +41,14 @@ import com.minecraftonline.griefalert.holograms.HologramManager;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
-import com.minecraftonline.griefalert.storage.MySqlProfileStorage;
-import com.minecraftonline.griefalert.storage.SqliteProfileStorage;
+import com.minecraftonline.griefalert.storage.profiles.ProfileStorageJSON;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.Reference;
 import com.minecraftonline.griefalert.api.data.GriefEvents;
-import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.SQLException;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -167,18 +164,25 @@ public final class GriefAlert {
     }
 
     try {
-      if (Settings.STORAGE_ENGINE.getValue().equalsIgnoreCase("mysql")) {
-        GriefAlert.getInstance().getLogger().debug("Using MySQL storage engine.");
-        profileStorage = new MySqlProfileStorage();
-      } else {
-        GriefAlert.getInstance().getLogger().debug("Using SQLite storage engine.");
-        profileStorage = new SqliteProfileStorage();
-      }
-    } catch (SQLException e) {
-      GriefAlert.getInstance().getLogger().error(
-              "Error while creating storage engine for profiles.");
+      profileStorage = new ProfileStorageJSON();
+    } catch (Exception e) {
+      GriefAlert.getInstance().getLogger().error("Error while creating storage engine for profiles.");
       e.printStackTrace();
     }
+
+//    try {
+//      if (Settings.STORAGE_ENGINE.getValue().equalsIgnoreCase("mysql")) {
+//        GriefAlert.getInstance().getLogger().debug("Using MySQL storage engine.");
+//        profileStorage = new MySqlProfileStorage();
+//      } else {
+//        GriefAlert.getInstance().getLogger().debug("Using SQLite storage engine.");
+//        profileStorage = new SqliteProfileStorage();
+//      }
+//    } catch (SQLException e) {
+//      GriefAlert.getInstance().getLogger().error(
+//              "Error while creating storage engine for profiles.");
+//      e.printStackTrace();
+//    }
 
 
     registerListeners();
@@ -265,6 +269,10 @@ public final class GriefAlert {
 
   private void registerCatalogTypes() {
     Sponge.getRegistry().registerModule(GriefEvent.class, GriefEvents.REGISTRY_MODULE);
+  }
+
+  public File getConfigDirectory() {
+    return configDirectory;
   }
 
   public File getDataDirectory() {

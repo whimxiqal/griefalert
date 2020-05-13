@@ -70,7 +70,7 @@ public final class SpongeListeners {
           .getProfileOf(
               GriefEvents.ITEM_USE,
               event.getItemStack().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType())
+              player.getLocation().getExtent())
           .ifPresent((profile) ->
               GriefAlert.getInstance()
                   .getAlertService()
@@ -93,7 +93,7 @@ public final class SpongeListeners {
           .getProfileOf(
               GriefEvents.INTERACT,
               event.getTargetBlock().getState().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType())
+              player.getLocation().getExtent())
           .ifPresent(profile ->
               Task.builder()
                   .execute(() -> GriefAlert.getInstance()
@@ -106,7 +106,7 @@ public final class SpongeListeners {
               .getProfileCache().getProfileOf(
                   GriefEvents.ITEM_APPLY,
                   stack.getType().getId(),
-                  player.getLocation().getExtent().getDimension().getType()))
+                  player.getLocation().getExtent()))
           .ifPresent(profile ->
               GriefAlert.getInstance()
                   .getAlertService()
@@ -129,7 +129,7 @@ public final class SpongeListeners {
           .getProfileOf(
               GriefEvents.INTERACT,
               event.getTargetEntity().getType().getId(),
-              player.getLocation().getExtent().getDimension().getType())
+              player.getLocation().getExtent())
           .ifPresent((profile) ->
               GriefAlert.getInstance()
                   .getAlertService()
@@ -161,7 +161,7 @@ public final class SpongeListeners {
               .getProfileOf(
                   GriefEvents.ATTACK,
                   event.getTargetEntity().getType().getId(),
-                  player.getLocation().getExtent().getDimension().getType())
+                  player.getLocation().getExtent())
               .ifPresent(profile ->
                   GriefAlert.getInstance()
                       .getAlertService()
@@ -176,7 +176,7 @@ public final class SpongeListeners {
             .getProfileOf(
                 GriefEvents.ATTACK,
                 event.getTargetEntity().getType().getId(),
-                player.getLocation().getExtent().getDimension().getType())
+                player.getLocation().getExtent())
             .ifPresent(profile ->
                 GriefAlert.getInstance()
                     .getAlertService()
@@ -195,7 +195,7 @@ public final class SpongeListeners {
                 .getProfileOf(
                     GriefEvents.EDIT,
                     event.getTargetTile().getBlock().getType().getId(),
-                    player.getLocation().getExtent().getDimension().getType()))
+                    player.getLocation().getExtent()))
         .ifPresent(griefProfile ->
             GriefAlert.getInstance()
                 .getAlertService()

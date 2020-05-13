@@ -74,7 +74,7 @@ public final class Format {
   public static final TextColor GRIEF_ALERT_THEME = TextColors.DARK_PURPLE;
   public static final TextColor ALERT_EVENT_COLOR = TextColors.RED;
   public static final TextColor ALERT_TARGET_COLOR = TextColors.RED;
-  public static final TextColor ALERT_DIMENSION_COLOR = TextColors.RED;
+  public static final TextColor ALERT_WORLD_COLOR = TextColors.RED;
 
   /**
    * Returns content formatted as an error message.
@@ -544,7 +544,7 @@ public final class Format {
             Format.bonus(Text.joinWith(
                 Text.of(", "),
                 ignored.stream()
-                    .map(dimension -> Format.item(dimension.getId()))
+                    .map(Text::of)
                     .collect(Collectors.toList()))))
             .get(griefProfile)).ifPresent(details::add);
     Optional.of(griefProfile.getAllColored()).filter(colors -> !colors.isEmpty())

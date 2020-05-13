@@ -43,10 +43,9 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionTypes;
 
 /**
- * General SqlProfileStorage. Utilizes Sponge's SqlService.
- * Currently unused because Sponge doesn't seem to handle error between
- * MySQL and MariaDB drivers due to a new divergence with a 'tx_isolation'
- * variable.
+ * Deprecated ProfileStorage implementation.
+ *
+ * @deprecated now using ProfileStorageJSON
  */
 public class SqlProfileStorage implements ProfileStorage {
 
@@ -87,12 +86,12 @@ public class SqlProfileStorage implements ProfileStorage {
           profile.getGriefEvent().getId());
       statement.setString(2,
           profile.getTarget());
-      statement.setBoolean(3,
-          profile.isIgnoredIn(DimensionTypes.OVERWORLD));
-      statement.setBoolean(4,
-          profile.isIgnoredIn(DimensionTypes.NETHER));
-      statement.setBoolean(5,
-          profile.isIgnoredIn(DimensionTypes.THE_END));
+//      statement.setBoolean(3,
+//          profile.isIgnoredIn(DimensionTypes.OVERWORLD));
+//      statement.setBoolean(4,
+//          profile.isIgnoredIn(DimensionTypes.NETHER));
+//      statement.setBoolean(5,
+//          profile.isIgnoredIn(DimensionTypes.THE_END));
       statement.setString(6,
           profile.getColored(GriefProfile.Colorable.EVENT)
               .map(TextColor::getName)
@@ -102,7 +101,7 @@ public class SqlProfileStorage implements ProfileStorage {
               .map(TextColor::getName)
               .orElse(null));
       statement.setString(8,
-          profile.getColored(GriefProfile.Colorable.DIMENSION)
+          profile.getColored(GriefProfile.Colorable.WORLD)
               .map(TextColor::getName)
               .orElse(null));
 
@@ -145,37 +144,37 @@ public class SqlProfileStorage implements ProfileStorage {
             .orElseThrow(() -> new RuntimeException(
                 "Saved GriefEvent ID in MySQL database does not match any GriefEvent."));
 
-        final GriefProfile profile = GriefProfile.of(event, rs.getString(2));
+        final GriefProfile.Builder profileBuilder = GriefProfile.builder(event, rs.getString(2));
 
-        if (rs.getBoolean(3)) {
-          profile.addIgnored(DimensionTypes.OVERWORLD);
-        }
-        if (rs.getBoolean(4)) {
-          profile.addIgnored(DimensionTypes.NETHER);
-        }
-        if (rs.getBoolean(5)) {
-          profile.addIgnored(DimensionTypes.THE_END);
-        }
+//        if (rs.getBoolean(3)) {
+//          profileBuilder.addIgnored(DimensionTypes.OVERWORLD);
+//        }
+//        if (rs.getBoolean(4)) {
+//          profileBuilder.addIgnored(DimensionTypes.NETHER);
+//        }
+//        if (rs.getBoolean(5)) {
+//          profileBuilder.addIgnored(DimensionTypes.THE_END);
+//        }
 
         Sponge.getRegistry()
             .getType(
                 TextColor.class,
                 Optional.ofNullable(rs.getString(6)).orElse(""))
-            .ifPresent(color -> profile.putColored(GriefProfile.Colorable.EVENT, color));
+            .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.EVENT, color));
 
         Sponge.getRegistry()
             .getType(
                 TextColor.class,
                 Optional.ofNullable(rs.getString(7)).orElse(""))
-            .ifPresent(color -> profile.putColored(GriefProfile.Colorable.TARGET, color));
+            .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.TARGET, color));
 
         Sponge.getRegistry()
             .getType(
                 TextColor.class,
                 Optional.ofNullable(rs.getString(8)).orElse(""))
-            .ifPresent(color -> profile.putColored(GriefProfile.Colorable.DIMENSION, color));
+            .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.WORLD, color));
 
-        profiles.add(profile);
+        profiles.add(profileBuilder.build());
       }
       return profiles;
     }

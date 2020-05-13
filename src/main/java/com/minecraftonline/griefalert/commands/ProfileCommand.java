@@ -25,6 +25,7 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.commands.common.CommandKey;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
@@ -40,6 +41,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -50,6 +52,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 public class ProfileCommand extends GeneralCommand {
 
@@ -82,8 +86,8 @@ public class ProfileCommand extends GeneralCommand {
           GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
           GenericArguments.string(CommandKeys.GA_TARGET.get()),
           GenericArguments.flags()
-              .valueFlag(GenericArguments.dimension(
-                  CommandKeys.DIMENSION.get()),
+              .valueFlag(GenericArguments.world(
+                  CommandKeys.WORLD.get()),
                   "-ignore", "i")
               .valueFlag(GenericArguments.catalogedElement(
                   CommandKeys.PROFILE_COLOR_EVENT.get(), TextColor.class),
@@ -92,8 +96,8 @@ public class ProfileCommand extends GeneralCommand {
                   CommandKeys.PROFILE_COLOR_TARGET.get(), TextColor.class),
                   "-target_color")
               .valueFlag(GenericArguments.catalogedElement(
-                  CommandKeys.DIMENSION.get(), TextColor.class),
-                  "-dimension_color")
+                  CommandKeys.PROFILE_COLOR_WORLD.get(), TextColor.class),
+                  "-world_color")
               .buildWith(GenericArguments.none())));
     }
 
@@ -110,20 +114,16 @@ public class ProfileCommand extends GeneralCommand {
         sendHelp(src);
         return CommandResult.success();
       }
-      GriefProfile profile = GriefProfile.of(event, target);
-
-      args.<DimensionType>getAll(CommandKeys.DIMENSION.get())
-          .forEach(profile::addIgnored);
-
+      GriefProfile.Builder profileBuilder = GriefProfile.builder(event, target);
+      args.<WorldProperties>getAll(CommandKeys.WORLD.get())
+          .forEach(profileBuilder::addIgnored);
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_EVENT.get())
-          .ifPresent(color -> profile.putColored(GriefProfile.Colorable.EVENT, color));
-
+          .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.EVENT, color));
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_TARGET.get())
-          .ifPresent(color -> profile.putColored(GriefProfile.Colorable.TARGET, color));
-
-      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_DIMENSION.get())
-          .ifPresent(color -> profile.putColored(GriefProfile.Colorable.DIMENSION, color));
-
+          .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.TARGET, color));
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_WORLD.get())
+          .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.WORLD, color));
+      GriefProfile profile = profileBuilder.build();
       try {
         if (GriefAlert.getInstance().getProfileStorage().write(profile)) {
           src.sendMessage(Format.success("GriefProfile added"));
@@ -225,8 +225,8 @@ public class ProfileCommand extends GeneralCommand {
               GenericArguments.string(CommandKeys.TARGET.get()),
               "t")
           .valueFlag(
-              GenericArguments.dimension(CommandKeys.DIMENSION.get()),
-              "d")
+              GenericArguments.dimension(CommandKeys.WORLD.get()),
+              "w")
           .flag("-colored", "c")
           .buildWith(
               GenericArguments.none()));
@@ -240,18 +240,18 @@ public class ProfileCommand extends GeneralCommand {
           .getProfileCache()
           .getProfiles()
           .stream()
-          .filter(profile -> args.<GriefEvent>getOne("event")
+          .filter(profile -> args.<GriefEvent>getOne(CommandKeys.GA_EVENT.get())
               .map(event -> profile.getGriefEvent()
                   .getId().toLowerCase().contains(event.getId().toLowerCase()))
               .orElse(true))
-          .filter(profile -> args.<String>getOne("target")
+          .filter(profile -> args.<String>getOne(CommandKeys.TARGET.get())
               .map(target -> profile.getTarget()
                   .toLowerCase().contains(target.toLowerCase()))
               .orElse(true))
           .filter(profile -> {
-            Collection<DimensionType> dimensions = args.getAll("dimension");
-            return dimensions.isEmpty()
-                || dimensions.stream().anyMatch(dimension -> !profile.isIgnoredIn(dimension));
+            Collection<World> worlds = args.getAll(CommandKeys.WORLD.get());
+            return worlds.isEmpty()
+                || worlds.stream().anyMatch(world -> !profile.isIgnoredIn(world));
           })
           .filter(profile -> !args.hasAny("colored") || profile.isColored())
           .map(profile -> Text.of(

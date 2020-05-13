@@ -24,6 +24,8 @@
 
 package com.minecraftonline.griefalert.api.records;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
@@ -34,12 +36,16 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 /**
  * The information in a {@link GriefProfile} informs the {@link AlertService}
@@ -50,39 +56,33 @@ import org.spongepowered.api.world.DimensionType;
  */
 public final class GriefProfile implements Serializable {
 
-  private final GriefEvent event;
+  private final String eventId;
   private final String target;
-  private final Set<DimensionType> ignored = Sets.newHashSet();
-  private final Map<Colorable, String> colors = Maps.newHashMap();
+  private final Set<String> ignored;
+  private final Map<Colorable, String> colors;
 
   public enum Colorable {
     EVENT,
     TARGET,
-    DIMENSION
+    WORLD
   }
 
   private GriefProfile(@Nonnull final GriefEvent event,
-                       @Nonnull final String target) {
-    this.event = event;
+                       @Nonnull final String target,
+                       @Nonnull final Set<WorldProperties> ignored,
+                       @Nonnull final Map<Colorable, String> colors) {
+    this.eventId = event.getId();
     this.target = target;
-  }
-
-  /**
-   * Factory method for a {@link GriefProfile}.
-   *
-   * @param event  the event describing the type of action performed by a player
-   * @param target the minecraft id for the target of this action
-   * @return the generated {@link GriefProfile}
-   */
-  @Nonnull
-  public static GriefProfile of(@Nonnull final GriefEvent event,
-                                @Nonnull final String target) {
-    return new GriefProfile(event, target);
+    this.ignored = ignored.stream().map(WorldProperties::getWorldName).collect(Collectors.toCollection(Sets::newLinkedHashSet));
+    this.colors = Maps.newLinkedHashMap(colors);
   }
 
   @Nonnull
   public GriefEvent getGriefEvent() {
-    return event;
+    return Sponge.getRegistry().getType(GriefEvent.class, eventId)
+        .orElseThrow(() -> new RuntimeException(
+            "GriefProfile contained an invalid GriefEvent id: "
+                + eventId));
   }
 
   @Nonnull
@@ -91,37 +91,15 @@ public final class GriefProfile implements Serializable {
   }
 
   /**
-   * Add the {@link DimensionType} to the set of ignored dimensions for this alert.
-   *
-   * @param dimension the dimension type
-   * @return false if the set already contains the dimension
-   */
-  public boolean addIgnored(@Nonnull DimensionType dimension) {
-    return ignored.add(dimension);
-  }
-
-  /**
-   * Map a {@link TextColor} to the enumerated colored components of this
-   * {@link GriefProfile} for printing the {@link Text} of {@link Alert}s.
-   *
-   * @param component the portion of the print message
-   * @param color     the color
-   * @return false if this component already has a color
-   */
-  public boolean putColored(@Nonnull Colorable component, @Nonnull TextColor color) {
-    return colors.putIfAbsent(component, color.getId()) != null;
-  }
-
-  /**
    * Return whether this profile is configured such that an
    * event occurring in the given {@link DimensionType} would be ignored
    * by {@link Alert} construction.
    *
-   * @param dimensionType the dimension
+   * @param world the world
    * @return true if ignored
    */
-  public boolean isIgnoredIn(@Nonnull final DimensionType dimensionType) {
-    return ignored.contains(dimensionType);
+  public boolean isIgnoredIn(@Nonnull final World world) {
+    return ignored.contains(world.getName());
   }
 
   /**
@@ -130,9 +108,12 @@ public final class GriefProfile implements Serializable {
    * @return ignored dimensions
    */
   @Nonnull
-  public Set<DimensionType> getIgnored() {
-    Set<DimensionType> out = Sets.newHashSet();
-    out.addAll(ignored);
+  public Set<World> getIgnored() {
+    Set<World> out = Sets.newHashSet();
+    ignored.forEach(worldName -> out.add(Sponge.getServer().getWorld(worldName).orElseThrow(
+        () -> new RuntimeException(
+            "GriefProfile contained an invalid DimensionType id: "
+                + worldName))));
     return out;
   }
 
@@ -183,7 +164,67 @@ public final class GriefProfile implements Serializable {
       return false;
     }
     GriefProfile other = (GriefProfile) obj;
-    return this.event.equals(other.event)
+    return this.eventId.equals(other.eventId)
         && this.target.equals(other.target);
   }
+
+  public static Builder builder(@Nonnull final GriefEvent event,
+                                @Nonnull final String target) {
+    return new Builder(event, target);
+  }
+
+  public static class Builder {
+
+    private final GriefEvent event;
+    private final String target;
+    private final Set<WorldProperties> ignored = Sets.newHashSet();
+    private final Map<Colorable, String> colors = Maps.newHashMap();
+
+    public Builder(@Nonnull final GriefEvent event,
+                   @Nonnull final String target) {
+      this.event = event;
+      this.target = target;
+    }
+
+    /**
+     * Generate.
+     *
+     * @return the {@link GriefProfile}
+     */
+    public GriefProfile build() {
+      return new GriefProfile(
+          event,
+          target,
+          ImmutableSet.<WorldProperties>builder().addAll(ignored).build(),
+          ImmutableMap.<Colorable, String>builder().putAll(colors).build());
+    }
+
+    /**
+     * Add the {@link DimensionType} to the set of ignored dimensions for this alert.
+     *
+     * @param world the world
+     * @return false if the set already contains the dimension
+     */
+    public Builder addIgnored(@Nullable WorldProperties world) {
+      if (world != null) {
+        ignored.add(world);
+      }
+      return this;
+    }
+
+    /**
+     * Map a {@link TextColor} to the enumerated colored components of this
+     * {@link GriefProfile} for printing the {@link Text} of {@link Alert}s.
+     *
+     * @param component the portion of the print message
+     * @param color     the color
+     * @return false if this component already has a color
+     */
+    public Builder putColored(@Nonnull Colorable component, @Nonnull TextColor color) {
+      colors.put(component, color.getId());
+      return this;
+    }
+
+  }
+
 }

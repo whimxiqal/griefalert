@@ -277,8 +277,8 @@ public final class AlertServiceImpl implements AlertService {
                   .orElse(Format.ALERT_TARGET_COLOR),
               Format.item(firstAlert.get().getTarget())));
           tokens.add(Text.of(firstAlert.get().getGriefProfile()
-                  .getColored(GriefProfile.Colorable.DIMENSION)
-                  .orElse(Format.ALERT_DIMENSION_COLOR),
+                  .getColored(GriefProfile.Colorable.WORLD)
+                  .orElse(Format.ALERT_WORLD_COLOR),
               Format.dimension(Alerts.getWorld(firstAlert.get()).getDimension().getType())));
           if (list.size() < 5) {
             tokens.add(Text.joinWith(Format.space(),

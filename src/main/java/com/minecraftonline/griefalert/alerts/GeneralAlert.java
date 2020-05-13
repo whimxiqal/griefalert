@@ -24,14 +24,18 @@
 
 package com.minecraftonline.griefalert.alerts;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.templates.Arg;
+import com.minecraftonline.griefalert.api.templates.Templates;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.enums.AlertTags;
 import com.minecraftonline.griefalert.util.enums.Details;
 
 import java.util.Date;
@@ -42,6 +46,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -85,24 +90,7 @@ public abstract class GeneralAlert implements Alert {
   @Override
   @Nonnull
   public final Text getMessage() {
-    Text.Builder builder = Text.builder();
-    builder.append(Text.of(
-        Format.userName(Alerts.getGriefer(this)),
-        Format.space(),
-        this.getGriefProfile()
-            .getColored(GriefProfile.Colorable.EVENT)
-            .orElse(Format.ALERT_EVENT_COLOR),
-        Format.action(this.getGriefEvent()),
-        Format.space(),
-        this.getGriefProfile()
-            .getColored(GriefProfile.Colorable.TARGET)
-            .orElse(Format.ALERT_TARGET_COLOR),
-        Grammar.addIndefiniteArticle(Format.item(this.getTarget())),
-        TextColors.RED, " in the ",
-        this.getGriefProfile()
-            .getColored(GriefProfile.Colorable.DIMENSION)
-            .orElse(Format.ALERT_DIMENSION_COLOR),
-        Format.dimension(Alerts.getWorld(this).getDimension().getType())));
+
     Text.Builder ellipses = Text.builder().append(Format.bonus("(...)"));
     Text hoverText = Text.of(Format.prefix(), Format.endLine(), Text.joinWith(
         Format.endLine(),
@@ -114,7 +102,29 @@ public abstract class GeneralAlert implements Alert {
     if (!hoverText.toPlain().isEmpty()) {
       ellipses.onHover(TextActions.showText(hoverText));
     }
-    return builder.append(Format.space()).append(ellipses.build()).build();
+
+    return Templates.ALERT.getTextTemplate().apply(
+        ImmutableMap.<String, TextElement>builder()
+            .put(Arg.GRIEFER.name(),
+                Format.userName(Alerts.getGriefer(this)))
+            .put(Arg.EVENT_COLOR.name(),
+                this.getGriefProfile().getColored(GriefProfile.Colorable.EVENT)
+                    .orElse(Format.ALERT_EVENT_COLOR))
+            .put(Arg.EVENT.name(),
+                Format.action(this.getGriefEvent()))
+            .put(Arg.TARGET_COLOR.name(),
+                this.getGriefProfile().getColored(GriefProfile.Colorable.TARGET)
+                    .orElse(Format.ALERT_TARGET_COLOR))
+            .put(Arg.TARGET.name(),
+                Grammar.addIndefiniteArticle(Format.item(this.getTarget())))
+            .put(Arg.WORLD_COLOR.name(),
+                this.getGriefProfile().getColored(GriefProfile.Colorable.WORLD)
+                    .orElse(Format.ALERT_WORLD_COLOR))
+            .put(Arg.WORLD.name(),
+                Text.of(Alerts.getWorld(this).getName()))
+            .put(Arg.SUFFIX.name(),
+                ellipses.build())
+            .build()).build();
   }
 
   @Nonnull

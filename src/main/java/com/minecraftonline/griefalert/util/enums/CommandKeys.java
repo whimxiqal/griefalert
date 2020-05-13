@@ -68,9 +68,9 @@ public final class CommandKeys {
       Text.of("event"),
       Text.of("The id of a GA event"));
 
-  public static final CommandKey DIMENSION = CommandKey.of(
-      Text.of("dimension"),
-      Text.of("The full Sponge id of a Dimension Type"));
+  public static final CommandKey WORLD = CommandKey.of(
+      Text.of("world"),
+      Text.of("The name of a world"));
 
   public static final CommandKey PROFILE_COLOR_EVENT = CommandKey.of(
       Text.of("event_color"),
@@ -80,7 +80,7 @@ public final class CommandKeys {
       Text.of("target_color"),
       Text.of("The color of the target in Alerts matching this profile"));
 
-  public static final CommandKey PROFILE_COLOR_DIMENSION = CommandKey.of(
+  public static final CommandKey PROFILE_COLOR_WORLD = CommandKey.of(
       Text.of("dimension_color"),
       Text.of("The color of the dimension in Alerts matching this profile"));
 
