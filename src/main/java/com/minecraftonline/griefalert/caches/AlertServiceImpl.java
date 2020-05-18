@@ -332,6 +332,8 @@ public final class AlertServiceImpl implements AlertService {
     Transform<World> officerPreviousTransform = officer.getTransform();
 
     // Teleport the officer
+    officer.getVehicle().ifPresent(Entity::clearPassengers);
+    officer.clearPassengers();
     Transform<World> grieferTransform = Alerts.buildTransform(alertItem.get());
     if (force) {
       officer.setTransform(grieferTransform);
