@@ -33,6 +33,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.services.AlertService;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -98,8 +99,8 @@ public final class GriefProfile implements Serializable {
    * @param world the world
    * @return true if ignored
    */
-  public boolean isIgnoredIn(@Nonnull final World world) {
-    return ignored.contains(world.getName());
+  public boolean isIgnoredIn(@Nonnull final WorldProperties world) {
+    return ignored.contains(world.getWorldName());
   }
 
   /**
@@ -200,10 +201,23 @@ public final class GriefProfile implements Serializable {
     }
 
     /**
+     * Add the {@link DimensionType}s to the set of ignored dimensions for this alert.
+     *
+     * @param worlds the worlds
+     * @return builder for chaining
+     */
+    public Builder addAllIgnored(@Nonnull Collection<WorldProperties> worlds) {
+      for (WorldProperties world : worlds) {
+        addIgnored(world);
+      }
+      return this;
+    }
+
+    /**
      * Add the {@link DimensionType} to the set of ignored dimensions for this alert.
      *
      * @param world the world
-     * @return false if the set already contains the dimension
+     * @return builder for chaining
      */
     public Builder addIgnored(@Nullable WorldProperties world) {
       if (world != null) {
@@ -218,7 +232,7 @@ public final class GriefProfile implements Serializable {
      *
      * @param component the portion of the print message
      * @param color     the color
-     * @return false if this component already has a color
+     * @return builder for chaining
      */
     public Builder putColored(@Nonnull Colorable component, @Nonnull TextColor color) {
       colors.put(component, color.getId());

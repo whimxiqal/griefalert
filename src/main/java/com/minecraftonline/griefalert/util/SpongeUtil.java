@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -92,13 +93,12 @@ public final class SpongeUtil {
     return Sponge.getServer().getWorld(worldUuid);
   }
 
-  public static Optional<WorldProperties> firstWorldWithDimension(DimensionType dimensionType) {
-    for (WorldProperties world : Sponge.getServer().getUnloadedWorlds()) {
-      if (world.getDimensionType().equals(dimensionType)) {
-        return Optional.of(world);
-      }
-    }
-    return Optional.empty();
+  public static List<World> worldsWithDimension(DimensionType dimensionType) {
+    return Sponge.getServer()
+        .getWorlds()
+        .stream()
+        .filter(world -> world.getDimension().getType().equals(dimensionType))
+        .collect(Collectors.toList());
   }
 
 }

@@ -25,8 +25,10 @@
 package com.minecraftonline.griefalert.api.services;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
+
 import java.util.Collection;
 import javax.annotation.Nonnull;
+
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
@@ -81,9 +83,9 @@ public interface AlertService {
    * with the given retrieval code. The {@link Player} will receive the necessary
    * information and tools to respond to an {@link Alert}.
    *
-   * @param index the {@link Alert} retrieval code
+   * @param index   the {@link Alert} retrieval code
    * @param officer the inspecting player
-   * @param force true if the player should teleport to the location, even if it's unsafe
+   * @param force   true if the player should teleport to the location, even if it's unsafe
    * @return true if the inspection succeeded
    * @throws IllegalArgumentException if the given index is invalid
    */
@@ -92,12 +94,29 @@ public interface AlertService {
                   boolean force) throws IllegalArgumentException;
 
   /**
-   * Undo the inspection done by the officer by returning them back to their previous location.
+   * Return an officer to their previous known location before their last grief check.
    *
-   * @param officer the inspecting player
-   * @return true if the player was returned
+   * @param officer The officer to teleport
    */
   boolean unInspect(@Nonnull Player officer);
+
+  /**
+   * Undo the inspection done by the officer by returning them
+   * back to the location prior to an inspection.
+   *
+   * @param officer the inspecting player
+   * @param index   the alert index
+   * @return true if the player was returned
+   */
+  boolean unInspect(@Nonnull Player officer, int index);
+
+  /**
+   * Open up a helpful panel to officers to more easily perform their tasks.
+   *
+   * @param officer the officer
+   * @return true if it successfully opened
+   */
+  boolean openPanel(@Nonnull Player officer);
 
   /**
    * Clear all information held in the {@link AlertService}.
@@ -107,11 +126,12 @@ public interface AlertService {
   /**
    * Give all the receivers all {@link Alert}s which match the filters given in the
    * {@link Request}.
+   *
    * @param receivers the receivers of all the information
-   * @param filters the holder for all filters
-   * @param sort how the {@link Alert}s will be sorted for presentation
-   * @param spread true will send all {@link Alert}s individually. False will collapse similar
-   *               {@link Alert}s into singular lines.
+   * @param filters   the holder for all filters
+   * @param sort      how the {@link Alert}s will be sorted for presentation
+   * @param spread    true will send all {@link Alert}s individually. False will collapse similar
+   *                  {@link Alert}s into singular lines.
    */
   void lookup(@Nonnull Collection<MessageReceiver> receivers,
               @Nonnull Request filters,

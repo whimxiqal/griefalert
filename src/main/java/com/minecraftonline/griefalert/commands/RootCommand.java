@@ -62,6 +62,7 @@ public class RootCommand extends GeneralCommand {
     addChild(new ReturnCommand());
     addChild(new ShowCommand());
     addChild(new FixCommand());
+    addChild(new PanelCommand());
     addChild(new ApplierCommand(
         Text.of("Rollback to previous states"),
         ApplierCommand.ApplyType.ROLLBACK,

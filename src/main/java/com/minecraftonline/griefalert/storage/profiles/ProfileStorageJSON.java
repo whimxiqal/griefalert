@@ -45,10 +45,14 @@ public class ProfileStorageJSON implements ProfileStorage {
 
   private final File profilesFile = new File(GriefAlert.getInstance().getConfigDirectory(), "profiles.json");
 
-  public ProfileStorageJSON() throws Exception {
-    if (profilesFile.createNewFile()) {
-      GriefAlert.getInstance().getLogger().info("Created grief profiles file");
-      replaceAll(DefaultProfiles.GET_ALL());
+  public ProfileStorageJSON() {
+    try {
+      if (profilesFile.createNewFile()) {
+        GriefAlert.getInstance().getLogger().info("Created grief profiles file");
+        replaceAll(DefaultProfiles.getAll());
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -60,17 +64,15 @@ public class ProfileStorageJSON implements ProfileStorage {
     }
     GriefProfile toRemove = null;
     Collection<GriefProfile> profiles = retrieve();
-    for (GriefProfile existing : profiles) {
-      if (profile.equals(existing)) {
-        return false;
-      }
+    if (profiles.contains(profile)) {
+      return false;
     }
     profiles.add(profile);
     replaceAll(profiles);
     return true;
   }
 
-  private boolean replaceAll(@Nonnull Collection<GriefProfile> profiles) throws Exception {
+  private boolean replaceAll(@Nonnull Collection<GriefProfile> profiles) {
     if (!profilesFile.exists()) {
       GriefAlert.getInstance().getLogger().error("Tried to save profiles, but could not find " + profilesFile.getName());
       return false;

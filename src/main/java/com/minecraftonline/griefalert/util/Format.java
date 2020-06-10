@@ -116,7 +116,7 @@ public final class Format {
   @SuppressWarnings("WeakerAccess")
   public static Text heading(Text content) {
     checkNotNull(content);
-    return Text.of(prefix(), TextColors.GOLD, TextStyles.BOLD, content);
+    return Text.of(prefix(), TextColors.GOLD, content);
   }
 
   /**
@@ -474,7 +474,7 @@ public final class Format {
               .stream()
               .map(uuid -> SpongeUtil.getWorld(uuid).orElseThrow(() ->
                   new RuntimeException("Invalid UUID in Request")))
-              .map(Text::of)
+              .map(world -> Text.of(world.getName()))
               .collect(Collectors.toList())));
       builder.append(Text.of("}"));
       tokens.add(builder.build());
@@ -544,7 +544,7 @@ public final class Format {
             Format.bonus(Text.joinWith(
                 Text.of(", "),
                 ignored.stream()
-                    .map(Text::of)
+                    .map(world -> Text.of(world.getName()))
                     .collect(Collectors.toList()))))
             .get(griefProfile)).ifPresent(details::add);
     Optional.of(griefProfile.getAllColored()).filter(colors -> !colors.isEmpty())

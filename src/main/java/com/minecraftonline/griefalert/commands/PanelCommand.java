@@ -27,48 +27,35 @@ package com.minecraftonline.griefalert.commands;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
-import com.minecraftonline.griefalert.util.enums.CommandKeys;
+import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
-import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+public class PanelCommand extends GeneralCommand {
 
-public class ReturnCommand extends GeneralCommand {
-
-
-  ReturnCommand() {
-    super(
-        Permissions.GRIEFALERT_COMMAND_CHECK,
-        Text.of("Return to your previous location prior to a grief alert check")
-    );
-    addAlias("return");
-    addAlias("r");
-    setCommandElement(GenericArguments.optional(GenericArguments.integer(CommandKeys.ALERT_INDEX.get())));
+  PanelCommand() {
+    super(Permissions.GRIEFALERT_COMMAND_CHECK,
+        Text.of("Open an inventory with commands executed with clickable items"));
+    addAlias("panel");
+    addAlias("p");
   }
 
   @Override
-  @Nonnull
-  public CommandResult execute(@Nonnull CommandSource src,
-                               @Nonnull CommandContext args) throws CommandException {
+  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
     if (src instanceof Player) {
-      boolean inspected = args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).isPresent()
-          ? GriefAlert.getInstance().getAlertService().unInspect((Player) src, args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).get())
-          : GriefAlert.getInstance().getAlertService().unInspect((Player) src);
-      if (inspected) {
+      if (GriefAlert.getInstance().getAlertService().openPanel((Player) src)) {
         return CommandResult.success();
       } else {
-        return CommandResult.empty();
+        src.sendMessage(Format.error("Use ", Format.bonus("/ga check"), " to select an Alert"));
       }
     } else {
       throw Errors.playerOnlyException();
     }
+    return CommandResult.empty();
   }
 }

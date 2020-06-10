@@ -22,36 +22,39 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.api.alerts;
+package com.minecraftonline.griefalert.api.storage;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.UUID;
+import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
+import com.minecraftonline.griefalert.api.alerts.inspections.Request;
+import com.minecraftonline.griefalert.api.records.GriefProfile;
+
+import java.util.Collection;
 import javax.annotation.Nonnull;
 
 /**
- * Stores the information the time someone inspected an {@link Alert}.
+ * An interface for persistent storage of {@link GriefProfile}s.
  *
  * @author PietElite
  */
-public final class AlertInspection implements Serializable {
+public interface InspectionStorage {
 
-  private final UUID officerUuid;
-  private final Date checked;
+  /**
+   * Write a {@link AlertInspection} into persistent storage.
+   *
+   * @param inspection The GriefProfile to add
+   * @return false if a {@link AlertInspection} already exists too similar to the
+   *         input {@link AlertInspection}
+   * @throws Exception if error
+   */
+  boolean write(@Nonnull final AlertInspection inspection);
 
-  public AlertInspection(@Nonnull final UUID officerUuid, @Nonnull final Date checked) {
-    this.officerUuid = officerUuid;
-    this.checked = checked;
-  }
-
+  /**
+   * Get all {@link GriefProfile}s saved in persistent storage.
+   *
+   * @return a collection of {@link GriefProfile}s
+   * @throws Exception if error
+   */
   @Nonnull
-  public Date getChecked() {
-    return checked;
-  }
-
-  @Nonnull
-  public UUID getOfficerUuid() {
-    return officerUuid;
-  }
+  Collection<AlertInspection> query(@Nonnull final Request request);
 
 }

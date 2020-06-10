@@ -46,7 +46,7 @@ public class ProfileCache {
   private final HashBasedTable<GriefEvent, String, GriefProfile> storage = HashBasedTable.create();
 
   public ProfileCache() {
-    this.load();
+    load();
   }
 
   /**
@@ -58,12 +58,9 @@ public class ProfileCache {
   }
 
   private void load() {
-
-    // Get all other profiles from the local profile list
-    ProfileStorage profileStorage = GriefAlert.getInstance().getProfileStorage();
     try {
       GriefAlert.getInstance().getLogger().info("Loading Grief Profiles from storage into cache...");
-      profileStorage.retrieve().forEach(this::add);
+      GriefAlert.getInstance().getProfileStorage().retrieve().forEach(this::add);
       GriefAlert.getInstance().getLogger().info("Grief Profiles were loaded into cache.");
     } catch (Exception e) {
       GriefAlert.getInstance().getLogger()
@@ -89,7 +86,7 @@ public class ProfileCache {
 
     // Make sure the dimension is not ignored
     if (profileOptional.isPresent()) {
-      if (!profileOptional.get().isIgnoredIn(world)) {
+      if (!profileOptional.get().isIgnoredIn(world.getProperties())) {
         return profileOptional;
       } else {
         return Optional.empty();

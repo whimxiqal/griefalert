@@ -29,6 +29,7 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import org.spongepowered.api.block.BlockTypes;
@@ -36,13 +37,14 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.World;
 
 public final class DefaultProfiles {
 
   private DefaultProfiles() {
   }
 
-  public static List<GriefProfile> GET_ALL() {
+  public static List<GriefProfile> getAll() {
     return Arrays.asList(
         // ====================================================================================
         GriefProfile.builder(GriefEvents.ATTACK, EntityTypes.ARMOR_STAND.getId()).build(),
@@ -75,7 +77,12 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BRICK_BLOCK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BRICK_STAIRS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BROWN_GLAZED_TERRACOTTA.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BROWN_MUSHROOM.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BROWN_MUSHROOM.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BROWN_MUSHROOM_BLOCK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BROWN_SHULKER_BOX.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.CACTUS.getId()).build(),
@@ -87,7 +94,12 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.CHORUS_FLOWER.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.CHORUS_PLANT.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COAL_BLOCK.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COAL_ORE.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COAL_ORE.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COBBLESTONE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COBBLESTONE_WALL.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COMMAND_BLOCK.getId()).putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
@@ -136,7 +148,12 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.ICE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.IRON_BARS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.IRON_BLOCK.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.IRON_ORE.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.IRON_ORE.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.IRON_TRAPDOOR.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.JUKEBOX.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.JUNGLE_DOOR.getId()).build(),
@@ -173,7 +190,12 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.NETHER_BRICK_STAIRS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.NETHER_WART.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.NETHER_WART_BLOCK.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.NETHERRACK.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.NETHER).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.NETHERRACK.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.NETHER)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.NOTEBLOCK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.OAK_STAIRS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.OBSERVER.getId()).build(),
@@ -201,12 +223,27 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.PURPUR_SLAB.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.PURPUR_STAIRS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.QUARTZ_BLOCK.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.QUARTZ_ORE.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.NETHER).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.QUARTZ_ORE.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.NETHER)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.QUARTZ_STAIRS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RAIL.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_FLOWER.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_FLOWER.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_GLAZED_TERRACOTTA.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_MUSHROOM.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_MUSHROOM.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_MUSHROOM_BLOCK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_NETHER_BRICK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_SANDSTONE.getId()).build(),
@@ -214,7 +251,12 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.RED_SHULKER_BOX.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_BLOCK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_LAMP.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_ORE.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_ORE.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_TORCH.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_WIRE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REPEATING_COMMAND_BLOCK.getId()).putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
@@ -227,7 +269,12 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SKULL.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SNOW.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SNOW_LAYER.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SOUL_SAND.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.NETHER).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SOUL_SAND.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.NETHER)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SPONGE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SPRUCE_DOOR.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SPRUCE_FENCE.getId()).build(),
@@ -267,16 +314,18 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.WOODEN_PRESSURE_PLATE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.WOODEN_SLAB.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.WOOL.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.YELLOW_FLOWER.getId()).addIgnored(SpongeUtil.firstWorldWithDimension(DimensionTypes.OVERWORLD).orElse(null)).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.YELLOW_FLOWER.getId())
+            .addAllIgnored(SpongeUtil.worldsWithDimension(DimensionTypes.OVERWORLD)
+                .stream()
+                .map(World::getProperties)
+                .collect(Collectors.toList()))
+            .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.YELLOW_GLAZED_TERRACOTTA.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.YELLOW_SHULKER_BOX.getId()).build(),
 
         // ====================================================================================
-        GriefProfile.builder(GriefEvents.DEATH, EntityTypes.CHICKEN.getId()).build(),
-        GriefProfile.builder(GriefEvents.DEATH, EntityTypes.COW.getId()).build(),
         GriefProfile.builder(GriefEvents.DEATH, EntityTypes.HORSE.getId()).build(),
         GriefProfile.builder(GriefEvents.DEATH, EntityTypes.MUSHROOM_COW.getId()).build(),
-        GriefProfile.builder(GriefEvents.DEATH, EntityTypes.SHEEP.getId()).build(),
 
         // ====================================================================================
         GriefProfile.builder(GriefEvents.EDIT, BlockTypes.STANDING_SIGN.getId()).build(),

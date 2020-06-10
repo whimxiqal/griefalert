@@ -61,7 +61,7 @@ public class ProfileCommand extends GeneralCommand {
     super(Permissions.GRIEFALERT_COMMAND_PROFILE,
         Text.of("Alter the list of Profiles, which flag Alerts"));
     addAlias("profile");
-    addAlias("p");
+    addAlias("pr");
     addChild(new AddCommand());
     addChild(new RemoveCommand());
     addChild(new CountCommand());
@@ -225,7 +225,7 @@ public class ProfileCommand extends GeneralCommand {
               GenericArguments.string(CommandKeys.TARGET.get()),
               "t")
           .valueFlag(
-              GenericArguments.dimension(CommandKeys.WORLD.get()),
+              GenericArguments.world(CommandKeys.WORLD.get()),
               "w")
           .flag("-colored", "c")
           .buildWith(
@@ -249,7 +249,7 @@ public class ProfileCommand extends GeneralCommand {
                   .toLowerCase().contains(target.toLowerCase()))
               .orElse(true))
           .filter(profile -> {
-            Collection<World> worlds = args.getAll(CommandKeys.WORLD.get());
+            Collection<WorldProperties> worlds = args.getAll(CommandKeys.WORLD.get());
             return worlds.isEmpty()
                 || worlds.stream().anyMatch(world -> !profile.isIgnoredIn(world));
           })

@@ -24,13 +24,14 @@
 
 package com.minecraftonline.griefalert.caches;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.alerts.GeneralAlert;
-import com.minecraftonline.griefalert.alerts.prism.PrismAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
-import com.minecraftonline.griefalert.api.alerts.AlertInspection;
+import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.events.PreBroadcastAlertEvent;
 import com.minecraftonline.griefalert.api.events.PreInspectAlertEvent;
@@ -42,12 +43,12 @@ import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
 import com.minecraftonline.griefalert.commands.CheckCommand;
+import com.minecraftonline.griefalert.inventories.InspectionInventory;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.SpongeUtil;
-import com.minecraftonline.griefalert.util.enums.AlertTags;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
@@ -75,6 +76,8 @@ import org.apache.commons.lang3.SerializationException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
@@ -83,16 +86,18 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.World;
 
 public final class AlertServiceImpl implements AlertService {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
   private final MapStack<UUID, GriefProfile> grieferRepeatHistory = new HashMapStack<>();
-  private final MapStack<UUID, Transform<World>> officerCheckHistory = new HashMapStack<>();
-  private final RotatingList<AlertItem> alertCache;
+  private final Table<UUID, Integer, AlertInspection> officerInspectHistory = HashBasedTable.create();
+  private RotatingList<AlertItem> alertCache;
   private final File alertStorageFile;
 
   /**
@@ -148,6 +153,7 @@ public final class AlertServiceImpl implements AlertService {
     }
 
     updateRepeatHistory(alert);
+    officerInspectHistory.column(output).forEach(((uuid, inspection) -> officerInspectHistory.remove(uuid, output)));
     return output;
   }
 
@@ -232,9 +238,9 @@ public final class AlertServiceImpl implements AlertService {
 
   @Override
   public void reset() {
-    this.alertCache.clear();
+    this.alertCache = generateAlertList();
     this.grieferRepeatHistory.clearAll();
-    this.officerCheckHistory.clearAll();
+    this.officerInspectHistory.clear();
   }
 
   private List<Text> formatAlerts(List<AlertItem> alerts, boolean spread) {
@@ -311,7 +317,7 @@ public final class AlertServiceImpl implements AlertService {
       AlertInspection firstCheck = alertItem.getChecks().get(0);
       double secondsSinceFirstCheck =
           ((double) (Instant.now().toEpochMilli()
-              - firstCheck.getChecked().toInstant().toEpochMilli())
+              - firstCheck.getInspected().toInstant().toEpochMilli())
           ) / 1000;
       if (secondsSinceFirstCheck < Settings.ALERT_CHECK_TIMEOUT.getValue()) {
         officer.sendMessage(Format.error(
@@ -345,11 +351,7 @@ public final class AlertServiceImpl implements AlertService {
     }
 
     // Post an event to show that the Alert is getting checked
-    PluginContainer plugin = GriefAlert.getInstance().getPluginContainer();
-    PreInspectAlertEvent.post(alertItem.get(), officer, plugin);
-
-    // The officer has teleported successfully, so save their previous location in the history
-    this.addOfficerTransform(officer.getUniqueId(), officerPreviousTransform);
+    PreInspectAlertEvent.post(alertItem.get(), officer, GriefAlert.getInstance().getPluginContainer());
 
     // Send the messages
     Communication.getStaffBroadcastChannelWithout(officer).send(Format.info(
@@ -357,9 +359,15 @@ public final class AlertServiceImpl implements AlertService {
         " is checking alert number ",
         Format.bonus(CheckCommand.clickToCheck(index))));
 
-    officer.sendMessage(Format.heading("Checking Alert: ",
-        Format.bonus(index)));
-    officer.sendMessage(alertItem.get().getMessage());
+    officer.sendMessage(Format.heading(
+        "Inspecting Alert ",
+        Format.bonus(index),
+        Format.space(),
+        Text.builder()
+            .append(Text.of(TextStyles.NONE, TextColors.GOLD, "[", Text.of(TextColors.GRAY, TextStyles.ITALIC, "PANEL"), "]"))
+            .onClick(TextActions.executeCallback(p -> InspectionInventory.openInspectionPanel(officer, index)))
+            .onHover(TextActions.showText(Text.of(Format.prefix(), Format.endLine(), Format.bonus("Open an Inspection Panel"))))
+            .build()));
 
     // Notify the officer of other staff members who may have checked this alert already
     if (!alertItem.getChecks().isEmpty()) {
@@ -380,39 +388,6 @@ public final class AlertServiceImpl implements AlertService {
                   .collect(Collectors.toList()))));
     }
 
-    // Build a panel for the officer with useful commands
-    Text.Builder panel = Text.builder().append(Format.bonus("=="));
-    if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_QUERY.toString())) {
-      panel.append(
-          Format.space(2),
-          AlertTags.getTagRecent(Alerts.getGriefer(alertItem.get()).getName()));
-    }
-    if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_SHOW.toString())) {
-      panel.append(
-          Format.space(2),
-          AlertTags.getTagShow(index));
-    }
-    if (officer.hasPermission(Permissions.GRIEFALERT_COMMAND_INFO.toString())) {
-      panel.append(
-          Format.space(2),
-          AlertTags.getTagInfo(index));
-    }
-    panel.append(
-        Format.space(2),
-        AlertTags.getTagReturn());
-
-    if (alertItem.get() instanceof PrismAlert
-        && officer.hasPermission(Permissions.GRIEFALERT_COMMAND_ROLLBACK.toString())) {
-      panel.append(Text.of(
-          Format.space(2),
-          AlertTags.getTagFix(index)));
-
-    }
-    panel.append(Text.of(
-        Format.space(2),
-        Format.bonus("==")));
-    officer.sendMessage(panel.build());
-
     // Give officer invulnerability
     if (Settings.CHECK_INVULNERABILITY.getValue() > 0) {
       giveInvulnerability(
@@ -427,7 +402,20 @@ public final class AlertServiceImpl implements AlertService {
               " has been revoked"));
     }
 
-    alertItem.addCheck(new AlertInspection(officer.getUniqueId(), new Date()));
+    AlertInspection inspection = new AlertInspection(
+        officer.getUniqueId(),
+        alertItem.get().getGrieferUuid(),
+        alertItem.get().getGriefEvent().getId(),
+        alertItem.get().getTarget(),
+        alertItem.get().getGriefPosition(),
+        alertItem.get().getWorldUuid(),
+        new Date(),
+        officerPreviousTransform,
+        index);
+    officerInspectHistory.put(officer.getUniqueId(), index, inspection);
+    alertItem.addCheck(inspection);
+    GriefAlert.getInstance().getInspectionStorage().write(inspection);
+
     return true;
   }
 
@@ -458,37 +446,57 @@ public final class AlertServiceImpl implements AlertService {
         .submit(GriefAlert.getInstance());
   }
 
-
-  /**
-   * Return an officer to their previous known location before a grief check.
-   *
-   * @param officer The officer to teleport
-   */
+  @Override
   public boolean unInspect(@NotNull Player officer) {
 
-    Optional<Transform<World>> previousTransformOptional = officerCheckHistory
-        .pop(officer.getUniqueId());
-    int revertsRemaining = officerCheckHistory.size(officer.getUniqueId());
+    Optional<AlertInspection> lastInspection = getLastInspection(officer.getUniqueId());
 
-    if (!previousTransformOptional.isPresent()) {
-      officer.sendMessage(Format.info("You have no previous location."));
+    if (!lastInspection.isPresent()) {
+      officer.sendMessage(Format.info("You have no previous location"));
       return false;
     }
 
-    if (!officer.setTransformSafely(previousTransformOptional.get())) {
-      Errors.sendCannotTeleportSafely(officer, previousTransformOptional.get());
+    AlertInspection inspection = lastInspection.get();
+
+    if (!officer.setTransformSafely(inspection.getPreviousTransform())) {
+      Errors.sendCannotTeleportSafely(officer, inspection.getPreviousTransform());
     } else {
-      officer.sendMessage(Format.success("Returned to previous location."));
+      officer.sendMessage(Format.success("Returned to previous location"));
     }
-    officer.sendMessage(Format.info(
-        Format.bonus(revertsRemaining),
-        " previous locations available."));
 
     return true;
   }
 
-  private void addOfficerTransform(UUID officerUuid, Transform<World> transform) {
-    officerCheckHistory.push(officerUuid, transform);
+  @Override
+  public boolean unInspect(@NotNull Player officer, int index) {
+
+    AlertInspection inspection = officerInspectHistory.get(
+        officer.getUniqueId(),
+        index);
+
+    if (inspection == null) {
+      officer.sendMessage(Format.info("You have no previous location for alert " + index));
+      return false;
+    }
+
+    if (!officer.setTransformSafely(inspection.getPreviousTransform())) {
+      Errors.sendCannotTeleportSafely(officer, inspection.getPreviousTransform());
+    } else {
+      officer.sendMessage(Format.success("Returned to previous location"));
+    }
+
+    return true;
+  }
+
+  @Override
+  public boolean openPanel(@Nonnull Player officer) {
+    Optional<AlertInspection> lastInspection = getLastInspection(officer.getUniqueId());
+    if (lastInspection.isPresent()) {
+      InspectionInventory.openInspectionPanel(officer, getInspectionsByTime(officer.getUniqueId()).getLast().getAlertIndex());
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -569,6 +577,32 @@ public final class AlertServiceImpl implements AlertService {
       GriefAlert.getInstance().getLogger().debug("Deleted alert storage file");
     }
     return rotatingArrayList;
+  }
+
+  private LinkedList<AlertInspection> getInspectionsByTime(UUID officerUuid) {
+    List<AlertInspection> inspections = Lists.newLinkedList();
+    inspections.addAll(officerInspectHistory.row(officerUuid).values());
+    inspections.sort((e1, e2) -> {
+      int i1 = e1.getAlertIndex();
+      int i2 = e2.getAlertIndex();
+      int cur = alertCache.cursor();
+      if (i1 < cur && i2 >= cur) {
+        return 1;
+      } else if (i1 >= cur && i2 < cur) {
+        return -1;
+      } else {
+        return Integer.compare(i1, i2);
+      }
+    });
+    return Lists.newLinkedList(inspections);
+  }
+
+  private Optional<AlertInspection> getLastInspection(UUID officerUuid) {
+    LinkedList<AlertInspection> inspections = getInspectionsByTime(officerUuid);
+    if (inspections.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(inspections.getLast());
   }
 
   private static class AlertItem implements Serializable {
