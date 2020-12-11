@@ -1,5 +1,13 @@
-/src/test/
+# Gradle
+/build/
 /libs/
+/api/
+/.gradle/
+
+# Testing
+/src/test/
+
+# Files
 *.iml
 *.properties
 .idea

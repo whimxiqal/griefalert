@@ -360,9 +360,9 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.PLACE, BlockTypes.WALL_SIGN.getId()).build(),
 
         // ====================================================================================
-        GriefProfile.builder(GriefEvents.REPLACE, BlockTypes.DIRT.getId()).build(),
-        GriefProfile.builder(GriefEvents.REPLACE, BlockTypes.FARMLAND.getId()).build(),
-        GriefProfile.builder(GriefEvents.REPLACE, BlockTypes.GRASS_PATH.getId()).build()
+        GriefProfile.builder(GriefEvents.TRANSFORM, BlockTypes.DIRT.getId()).build(),
+        GriefProfile.builder(GriefEvents.TRANSFORM, BlockTypes.FARMLAND.getId()).build(),
+        GriefProfile.builder(GriefEvents.TRANSFORM, BlockTypes.GRASS_PATH.getId()).build()
     );
   }
 

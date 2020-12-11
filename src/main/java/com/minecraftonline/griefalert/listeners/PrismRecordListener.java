@@ -47,7 +47,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -131,7 +130,7 @@ public class PrismRecordListener implements EventListener<PrismRecordPreSaveEven
 
       Optional<GriefProfile> replaceOptional = GriefAlert.getInstance().getProfileCache()
           .getProfileOf(
-              GriefEvents.REPLACE,
+              GriefEvents.TRANSFORM,
               originalBlockId.get(),
               worldOptional.get());
 

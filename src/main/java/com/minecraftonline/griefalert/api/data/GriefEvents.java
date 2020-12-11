@@ -69,9 +69,9 @@ public final class GriefEvents {
       .of("attack", "Entity Attack", "attacked",
           "Primarily interact with a target entity with main hand");
 
-  public static final GriefEvent REPLACE = GriefEvent
-      .of("replace", "Block Replace", "replaced",
-          "Change a block from one non-air target block to a different non-air block");
+  public static final GriefEvent TRANSFORM = GriefEvent
+      .of("transform", "Transform", "transformed",
+          "Transformed a block from one non-air target block to a different non-air block");
 
   public static final GriefEvent EDIT = GriefEvent
       .of("edit", "Edit", "edited",
@@ -95,7 +95,7 @@ public final class GriefEvents {
           return Lists.newArrayList(
               BREAK,
               PLACE,
-              REPLACE,
+              TRANSFORM,
               DEATH,
               EDIT,
               ITEM_USE,
