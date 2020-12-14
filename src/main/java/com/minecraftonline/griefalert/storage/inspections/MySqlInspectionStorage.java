@@ -96,7 +96,7 @@ public class MySqlInspectionStorage implements InspectionStorage {
       statement.setInt(6, inspection.getY());
       statement.setInt(7, inspection.getZ());
       statement.setString(8, inspection.getWorldUuid().toString().replace("-", ""));
-      statement.setLong(9, inspection.getInspected().getTime() / 1000L);
+      statement.setLong(9, inspection.getInspected().getEpochSecond());
       statement.execute();
       return true;
     } catch (SQLException e) {

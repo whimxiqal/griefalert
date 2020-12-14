@@ -47,7 +47,7 @@ public class ReturnCommand extends GeneralCommand {
   ReturnCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_CHECK,
-        Text.of("Return to your previous location prior to a grief alert check")
+        Text.of("Return to your location prior to an alert check")
     );
     addAlias("return");
     addAlias("r");
@@ -60,8 +60,8 @@ public class ReturnCommand extends GeneralCommand {
                                @Nonnull CommandContext args) throws CommandException {
     if (src instanceof Player) {
       boolean inspected = args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).isPresent()
-          ? GriefAlert.getInstance().getAlertService().unInspect((Player) src, args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).get())
-          : GriefAlert.getInstance().getAlertService().unInspect((Player) src);
+          ? GriefAlert.getInstance().getAlertService().uninspect((Player) src, args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).get())
+          : GriefAlert.getInstance().getAlertService().uninspect((Player) src);
       if (inspected) {
         return CommandResult.success();
       } else {

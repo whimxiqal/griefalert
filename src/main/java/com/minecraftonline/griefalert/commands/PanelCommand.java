@@ -40,7 +40,7 @@ public class PanelCommand extends GeneralCommand {
 
   PanelCommand() {
     super(Permissions.GRIEFALERT_COMMAND_CHECK,
-        Text.of("Open an inventory with commands executed with clickable items"));
+        Text.of("GriefAlert menu interface"));
     addAlias("panel");
     addAlias("p");
   }

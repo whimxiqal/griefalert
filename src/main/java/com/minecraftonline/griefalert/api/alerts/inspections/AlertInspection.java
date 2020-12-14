@@ -30,6 +30,7 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -52,7 +53,7 @@ public final class AlertInspection implements Serializable {
   private final int yPos;
   private final int zPos;
   private final UUID worldUuid;
-  private final Date inspected;
+  private final Instant inspected;
   private final UUID previousWorldUuid;
   private final double previousPositionX;
   private final double previousPositionY;
@@ -61,6 +62,8 @@ public final class AlertInspection implements Serializable {
   private final double previousRotationY;
   private final double previousRotationZ;
   private final int alertIndex;
+
+  private boolean uninspected = false;
 
   /**
    * Basic constructor for an {@link AlertInspection}
@@ -82,7 +85,7 @@ public final class AlertInspection implements Serializable {
                          @Nonnull final String target,
                          @Nonnull final Vector3i blockPosition,
                          @Nonnull final UUID worldUuid,
-                         @Nonnull final Date inspected,
+                         @Nonnull final Instant inspected,
                          @Nonnull final Transform<World> previousTransform,
                          final int alertIndex) {
     this.officerUuid = officerUuid;
@@ -142,7 +145,7 @@ public final class AlertInspection implements Serializable {
   }
 
   @Nonnull
-  public Date getInspected() {
+  public Instant getInspected() {
     return inspected;
   }
 
@@ -158,4 +161,13 @@ public final class AlertInspection implements Serializable {
   public int getAlertIndex() {
     return alertIndex;
   }
+
+  public void uninspect() {
+    uninspected = true;
+  }
+
+  public boolean isUninspected() {
+    return uninspected;
+  }
+
 }

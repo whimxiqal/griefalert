@@ -98,7 +98,7 @@ public interface AlertService {
    *
    * @param officer The officer to teleport
    */
-  boolean unInspect(@Nonnull Player officer);
+  boolean uninspect(@Nonnull Player officer);
 
   /**
    * Undo the inspection done by the officer by returning them
@@ -108,7 +108,7 @@ public interface AlertService {
    * @param index   the alert index
    * @return true if the player was returned
    */
-  boolean unInspect(@Nonnull Player officer, int index);
+  boolean uninspect(@Nonnull Player officer, int index);
 
   /**
    * Open up a helpful panel to officers to more easily perform their tasks.

@@ -94,7 +94,7 @@ public class SqliteInspectionStorage implements InspectionStorage {
       statement.setInt(6, inspection.getY());
       statement.setInt(7, inspection.getZ());
       statement.setBytes(8, toBytes(inspection.getWorldUuid()));
-      statement.setLong(9, inspection.getInspected().getTime() / 1000L);
+      statement.setLong(9, inspection.getInspected().getEpochSecond());
       statement.execute();
       return true;
     } catch (SQLException e) {

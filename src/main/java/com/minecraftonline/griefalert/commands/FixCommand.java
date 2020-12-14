@@ -108,7 +108,7 @@ public class FixCommand extends GeneralCommand {
 
         if ((src instanceof Player)
             && ((Player) src).getUniqueId().equals(alert.getGrieferUuid())
-            && (!Permissions.has(src, Permissions.GRIEFALERT_UNRESTRICTED))) {
+            && (!Permissions.has(src, Permissions.SELF_FIX))) {
           throw new CommandException(Format.error("You can't undo your own actions"));
         }
 

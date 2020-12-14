@@ -60,9 +60,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -77,12 +79,10 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
@@ -317,7 +317,7 @@ public final class AlertServiceImpl implements AlertService {
       AlertInspection firstCheck = alertItem.getChecks().get(0);
       double secondsSinceFirstCheck =
           ((double) (Instant.now().toEpochMilli()
-              - firstCheck.getInspected().toInstant().toEpochMilli())
+              - firstCheck.getInspected().toEpochMilli())
           ) / 1000;
       if (secondsSinceFirstCheck < Settings.ALERT_CHECK_TIMEOUT.getValue()) {
         officer.sendMessage(Format.error(
@@ -409,7 +409,7 @@ public final class AlertServiceImpl implements AlertService {
         alertItem.get().getTarget(),
         alertItem.get().getGriefPosition(),
         alertItem.get().getWorldUuid(),
-        new Date(),
+        Instant.now(),
         officerPreviousTransform,
         index);
     officerInspectHistory.put(officer.getUniqueId(), index, inspection);
@@ -447,42 +447,53 @@ public final class AlertServiceImpl implements AlertService {
   }
 
   @Override
-  public boolean unInspect(@NotNull Player officer) {
+  public boolean uninspect(@NotNull Player officer) {
 
-    Optional<AlertInspection> lastInspection = getLastInspection(officer.getUniqueId());
+    Optional<AlertInspection> lastInspection = getLastReturnableInspection(officer.getUniqueId());
 
     if (!lastInspection.isPresent()) {
       officer.sendMessage(Format.info("You have no previous location"));
       return false;
     }
 
-    AlertInspection inspection = lastInspection.get();
-
-    if (!officer.setTransformSafely(inspection.getPreviousTransform())) {
-      Errors.sendCannotTeleportSafely(officer, inspection.getPreviousTransform());
-    } else {
-      officer.sendMessage(Format.success("Returned to previous location"));
-    }
-
-    return true;
+    return uninspect(officer, lastInspection.get().getAlertIndex());
   }
 
   @Override
-  public boolean unInspect(@NotNull Player officer, int index) {
+  public boolean uninspect(@NotNull Player officer, int index) {
 
     AlertInspection inspection = officerInspectHistory.get(
         officer.getUniqueId(),
         index);
 
     if (inspection == null) {
-      officer.sendMessage(Format.info("You have no previous location for alert " + index));
+      officer.sendMessage(Format.info(
+          "You have no previous location for alert ",
+          Format.bonus(index)));
+      return false;
+    }
+
+    if (inspection.getInspected().isBefore(Instant.now().minus(5, ChronoUnit.MINUTES))) {
+      officer.sendMessage(Format.error("Your return location has expired"));
+      return false;
+    }
+
+    if (inspection.isUninspected()) {
+      officer.sendMessage(Format.error(
+          "You have already returned from alert ",
+          Format.bonus(index)
+      ));
       return false;
     }
 
     if (!officer.setTransformSafely(inspection.getPreviousTransform())) {
       Errors.sendCannotTeleportSafely(officer, inspection.getPreviousTransform());
     } else {
-      officer.sendMessage(Format.success("Returned to previous location"));
+      inspection.uninspect();
+      officer.sendMessage(Format.success(
+          "Returned to location before grief check ",
+          Format.bonus(inspection.getAlertIndex()),
+          "!"));
     }
 
     return true;
@@ -582,18 +593,7 @@ public final class AlertServiceImpl implements AlertService {
   private LinkedList<AlertInspection> getInspectionsByTime(UUID officerUuid) {
     List<AlertInspection> inspections = Lists.newLinkedList();
     inspections.addAll(officerInspectHistory.row(officerUuid).values());
-    inspections.sort((e1, e2) -> {
-      int i1 = e1.getAlertIndex();
-      int i2 = e2.getAlertIndex();
-      int cur = alertCache.cursor();
-      if (i1 < cur && i2 >= cur) {
-        return 1;
-      } else if (i1 >= cur && i2 < cur) {
-        return -1;
-      } else {
-        return Integer.compare(i1, i2);
-      }
-    });
+    inspections.sort(Comparator.comparing(AlertInspection::getInspected));
     return Lists.newLinkedList(inspections);
   }
 
@@ -603,6 +603,18 @@ public final class AlertServiceImpl implements AlertService {
       return Optional.empty();
     }
     return Optional.of(inspections.getLast());
+  }
+
+  private Optional<AlertInspection> getLastReturnableInspection(UUID officerUuid) {
+    LinkedList<AlertInspection> inspections = getInspectionsByTime(officerUuid);
+    AlertInspection inspection;
+    for (Iterator<AlertInspection> it = inspections.descendingIterator(); it.hasNext();) {
+      inspection = it.next();
+      if (!inspection.isUninspected()) {
+        return Optional.of(inspection);
+      }
+    }
+    return Optional.empty();
   }
 
   private static class AlertItem implements Serializable {

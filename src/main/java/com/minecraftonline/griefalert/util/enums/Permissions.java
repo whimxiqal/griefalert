@@ -39,47 +39,62 @@ public final class Permissions {
     return user.hasPermission(permission.get());
   }
 
+  /* === COMMANDS === */
+
+  /* Generic command permissions for staff members */
   public static final Permission GRIEFALERT_COMMAND = Permission.of(
-      "griefalert.command"
+      "griefalert.staff.command"
   );
+  /* Can use 'check' command */
   public static final Permission GRIEFALERT_COMMAND_CHECK = Permission.of(
-      "griefalert.command.check"
+      "griefalert.staff.command.check"
   );
+  /* Can use 'info' command */
   public static final Permission GRIEFALERT_COMMAND_INFO = Permission.of(
-      "griefalert.command.info"
+      "griefalert.staff.command.info"
   );
+  /* Can use 'query' command */
   public static final Permission GRIEFALERT_COMMAND_QUERY = Permission.of(
-      "griefalert.command.query"
+      "griefalert.staff.command.query"
   );
+  /* Can use 'fix' command */
   public static final Permission GRIEFALERT_COMMAND_FIX = Permission.of(
-      "griefalert.command.fix"
+      "griefalert.staff.command.fix"
   );
+  /* Can use 'show' command */
   public static final Permission GRIEFALERT_COMMAND_SHOW = Permission.of(
-      "griefalert.command.show"
+      "griefalert.staff.command.show"
   );
+  /* Can use 'profile' command */
   public static final Permission GRIEFALERT_COMMAND_PROFILE = Permission.of(
-      "griefalert.command.profile"
+      "griefalert.admin.command.profile"
   );
+  /* Can use 'reload' command */
   public static final Permission GRIEFALERT_COMMAND_RELOAD = Permission.of(
-      "griefalert.command.reload"
+      "griefalert.admin.command.reload"
   );
+  /* Can use 'logs' command */
   public static final Permission GRIEFALERT_COMMAND_LOGS = Permission.of(
-      "griefalert.command.logs"
+      "griefalert.admin.command.logs"
   );
+  /* Can use 'rollback' command */
   public static final Permission GRIEFALERT_COMMAND_ROLLBACK = Permission.of(
-      "griefalert.command.rollback"
+      "griefalert.admin.command.rollback"
   );
 
+  /* === ABILITIES === */
 
-  @SuppressWarnings("WeakerAccess")
+  /* Receive incoming alert messages */
   public static final Permission GRIEFALERT_MESSAGING = Permission.of(
-      "griefalert.messaging"
+      "griefalert.staff.messaging"
   );
+  /* Mute outgoing alert messages */
   public static final Permission GRIEFALERT_SILENT = Permission.of(
-      "griefalert.silent"
+      "griefalert.staff.silent"
   );
-  public static final Permission GRIEFALERT_UNRESTRICTED = Permission.of(
-      "griefalert.unrestricted"
+  /* Allow 'fix' command on ones own alert */
+  public static final Permission SELF_FIX = Permission.of(
+      "griefalert.admin.selffix"
   );
 
 }
