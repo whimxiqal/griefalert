@@ -16,11 +16,13 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.ArtData;
 import org.spongepowered.api.data.persistence.DataFormats;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.text.Text;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class EntityAlert extends SpongeAlert {
@@ -28,8 +30,8 @@ public abstract class EntityAlert extends SpongeAlert {
   private final String entitySnapshotContainer;
   private final Vector3i griefPosition;
 
-  EntityAlert(GriefProfile griefProfile, TargetEntityEvent event) {
-    super(griefProfile, event);
+  EntityAlert(GriefProfile griefProfile, TargetEntityEvent event, Supplier<Player> supplier) {
+    super(griefProfile, supplier);
     this.griefPosition = event.getTargetEntity().getLocation().getBlockPosition();
     String serialized;
     try {

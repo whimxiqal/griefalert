@@ -14,6 +14,7 @@ import org.spongepowered.api.event.Event;
 import org.spongepowered.api.world.World;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public abstract class SpongeAlert extends GeneralAlert {
 
@@ -23,14 +24,17 @@ public abstract class SpongeAlert extends GeneralAlert {
   private final UUID worldUuid;
 
   protected SpongeAlert(GriefProfile griefProfile, Event event) {
+    this(griefProfile, () -> event.getCause().first(Player.class).orElseThrow(() ->
+        new RuntimeException("SpongeAlert couldn't find a player in the cause stack")));
+  }
+
+  protected SpongeAlert(GriefProfile griefProfile, Supplier<Player> supplier) {
     super(griefProfile);
-    Player player = event.getCause().first(Player.class).orElseThrow(() ->
-        new RuntimeException("SpongeAlert couldn't find a player in the cause stack"));
+    Player player = supplier.get();
     this.grieferUuid = player.getUniqueId();
-    Transform<World> transform = player.getTransform();
-    grieferPosition = transform.getPosition();
-    grieferRotation = transform.getRotation();
-    worldUuid = transform.getExtent().getUniqueId();
+    grieferPosition = player.getTransform().getPosition();
+    grieferRotation = player.getTransform().getRotation();
+    worldUuid = player.getTransform().getExtent().getUniqueId();
   }
 
   @Nonnull

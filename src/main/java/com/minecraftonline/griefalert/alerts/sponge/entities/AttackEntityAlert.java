@@ -10,6 +10,8 @@ import com.minecraftonline.griefalert.api.data.GriefEvents;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
 
 /**
@@ -29,8 +31,9 @@ public class AttackEntityAlert extends EntityAlert {
    */
   public AttackEntityAlert(@Nonnull final GriefProfile griefProfile,
                            @Nonnull final AttackEntityEvent event,
-                           @Nonnull final UUID grieferUuid) {
-    super(griefProfile, event);
+                           @Nonnull final UUID grieferUuid,
+                           @Nonnull final Player player) {
+    super(griefProfile, event, () -> player);
     this.grieferUuid = grieferUuid;
 
     if (griefProfile.getTarget().equals("minecraft:item_frame")) {
@@ -45,8 +48,9 @@ public class AttackEntityAlert extends EntityAlert {
   public AttackEntityAlert(@Nonnull final GriefProfile griefProfile,
                            @Nonnull final AttackEntityEvent event,
                            @Nonnull final UUID grieferUuid,
+                           @Nonnull final Player player,
                            @Nonnull final String tool) {
-    this(griefProfile, event, grieferUuid);
+    this(griefProfile, event, grieferUuid, player);
     addDetail(Detail.of(
         "Tool",
         "The item in the hand of the player at the time of the event.",

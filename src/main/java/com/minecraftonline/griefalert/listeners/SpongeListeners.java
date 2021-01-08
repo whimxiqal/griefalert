@@ -165,7 +165,11 @@ public final class SpongeListeners {
               .ifPresent(profile ->
                   GriefAlert.getInstance()
                       .getAlertService()
-                      .submit(new AttackEntityAlert(profile, event, player.getUniqueId(), directCause)));
+                      .submit(new AttackEntityAlert(profile,
+                          event,
+                          player.getUniqueId(),
+                          player,
+                          directCause)));
         }
 
       } else if (damageSource.getSource() instanceof Player) {
@@ -180,7 +184,10 @@ public final class SpongeListeners {
             .ifPresent(profile ->
                 GriefAlert.getInstance()
                     .getAlertService()
-                    .submit(new AttackEntityAlert(profile, event, player.getUniqueId())));
+                    .submit(new AttackEntityAlert(profile,
+                        event,
+                        player.getUniqueId(),
+                        player)));
       }
     }
   }

@@ -8,13 +8,15 @@ import com.minecraftonline.griefalert.util.Format;
 
 import javax.annotation.Nonnull;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 
 public class InteractEntityAlert extends EntityAlert {
 
   public InteractEntityAlert(@Nonnull GriefProfile griefProfile,
                              @Nonnull InteractEntityEvent.Secondary event) {
-    super(griefProfile, event);
+    super(griefProfile, event, () -> event.getCause().first(Player.class).orElseThrow(() ->
+        new RuntimeException("InteractEntityAlert couldn't find a player in the cause stack")));
 
     if (griefProfile.getTarget().equals("minecraft:item_frame")) {
       addDetail(getItemFrameDetail());
