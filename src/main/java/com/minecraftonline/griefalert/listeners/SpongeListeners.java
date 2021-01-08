@@ -37,12 +37,14 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.IsCancelled;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.scheduler.Task;
 
@@ -60,7 +62,7 @@ public final class SpongeListeners {
    *
    * @param event the event for which to listen
    */
-  @Listener
+  @Listener(order = Order.LATE)
   public void onInteractItemEventSecondary(InteractItemEvent.Secondary event) {
     if (event.getCause().root() instanceof Player) {
       Player player = (Player) event.getCause().root();
@@ -83,7 +85,7 @@ public final class SpongeListeners {
    *
    * @param event the event for which to listen
    */
-  @Listener
+  @Listener(order = Order.LATE)
   public void onInteractBlockEventSecondary(InteractBlockEvent.Secondary event) {
     if (event.getCause().root() instanceof Player) {
       Player player = (Player) event.getCause().root();
@@ -119,7 +121,7 @@ public final class SpongeListeners {
    *
    * @param event the event for which to listen
    */
-  @Listener
+  @Listener(order = Order.LATE)
   public void onInteractEntityEventSecondary(InteractEntityEvent.Secondary event) {
     if (event.getCause().root() instanceof Player) {
       Player player = (Player) event.getCause().root();
@@ -142,7 +144,7 @@ public final class SpongeListeners {
    *
    * @param event the event for which to listen
    */
-  @Listener
+  @Listener(order = Order.LATE)
   public void onAttackEntityEvent(AttackEntityEvent event) {
 
     if (event.getCause().root() instanceof EntityDamageSource) {
@@ -192,7 +194,7 @@ public final class SpongeListeners {
     }
   }
 
-  @Listener
+  @Listener(order = Order.LATE)
   public void onChangeSignEvent(ChangeSignEvent event) {
     event.getCause()
         .first(Player.class)
