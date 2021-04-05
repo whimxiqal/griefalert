@@ -118,6 +118,8 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.DIAMOND_ORE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.DISPENSER.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.DROPPER.getId()).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.EMERALD_BLOCK.getId()).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.EMERALD_ORE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.END_BRICKS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.END_GATEWAY.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.END_PORTAL.getId()).build(),

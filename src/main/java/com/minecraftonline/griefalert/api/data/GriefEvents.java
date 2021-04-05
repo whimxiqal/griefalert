@@ -35,48 +35,33 @@ import org.spongepowered.api.registry.CatalogRegistryModule;
 
 public final class GriefEvents {
 
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private GriefEvents() {
-  }
-
-  public static final GriefEvent BREAK = GriefEvent.of(
-      PrismEvents.BLOCK_BREAK,
-      "Break a block");
-
-  public static final GriefEvent PLACE = GriefEvent.of(
-      PrismEvents.BLOCK_PLACE,
-      "Place a block");
-
-  public static final GriefEvent DEATH = GriefEvent.of(
-      PrismEvents.ENTITY_DEATH,
-      "Directly cause the death of an entity");
-
-  public static final GriefEvent ITEM_USE = GriefEvent
-      .of("use", "Item Use", "used",
-          "Secondarily interact with the target item in main hand");
-
-  public static final GriefEvent ITEM_APPLY = GriefEvent
-      .of("apply", "Item Apply", "applied",
-          "Secondarily interact with a block while holding the target item in main hand.");
-
-  public static final GriefEvent INTERACT = GriefEvent
-      .of("interact", "Interact", "interacted with",
-          "Secondarily interact with a target object in the world with main hand");
-
   public static final GriefEvent ATTACK = GriefEvent
       .of("attack", "Entity Attack", "attacked",
           "Primarily interact with a target entity with main hand");
-
-  public static final GriefEvent TRANSFORM = GriefEvent
-      .of("transform", "Transform", "transformed",
-          "Transformed a block from one non-air target block to a different non-air block");
-
+  public static final GriefEvent BREAK = GriefEvent.of(
+      PrismEvents.BLOCK_BREAK,
+      "Break a block");
+  public static final GriefEvent DEATH = GriefEvent.of(
+      PrismEvents.ENTITY_DEATH,
+      "Directly cause the death of an entity");
   public static final GriefEvent EDIT = GriefEvent
       .of("edit", "Edit", "edited",
           "Edit the contents or internal state of an object");
-
+  public static final GriefEvent INTERACT = GriefEvent
+      .of("interact", "Interact", "interacted with",
+          "Secondarily interact with a target object in the world with main hand");
+  public static final GriefEvent ITEM_APPLY = GriefEvent
+      .of("apply", "Item Apply", "applied",
+          "Secondarily interact with a block while holding the target item in main hand.");
+  public static final GriefEvent ITEM_USE = GriefEvent
+      .of("use", "Item Use", "used",
+          "Secondarily interact with the target item in main hand");
+  public static final GriefEvent PLACE = GriefEvent.of(
+      PrismEvents.BLOCK_PLACE,
+      "Place a block");
+  public static final GriefEvent TRANSFORM = GriefEvent
+      .of("transform", "Transform", "transformed",
+          "Transformed a block from one non-air target block to a different non-air block");
   public static final CatalogRegistryModule<GriefEvent> REGISTRY_MODULE = new
       CatalogRegistryModule<GriefEvent>() {
         @Nonnull
@@ -105,6 +90,12 @@ public final class GriefEvents {
           );
         }
       };
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private GriefEvents() {
+  }
 
 
 }

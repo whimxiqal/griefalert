@@ -31,29 +31,27 @@ import java.text.SimpleDateFormat;
 
 public final class Settings {
 
-  /**
-   * Private constructor to prevent instantiation.
-   */
-  private Settings() {
-  }
-
   public static final Setting<Integer> ALERTS_CODE_LIMIT = Setting.of(
       "alerts_code_limit",
       10000,
       "Number of alerts to cache",
       val -> (val >= 10) && (val <= 100000),
-      "The alerts_code_limit configuration value is out of the acceptable range {10, 100000}. ",
+      "The alerts_code_limit configuration value is out of the acceptable range [10, 100000]. ",
       Integer.class);
-
-  public static final Setting<Integer> MAX_HIDDEN_REPEATED_EVENTS = Setting.of(
-      "max_hidden_repeated_events",
+  public static final Setting<Integer> ALERT_CHECK_TIMEOUT = Setting.of(
+      "alert_check_timeout",
+      5,
+      "The number of seconds to wait before another staff member can check an alert after the first",
+      val -> (val >= 0) && (val <= 60),
+      "The alert_check_timeout configuration value is out of the acceptable range [0, 60]. ",
+      Integer.class);
+  public static final Setting<Integer> CHECK_INVULNERABILITY = Setting.of(
+      "check_invulnerability",
       10,
-      "Maximum number of repeated events to hide if they occurred in a row",
-      val -> (val >= 1) && (val <= 1000),
-      "The max_hidden_repeated_events configuration value is out of the "
-          + "acceptable range {1, 1000}. ",
+      "The number of seconds of invulnerability staff get when they check alerts",
+      val -> (val >= 0) && (val <= 60),
+      "The check_invulnerability configuration value is out of the acceptable range [0, 60]. ",
       Integer.class);
-
   public static final Setting<String> DATE_FORMAT = Setting.of(
       "date_format",
       "dd MMM yyyy HH:mm:ss z",
@@ -68,7 +66,29 @@ public final class Settings {
       },
       "The date_format configuration value can not be parsed by Java's SimpleDateFormat. ",
       String.class);
-
+  public static final Setting<Boolean> DIMENSIONED_ALERTS = Setting.of(
+      "dimensioned_alerts",
+      false,
+      "Set to true to show dimension type on alerts instead of world names",
+      b -> true,
+      "",
+      Boolean.class
+  );
+  public static final Setting<Integer> INSPECTION_RETURN_TIMEOUT = Setting.of(
+      "alert_inspect_timeout",
+      30,
+      "The number of minutes before an alert inspection may not be returned from. Set too -1 to disable",
+      val -> (val >= -1) && (val <= 1440),
+      "The alert_inspect_timeout configuration value is out of the acceptable range [-1, 1440]. ",
+      Integer.class);
+  public static final Setting<Integer> MAX_HIDDEN_REPEATED_EVENTS = Setting.of(
+      "max_hidden_repeated_events",
+      10,
+      "Maximum number of repeated events to hide if they occurred in a row",
+      val -> (val >= 1) && (val <= 1000),
+      "The max_hidden_repeated_events configuration value is out of the "
+          + "acceptable range {1, 1000}. ",
+      Integer.class);
   public static final Setting<Boolean> SHOW_ALERTS_IN_CONSOLE = Setting.of(
       "show_alerts_in_console",
       true,
@@ -76,7 +96,20 @@ public final class Settings {
       bool -> true,
       "",
       Boolean.class);
-
+  public static final Setting<String> STORAGE_ADDRESS = Setting.of(
+      "storage_address",
+      "localhost",
+      "The storage address to be used if storage type requires it",
+      s -> true,
+      "",
+      String.class);
+  public static final Setting<String> STORAGE_DATABASE = Setting.of(
+      "storage_database",
+      "",
+      "The storage database to be used if storage type requires it",
+      s -> true,
+      "",
+      String.class);
   public static final Setting<String> STORAGE_ENGINE = Setting.of(
       "storage_engine",
       "sqlite",
@@ -85,31 +118,6 @@ public final class Settings {
       s -> Lists.newArrayList("mysql", "sqlite").contains(s.toLowerCase()),
       "The storage_engine configuration value is not one of the options {MySQL, SQLite}. ",
       String.class);
-
-  public static final Setting<String> STORAGE_ADDRESS = Setting.of(
-      "storage_address",
-      "localhost",
-      "The storage address to be used if storage type requires it",
-      s -> true,
-      "",
-      String.class);
-
-  public static final Setting<String> STORAGE_DATABASE = Setting.of(
-      "storage_database",
-      "",
-      "The storage database to be used if storage type requires it",
-      s -> true,
-      "",
-      String.class);
-
-  public static final Setting<String> STORAGE_USERNAME = Setting.of(
-      "storage_username",
-      "",
-      "The storage username to be used if storage type requires it",
-      s -> true,
-      "",
-      String.class);
-
   public static final Setting<String> STORAGE_PASSWORD = Setting.of(
       "storage_password",
       "",
@@ -117,21 +125,17 @@ public final class Settings {
       s -> true,
       "",
       String.class);
-
-  public static final Setting<Integer> CHECK_INVULNERABILITY = Setting.of(
-      "check_invulnerability",
-      10,
-      "The number of seconds of invulnerability staff get when they check alerts",
-      val -> (val >= 0) && (val <= 60),
-      "The check_invulnerability configuration value is out of the acceptable range {0, 60}. ",
-      Integer.class);
-
-  public static final Setting<Integer> ALERT_CHECK_TIMEOUT = Setting.of(
-      "alert_check_timeout",
-      5,
-      "The number of seconds to wait before another staff member can check an alert after the first",
-      val -> (val >= 0) && (val <= 60),
-      "The alert_check_timeout configuration value is out of the acceptable range {0, 60}. ",
-      Integer.class);
+  public static final Setting<String> STORAGE_USERNAME = Setting.of(
+      "storage_username",
+      "",
+      "The storage username to be used if storage type requires it",
+      s -> true,
+      "",
+      String.class);
+  /**
+   * Private constructor to prevent instantiation.
+   */
+  private Settings() {
+  }
 
 }

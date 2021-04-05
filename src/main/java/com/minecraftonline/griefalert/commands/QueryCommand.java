@@ -66,9 +66,8 @@ public class QueryCommand extends GeneralCommand {
             GenericArguments.string(CommandKeys.TARGET.get()), "t")
         .valueFlag(
             GenericArguments.integer(CommandKeys.MAXIMUM.get()), "m")
-        .flag("-spread", "s")
-        .buildWith(
-            GenericArguments.none()));
+        .flag("s")
+        .buildWith(GenericArguments.none()));
   }
 
   @Override
@@ -97,7 +96,7 @@ public class QueryCommand extends GeneralCommand {
     GriefAlert.getInstance().getAlertService().lookup(Collections.singleton(src),
         builder.build(),
         AlertService.Sort.REVERSE_CHRONOLOGICAL,
-        args.hasAny("spread"));
+        args.hasAny("s"));
 
     return CommandResult.success();
 

@@ -4,11 +4,14 @@ package com.minecraftonline.griefalert.alerts.sponge;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.templates.Arg;
+import com.minecraftonline.griefalert.api.templates.Templates;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 
@@ -20,12 +23,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
+import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.enums.Settings;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
@@ -117,28 +123,50 @@ public class ChangeSignAlert implements Alert {
   @Nonnull
   @Override
   public Text getMessage() {
-    Text.Builder builder = Text.builder()
-        .append(Format.userName(Alerts.getGriefer(this)))
-        .append(Text.of(TextColors.RED, " applied changes to a sign"));
-    List<Text> lines = formatLines().stream().map(alertDetail ->
+
+    List<Text> signLines = formatLines().stream().map(alertDetail ->
         alertDetail.get(this).get()).collect(Collectors.toList());
-    Text content;
-    if (!lines.isEmpty()) {
-      content = Text.joinWith(
+    Text signContent;
+    if (!signLines.isEmpty()) {
+      signContent = Text.joinWith(
           Format.endLine(),
           formatLines().stream()
               .map(alertDetail -> alertDetail.get(this).get())
               .collect(Collectors.toList()));
     } else {
-      content = Format.bonus("Empty");
+      signContent = Format.bonus("Empty");
     }
     Text ellipses = Text.builder().append(Format.bonus("(...)"))
         .onHover(TextActions.showText(Text.of(
             Format.prefix(),
             Format.endLine(),
-            content)))
+            signContent)))
         .build();
-    return builder.append(Format.space()).append(ellipses).build();
+
+    return Templates.ALERT.getTextTemplate().apply(
+        ImmutableMap.<String, TextElement>builder()
+            .put(Arg.GRIEFER.name(),
+                Format.userName(Alerts.getGriefer(this)))
+            .put(Arg.EVENT_COLOR.name(),
+                this.getGriefProfile().getColored(GriefProfile.Colorable.EVENT)
+                    .orElse(Format.ALERT_EVENT_COLOR))
+            .put(Arg.EVENT.name(),
+                Format.action(this.getGriefEvent(), "applied changes to"))
+            .put(Arg.TARGET_COLOR.name(),
+                this.getGriefProfile().getColored(GriefProfile.Colorable.TARGET)
+                    .orElse(Format.ALERT_TARGET_COLOR))
+            .put(Arg.TARGET.name(),
+                Grammar.addIndefiniteArticle(Format.item(this.getTarget())))
+            .put(Arg.WORLD_COLOR.name(),
+                this.getGriefProfile().getColored(GriefProfile.Colorable.WORLD)
+                    .orElse(Format.ALERT_WORLD_COLOR))
+            .put(Arg.WORLD.name(),
+                Settings.DIMENSIONED_ALERTS.getValue()
+                    ? Text.of("the ", Format.dimension(Alerts.getWorld(this).getDimension().getType()))
+                    : Text.of(Alerts.getWorld(this).getName()))
+            .put(Arg.SUFFIX.name(),
+                ellipses)
+            .build()).build();
   }
 
   @Nonnull

@@ -24,13 +24,17 @@
 
 package com.minecraftonline.griefalert.storage;
 
-import com.google.common.collect.ImmutableList;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.configuration.Setting;
 import com.minecraftonline.griefalert.util.enums.Settings;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -38,18 +42,20 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class ConfigHelper {
 
-  private final ImmutableList<Setting<?>> settings = ImmutableList.of(
-      Settings.ALERTS_CODE_LIMIT,
-      Settings.MAX_HIDDEN_REPEATED_EVENTS,
-      Settings.SHOW_ALERTS_IN_CONSOLE,
-      Settings.CHECK_INVULNERABILITY,
-      Settings.ALERT_CHECK_TIMEOUT,
-      Settings.DATE_FORMAT,
-      Settings.STORAGE_ENGINE,
-      Settings.STORAGE_ADDRESS,
-      Settings.STORAGE_DATABASE,
-      Settings.STORAGE_USERNAME,
-      Settings.STORAGE_PASSWORD);
+  private Collection<Setting<?>> allSettings() {
+    List<Setting<?>> settings = new LinkedList<>();
+    Arrays.stream(Settings.class.getDeclaredFields())
+        .filter(field -> Modifier.isStatic(field.getModifiers()))
+        .filter(field -> Setting.class.isAssignableFrom(field.getType()))
+        .forEach(field -> {
+          try {
+            settings.add((Setting<?>) field.get(null));
+          } catch (IllegalAccessException e) {
+            e.printStackTrace();
+          }
+        });
+    return settings;
+  }
 
   /**
    * Create and initialize this helper class for managing the configuration data. This constructor
@@ -72,7 +78,7 @@ public class ConfigHelper {
       GriefAlert.getInstance().getLogger().info(
           "No configuration file found. Generating new one...");
       try {
-        settings.forEach(
+        allSettings().forEach(
             setting -> {
               root.getNode(setting.getName()).setComment(setting.getComment());
               root.getNode(setting.getName()).setValue(setting.getDefaultValue());
@@ -80,6 +86,7 @@ public class ConfigHelper {
         GriefAlert.getInstance().getConfigManager().save(root);
         GriefAlert.getInstance().getLogger().info("New configuration file created successfully");
       } catch (IOException e) {
+        e.printStackTrace();
         GriefAlert.getInstance().getLogger().error("Exception while initializing configuration", e);
       }
     }
@@ -91,19 +98,29 @@ public class ConfigHelper {
    *
    * @param root The root node for the configuration values in the file
    */
-  public void load(ConfigurationNode root) {
+  public void load(CommentedConfigurationNode root) {
     try {
       GriefAlert.getInstance().getConfigManager().load();
-      for (Setting<?> setting : settings) {
+      for (Setting<?> setting : allSettings()) {
         try {
           setting.setValueFromConfig(root);
         } catch (RuntimeException | ObjectMappingException e1) {
+          root.getNode(setting.getName()).setComment(setting.getComment());
+          root.getNode(setting.getName()).setValue(setting.getDefaultValue());
           GriefAlert.getInstance().getLogger().error(e1.getMessage());
         }
       }
       GriefAlert.getInstance().getLogger().info("Configuration file loaded");
     } catch (Exception e2) {
       e2.printStackTrace();
+      return;
+    }
+
+    try {
+      GriefAlert.getInstance().getConfigManager().save(root);
+    } catch (IOException e) {
+      e.printStackTrace();
+      GriefAlert.getInstance().getLogger().error("Exception while saving configuration after load", e);
     }
   }
 

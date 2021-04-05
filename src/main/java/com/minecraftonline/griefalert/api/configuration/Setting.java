@@ -109,7 +109,7 @@ public final class Setting<T> {
    * Set this setting's value based on the input {@link ConfigurationNode}.
    *
    * @param node The configuration node
-   * @throws RuntimeException       if the node does not have this setting
+   * @throws IllegalStateException  if the node does not have this setting
    * @throws ObjectMappingException if the node contains the wrong type of value
    */
   public void setValueFromConfig(@Nonnull ConfigurationNode node)

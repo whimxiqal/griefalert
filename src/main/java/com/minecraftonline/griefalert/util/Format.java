@@ -75,6 +75,7 @@ public final class Format {
   public static final TextColor ALERT_EVENT_COLOR = TextColors.RED;
   public static final TextColor ALERT_TARGET_COLOR = TextColors.RED;
   public static final TextColor ALERT_WORLD_COLOR = TextColors.RED;
+  public static final TextColor CLICK_COMMAND_COLOR = TextColors.LIGHT_PURPLE;
 
   /**
    * Returns content formatted as an error message.
@@ -277,7 +278,7 @@ public final class Format {
                              @Nullable Text hoverMessage) {
     Text.Builder builder = Text.builder()
         .append(Text.of(TextColors.GOLD, TextStyles.ITALIC, "[",
-            Text.of(TextColors.GRAY, label), "]"))
+            Text.of(Format.CLICK_COMMAND_COLOR, label), "]"))
         .onClick(TextActions.runCommand(command));
     if (hoverMessage != null) {
       builder.onHover(TextActions.showText(Text.of(
@@ -499,8 +500,25 @@ public final class Format {
     }
   }
 
+  /**
+   * Format a GriefEvent into readable text.
+   *
+   * @param event the event
+   * @return the readable text
+   */
   public static Text action(@Nonnull GriefEvent event) {
-    return Text.builder(event.getPreterit())
+    return action(event, event.getPreterit());
+  }
+
+  /**
+   * Format a GriefEvent into readable text with a specific label string.
+   *
+   * @param event the event
+   * @param label the message label
+   * @return the readable text
+   */
+  public static Text action(@Nonnull GriefEvent event, String label) {
+    return Text.builder(label)
         .onHover(TextActions.showText(Text.of(
             Format.heading("Event"),
             Format.endLine(),

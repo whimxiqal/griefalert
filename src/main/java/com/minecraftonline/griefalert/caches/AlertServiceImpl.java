@@ -363,11 +363,16 @@ public final class AlertServiceImpl implements AlertService {
         "Inspecting Alert ",
         Format.bonus(index),
         Format.space(),
-        Text.builder()
-            .append(Text.of(TextStyles.NONE, TextColors.GOLD, "[", Text.of(TextColors.GRAY, TextStyles.ITALIC, "PANEL"), "]"))
-            .onClick(TextActions.executeCallback(p -> InspectionInventory.openInspectionPanel(officer, index)))
-            .onHover(TextActions.showText(Text.of(Format.prefix(), Format.endLine(), Format.bonus("Open an Inspection Panel"))))
-            .build()));
+        Format.command("PANEL",
+            "/griefalert panel",
+            Text.of(Format.prefix(),
+                Format.endLine(),
+                Format.bonus("Open an Inspection Panel")))));
+//        Text.builder()
+//            .append(Text.of(TextStyles.NONE, TextColors.GOLD, "[", Text.of(TextColors.GRAY, TextStyles.ITALIC, "PANEL"), "]"))
+//            .onClick(TextActions.executeCallback(p -> InspectionInventory.openInspectionPanel(officer, index)))
+//            .onHover(TextActions.showText())
+//            .build()));
 
     // Notify the officer of other staff members who may have checked this alert already
     if (!alertItem.getChecks().isEmpty()) {
@@ -473,9 +478,11 @@ public final class AlertServiceImpl implements AlertService {
       return false;
     }
 
-    if (inspection.getInspected().isBefore(Instant.now().minus(5, ChronoUnit.MINUTES))) {
-      officer.sendMessage(Format.error("Your return location has expired"));
-      return false;
+    if (Settings.INSPECTION_RETURN_TIMEOUT.getValue() >= 0) {
+      if (inspection.getInspected().isBefore(Instant.now().minus(Settings.INSPECTION_RETURN_TIMEOUT.getValue(), ChronoUnit.MINUTES))) {
+        officer.sendMessage(Format.error("Your return location has expired"));
+        return false;
+      }
     }
 
     if (inspection.isUninspected()) {

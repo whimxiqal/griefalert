@@ -35,7 +35,6 @@ import com.minecraftonline.griefalert.api.templates.Templates;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
-import com.minecraftonline.griefalert.util.enums.AlertTags;
 import com.minecraftonline.griefalert.util.enums.Details;
 
 import java.util.Date;
@@ -45,10 +44,10 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
+import com.minecraftonline.griefalert.util.enums.Settings;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * An object to hold all information about an Alert caused by an
@@ -121,7 +120,9 @@ public abstract class GeneralAlert implements Alert {
                 this.getGriefProfile().getColored(GriefProfile.Colorable.WORLD)
                     .orElse(Format.ALERT_WORLD_COLOR))
             .put(Arg.WORLD.name(),
-                Text.of(Alerts.getWorld(this).getName()))
+                Settings.DIMENSIONED_ALERTS.getValue()
+                    ? Text.of("the ", Format.dimension(Alerts.getWorld(this).getDimension().getType()))
+                    : Text.of(Alerts.getWorld(this).getName()))
             .put(Arg.SUFFIX.name(),
                 ellipses.build())
             .build()).build();
