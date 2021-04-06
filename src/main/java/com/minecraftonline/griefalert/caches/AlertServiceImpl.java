@@ -160,7 +160,9 @@ public final class AlertServiceImpl implements AlertService {
 
   private void updateRepeatHistory(@Nonnull final Alert alert) {
     RecentAlertHistory history = grieferRepeatHistory.computeIfAbsent(alert.getGrieferUuid(), uuid -> new RecentAlertHistory());
-    alert.setSilent(history.put(alert.getGriefProfile()));
+    if (history.put(alert.getGriefProfile())) {
+      alert.setSilent(true);
+    }
   }
 
   @Nonnull
