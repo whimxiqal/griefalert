@@ -1,4 +1,3 @@
-
 # GriefAlert  
   
 A grief alerting plugin for [MinecraftOnline](https://www.minecraftonline.com), 
@@ -84,7 +83,7 @@ Only if the specified flag requirements are satisfied will a query returned to t
 | Prism Event      | *event*     | The name indicative of the type of event. Event types: {break, decay, grow, place, death, command, close, open, drop, insert, pickup, remove, disconnect, join}
 | GA Event         | *event*     | The name indicative of the type of event. Event types: {break, place, death, use, apply, interact, attack, replace}
 | Dimension        | *dimension* | {minecraft:overworld, minecraft:nether, minecraft:the_end} |
-| Ignore           | *ignore*    | Similar to Dimension, specify which Dimension Types to ignore |
+| Ignore           | *ignore*    | A world name such that the world is ignored |
 | (...) Color      | *..._color* | Specifies the color for a specific portion (...) of text. Color types: {black, dark_blue, dark_green, dark_aqua, dark_red, dark_purple, gold, gray, dark_gray, blue, green, aqua, read, light_purple, yellow, white} |
 | Spread           | *spread*    | Return all results of a query separately |
 | Group            | *group*     | Return all results of a query collapsed together where possible |
