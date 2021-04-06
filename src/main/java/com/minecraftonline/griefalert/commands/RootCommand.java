@@ -24,6 +24,7 @@
 
 package com.minecraftonline.griefalert.commands;
 
+import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
@@ -93,7 +94,7 @@ public class RootCommand extends GeneralCommand {
     src.sendMessage(Text.of(
         Format.GRIEF_ALERT_THEME, TextStyles.BOLD, String.format(
             "GriefAlert v%s",
-            Reference.VERSION),
+            GriefAlert.getInstance().getPluginContainer().getVersion().orElse("unknown")),
         Format.space(),
         TextStyles.RESET, Format.bonus("by MinecraftOnline")));
     src.sendMessage(Text.of(

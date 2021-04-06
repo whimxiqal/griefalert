@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Fixable;
+import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.templates.Arg;
 import com.minecraftonline.griefalert.api.templates.Templates;
@@ -72,9 +73,12 @@ public class FixCommand extends GeneralCommand {
     addAlias("fix");
     addAlias("f");
     setCommandElement(GenericArguments.flags()
-        .flag("c", "-collect")
+        .flag("c")
         .buildWith(
-            GenericArguments.integer(CommandKeys.ALERT_INDEX.get())));
+            GenericArguments.optional(GenericArguments.integer(CommandKeys.ALERT_INDEX.get()))));
+    addFlagDescription("c",
+        Text.of("Collects the item from the griefer's inventory. \nThe griefer may or may not have picked it up!"),
+        false);
   }
 
 
@@ -85,7 +89,7 @@ public class FixCommand extends GeneralCommand {
 
     int index;
     try {
-      index = args.<Integer>requireOne(CommandKeys.ALERT_INDEX.get());
+      index = args.requireOne(CommandKeys.ALERT_INDEX.get());
     } catch (NoSuchElementException e) {
       sendHelp(src);
       return CommandResult.success();

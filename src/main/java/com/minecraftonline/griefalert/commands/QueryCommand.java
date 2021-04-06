@@ -45,6 +45,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class QueryCommand extends GeneralCommand {
 
@@ -61,13 +62,22 @@ public class QueryCommand extends GeneralCommand {
         .valueFlag(
             GenericArguments.string(CommandKeys.PLAYER.get()), "p")
         .valueFlag(
-            GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class), "e")
-        .valueFlag(
             GenericArguments.string(CommandKeys.TARGET.get()), "t")
+        .valueFlag(
+            GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class), "e")
         .valueFlag(
             GenericArguments.integer(CommandKeys.MAXIMUM.get()), "m")
         .flag("s")
         .buildWith(GenericArguments.none()));
+    addFlagDescription(FlagDescription.PLAYER);
+    addFlagDescription(FlagDescription.TARGET);
+    addFlagDescription(FlagDescription.EVENT);
+    addFlagDescription("m",
+        Text.of("Only retrieve a certain ", TextColors.AQUA, "maximum ", TextColors.RESET, "number of alerts"),
+        true);
+    addFlagDescription("s",
+        Text.of(TextColors.AQUA, "Spread", TextColors.RESET, " all alerts into individual ones"),
+        false);
   }
 
   @Override

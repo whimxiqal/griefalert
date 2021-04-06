@@ -99,6 +99,18 @@ public class ProfileCommand extends GeneralCommand {
                   CommandKeys.PROFILE_COLOR_WORLD.get(), TextColor.class),
                   "-world_color")
               .buildWith(GenericArguments.none())));
+      addFlagDescription("i",
+          Text.of(TextColors.AQUA, "Ignore", TextColors.RESET, " the world with the given world name"),
+          true);
+      addFlagDescription("-event_color",
+          Text.of("Use this color on the event of the alerts with this profile"),
+          true);
+      addFlagDescription("-target_color",
+          Text.of("Use this color on the target of the alerts with this profile"),
+          true);
+      addFlagDescription("-world_color",
+          Text.of("Use this color on the world of the alerts with this profile"),
+          true);
     }
 
     @Nonnull

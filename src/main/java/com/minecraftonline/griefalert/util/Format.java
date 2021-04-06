@@ -364,9 +364,20 @@ public final class Format {
    * @return the formatted text
    */
   public static Text hover(String label, String onHover) {
+    return hover(Text.of(TextStyles.ITALIC, label), Text.of(onHover));
+  }
+
+  /**
+   * Format the label with text to show upon hovering with the cursor.
+   *
+   * @param label   the label to be printed
+   * @param onHover the text to show upon hovering
+   * @return the formatted text
+   */
+  public static Text hover(Text label, Text onHover) {
     return Text.builder()
-        .append(Text.of(TextStyles.ITALIC, label))
-        .onHover(TextActions.showText(Format.bonus(onHover)))
+        .append(label)
+        .onHover(TextActions.showText(onHover))
         .build();
   }
 

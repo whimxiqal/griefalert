@@ -42,6 +42,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class CheckCommand extends GeneralCommand {
 
@@ -54,7 +55,16 @@ public class CheckCommand extends GeneralCommand {
     addAlias("c");
     setCommandElement(GenericArguments.seq(
         GenericArguments.integer(CommandKeys.ALERT_INDEX.get()),
-        GenericArguments.flags().flag("-force", "f").buildWith(GenericArguments.none())));
+        GenericArguments.flags()
+            .flag("f")
+            .flag("b")
+            .buildWith(GenericArguments.none())));
+    addFlagDescription("f",
+        Text.of(TextColors.AQUA, "Force", TextColors.RESET, " the teleportation, even if no safe location could be found"),
+        false);
+    addFlagDescription("b",
+        Text.of("Teleport to the", TextColors.AQUA, " block", TextColors.RESET, " location of the grief event \ninstead of the griefer's location"),
+        false);
   }
 
   @Nonnull
@@ -71,7 +81,7 @@ public class CheckCommand extends GeneralCommand {
         return CommandResult.success();
       }
       try {
-        GriefAlert.getInstance().getAlertService().inspect(index, player, args.hasAny("force"));
+        GriefAlert.getInstance().getAlertService().inspect(index, player, args.hasAny("force"), args.hasAny("block"));
         return CommandResult.success();
       } catch (IndexOutOfBoundsException e) {
         throw Errors.noAlertException();

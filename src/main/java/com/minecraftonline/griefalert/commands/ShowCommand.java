@@ -26,6 +26,7 @@ package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Errors;
@@ -34,6 +35,7 @@ import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.command.CommandException;
@@ -59,7 +61,7 @@ class ShowCommand extends GeneralCommand {
         Text.of("Create a Hologram at the location of grief"));
     addAlias("show");
     addAlias("s");
-    setCommandElement(GenericArguments.onlyOne(
+    setCommandElement(GenericArguments.optional(
         GenericArguments.integer(CommandKeys.ALERT_INDEX.get())));
   }
 
@@ -68,17 +70,29 @@ class ShowCommand extends GeneralCommand {
   public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
     if (src instanceof Player) {
       Player player = (Player) src;
-      int index;
+      Optional<Integer> index;
       try {
-        index = args.requireOne(CommandKeys.ALERT_INDEX.get());
+        index = args.getOne(CommandKeys.ALERT_INDEX.get());
+
       } catch (NoSuchElementException e) {
         sendHelp(src);
         return CommandResult.success();
       }
 
+      if (!index.isPresent()) {
+        index = GriefAlert.getInstance().getAlertService()
+            .getLastInspection(player)
+            .map(AlertInspection::getAlertIndex);
+      }
+
+      if (!index.isPresent()) {
+        player.sendMessage(Format.error("No recent index could be found, so please specify an alert index"));
+        return CommandResult.empty();
+      }
+
       Alert alert;
       try {
-        alert = GriefAlert.getInstance().getAlertService().getAlert(index);
+        alert = GriefAlert.getInstance().getAlertService().getAlert(index.get());
       } catch (IllegalArgumentException e) {
         throw Errors.noAlertException();
       }
@@ -96,7 +110,7 @@ class ShowCommand extends GeneralCommand {
       Communication.getStaffBroadcastChannel().send(Format.info(
           Format.userName(player),
           " is taking a closer look at alert ",
-          CheckCommand.clickToCheck(index)));
+          CheckCommand.clickToCheck(index.get())));
       return CommandResult.success();
     } else {
       throw Errors.playerOnlyException();

@@ -64,9 +64,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -86,19 +88,18 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public final class AlertServiceImpl implements AlertService {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
-  private final MapStack<UUID, GriefProfile> grieferRepeatHistory = new HashMapStack<>();
+  private final Map<UUID, RecentAlertHistory> grieferRepeatHistory = new HashMap<>();
   private final Table<UUID, Integer, AlertInspection> officerInspectHistory = HashBasedTable.create();
-  private RotatingList<AlertItem> alertCache;
   private final File alertStorageFile;
+  private RotatingList<AlertItem> alertCache;
 
   /**
    * Default constructor.
@@ -158,19 +159,8 @@ public final class AlertServiceImpl implements AlertService {
   }
 
   private void updateRepeatHistory(@Nonnull final Alert alert) {
-    UUID grieferUuid = alert.getGrieferUuid();
-    if (grieferRepeatHistory.peek(grieferUuid)
-        .filter(griefProfile -> alert.getGriefProfile().equals(griefProfile))
-        .isPresent()) {
-      alert.setSilent(true);
-    } else {
-      grieferRepeatHistory.clear(grieferUuid);
-    }
-    grieferRepeatHistory.push(grieferUuid, alert.getGriefProfile());
-    int silentAlertLimit = Settings.MAX_HIDDEN_REPEATED_EVENTS.getValue();
-    if (grieferRepeatHistory.size(grieferUuid) >= silentAlertLimit) {
-      grieferRepeatHistory.clear(grieferUuid);
-    }
+    RecentAlertHistory history = grieferRepeatHistory.computeIfAbsent(alert.getGrieferUuid(), uuid -> new RecentAlertHistory());
+    alert.setSilent(history.put(alert.getGriefProfile()));
   }
 
   @Nonnull
@@ -239,7 +229,8 @@ public final class AlertServiceImpl implements AlertService {
   @Override
   public void reset() {
     this.alertCache = generateAlertList();
-    this.grieferRepeatHistory.clearAll();
+    this.grieferRepeatHistory.values().forEach(RecentAlertHistory::clear);
+    this.grieferRepeatHistory.clear();
     this.officerInspectHistory.clear();
   }
 
@@ -304,7 +295,7 @@ public final class AlertServiceImpl implements AlertService {
   }
 
   @Override
-  public boolean inspect(int index, @NotNull Player officer, boolean force)
+  public boolean inspect(int index, @NotNull Player officer, boolean force, boolean block)
       throws IndexOutOfBoundsException {
 
     // Perform all checks to make sure it will work
@@ -335,18 +326,30 @@ public final class AlertServiceImpl implements AlertService {
 
     // Save the officer's previous transform and add it into the alert's database later
     // if the officer successfully teleports.
-    Transform<World> officerPreviousTransform = officer.getTransform();
+    final Transform<World> officerPreviousTransform = officer.getTransform();
 
     // Teleport the officer
     officer.getVehicle().ifPresent(Entity::clearPassengers);
     officer.clearPassengers();
     Transform<World> grieferTransform = Alerts.buildTransform(alertItem.get());
+    Location<World> griefLocation = Alerts.getGriefLocation(alertItem.get());
     if (force) {
-      officer.setTransform(grieferTransform);
+      if (block) {
+        officer.setLocation(griefLocation);
+      } else {
+        officer.setTransform(grieferTransform);
+      }
     } else {
-      if (!officer.setTransformSafely(grieferTransform)) {
-        Errors.sendCannotTeleportSafely(officer, grieferTransform);
-        return false;
+      if (block) {
+        if (!officer.setLocationSafely(griefLocation)) {
+          Errors.sendCannotTeleportSafely(officer, griefLocation);
+          return false;
+        }
+      } else {
+        if (!officer.setTransformSafely(grieferTransform)) {
+          Errors.sendCannotTeleportSafely(officer, grieferTransform);
+          return false;
+        }
       }
     }
 
@@ -368,11 +371,6 @@ public final class AlertServiceImpl implements AlertService {
             Text.of(Format.prefix(),
                 Format.endLine(),
                 Format.bonus("Open an Inspection Panel")))));
-//        Text.builder()
-//            .append(Text.of(TextStyles.NONE, TextColors.GOLD, "[", Text.of(TextColors.GRAY, TextStyles.ITALIC, "PANEL"), "]"))
-//            .onClick(TextActions.executeCallback(p -> InspectionInventory.openInspectionPanel(officer, index)))
-//            .onHover(TextActions.showText())
-//            .build()));
 
     // Notify the officer of other staff members who may have checked this alert already
     if (!alertItem.getChecks().isEmpty()) {
@@ -602,6 +600,12 @@ public final class AlertServiceImpl implements AlertService {
     inspections.addAll(officerInspectHistory.row(officerUuid).values());
     inspections.sort(Comparator.comparing(AlertInspection::getInspected));
     return Lists.newLinkedList(inspections);
+  }
+
+  @Nonnull
+  @Override
+  public Optional<AlertInspection> getLastInspection(Player officer) {
+    return this.getLastInspection(officer.getUniqueId());
   }
 
   private Optional<AlertInspection> getLastInspection(UUID officerUuid) {

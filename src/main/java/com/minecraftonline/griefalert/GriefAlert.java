@@ -24,8 +24,6 @@
 
 package com.minecraftonline.griefalert;
 
-import static com.minecraftonline.griefalert.GriefAlert.VERSION;
-
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.helion3.prism.api.services.PrismService;
@@ -82,14 +80,12 @@ import org.spongepowered.api.plugin.PluginContainer;
  */
 @Plugin(id = Reference.ID,
         name = Reference.NAME,
-        version = VERSION,
         description = Reference.DESCRIPTION,
         dependencies = {@Dependency(id = "prism"),
                 @Dependency(id = "holograms"),
                 @Dependency(id = "worldedit")})
 public final class GriefAlert {
 
-  public static final String VERSION = Reference.VERSION;
   private static GriefAlert instance;
 
   // Injected features directly from Sponge

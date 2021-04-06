@@ -84,10 +84,18 @@ public final class Settings {
   public static final Setting<Integer> MAX_HIDDEN_REPEATED_EVENTS = Setting.of(
       "max_hidden_repeated_events",
       10,
-      "Maximum number of repeated events to hide if they occurred in a row",
+      "Maximum number of alerts with subsequent identical alerts to hide all but the first",
       val -> (val >= 1) && (val <= 1000),
       "The max_hidden_repeated_events configuration value is out of the "
           + "acceptable range {1, 1000}. ",
+      Integer.class);
+  public static final Setting<Integer> MAX_HIDDEN_REPEATED_EVENTS_TIMEOUT = Setting.of(
+      "max_hidden_repeated_events_timeout",
+      30,
+      "Maximum number of seconds within which a subsequent identical alert could be silenced. Set to -1 to disable",
+      val -> (val >= -1) && (val <= 3600),
+      "The max_hidden_repeated_events configuration value is out of the "
+          + "acceptable range {-1, 3600}. ",
       Integer.class);
   public static final Setting<Boolean> SHOW_ALERTS_IN_CONSOLE = Setting.of(
       "show_alerts_in_console",

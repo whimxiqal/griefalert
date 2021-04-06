@@ -27,8 +27,10 @@ package com.minecraftonline.griefalert.commands.common;
 import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.util.Format;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.command.CommandSource;
@@ -38,7 +40,10 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 
 import javax.annotation.Nonnull;
 
@@ -53,6 +58,36 @@ public abstract class GeneralCommand implements CommandExecutor {
   private final List<GeneralCommand> commandChildren = new LinkedList<>();
   private final List<String> aliases = new LinkedList<>();
   private CommandElement commandElement = GenericArguments.none();
+  private final Map<String, Text> flagDescriptions = new HashMap<>();
+  private final Map<String, Boolean> flagValueState = new HashMap<>();
+
+  public enum FlagDescription {
+    AFTER("a",
+        Text.of("Use events ", TextColors.AQUA, " after", TextColors.RESET, " this date"),
+        true),
+    BEFORE("b",
+        Text.of("Use events ", TextColors.AQUA, " before", TextColors.RESET, " this date"),
+        true),
+    PLAYER("p",
+        Text.of("Use events caused by this ", TextColors.AQUA, "player"),
+        true),
+    TARGET("t",
+           Text.of("Use events in which this block or other object was the ", TextColors.AQUA, "target"),
+        true),
+    EVENT("e",
+        Text.of("Use events caused via this ", TextColors.AQUA, "event"),
+        true);
+    ;
+    String flag;
+    Text description;
+    boolean hasValue;
+
+    FlagDescription(String flag, Text description, boolean hasValue) {
+      this.flag = flag;
+      this.description = description;
+      this.hasValue = hasValue;
+    }
+  }
 
 
   /**
@@ -103,33 +138,67 @@ public abstract class GeneralCommand implements CommandExecutor {
     return this.commandElement;
   }
 
+  public final void addFlagDescription(FlagDescription flagDescription) {
+    addFlagDescription(flagDescription.flag, flagDescription.description, flagDescription.hasValue);
+  }
+
+  public final void addFlagDescription(String flag, Text description, boolean valueFlag) {
+    this.flagDescriptions.put(flag, description);
+    this.flagValueState.put(flag, valueFlag);
+  }
+
   /**
    * Send a help message about this command to the given <code>CommandSource</code>.
    *
    * @param source The source of the help message
    */
   protected final void sendHelp(CommandSource source) {
-    PaginationList.builder().title(Format.info("Command Help : ", Format.bonus(
+    PaginationList.builder().title(Format.info("Command Help ", Format.bonus(
         "{",
         Text.joinWith(
             Text.of(", "),
             getAliases().stream().map(Text::of).collect(Collectors.toList())),
         "}")))
         .header(Text.of(
-            TextColors.LIGHT_PURPLE, "Parameters:",
+            TextColors.LIGHT_PURPLE, "Parameters >",
             Format.space(),
             TextColors.GRAY,
             buildCommandSpec().getUsage(source),
             Format.endLine(),
-            TextColors.LIGHT_PURPLE, "Description:",
+            TextColors.LIGHT_PURPLE, "Description >",
             Format.space(),
-            TextColors.YELLOW, getDescription()))
+            TextColors.YELLOW, getDescription(),
+            flagDescriptions.isEmpty()
+                ? Text.EMPTY
+                : Text.of(
+                Format.endLine(),
+                TextColors.LIGHT_PURPLE, "Flags > ",
+                Text.joinWith(Text.of(" "), flagDescriptions.entrySet().stream()
+                    .map(entry -> {
+                      boolean isValueFlag = flagValueState.get(entry.getKey());
+                      return Format.hover(Text.of(TextStyles.ITALIC,
+                          TextColors.DARK_GRAY, "[",
+                          isValueFlag
+                              ? TextColors.GREEN
+                              : TextColors.GOLD,
+                          "-", entry.getKey(),
+                          TextColors.DARK_GRAY, "]"),
+                          Text.of(isValueFlag
+                              ? Text.of(TextColors.GREEN, "Flag - Requires Value")
+                              : Text.of(TextColors.GOLD, "Flag"),
+                              Format.endLine(),
+                              TextColors.RESET, entry.getValue()));
+                    })
+                    .collect(Collectors.toList())))))
         .contents(getChildren().stream()
             .filter(command -> source.hasPermission(command.getPermission().toString()))
             .map(command -> Text.of(
                 TextColors.AQUA, Format.hover(
                     command.getAliases().get(0),
-                    "Aliases: " + String.join(", ", command.getAliases())),
+                    "Aliases: " + String.join(", ", command.getAliases()))
+                    .toBuilder()
+                    .onClick(TextActions.executeCallback(command::sendHelp))
+                    .build(),
                 Format.space(),
                 TextColors.WHITE, command.getDescription()))
             .collect(Collectors.toList()))

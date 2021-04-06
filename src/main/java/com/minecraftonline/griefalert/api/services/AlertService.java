@@ -27,8 +27,11 @@ package com.minecraftonline.griefalert.api.services;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 
 import java.util.Collection;
+import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
@@ -79,19 +82,32 @@ public interface AlertService {
   Alert getAlert(int index) throws IllegalArgumentException;
 
   /**
+   * Retrieve the most recent {@link Alert} that this officer inspected.
+   *
+   * @param officer the officer
+   * @return the inspected alert
+   */
+  @Nonnull
+  Optional<AlertInspection> getLastInspection(Player officer);
+
+  /**
    * Send the given {@link Player} to the location of the {@link Alert} found
    * with the given retrieval code. The {@link Player} will receive the necessary
    * information and tools to respond to an {@link Alert}.
    *
    * @param index   the {@link Alert} retrieval code
    * @param officer the inspecting player
-   * @param force   true if the player should teleport to the location, even if it's unsafe
+   * @param force   true if the officer should teleport to the location, even if it's unsafe
+   * @param block   true if the officer should teleport the block location,
+   *                false if the officer should teleport to the griefer's location
+   *                at the time of grief
    * @return true if the inspection succeeded
    * @throws IllegalArgumentException if the given index is invalid
    */
   boolean inspect(int index,
                   @Nonnull Player officer,
-                  boolean force) throws IllegalArgumentException;
+                  boolean force,
+                  boolean block) throws IllegalArgumentException;
 
   /**
    * Return an officer to their previous known location before their last grief check.

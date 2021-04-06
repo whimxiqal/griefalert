@@ -29,6 +29,7 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
@@ -49,11 +50,23 @@ public final class Errors {
    */
   public static void sendCannotTeleportSafely(ChatTypeMessageReceiver receiver,
                                               Transform<World> transform) {
+    sendCannotTeleportSafely(receiver, transform.getLocation());
+  }
+
+  /**
+   * Send a receiver an error message conveying the inability to set a Location
+   * safely.
+   *
+   * @param receiver  the receiver of the message
+   * @param location the inaccessible location
+   */
+  public static void sendCannotTeleportSafely(ChatTypeMessageReceiver receiver,
+                                              Location<World> location) {
     receiver.sendMessage(
         ChatTypes.CHAT,
         Format.error(
-            "You could not be teleported safely to this location: ", Format.bonusLocation(
-                transform.getLocation())));
+            "You could not be teleported safely to this location: ",
+            Format.bonusLocation(location)));
   }
 
   public static CommandException playerOnlyException() {

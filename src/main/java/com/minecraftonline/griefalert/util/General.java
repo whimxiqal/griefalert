@@ -59,7 +59,7 @@ public final class General {
             Text.of(
                 TextColors.DARK_PURPLE, "    /         /\\     ",
                 TextColors.GOLD, "GriefAlert ",
-                TextColors.DARK_GRAY, "v" + GriefAlert.VERSION, " by PietElite"));
+                TextColors.DARK_GRAY, "v" + GriefAlert.getInstance().getPluginContainer().getVersion().orElse("unknown"), " by PietElite"));
     Sponge.getServer()
         .getConsole()
         .sendMessage(

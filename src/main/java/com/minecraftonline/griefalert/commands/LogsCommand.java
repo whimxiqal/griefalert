@@ -59,6 +59,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class LogsCommand extends GeneralCommand {
 
@@ -78,8 +79,16 @@ public class LogsCommand extends GeneralCommand {
                     CommandKeys.PRISM_EVENT.get(),
                     PrismEvent.class),
             "e")
-        .flag("-group", "g")
+        .flag("g")
         .buildWith(GenericArguments.none()));
+    addFlagDescription(FlagDescription.AFTER);
+    addFlagDescription(FlagDescription.BEFORE);
+    addFlagDescription(FlagDescription.PLAYER);
+    addFlagDescription(FlagDescription.TARGET);
+    addFlagDescription(FlagDescription.EVENT);
+    addFlagDescription("g",
+        Text.of(TextColors.AQUA, "Group", TextColors.RESET, " identical logs"),
+        false);
   }
 
   @Override

@@ -60,6 +60,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 
 public final class ApplierCommand extends GeneralCommand {
@@ -81,8 +82,16 @@ public final class ApplierCommand extends GeneralCommand {
         .valueFlag(GenericArguments.string(CommandKeys.PLAYER.get()), "p")
         .valueFlag(GenericArguments.string(CommandKeys.PRISM_TARGET.get()), "t")
         .valueFlag(GenericArguments.catalogedElement(CommandKeys.PRISM_EVENT.get(), PrismEvent.class), "e")
-        .flag("-force", "f")
+        .flag("f")
         .buildWith(GenericArguments.none()));
+    addFlagDescription(FlagDescription.AFTER);
+    addFlagDescription(FlagDescription.BEFORE);
+    addFlagDescription(FlagDescription.PLAYER);
+    addFlagDescription(FlagDescription.TARGET);
+    addFlagDescription(FlagDescription.EVENT);
+    addFlagDescription("f",
+        Text.of(TextColors.AQUA, "Force", TextColors.RESET, " this action, even if there are signs in it"),
+        false);
   }
 
   @Override

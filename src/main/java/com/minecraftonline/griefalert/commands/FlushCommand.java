@@ -38,6 +38,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class FlushCommand extends GeneralCommand {
 
@@ -47,8 +48,12 @@ public class FlushCommand extends GeneralCommand {
         Text.of("Clear the Alert cache")
     );
     addAlias("flush");
-    setCommandElement(GenericArguments.flags().flag("-force", "f")
+    setCommandElement(GenericArguments.flags()
+        .flag("a")
         .buildWith(GenericArguments.none()));
+    addFlagDescription("a",
+        Text.of(TextColors.AQUA, "Accept", TextColors.RESET, " the warning message and perform the cache flush"),
+        false);
   }
 
   @Override
@@ -57,7 +62,7 @@ public class FlushCommand extends GeneralCommand {
                                @Nonnull CommandContext args) {
     if (!args.hasAny("force")) {
       src.sendMessage(Format.info("This will clear all cached Alert data! "
-          + "Use --force if you're sure."));
+          + "Use -a to accept and continue with the operation."));
       return CommandResult.success();
     }
     GriefAlert.getInstance().getAlertService().reset();
