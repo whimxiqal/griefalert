@@ -92,6 +92,10 @@ public final class Permissions {
   public static final Permission GRIEFALERT_SILENT = Permission.of(
       "griefalert.staff.silent"
   );
+  /* Can use the tool */
+  public static final Permission GRIEFALERT_TOOL = Permission.of(
+      "griefalert.staff.tool"
+  );
   /* Allow 'fix' command on ones own alert */
   public static final Permission SELF_FIX = Permission.of(
       "griefalert.admin.selffix"

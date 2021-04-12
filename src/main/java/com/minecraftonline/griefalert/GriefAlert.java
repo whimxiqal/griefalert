@@ -53,12 +53,20 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 
 import com.minecraftonline.griefalert.util.enums.Settings;
+import com.minecraftonline.griefalert.tool.ImmutableToolGrieferManipulator;
+import com.minecraftonline.griefalert.tool.ImmutableToolManipulator;
+import com.minecraftonline.griefalert.tool.Keys;
+import com.minecraftonline.griefalert.tool.ToolGrieferManipulator;
+import com.minecraftonline.griefalert.tool.ToolHandler;
+import com.minecraftonline.griefalert.tool.ToolManipulator;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
@@ -70,6 +78,7 @@ import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.TypeTokens;
 
 /**
  * The main class for the plugin Grief Alert.
@@ -81,7 +90,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 @Plugin(id = Reference.ID,
         name = Reference.NAME,
         description = Reference.DESCRIPTION,
-        dependencies = {@Dependency(id = "prism"),
+        dependencies = {@Dependency(id = "prism", version = "3.0.2"),
                 @Dependency(id = "holograms"),
                 @Dependency(id = "worldedit")})
 public final class GriefAlert {
@@ -133,7 +142,7 @@ public final class GriefAlert {
   private ProfileStorage profileStorage;
   private HologramManager hologramManager;
   private InspectionStorage inspectionStorage;
-
+  private ToolHandler toolHandler;
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
@@ -163,6 +172,40 @@ public final class GriefAlert {
     if (getDataDirectory().mkdirs()) {
       getLogger().info("Data directory created.");
     }
+
+    // Tool information
+    Keys.GA_TOOL = Key.builder()
+        .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
+        .id("griefalerttool")
+        .name("GriefAlert staff tool")
+        .query(ToolManipulator.QUERY)
+        .build();
+
+    Keys.TOOL_GRIEFER_UUID = Key.builder()
+        .type(TypeTokens.UUID_VALUE_TOKEN)
+        .id("griefalerttoolgriefer")
+        .name("GriefAlert staff tool griefer")
+        .query(ToolManipulator.QUERY)
+        .build();
+
+    DataRegistration.builder()
+        .dataClass(ToolManipulator.class)
+        .immutableClass(ImmutableToolManipulator.class)
+        .builder(new ToolManipulator.Builder())
+        .id("grief-alert-tool")
+        .name("GriefAlert staff tool griefer data")
+        .build();
+
+    DataRegistration.builder()
+        .dataClass(ToolGrieferManipulator.class)
+        .immutableClass(ImmutableToolGrieferManipulator.class)
+        .builder(new ToolGrieferManipulator.Builder())
+        .id("grief-alert-tool-griefer")
+        .name("GriefAlert staff tool griefer data")
+        .build();
+
+    toolHandler = new ToolHandler();
+    Sponge.getEventManager().registerListeners(this, toolHandler);
 
     try {
       if (Settings.STORAGE_ENGINE.getValue().equalsIgnoreCase("mysql")) {
@@ -311,6 +354,10 @@ public final class GriefAlert {
 
   public InspectionStorage getInspectionStorage() {
     return inspectionStorage;
+  }
+
+  public ToolHandler getToolHandler() {
+    return toolHandler;
   }
 
   public Logger getLogger() {

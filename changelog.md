@@ -1,3 +1,6 @@
+# 1.3.0
+- introduced the GriefAlert tool with `/ga tool <griefer>`
+
 # 1.2.6
 - added a configurable timeout for alerts with repeated profiles to reduce alert spam
 - changed alert silencing behavior to silence non-consecutive repeated alerts

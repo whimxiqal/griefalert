@@ -140,6 +140,15 @@ public final class Settings {
       s -> true,
       "",
       String.class);
+  public static final Setting<Integer> TOOL_ROLLBACK_RANGE = Setting.of(
+      "tool_rollback_range",
+      168,
+      "The range of time in hours to rollback with the tool. Set -1 to query all time",
+      val -> (val >= -1) && (val <= 87540),
+      "The max_hidden_repeated_events configuration value is out of the "
+          + "acceptable range {-1, 87540}. ",
+      Integer.class);
+
   /**
    * Private constructor to prevent instantiation.
    */

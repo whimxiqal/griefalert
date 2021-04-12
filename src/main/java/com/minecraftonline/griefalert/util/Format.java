@@ -43,10 +43,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -383,9 +385,34 @@ public final class Format {
 
   public static Text buildBroadcast(Alert alert, int index) {
     return Text.of(
-        alert.getMessage(),
+        // TODO fix shrink function (and make shrink value configurable)
+        Format.shrink(alert.getMessage(), Integer.MAX_VALUE /* temporarily disabled */),
         Format.space(),
         CheckCommand.clickToCheck(index));
+  }
+
+  public static Text shrink(Text input, int size) {
+    Text replacement = input;
+    if (shrunkenLength(replacement) > size) {
+      replacement = shrinkWord(replacement, "the");
+    }
+    if (shrunkenLength(replacement) > size) {
+      replacement = shrinkWord(replacement, "in");
+    }
+    if (shrunkenLength(replacement) > size) {
+      replacement = shrinkWord(replacement, "a");
+      replacement = shrinkWord(replacement, "an");
+    }
+    return replacement;
+  }
+
+  private static Text shrinkWord(Text input, String word) {
+    return input.replace(Pattern.compile("( |(\\.\\.\\.))*" + " " + word + " " + "( |(\\.\\.\\.))*"),
+        Text.of(TextColors.GRAY, " ... "), true);
+  }
+
+  private static int shrunkenLength(Text input) {
+    return input.toPlain().replace(".", "").length();
   }
 
   public static Text request(Request request) {
