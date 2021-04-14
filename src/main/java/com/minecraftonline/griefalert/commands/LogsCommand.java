@@ -70,7 +70,7 @@ public class LogsCommand extends GeneralCommand {
     addAlias("l");
     addChild(new LogsInspectorCommand());
     setCommandElement(GenericArguments.flags()
-        .valueFlag(GenericArguments.string(CommandKeys.SINCE.get()), "s")
+        .valueFlag(GenericArguments.string(CommandKeys.AFTER.get()), "s")
         .valueFlag(GenericArguments.string(CommandKeys.BEFORE.get()), "b")
         .valueFlag(GenericArguments.string(CommandKeys.PLAYER.get()), "p")
         .valueFlag(GenericArguments.string(CommandKeys.PRISM_TARGET.get()), "t")
@@ -119,7 +119,7 @@ public class LogsCommand extends GeneralCommand {
 
 
         // Parse the 'since' with the given date format, or just do a year ago
-        Date since = args.<String>getOne(CommandKeys.SINCE.get()).flatMap(str -> {
+        Date since = args.<String>getOne(CommandKeys.AFTER.get()).flatMap(str -> {
           try {
             return Optional.of(DateUtil.parseAnyDate(str));
           } catch (IllegalArgumentException e) {

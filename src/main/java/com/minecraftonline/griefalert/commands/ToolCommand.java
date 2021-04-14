@@ -64,6 +64,12 @@ public class ToolCommand extends GeneralCommand {
   public CommandResult execute(@Nonnull CommandSource src,
                                @Nonnull CommandContext args) throws CommandException {
     if (src instanceof Player) {
+
+      if (!GriefAlert.getInstance().getToolHandler().isToolEnabled()) {
+        src.sendMessage(Format.error("The GriefAlert tool is currently disabled"));
+        return CommandResult.empty();
+      }
+
       Player player = (Player) src;
 
       Optional<String> playerName = args.getOne(Text.of("player"));
@@ -78,6 +84,10 @@ public class ToolCommand extends GeneralCommand {
           Sponge.getServer().getGameProfileManager().get(playerName.get()).whenComplete((profile, exception) -> {
             if (profile == null || !profile.getName().isPresent()) {
               player.sendMessage(Format.error("That player could not be found"));
+              return;
+            }
+            if (player.getUniqueId().equals(profile.getUniqueId())) {
+              player.sendMessage(Format.error("You may not create a tool for yourself!"));
               return;
             }
             ItemStack tool = GriefAlert.getInstance()

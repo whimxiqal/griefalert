@@ -90,7 +90,7 @@ import org.spongepowered.api.util.TypeTokens;
 @Plugin(id = Reference.ID,
         name = Reference.NAME,
         description = Reference.DESCRIPTION,
-        dependencies = {@Dependency(id = "prism", version = "3.0.2"),
+        dependencies = {@Dependency(id = "prism", version = "3.0.3"),
                 @Dependency(id = "holograms"),
                 @Dependency(id = "worldedit")})
 public final class GriefAlert {

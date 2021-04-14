@@ -1,3 +1,14 @@
+# 1.3.1-2
+- Fixed concurrency problems with officer inspection history
+- Turned `since` flag into `after` flag on applier commands
+- Officers now teleport to the block of grief instead of the player by default
+- Fixed the `check` command flags
+- Added `enabletool` command for administrators
+- Show formatted name in Alert messages using Hermes service
+- Bump Prism dependency to 3.0.2
+- Added GriefAlert tool to staff panel
+- Destroy GriefAlert tool upon any inventory action
+
 # 1.3.0
 - introduced the GriefAlert tool with `/ga tool <griefer>`
 

@@ -65,11 +65,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -154,7 +156,10 @@ public final class AlertServiceImpl implements AlertService {
     }
 
     updateRepeatHistory(alert);
-    officerInspectHistory.column(output).forEach(((uuid, inspection) -> officerInspectHistory.remove(uuid, output)));
+    Set<Map.Entry<UUID, AlertInspection>> inspectionSetCopy = new HashSet<>(officerInspectHistory.column(output).entrySet());
+    inspectionSetCopy.forEach(inspectionEntry -> officerInspectHistory.remove(inspectionEntry.getKey(), output));
+    
+    //.forEach(((uuid, inspection) -> officerInspectHistory.remove(uuid, output)));
     return output;
   }
 

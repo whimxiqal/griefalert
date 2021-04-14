@@ -95,14 +95,19 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.item.inventory.AffectItemStackEvent;
+import org.spongepowered.api.event.item.inventory.AffectSlotEvent;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentTypes;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -121,20 +126,22 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ToolHandler {
 
+  private boolean toolEnabled = true;
+
   @Listener(order = Order.FIRST)
-  public void InteractBlockSecondary(InteractBlockEvent.Secondary event) {
+  public void onInteractBlockSecondary(InteractBlockEvent.Secondary event) {
     event.getTargetBlock().getLocation().ifPresent(location ->
         fix(event, location.getBlockRelative(event.getTargetSide())));
   }
 
   @Listener(order = Order.FIRST)
-  public void InteractBlockPrimary(InteractBlockEvent.Primary event) {
+  public void onInteractBlockPrimary(InteractBlockEvent.Primary event) {
     event.getTargetBlock().getLocation().ifPresent(location ->
         fix(event, location));
   }
 
   @Listener(order = Order.FIRST)
-  public void Interact(InteractEntityEvent event) {
+  public void onInteract(InteractEntityEvent event) {
     event.getCause().first(Player.class)
         .flatMap(player ->
             player.getItemInHand(HandTypes.MAIN_HAND)
@@ -143,19 +150,11 @@ public class ToolHandler {
   }
 
   @Listener(order = Order.FIRST)
-  public void InventoryEvent(ClickInventoryEvent event) {
+  public void InventoryEvent(AffectSlotEvent event) {
+    if (event instanceof ChangeInventoryEvent.Held) return;  // They can switch to it
     event.getTransactions().forEach(slotTransaction -> {
       if (isTool(slotTransaction.getFinal())) {
-        if (event.getTargetInventory() instanceof PlayerInventory) {
-          Optional<Player> carrier = ((PlayerInventory) event.getTargetInventory()).getCarrier();
-          if (carrier.isPresent()) {
-            if (carrier.get().hasPermission(Permissions.GRIEFALERT_COMMAND_FIX.get())) {
-              return;
-            }
-          }
-        }
-        slotTransaction.setValid(false);
-        slotTransaction.setCustom(ItemStackSnapshot.NONE);
+        slotTransaction.setCustom(ItemStack.empty());
       }
     });
   }
@@ -180,6 +179,14 @@ public class ToolHandler {
     });
   }
 
+  private void clearToolsFrom(Inventory inventory) {
+    inventory.slots().forEach(slot -> {
+      if (slot.peek().isPresent() && isTool(slot.peek().get())) {
+        slot.set(ItemStack.empty());
+      }
+    });
+  }
+
   private void fix(InteractBlockEvent event, Location<World> location) {
     event.getCause().first(Player.class).ifPresent(player ->
         player.getItemInHand(HandTypes.MAIN_HAND)
@@ -188,6 +195,11 @@ public class ToolHandler {
               if (!player.hasPermission(Permissions.GRIEFALERT_TOOL.get())) {
                 player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.empty());
                 player.sendMessage(Format.error("You don't have permission to use this!"));
+                return;
+              }
+              if (!toolEnabled) {
+                player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.empty());
+                player.sendMessage(Format.error("The GriefAlert tool is currently disabled"));
                 return;
               }
               event.setCancelled(true);
@@ -270,6 +282,14 @@ public class ToolHandler {
     return manipulatorOptional
         .map(ToolGrieferManipulator::getValueGetter)
         .map(Value::get);
+  }
+
+  public void setToolEnabled(boolean toolEnabled) {
+    this.toolEnabled = toolEnabled;
+  }
+
+  public boolean isToolEnabled() {
+    return toolEnabled;
   }
 
   public ItemStack tool(String playerName, UUID playerUuid) {

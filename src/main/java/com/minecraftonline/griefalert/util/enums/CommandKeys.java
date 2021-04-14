@@ -36,8 +36,8 @@ public final class CommandKeys {
       Text.of("index"),
       Text.of("The index of an Alert in the list"));
 
-  public static final CommandKey SINCE = CommandKey.of(
-      Text.of("since"),
+  public static final CommandKey AFTER = CommandKey.of(
+      Text.of("after"),
       Text.of("The earliest date in the query range"));
 
   public static final CommandKey BEFORE = CommandKey.of(

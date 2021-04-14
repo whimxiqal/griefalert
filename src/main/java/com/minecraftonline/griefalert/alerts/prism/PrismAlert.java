@@ -133,7 +133,8 @@ public abstract class PrismAlert extends GeneralAlert implements Fixable {
             new RuntimeException(
                 "PrismAlert stored an invalid GriefEvent: "
                     + getGriefEvent().getId())))
-        .addWorldUuid(getWorldUuid()).setxRange(getGriefPosition().getX(), getGriefPosition().getX())
+        .addWorldUuid(getWorldUuid())
+        .setxRange(getGriefPosition().getX(), getGriefPosition().getX())
         .setyRange(getGriefPosition().getY(), getGriefPosition().getY())
         .setzRange(getGriefPosition().getZ(), getGriefPosition().getZ())
         .build();

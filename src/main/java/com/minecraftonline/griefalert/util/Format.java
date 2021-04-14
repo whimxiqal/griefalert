@@ -53,7 +53,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.minecraftonline.hermes.service.NameService;
 import org.apache.commons.lang3.StringUtils;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -355,7 +357,14 @@ public final class Format {
    * @return The Text form of the grief checker's name
    */
   public static Text userName(User user) {
-    return Text.of(user.getName());
+    return Sponge.getServiceManager()
+        .provide(NameService.class)
+        .flatMap(service -> service.getNameData(user))
+        .map(data -> Text.builder()
+            .append(data.getShortName())
+            .onHover(TextActions.showText(data.getFullName()))
+            .build())
+        .orElse(Text.of(user.getName()));
   }
 
   /**

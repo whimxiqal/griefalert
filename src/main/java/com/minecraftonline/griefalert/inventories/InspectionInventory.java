@@ -56,6 +56,18 @@ public class InspectionInventory {
 
   private static Map<Integer, InventoryItem> inventoryItems = Lists.newArrayList(
       new InventoryItem(
+          InspectionInventoryStacks.TOOL,
+          8,
+          Permissions.GRIEFALERT_TOOL,
+          (officer, alertIndex) -> Sponge.getCommandManager().process(
+              officer,
+              "griefalert tool " + SpongeUtil.getUser(GriefAlert.getInstance()
+                  .getAlertService()
+                  .getAlert(alertIndex)
+                  .getGrieferUuid())
+                  .orElseThrow(() -> new RuntimeException(String.format("Query command failed while %s using panel", officer.getName())))
+                  .getName())),
+      new InventoryItem(
           InspectionInventoryStacks.INFO,
           11,
           Permissions.GRIEFALERT_COMMAND_INFO,
@@ -72,7 +84,7 @@ public class InspectionInventory {
                   .getAlertService()
                   .getAlert(alertIndex)
                   .getGrieferUuid())
-                  .orElseThrow(() -> new RuntimeException(String.format("Query command failed while {} using panel", officer.getName())))
+                  .orElseThrow(() -> new RuntimeException(String.format("Query command failed while %s using panel", officer.getName())))
                   .getName())),
       new InventoryItem(
           InspectionInventoryStacks.SHOW,
@@ -94,7 +106,9 @@ public class InspectionInventory {
           Permissions.GRIEFALERT_COMMAND_CHECK,
           (officer, alertIndex) -> {
             Alert alert = GriefAlert.getInstance().getAlertService().getAlert(alertIndex);
-            officer.setTransform(new Transform<>(Alerts.getWorld(alert), alert.getGrieferPosition(), alert.getGrieferRotation()));
+            if (!officer.setTransformSafely(new Transform<>(Alerts.getWorld(alert), alert.getGrieferPosition(), alert.getGrieferRotation()))) {
+              officer.sendMessage(Format.error("Could not teleport you safely"));
+            }
           }))
       .stream()
       .collect(Collectors.toMap(InventoryItem::getSlotIndex, item -> item));

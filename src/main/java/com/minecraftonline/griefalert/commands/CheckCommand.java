@@ -49,7 +49,7 @@ public class CheckCommand extends GeneralCommand {
   CheckCommand() {
     super(
         Permissions.GRIEFALERT_COMMAND_CHECK,
-        Text.of("Teleport to the location of event")
+        Text.of("Teleport to the block location of the event")
     );
     addAlias("check");
     addAlias("c");
@@ -57,13 +57,13 @@ public class CheckCommand extends GeneralCommand {
         GenericArguments.integer(CommandKeys.ALERT_INDEX.get()),
         GenericArguments.flags()
             .flag("f")
-            .flag("b")
+            .flag("p")
             .buildWith(GenericArguments.none())));
     addFlagDescription("f",
         Text.of(TextColors.AQUA, "Force", TextColors.RESET, " the teleportation, even if no safe location could be found"),
         false);
-    addFlagDescription("b",
-        Text.of("Teleport to the", TextColors.AQUA, " block", TextColors.RESET, " location of the grief event \ninstead of the griefer's location"),
+    addFlagDescription("p",
+        Text.of("Teleport to the", TextColors.AQUA, " player", TextColors.RESET, "'s location of the grief event \ninstead of the block location"),
         false);
   }
 
@@ -81,7 +81,7 @@ public class CheckCommand extends GeneralCommand {
         return CommandResult.success();
       }
       try {
-        GriefAlert.getInstance().getAlertService().inspect(index, player, args.hasAny("force"), args.hasAny("block"));
+        GriefAlert.getInstance().getAlertService().inspect(index, player, args.hasAny("f"), !args.hasAny("p"));
         return CommandResult.success();
       } catch (IndexOutOfBoundsException e) {
         throw Errors.noAlertException();

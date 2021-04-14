@@ -81,6 +81,10 @@ public final class Permissions {
   public static final Permission GRIEFALERT_COMMAND_ROLLBACK = Permission.of(
       "griefalert.admin.command.rollback"
   );
+  /* Can use 'disabletool' command */
+  public static final Permission GRIEFALERT_COMMAND_ENABLETOOL = Permission.of(
+      "griefalert.admin.command.enabletool"
+  );
 
   /* === ABILITIES === */
 
