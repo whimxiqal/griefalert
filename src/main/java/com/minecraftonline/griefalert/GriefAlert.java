@@ -82,8 +82,7 @@ import org.spongepowered.api.util.TypeTokens;
 
 /**
  * The main class for the plugin Grief Alert.
- * This plugin is made exclusively for MinecraftOnline.com
- * Do not use this plugin without explicit approval from the administration team at MinecraftOnline.
+ * This plugin is made for MinecraftOnline.com
  *
  * @author PietElite
  */
