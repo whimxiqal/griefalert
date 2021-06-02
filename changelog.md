@@ -1,3 +1,8 @@
+# 1.4.0
+- Profiles may now be made `translucent`, meaning GriefAlert will attempt to determine
+  if an Alert is thought to be caused by grief and, if not, silence the Alert.
+- GA Tool is now a stick
+
 # 1.3.1-2
 - Fixed concurrency problems with officer inspection history
 - Turned `since` flag into `after` flag on applier commands

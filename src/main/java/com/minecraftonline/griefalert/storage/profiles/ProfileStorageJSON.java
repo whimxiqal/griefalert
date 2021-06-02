@@ -32,6 +32,7 @@ import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.util.enums.DefaultProfiles;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -62,7 +63,6 @@ public class ProfileStorageJSON implements ProfileStorage {
       GriefAlert.getInstance().getLogger().error("Tried to save profiles, but could not find " + profilesFile.getName());
       return false;
     }
-    GriefProfile toRemove = null;
     Collection<GriefProfile> profiles = retrieve();
     if (profiles.contains(profile)) {
       return false;
@@ -109,9 +109,18 @@ public class ProfileStorageJSON implements ProfileStorage {
     }
   }
 
+  @Nullable
+  @Override
+  public GriefProfile get(@Nonnull GriefEvent griefEvent, @Nonnull String target) throws Exception {
+    return retrieve().stream()
+        .filter(griefProfile -> griefProfile.getGriefEvent().equals(griefEvent) && griefProfile.getTarget().equalsIgnoreCase(target))
+        .findFirst()
+        .orElse(null);
+  }
+
   @Nonnull
   @Override
-  public Collection<GriefProfile> retrieve() throws Exception {
+  public Collection<GriefProfile> retrieve() {
     if (!profilesFile.exists()) {
       GriefAlert.getInstance().getLogger().error("Tried to get profiles, but could not find " + profilesFile.getName());
       return Collections.emptyList();

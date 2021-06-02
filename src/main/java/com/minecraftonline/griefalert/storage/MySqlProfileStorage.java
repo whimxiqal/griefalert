@@ -41,9 +41,9 @@ import java.util.Optional;
 import java.util.Properties;
 import javax.annotation.Nonnull;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.world.DimensionTypes;
 
 /**
  * Deprecated ProfileStorage implementation.
@@ -136,6 +136,13 @@ public class MySqlProfileStorage implements ProfileStorage {
     connection.prepareStatement(command).execute();
     connection.close();
     return true;
+  }
+
+  @Nullable
+  @Override
+  public GriefProfile get(@Nonnull GriefEvent griefEvent, @Nonnull String target) throws Exception {
+    // TODO complete setup
+    return null;
   }
 
   @Nonnull

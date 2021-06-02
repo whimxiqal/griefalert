@@ -61,6 +61,7 @@ public final class GriefProfile implements Serializable {
   private final String target;
   private final Set<String> ignored;
   private final Map<Colorable, String> colors;
+  private final boolean translucent;
 
   public enum Colorable {
     EVENT,
@@ -71,11 +72,13 @@ public final class GriefProfile implements Serializable {
   private GriefProfile(@Nonnull final GriefEvent event,
                        @Nonnull final String target,
                        @Nonnull final Set<WorldProperties> ignored,
-                       @Nonnull final Map<Colorable, String> colors) {
+                       @Nonnull final Map<Colorable, String> colors,
+                       boolean translucent) {
     this.eventId = event.getId();
     this.target = target;
     this.ignored = ignored.stream().map(WorldProperties::getWorldName).collect(Collectors.toCollection(Sets::newLinkedHashSet));
     this.colors = Maps.newLinkedHashMap(colors);
+    this.translucent = translucent;
   }
 
   @Nonnull
@@ -152,6 +155,10 @@ public final class GriefProfile implements Serializable {
     return out;
   }
 
+  public boolean isTranslucent() {
+    return translucent;
+  }
+
   /**
    * Gives whether or not the other object is a {@link GriefProfile}
    * and has the same {@link GriefEvent} and target.
@@ -180,6 +187,7 @@ public final class GriefProfile implements Serializable {
     private final String target;
     private final Set<WorldProperties> ignored = Sets.newHashSet();
     private final Map<Colorable, String> colors = Maps.newHashMap();
+    private boolean translucent = false;
 
     public Builder(@Nonnull final GriefEvent event,
                    @Nonnull final String target) {
@@ -197,7 +205,8 @@ public final class GriefProfile implements Serializable {
           event,
           target,
           ImmutableSet.<WorldProperties>builder().addAll(ignored).build(),
-          ImmutableMap.<Colorable, String>builder().putAll(colors).build());
+          ImmutableMap.<Colorable, String>builder().putAll(colors).build(),
+          translucent);
     }
 
     /**
@@ -223,6 +232,11 @@ public final class GriefProfile implements Serializable {
       if (world != null) {
         ignored.add(world);
       }
+      return this;
+    }
+
+    public Builder setTranslucent(boolean translucent) {
+      this.translucent = translucent;
       return this;
     }
 

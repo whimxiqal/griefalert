@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 
 public class InspectionInventory {
 
-  private static Map<Integer, InventoryItem> inventoryItems = Lists.newArrayList(
+  private final static Map<Integer, InventoryItem> inventoryItems = Lists.newArrayList(
       new InventoryItem(
           InspectionInventoryStacks.TOOL,
           8,

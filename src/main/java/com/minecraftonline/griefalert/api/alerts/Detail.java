@@ -116,6 +116,13 @@ public final class Detail<P extends Serializable> implements Serializable {
     }
   }
 
+  public String getLabel() {
+    return this.label;
+  }
+
+  public Optional<Text> evaluateInfo(P container) {
+    return this.infoFunction.apply(container);
+  }
 
   /**
    * Get the formatted {@link Text} version of this detail.

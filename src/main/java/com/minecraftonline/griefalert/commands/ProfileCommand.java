@@ -25,6 +25,7 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
+import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.commands.common.CommandKey;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
@@ -36,12 +37,13 @@ import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -51,7 +53,6 @@ import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -64,6 +65,7 @@ public class ProfileCommand extends GeneralCommand {
     addAlias("pr");
     addChild(new AddCommand());
     addChild(new RemoveCommand());
+    addChild(new EditCommand());
     addChild(new CountCommand());
     addChild(new ListCommand());
     addChild(new EventsCommand());
@@ -89,6 +91,7 @@ public class ProfileCommand extends GeneralCommand {
               .valueFlag(GenericArguments.world(
                   CommandKeys.WORLD.get()),
                   "-ignore", "i")
+              .flag("t")
               .valueFlag(GenericArguments.catalogedElement(
                   CommandKeys.PROFILE_COLOR_EVENT.get(), TextColor.class),
                   "-event_color")
@@ -102,6 +105,10 @@ public class ProfileCommand extends GeneralCommand {
       addFlagDescription("i",
           Text.of(TextColors.AQUA, "Ignore", TextColors.RESET, " the world with the given world name"),
           true);
+      addFlagDescription("t",
+          Text.of("Set this profile as ", TextColors.AQUA, "translucent ", TextColors.RESET,
+              "which silences alerts if GriefAlert internally thinks it was not grief"),
+          false);
       addFlagDescription("-event_color",
           Text.of("Use this color on the event of the alerts with this profile"),
           true);
@@ -129,6 +136,9 @@ public class ProfileCommand extends GeneralCommand {
       GriefProfile.Builder profileBuilder = GriefProfile.builder(event, target);
       args.<WorldProperties>getAll(CommandKeys.WORLD.get())
           .forEach(profileBuilder::addIgnored);
+      if (args.hasAny("t")) {
+        profileBuilder.setTranslucent(true);
+      }
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_EVENT.get())
           .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.EVENT, color));
       args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_TARGET.get())
@@ -157,6 +167,125 @@ public class ProfileCommand extends GeneralCommand {
     }
 
   }
+
+  public static class EditCommand extends GeneralCommand {
+
+    EditCommand() {
+      super(Permissions.GRIEFALERT_COMMAND_PROFILE, Text.of("Edit a profile in the database."));
+      addAlias("edit");
+      addAlias("e");
+      setCommandElement(GenericArguments.seq(
+          GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+          GenericArguments.string(CommandKeys.GA_TARGET.get()),
+          GenericArguments.flags()
+              .valueFlag(GenericArguments.world(
+                  CommandKeys.WORLD.get()),
+                  "-ignore", "i")
+              .flag("t")
+              .valueFlag(GenericArguments.catalogedElement(
+                  CommandKeys.PROFILE_COLOR_EVENT.get(), TextColor.class),
+                  "-event_color")
+              .valueFlag(GenericArguments.catalogedElement(
+                  CommandKeys.PROFILE_COLOR_TARGET.get(), TextColor.class),
+                  "-target_color")
+              .valueFlag(GenericArguments.catalogedElement(
+                  CommandKeys.PROFILE_COLOR_WORLD.get(), TextColor.class),
+                  "-world_color")
+              .buildWith(GenericArguments.none())));
+      addFlagDescription("i",
+          Text.of(TextColors.AQUA, "Ignore", TextColors.RESET, " the world with the given world name"),
+          true);
+      addFlagDescription("t",
+          Text.of("Set this profile as ", TextColors.AQUA, "translucent ", TextColors.RESET,
+              "which silences alerts if GriefAlert internally thinks it was not grief"),
+          false);
+      addFlagDescription("-event_color",
+          Text.of("Use this color on the event of the alerts with this profile"),
+          true);
+      addFlagDescription("-target_color",
+          Text.of("Use this color on the target of the alerts with this profile"),
+          true);
+      addFlagDescription("-world_color",
+          Text.of("Use this color on the world of the alerts with this profile"),
+          true);
+    }
+
+    @Nonnull
+    @Override
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) {
+
+      GriefEvent event;
+      String target;
+      try {
+        event = args.requireOne(CommandKeys.GA_EVENT.get());
+        target = General.ensureIdFormat(args.requireOne(CommandKeys.GA_TARGET.get()));
+      } catch (NoSuchElementException e) {
+        sendHelp(src);
+        return CommandResult.success();
+      }
+      GriefProfile oldProfile;
+      try {
+        oldProfile = GriefAlert.getInstance().getProfileStorage().get(event, target);
+      } catch (Exception e) {
+        e.printStackTrace();
+        src.sendMessage(Format.error("An error occurred!"));
+        return CommandResult.empty();
+      }
+      if (oldProfile == null) {
+        src.sendMessage(Format.error("That profile does not exist yet."));
+        return CommandResult.empty();
+      }
+
+      GriefProfile.Builder profileBuilder = GriefProfile.builder(event, target);
+
+      // Toggle worlds based on old ignored worlds
+      Set<WorldProperties> specifiedWorlds = new HashSet<>(args.getAll(CommandKeys.WORLD.get()));
+      oldProfile.getIgnored().stream().map(World::getProperties).forEach(specifiedWorlds::remove);
+      specifiedWorlds.forEach(profileBuilder::addIgnored);
+
+      // Toggle translucence
+      profileBuilder.setTranslucent(oldProfile.isTranslucent() ^ args.hasAny("t"));
+
+      // Set new colors
+      oldProfile.getAllColored().forEach(profileBuilder::putColored);
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_EVENT.get())
+          .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.EVENT, color));
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_TARGET.get())
+          .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.TARGET, color));
+      args.<TextColor>getOne(CommandKeys.PROFILE_COLOR_WORLD.get())
+          .ifPresent(color -> profileBuilder.putColored(GriefProfile.Colorable.WORLD, color));
+      GriefProfile profile = profileBuilder.build();
+
+      ProfileStorage profileStorage = GriefAlert.getInstance().getProfileStorage();
+      try {
+        if (!profileStorage.remove(profile.getGriefEvent(), profile.getTarget())) {
+          src.sendMessage(Format.error("Could not remove the old version"));
+          return CommandResult.empty();
+        }
+        if (profileStorage.write(profile)) {
+          src.sendMessage(Format.success("GriefProfile edited"));
+          GriefAlert.getInstance().getProfileCache().reload();
+          return CommandResult.success();
+        } else {
+          src.sendMessage(Format.error("GriefProfile editing failed"));
+          // Add back the old one because this one failed
+          if (!profileStorage.write(oldProfile)) {
+            src.sendMessage(Format.error("Also, the old version could not be reestablished! Please recreate this profile."));
+          }
+          return CommandResult.empty();
+        }
+      } catch (Exception e) {
+        GriefAlert.getInstance().getLogger().error("An Exception thrown when trying to "
+            + "add a profile: "
+            + Format.profile(profile).toPlain());
+        General.printStackTraceToDebugLogger(e);
+        return CommandResult.empty();
+      }
+
+    }
+
+  }
+
 
   public static class RemoveCommand extends GeneralCommand {
 

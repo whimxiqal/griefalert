@@ -116,8 +116,22 @@ public final class AlertServiceImpl implements AlertService {
   @Override
   public int submit(@NotNull Alert alert) {
 
+    // Silence alert if the player has the associated permission
     if (Permissions.has(Alerts.getGriefer(alert), Permissions.GRIEFALERT_SILENT)) {
       alert.setSilent(true);
+    }
+
+    // Silence alerts based on translucency logic
+    if (alert.getGriefProfile().isTranslucent()) {
+      if (alert instanceof GeneralAlert) {
+        ((GeneralAlert) alert).getDetails()
+            .stream()
+            .filter(detail -> detail.getLabel().equalsIgnoreCase("Block Creator"))
+            .findFirst()
+            .flatMap(detail -> detail.evaluateInfo(alert))
+            .filter(text -> text.toPlain().equalsIgnoreCase(Alerts.getGriefer(alert).getName()))
+            .ifPresent(text -> alert.setSilent(true));
+      }
     }
 
     try {
@@ -158,7 +172,7 @@ public final class AlertServiceImpl implements AlertService {
     updateRepeatHistory(alert);
     Set<Map.Entry<UUID, AlertInspection>> inspectionSetCopy = new HashSet<>(officerInspectHistory.column(output).entrySet());
     inspectionSetCopy.forEach(inspectionEntry -> officerInspectHistory.remove(inspectionEntry.getKey(), output));
-    
+
     //.forEach(((uuid, inspection) -> officerInspectHistory.remove(uuid, output)));
     return output;
   }
@@ -626,7 +640,7 @@ public final class AlertServiceImpl implements AlertService {
   private Optional<AlertInspection> getLastReturnableInspection(UUID officerUuid) {
     LinkedList<AlertInspection> inspections = getInspectionsByTime(officerUuid);
     AlertInspection inspection;
-    for (Iterator<AlertInspection> it = inspections.descendingIterator(); it.hasNext();) {
+    for (Iterator<AlertInspection> it = inspections.descendingIterator(); it.hasNext(); ) {
       inspection = it.next();
       if (!inspection.isUninspected()) {
         return Optional.of(inspection);

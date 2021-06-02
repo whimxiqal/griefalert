@@ -69,7 +69,7 @@ public final class InspectionInventoryStacks {
       .build();
 
   public static final ItemStack TOOL = ItemStack.builder()
-      .itemType(ItemTypes.GLASS)
+      .itemType(ItemTypes.STICK)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.DARK_GREEN, "GriefAlert Tool"))
       .add(Keys.ITEM_LORE, Lists.newArrayList(Text.of(TextColors.GRAY, "/ga tool <griefer>")))
       .add(Keys.ITEM_ENCHANTMENTS, Lists.newArrayList(Enchantment.builder()

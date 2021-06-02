@@ -141,7 +141,7 @@ public class ToolHandler {
   }
 
   @Listener(order = Order.FIRST)
-  public void onInteract(InteractEntityEvent event) {
+  public void onInteractEntity(InteractEntityEvent event) {
     event.getCause().first(Player.class)
         .flatMap(player ->
             player.getItemInHand(HandTypes.MAIN_HAND)
@@ -258,7 +258,7 @@ public class ToolHandler {
   }
 
   private boolean isTool(ItemStackSnapshot itemStackSnapshot) {
-    if (!itemStackSnapshot.getType().equals(ItemTypes.GLASS)) {
+    if (!itemStackSnapshot.getType().equals(ItemTypes.STICK)) {
       return false;
     }
     return itemStackSnapshot.get(ImmutableToolManipulator.class)
@@ -268,7 +268,7 @@ public class ToolHandler {
   }
 
   private boolean isTool(ItemStack itemStack) {
-    if (!itemStack.getType().equals(ItemTypes.GLASS)) {
+    if (!itemStack.getType().equals(ItemTypes.STICK)) {
       return false;
     }
     return itemStack.get(ToolManipulator.class)
@@ -294,7 +294,7 @@ public class ToolHandler {
 
   public ItemStack tool(String playerName, UUID playerUuid) {
     ItemStack itemStack = ItemStack.builder()
-        .itemType(ItemTypes.GLASS)
+        .itemType(ItemTypes.STICK)
         .quantity(1)
         .build();
 

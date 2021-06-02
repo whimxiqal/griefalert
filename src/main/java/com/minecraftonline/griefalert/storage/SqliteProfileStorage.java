@@ -40,9 +40,9 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.world.DimensionTypes;
 
 /**
  * Deprecated ProfileStorage implementation.
@@ -131,6 +131,13 @@ public class SqliteProfileStorage implements ProfileStorage {
     getConnection().prepareStatement(command).execute();
     close();
     return true;
+  }
+
+  @Nullable
+  @Override
+  public GriefProfile get(@Nonnull GriefEvent griefEvent, @Nonnull String target) throws Exception {
+    // TODO implement
+    return null;
   }
 
   @Nonnull

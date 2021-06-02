@@ -602,6 +602,10 @@ public final class Format {
         "The ID for the target object of this grief event.",
         Format.item(griefProfile.getTarget()))
         .get(griefProfile).ifPresent(details::add);
+    if (griefProfile.isTranslucent()) {
+      Detail.of("Trnslt.", "The translucency of the profile, which ignores events which have already been considered not grief",
+          Text.of("yes")).get(griefProfile).ifPresent(details::add);
+    }
     Optional.of(griefProfile.getIgnored()).filter(ignored -> !ignored.isEmpty())
         .flatMap(ignored -> Detail.of(
             "Ignored",
