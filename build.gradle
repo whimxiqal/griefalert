@@ -48,16 +48,27 @@ compileJava {
 }
 
 dependencies {
+    // Sponge
     implementation 'org.spongepowered:spongeapi:7.2.0'
+
+    // WorldEdit
     implementation 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     implementation 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
-    implementation fileTree(dir: 'libs', include: '*.jar')
-//    shadow fileTree(dir: 'libs', include: 'shadow/*.jar')
+
+    // Holograms
     implementation 'com.github.randombyte-developer:holograms:v3.2.0'
+
+    // Database connectors
     implementation 'org.xerial:sqlite-jdbc:3.8.11.2'
     implementation 'mysql:mysql-connector-java:8.0.19'
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.5.4'
+
+    // JUnit
     testImplementation('junit:junit:4.13')
+
+    // Lombok
+    implementation 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
 }
 
 sponge.plugin.meta {
