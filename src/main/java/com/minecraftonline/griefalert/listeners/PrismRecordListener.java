@@ -35,14 +35,12 @@ import com.minecraftonline.griefalert.alerts.prism.ReplaceAlert;
 import com.minecraftonline.griefalert.alerts.prism.SignBreakAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.PrismUtil;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
-
 import java.util.Optional;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.event.EventListener;
@@ -50,8 +48,10 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * A listener for Prism's event that is fired before a record is saved.
+ */
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
-
 
   @Override
   public void handle(PrismRecordPreSaveEvent event) {

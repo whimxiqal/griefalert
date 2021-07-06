@@ -24,13 +24,10 @@
 
 package com.minecraftonline.griefalert.util;
 
+/**
+ * A utility class to store static variables pertaining to this project.
+ */
 public final class Reference {
-
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private Reference() {
-  }
 
   public static final String ID = "griefalert";
   public static final String NAME = "GriefAlert";
@@ -39,5 +36,11 @@ public final class Reference {
   public static final String WEBSITE = "https://www.minecraftonline.com";
   public static final String SOURCE = "https://gitlab.com/minecraftonline/griefalert";
   public static final String MC_VERSION = "1.12.2";
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private Reference() {
+  }
 
 }

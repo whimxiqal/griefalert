@@ -27,6 +27,11 @@ package com.minecraftonline.griefalert.util.enums;
 import com.minecraftonline.griefalert.util.Format;
 import org.spongepowered.api.text.Text;
 
+/**
+ * A utility class to hold static methods which generate various "tags",
+ * which are helpful clickable {@link Text} objects to make running
+ * commands easier.
+ */
 public final class AlertTags {
 
   private AlertTags() {

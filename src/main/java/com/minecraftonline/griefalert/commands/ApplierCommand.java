@@ -41,15 +41,12 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -62,13 +59,10 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-
+/**
+ * A command to rollback or restore changes using Prism.
+ */
 public final class ApplierCommand extends GeneralCommand {
-
-  public enum ApplyType {
-    ROLLBACK,
-    RESTORE
-  }
 
   private final ApplyType applyType;
 
@@ -96,7 +90,8 @@ public final class ApplierCommand extends GeneralCommand {
 
   @Override
   @Nonnull
-  public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
+  public CommandResult execute(@Nonnull CommandSource src,
+                               @Nonnull CommandContext args) throws CommandException {
 
     if (src instanceof Player) {
       Player player = (Player) src;
@@ -192,6 +187,14 @@ public final class ApplierCommand extends GeneralCommand {
     } else {
       throw Errors.playerOnlyException();
     }
+  }
+
+  /**
+   * The application type, either restoration or rolling back.
+   */
+  public enum ApplyType {
+    ROLLBACK,
+    RESTORE
   }
 
 }

@@ -28,7 +28,6 @@ import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.api.alerts.inspections.Request;
 import com.minecraftonline.griefalert.api.storage.InspectionStorage;
 import com.minecraftonline.griefalert.util.enums.Settings;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -38,23 +37,14 @@ import java.util.Collections;
 import java.util.Properties;
 import javax.annotation.Nonnull;
 
+/**
+ * Storage implementation for inspections in MySQL.
+ */
 public class MySqlInspectionStorage implements InspectionStorage {
 
   private static final String TABLE_NAME = "GriefAlertInspections";
   private final String address;
   private final Properties databaseProperties;
-
-  private enum Field {
-    officerUuid,
-    grieferUuid,
-    event,
-    target,
-    xPos,
-    yPos,
-    zPos,
-    worldUuid,
-    inspected
-  }
 
   /**
    * General constructor.
@@ -74,7 +64,8 @@ public class MySqlInspectionStorage implements InspectionStorage {
   @Override
   public boolean write(@Nonnull AlertInspection inspection) {
     String command = String.format(
-        "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s) values (UNHEX(?), UNHEX(?), ?, ?, ?, ?, ?, UNHEX(?), ?);",
+        "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s) "
+            + "values (UNHEX(?), UNHEX(?), ?, ?, ?, ?, ?, UNHEX(?), ?);",
         TABLE_NAME,
         Field.officerUuid,
         Field.grieferUuid,
@@ -139,6 +130,18 @@ public class MySqlInspectionStorage implements InspectionStorage {
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  private enum Field {
+    officerUuid,
+    grieferUuid,
+    event,
+    target,
+    xPos,
+    yPos,
+    zPos,
+    worldUuid,
+    inspected
   }
 
 }

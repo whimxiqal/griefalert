@@ -28,23 +28,23 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * An enumeration of templates for ease of use.
+ */
 public class Templates {
-
-  private Templates() {
-  }
 
   /**
    * A template used for constructing messages for {@link Alert}s.
    * This template uses the names of the enumerated elements of
    * {@link Arg}.
    * <li>
-   *   {@link Arg#GRIEFER}
-   *   {@link Arg#EVENT_COLOR}
-   *   {@link Arg#EVENT}
-   *   {@link Arg#TARGET_COLOR}
-   *   {@link Arg#TARGET}
-   *   {@link Arg#WORLD_COLOR}
-   *   {@link Arg#WORLD}
+   * {@link Arg#GRIEFER}
+   * {@link Arg#EVENT_COLOR}
+   * {@link Arg#EVENT}
+   * {@link Arg#TARGET_COLOR}
+   * {@link Arg#TARGET}
+   * {@link Arg#WORLD_COLOR}
+   * {@link Arg#WORLD}
    * </li>
    */
   public static final Template ALERT = new Template(
@@ -62,7 +62,6 @@ public class Templates {
           " ",
           TextTemplate.arg(Arg.SUFFIX.name())),
       ".* [a-z ]* .* in the .*");
-
   /**
    * A template used for constructing messages for notifying
    * staff when an officer fixes an {@link Alert}.
@@ -103,5 +102,8 @@ public class Templates {
           " ",
           TextTemplate.arg(Arg.SUFFIX.name())),
       ".* .* fixed .* that .* [a-z ]* at [0-9]*, [0-9]*, [0-9]* in the .*");
+
+  private Templates() {
+  }
 
 }

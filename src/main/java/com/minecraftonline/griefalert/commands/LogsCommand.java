@@ -41,14 +41,12 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -61,6 +59,9 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * Command to query the logs from Prism throughout a WorldEdit region.
+ */
 public class LogsCommand extends GeneralCommand {
 
   LogsCommand() {
@@ -177,7 +178,9 @@ public class LogsCommand extends GeneralCommand {
     }
   }
 
-
+  /**
+   * A command to enable the Prism inspection tool.
+   */
   public static class LogsInspectorCommand extends GeneralCommand {
 
     LogsInspectorCommand() {

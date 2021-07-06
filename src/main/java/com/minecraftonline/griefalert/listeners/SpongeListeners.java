@@ -32,7 +32,6 @@ import com.minecraftonline.griefalert.alerts.sponge.UseAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.AttackEntityAlert;
 import com.minecraftonline.griefalert.alerts.sponge.entities.InteractEntityAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvents;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -44,10 +43,12 @@ import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.event.filter.IsCancelled;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.scheduler.Task;
 
+/**
+ * A collection of listeners.
+ */
 public final class SpongeListeners {
 
   private SpongeListeners() {
@@ -194,6 +195,11 @@ public final class SpongeListeners {
     }
   }
 
+  /**
+   * A listener for the information on a sign.
+   *
+   * @param event the event
+   */
   @Listener(order = Order.LATE)
   public void onChangeSignEvent(ChangeSignEvent event) {
     event.getCause()

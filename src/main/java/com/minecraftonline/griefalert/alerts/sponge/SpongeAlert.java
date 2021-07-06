@@ -5,17 +5,15 @@ package com.minecraftonline.griefalert.alerts.sponge;
 import com.flowpowered.math.vector.Vector3d;
 import com.minecraftonline.griefalert.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-
-import javax.annotation.Nonnull;
-
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Event;
-import org.spongepowered.api.world.World;
-
 import java.util.UUID;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Event;
 
+/**
+ * An abstract alert caused by Sponge, as opposed by Prism.
+ */
 public abstract class SpongeAlert extends GeneralAlert {
 
   private final UUID grieferUuid;

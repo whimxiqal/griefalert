@@ -27,14 +27,17 @@ package com.minecraftonline.griefalert.caches;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.enums.Settings;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.scheduler.Task;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 
+/**
+ * A structure to store recent alerts for a single cause (as in a player).
+ * This structure is in place to ensure alert silencing behavior.
+ */
 public class RecentAlertHistory {
 
   private final Map<GriefProfile, Integer> recents = new ConcurrentHashMap<>();
@@ -56,7 +59,8 @@ public class RecentAlertHistory {
         if (cancelers.containsKey(profile)) {
           Sponge.getScheduler()
               .getTaskById(cancelers.get(profile))
-              .orElseThrow(() -> new RuntimeException("An error occured with a GriefAlert profile silencing canceler"))
+              .orElseThrow(() ->
+                  new RuntimeException("An error occurred with a GriefAlert profile silencing canceler"))
               .cancel();
           cancelers.remove(profile);
         }

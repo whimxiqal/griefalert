@@ -24,11 +24,13 @@
 
 package com.minecraftonline.griefalert.tool;
 
+import javax.annotation.Nonnull;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableBooleanData;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
-import javax.annotation.Nonnull;
-
+/**
+ * A magic class to help define the GriefAlert tool.
+ */
 public class ImmutableToolManipulator
     extends AbstractImmutableBooleanData<ImmutableToolManipulator, ToolManipulator> {
   public ImmutableToolManipulator(boolean value) {

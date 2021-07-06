@@ -28,9 +28,7 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.api.alerts.inspections.Request;
 import com.minecraftonline.griefalert.api.storage.InspectionStorage;
-
 import java.nio.ByteBuffer;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -39,24 +37,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import javax.sql.rowset.serial.SerialBlob;
 
+/**
+ * Storage implementation for inspection storage using SQLite.
+ */
 public class SqliteInspectionStorage implements InspectionStorage {
 
   private static final String TABLE_NAME = "GriefAlertInspections";
   private final String address;
-
-  private enum Field {
-    officerUuid,
-    grieferUuid,
-    event,
-    target,
-    xPos,
-    yPos,
-    zPos,
-    worldUuid,
-    inspected
-  }
 
   /**
    * General constructor.
@@ -136,6 +124,18 @@ public class SqliteInspectionStorage implements InspectionStorage {
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  private enum Field {
+    officerUuid,
+    grieferUuid,
+    event,
+    target,
+    xPos,
+    yPos,
+    zPos,
+    worldUuid,
+    inspected
   }
 
 }

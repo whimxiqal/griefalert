@@ -31,16 +31,14 @@ import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.services.AlertService;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -63,25 +61,30 @@ public final class GriefProfile implements Serializable {
   private final Map<Colorable, String> colors;
   private final boolean translucent;
 
-  public enum Colorable {
-    EVENT,
-    TARGET,
-    WORLD
-  }
-
-  private GriefProfile(@Nonnull final GriefEvent event,
-                       @Nonnull final String target,
-                       @Nonnull final Set<WorldProperties> ignored,
-                       @Nonnull final Map<Colorable, String> colors,
+  private GriefProfile(@NotNull final GriefEvent event,
+                       @NotNull final String target,
+                       @NotNull final Set<WorldProperties> ignored,
+                       @NotNull final Map<Colorable, String> colors,
                        boolean translucent) {
     this.eventId = event.getId();
     this.target = target;
-    this.ignored = ignored.stream().map(WorldProperties::getWorldName).collect(Collectors.toCollection(Sets::newLinkedHashSet));
+    this.ignored = ignored.stream().map(WorldProperties::getWorldName)
+        .collect(Collectors.toCollection(Sets::newLinkedHashSet));
     this.colors = Maps.newLinkedHashMap(colors);
     this.translucent = translucent;
   }
 
-  @Nonnull
+  public static Builder builder(@NotNull final GriefEvent event,
+                                @NotNull final String target) {
+    return new Builder(event, target);
+  }
+
+  /**
+   * Retrieve the grief event using the event id.
+   *
+   * @return the grief event
+   */
+  @NotNull
   public GriefEvent getGriefEvent() {
     return Sponge.getRegistry().getType(GriefEvent.class, eventId)
         .orElseThrow(() -> new RuntimeException(
@@ -89,7 +92,7 @@ public final class GriefProfile implements Serializable {
                 + eventId));
   }
 
-  @Nonnull
+  @NotNull
   public String getTarget() {
     return target;
   }
@@ -102,7 +105,7 @@ public final class GriefProfile implements Serializable {
    * @param world the world
    * @return true if ignored
    */
-  public boolean isIgnoredIn(@Nonnull final WorldProperties world) {
+  public boolean isIgnoredIn(@NotNull final WorldProperties world) {
     return ignored.contains(world.getWorldName());
   }
 
@@ -111,7 +114,7 @@ public final class GriefProfile implements Serializable {
    *
    * @return ignored dimensions
    */
-  @Nonnull
+  @NotNull
   public Set<World> getIgnored() {
     Set<World> out = Sets.newHashSet();
     ignored.forEach(worldName -> out.add(Sponge.getServer().getWorld(worldName).orElseThrow(
@@ -136,8 +139,8 @@ public final class GriefProfile implements Serializable {
    * @param component the component of an profile
    * @return an optional possibly containing the {@link TextColor}
    */
-  @Nonnull
-  public Optional<TextColor> getColored(@Nonnull Colorable component) {
+  @NotNull
+  public Optional<TextColor> getColored(@NotNull Colorable component) {
     return Optional.ofNullable(colors.get(component))
         .flatMap(s -> Sponge.getRegistry().getType(TextColor.class, s));
   }
@@ -147,7 +150,7 @@ public final class GriefProfile implements Serializable {
    *
    * @return the mapped components
    */
-  @Nonnull
+  @NotNull
   public Map<Colorable, TextColor> getAllColored() {
     Map<Colorable, TextColor> out = Maps.newHashMap();
     colors.forEach((colored, s) ->
@@ -176,11 +179,18 @@ public final class GriefProfile implements Serializable {
         && this.target.equals(other.target);
   }
 
-  public static Builder builder(@Nonnull final GriefEvent event,
-                                @Nonnull final String target) {
-    return new Builder(event, target);
+  /**
+   * An enumeration of items that may be colored in an message associated with this profile.
+   */
+  public enum Colorable {
+    EVENT,
+    TARGET,
+    WORLD
   }
 
+  /**
+   * A builder for the profile for ease of construction.
+   */
   public static class Builder {
 
     private final GriefEvent event;
@@ -189,8 +199,8 @@ public final class GriefProfile implements Serializable {
     private final Map<Colorable, String> colors = Maps.newHashMap();
     private boolean translucent = false;
 
-    public Builder(@Nonnull final GriefEvent event,
-                   @Nonnull final String target) {
+    public Builder(@NotNull final GriefEvent event,
+                   @NotNull final String target) {
       this.event = event;
       this.target = target;
     }
@@ -215,7 +225,7 @@ public final class GriefProfile implements Serializable {
      * @param worlds the worlds
      * @return builder for chaining
      */
-    public Builder addAllIgnored(@Nonnull Collection<WorldProperties> worlds) {
+    public Builder addAllIgnored(@NotNull Collection<WorldProperties> worlds) {
       for (WorldProperties world : worlds) {
         addIgnored(world);
       }
@@ -248,7 +258,7 @@ public final class GriefProfile implements Serializable {
      * @param color     the color
      * @return builder for chaining
      */
-    public Builder putColored(@Nonnull Colorable component, @Nonnull TextColor color) {
+    public Builder putColored(@NotNull Colorable component, @NotNull TextColor color) {
       colors.put(component, color.getId());
       return this;
     }

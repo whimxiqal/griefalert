@@ -28,13 +28,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.util.SpongeUtil;
-
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Date;
 import java.util.UUID;
-import javax.annotation.Nonnull;
-
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.World;
 
@@ -49,9 +46,9 @@ public final class AlertInspection implements Serializable {
   private final UUID grieferUuid;
   private final String eventId;
   private final String target;
-  private final int xPos;
-  private final int yPos;
-  private final int zPos;
+  private final int posX;
+  private final int posY;
+  private final int posZ;
   private final UUID worldUuid;
   private final Instant inspected;
   private final UUID previousWorldUuid;
@@ -79,22 +76,22 @@ public final class AlertInspection implements Serializable {
    * @param previousTransform the transform of the officer before the inspection
    * @param alertIndex        the index of the Alert
    */
-  public AlertInspection(@Nonnull final UUID officerUuid,
-                         @Nonnull final UUID grieferUuid,
-                         @Nonnull final String eventId,
-                         @Nonnull final String target,
-                         @Nonnull final Vector3i blockPosition,
-                         @Nonnull final UUID worldUuid,
-                         @Nonnull final Instant inspected,
-                         @Nonnull final Transform<World> previousTransform,
+  public AlertInspection(@NotNull final UUID officerUuid,
+                         @NotNull final UUID grieferUuid,
+                         @NotNull final String eventId,
+                         @NotNull final String target,
+                         @NotNull final Vector3i blockPosition,
+                         @NotNull final UUID worldUuid,
+                         @NotNull final Instant inspected,
+                         @NotNull final Transform<World> previousTransform,
                          final int alertIndex) {
     this.officerUuid = officerUuid;
     this.grieferUuid = grieferUuid;
     this.eventId = eventId;
     this.target = target;
-    this.xPos = blockPosition.getX();
-    this.yPos = blockPosition.getY();
-    this.zPos = blockPosition.getZ();
+    this.posX = blockPosition.getX();
+    this.posY = blockPosition.getY();
+    this.posZ = blockPosition.getZ();
     this.worldUuid = worldUuid;
     this.inspected = inspected;
     this.previousWorldUuid = previousTransform.getExtent().getUniqueId();
@@ -107,53 +104,59 @@ public final class AlertInspection implements Serializable {
     this.alertIndex = alertIndex;
   }
 
-  @Nonnull
+  @NotNull
   public UUID getOfficerUuid() {
     return officerUuid;
   }
 
-  @Nonnull
+  @NotNull
   public UUID getGrieferUuid() {
     return grieferUuid;
   }
 
-  @Nonnull
+  @NotNull
   public String getEventId() {
     return eventId;
   }
 
-  @Nonnull
+  @NotNull
   public String getTarget() {
     return target;
   }
 
   public int getX() {
-    return xPos;
+    return posX;
   }
 
   public int getY() {
-    return yPos;
+    return posY;
   }
 
   public int getZ() {
-    return zPos;
+    return posZ;
   }
 
-  @Nonnull
+  @NotNull
   public UUID getWorldUuid() {
     return worldUuid;
   }
 
-  @Nonnull
+  @NotNull
   public Instant getInspected() {
     return inspected;
   }
 
-  @Nonnull
+  /**
+   * Get the transform for the player before the inspection.
+   *
+   * @return the previous transform
+   */
+  @NotNull
   public Transform<World> getPreviousTransform() {
     return new Transform<>(
         SpongeUtil.getWorld(previousWorldUuid)
-            .orElseThrow(() -> new RuntimeException("AlertInspection stored an invalid previous World Uuid: " + previousWorldUuid)),
+            .orElseThrow(() -> new RuntimeException("AlertInspection stored an invalid previous World Uuid: "
+                + previousWorldUuid)),
         new Vector3d(previousPositionX, previousPositionY, previousPositionZ),
         new Vector3d(previousRotationX, previousRotationY, previousRotationZ));
   }

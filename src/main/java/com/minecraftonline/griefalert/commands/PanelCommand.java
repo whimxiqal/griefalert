@@ -29,6 +29,7 @@ import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -36,6 +37,9 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+/**
+ * A command to start a panel.
+ */
 public class PanelCommand extends GeneralCommand {
 
   PanelCommand() {
@@ -45,8 +49,11 @@ public class PanelCommand extends GeneralCommand {
     addAlias("p");
   }
 
+
+  @NotNull
   @Override
-  public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+  public CommandResult execute(@NotNull CommandSource src,
+                               @NotNull CommandContext args) throws CommandException {
     if (src instanceof Player) {
       if (GriefAlert.getInstance().getAlertService().openPanel((Player) src)) {
         return CommandResult.success();

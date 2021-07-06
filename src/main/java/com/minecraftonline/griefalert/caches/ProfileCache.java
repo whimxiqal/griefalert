@@ -28,12 +28,8 @@ import com.google.common.collect.HashBasedTable;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-
 import java.util.Collection;
 import java.util.Optional;
-
-import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
 
 /**
@@ -69,14 +65,12 @@ public class ProfileCache {
   }
 
   /**
-   * Get a <code>GriefProfile</code> which matches the given parameters. All of these parameters
-   * are required to identify a <code>GriefProfile</code> from a list.
+   * Get a grief profile given some parameters.
    *
-   * @param griefEvent The queried <code>GriefEvent</code>
+   * @param griefEvent The queried grief event
    * @param target     The queried target id
-   * @param world      The queried <code>World</code>
-   * @return An <code>Optional</code> containing the <code>GriefAlert</code> that matches the
-   * criteria, or an empty <code>Optional</code> if on does not exist
+   * @param world      The queried world
+   * @return The grief profile that matches the criteria
    */
   public Optional<GriefProfile> getProfileOf(GriefEvent griefEvent,
                                              String target,

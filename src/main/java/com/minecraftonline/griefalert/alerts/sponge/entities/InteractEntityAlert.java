@@ -5,14 +5,21 @@ package com.minecraftonline.griefalert.alerts.sponge.entities;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 
+/**
+ * An alert caused by interacting with an entity.
+ */
 public class InteractEntityAlert extends EntityAlert {
 
+  /**
+   * Default constructor.
+   *
+   * @param griefProfile the grief profile
+   * @param event        the event
+   */
   public InteractEntityAlert(@Nonnull GriefProfile griefProfile,
                              @Nonnull InteractEntityEvent.Secondary event) {
     super(griefProfile, event, () -> event.getCause().first(Player.class).orElseThrow(() ->
@@ -27,6 +34,13 @@ public class InteractEntityAlert extends EntityAlert {
 
   }
 
+  /**
+   * Constructor to include the tool that was used during interacting with an entity.
+   *
+   * @param griefProfile the grief profile
+   * @param event        the event
+   * @param tool         the tool
+   */
   public InteractEntityAlert(@Nonnull GriefProfile griefProfile,
                              @Nonnull InteractEntityEvent.Secondary event,
                              @Nonnull final String tool) {

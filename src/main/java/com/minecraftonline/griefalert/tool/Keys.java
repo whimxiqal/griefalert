@@ -24,11 +24,13 @@
 
 package com.minecraftonline.griefalert.tool;
 
+import java.util.UUID;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import java.util.UUID;
-
+/**
+ * Sponge keys enumeration utility class.
+ */
 public class Keys {
   /**
    * Applied to wands to differ them from regular items.

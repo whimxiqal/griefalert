@@ -2,20 +2,19 @@
 
 package com.minecraftonline.griefalert.alerts.sponge.entities;
 
+import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
-
 import java.util.UUID;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
 
 /**
- * An <code>Alert</code> for the Attack <code>GriefEvent</code>.
+ * An {@link Alert} for the Attack {@link GriefEvent}.
  *
  * @see GriefEvents
  */
@@ -26,7 +25,7 @@ public class AttackEntityAlert extends EntityAlert {
   /**
    * General constructor.
    *
-   * @param griefProfile the <code>GriefProfile</code>
+   * @param griefProfile the grief profile
    * @param event        the event which triggered the alert
    */
   public AttackEntityAlert(@Nonnull final GriefProfile griefProfile,
@@ -45,6 +44,15 @@ public class AttackEntityAlert extends EntityAlert {
 
   }
 
+  /**
+   * Explicit constructor.
+   *
+   * @param griefProfile the grief profile
+   * @param event the event
+   * @param grieferUuid the grief uuid
+   * @param player the player
+   * @param tool the tool which was used during the attack
+   */
   public AttackEntityAlert(@Nonnull final GriefProfile griefProfile,
                            @Nonnull final AttackEntityEvent event,
                            @Nonnull final UUID grieferUuid,

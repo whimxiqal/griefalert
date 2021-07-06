@@ -24,13 +24,15 @@
 
 package com.minecraftonline.griefalert.tool;
 
+import java.util.UUID;
+import javax.annotation.Nonnull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableSingleData;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
-import javax.annotation.Nonnull;
-import java.util.UUID;
-
+/**
+ * A magic class to help handle the GriefAlert tool.
+ */
 public class ImmutableToolGrieferManipulator
     extends AbstractImmutableSingleData<UUID, ImmutableToolGrieferManipulator, ToolGrieferManipulator> {
   public ImmutableToolGrieferManipulator(UUID value) {
@@ -40,7 +42,8 @@ public class ImmutableToolGrieferManipulator
   @Nonnull
   @Override
   protected ImmutableValue<UUID> getValueGetter() {
-    return Sponge.getRegistry().getValueFactory().createValue(Keys.TOOL_GRIEFER_UUID, this.getValue()).asImmutable();
+    return Sponge.getRegistry().getValueFactory()
+        .createValue(Keys.TOOL_GRIEFER_UUID, this.getValue()).asImmutable();
   }
 
   @Nonnull

@@ -29,6 +29,9 @@ import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import javax.annotation.Nonnull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -43,10 +46,9 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import javax.annotation.Nonnull;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-
+/**
+ * A command to get a GriefAlert tool.
+ */
 public class ToolCommand extends GeneralCommand {
 
   ToolCommand() {
@@ -81,32 +83,33 @@ public class ToolCommand extends GeneralCommand {
 
       Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
         try {
-          Sponge.getServer().getGameProfileManager().get(playerName.get()).whenComplete((profile, exception) -> {
-            if (profile == null || !profile.getName().isPresent()) {
-              player.sendMessage(Format.error("That player could not be found"));
-              return;
-            }
-            if (player.getUniqueId().equals(profile.getUniqueId())) {
-              player.sendMessage(Format.error("You may not create a tool for yourself!"));
-              return;
-            }
-            ItemStack tool = GriefAlert.getInstance()
-                .getToolHandler()
-                .tool(profile.getName().get(), profile.getUniqueId());
+          Sponge.getServer().getGameProfileManager().get(playerName.get())
+              .whenComplete((profile, exception) -> {
+                if (profile == null || !profile.getName().isPresent()) {
+                  player.sendMessage(Format.error("That player could not be found"));
+                  return;
+                }
+                if (player.getUniqueId().equals(profile.getUniqueId())) {
+                  player.sendMessage(Format.error("You may not create a tool for yourself!"));
+                  return;
+                }
+                ItemStack tool = GriefAlert.getInstance()
+                    .getToolHandler()
+                    .tool(profile.getName().get(), profile.getUniqueId());
 
-            Inventory inv = player.getInventory()
-                .query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class));
-            if (!inv.canFit(tool)) {
-              player.sendMessage(Format.error("You have no room in your inventory! ",
-                  "Make way for the tool and try again"));
-              return;
-            }
-            inv.offer(tool);
-            player.sendMessage(Text.of(Format.prefix(), TextColors.GOLD, "Left Click ",
-                TextColors.WHITE, "to fix addition grief"));
-            player.sendMessage(Text.of(Format.prefix(), TextColors.LIGHT_PURPLE, "Right Click ",
-                TextColors.WHITE, "to fix breakage grief"));
-          }).get();
+                Inventory inv = player.getInventory()
+                    .query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class));
+                if (!inv.canFit(tool)) {
+                  player.sendMessage(Format.error("You have no room in your inventory! ",
+                      "Make way for the tool and try again"));
+                  return;
+                }
+                inv.offer(tool);
+                player.sendMessage(Text.of(Format.prefix(), TextColors.GOLD, "Left Click ",
+                    TextColors.WHITE, "to fix addition grief"));
+                player.sendMessage(Text.of(Format.prefix(), TextColors.LIGHT_PURPLE, "Right Click ",
+                    TextColors.WHITE, "to fix breakage grief"));
+              }).get();
         } catch (InterruptedException | ExecutionException e) {
           // ignore
         }

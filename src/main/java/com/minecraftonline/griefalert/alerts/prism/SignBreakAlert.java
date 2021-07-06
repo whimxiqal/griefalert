@@ -30,9 +30,11 @@ import com.minecraftonline.griefalert.api.data.SignText;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.PrismUtil;
-
 import java.util.Optional;
 
+/**
+ * An alert caused by breaking a sign.
+ */
 public class SignBreakAlert extends PrismAlert {
 
   /**

@@ -32,13 +32,18 @@ import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * A extra bit of information to be appended onto an {@link Alert}.
+ *
+ * @param <P> the type of object which is given to retrieve the formatted text
+ *            for any individual use of a Detail.
+ */
 public final class Detail<P extends Serializable> implements Serializable {
 
   private String label;

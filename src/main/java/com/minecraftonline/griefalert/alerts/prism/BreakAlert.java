@@ -28,6 +28,9 @@ import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.enums.Details;
 
+/**
+ * A block alert that is caused by breaking the block.
+ */
 public class BreakAlert extends BlockAlert {
 
   public BreakAlert(GriefProfile griefProfile, PrismRecord prismRecord) {

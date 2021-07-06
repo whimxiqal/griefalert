@@ -26,6 +26,9 @@ package com.minecraftonline.griefalert.api.templates;
 
 import org.spongepowered.api.text.TextTemplate;
 
+/**
+ * A wrapper around a Sponge {@link TextTemplate}.
+ */
 public class Template {
 
   private final TextTemplate textTemplate;

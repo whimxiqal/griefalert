@@ -25,7 +25,6 @@
 package com.minecraftonline.griefalert.api.structures;
 
 import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

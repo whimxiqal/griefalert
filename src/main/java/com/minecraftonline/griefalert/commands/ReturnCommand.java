@@ -29,9 +29,7 @@ import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -40,9 +38,10 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-
+/**
+ * A command for an officer to return a location prior to an inspection.
+ */
 public class ReturnCommand extends GeneralCommand {
-
 
   ReturnCommand() {
     super(
@@ -60,8 +59,10 @@ public class ReturnCommand extends GeneralCommand {
                                @Nonnull CommandContext args) throws CommandException {
     if (src instanceof Player) {
       boolean inspected = args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).isPresent()
-          ? GriefAlert.getInstance().getAlertService().uninspect((Player) src, args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).get())
-          : GriefAlert.getInstance().getAlertService().uninspect((Player) src);
+          ? GriefAlert.getInstance().getAlertService()
+          .uninspect((Player) src, args.<Integer>getOne(CommandKeys.ALERT_INDEX.get()).get())
+          : GriefAlert.getInstance().getAlertService()
+          .uninspect((Player) src);
       if (inspected) {
         return CommandResult.success();
       } else {

@@ -24,6 +24,9 @@
 
 package com.minecraftonline.griefalert.tool;
 
+import java.util.Optional;
+import java.util.UUID;
+import javax.annotation.Nonnull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -35,11 +38,11 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import javax.annotation.Nonnull;
-import java.util.Optional;
-import java.util.UUID;
-
-public class ToolGrieferManipulator extends AbstractSingleData<UUID, ToolGrieferManipulator, ImmutableToolGrieferManipulator> {
+/**
+ * Magic method to help define a GriefAlert tool with a specific griefer.
+ */
+public class ToolGrieferManipulator
+    extends AbstractSingleData<UUID, ToolGrieferManipulator, ImmutableToolGrieferManipulator> {
   public static final DataQuery QUERY = DataQuery.of("griefalerttoolgriefer");
 
   public ToolGrieferManipulator(UUID value) {
@@ -55,13 +58,15 @@ public class ToolGrieferManipulator extends AbstractSingleData<UUID, ToolGriefer
   @Nonnull
   @Override
   public Optional<ToolGrieferManipulator> from(DataContainer container) {
-    return container.getString(Keys.TOOL_GRIEFER_UUID.getQuery()).map(UUID::fromString).map(ToolGrieferManipulator::new);
+    return container.getString(Keys.TOOL_GRIEFER_UUID.getQuery())
+        .map(UUID::fromString).map(ToolGrieferManipulator::new);
   }
 
   @Nonnull
   @Override
   protected DataContainer fillContainer(@Nonnull DataContainer dataContainer) {
-    return super.fillContainer(dataContainer.set(Keys.TOOL_GRIEFER_UUID.getQuery(), this.getValue().toString()));
+    return super.fillContainer(dataContainer.set(Keys.TOOL_GRIEFER_UUID.getQuery(),
+        this.getValue().toString()));
   }
 
   @Nonnull
@@ -87,7 +92,11 @@ public class ToolGrieferManipulator extends AbstractSingleData<UUID, ToolGriefer
     return 1;
   }
 
-  public static class Builder implements DataManipulatorBuilder<ToolGrieferManipulator, ImmutableToolGrieferManipulator> {
+  /**
+   * A builder for the manipulator.
+   */
+  public static class Builder
+      implements DataManipulatorBuilder<ToolGrieferManipulator, ImmutableToolGrieferManipulator> {
 
     @Nonnull
     @Override
@@ -104,7 +113,8 @@ public class ToolGrieferManipulator extends AbstractSingleData<UUID, ToolGriefer
     @Nonnull
     @Override
     public Optional<ToolGrieferManipulator> build(DataView container) throws InvalidDataException {
-      return container.getString(Keys.GA_TOOL.getQuery()).map(UUID::fromString).map(ToolGrieferManipulator::new);
+      return container.getString(Keys.GA_TOOL.getQuery()).map(UUID::fromString)
+          .map(ToolGrieferManipulator::new);
     }
   }
 }

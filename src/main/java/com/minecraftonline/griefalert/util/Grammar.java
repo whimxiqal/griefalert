@@ -26,6 +26,9 @@ package com.minecraftonline.griefalert.util;
 
 import org.spongepowered.api.text.Text;
 
+/**
+ * A utility class for static methods pertaining to enforcing proper grammar rules.
+ */
 public final class Grammar {
 
   /**

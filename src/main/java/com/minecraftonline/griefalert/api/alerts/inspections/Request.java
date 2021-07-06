@@ -27,13 +27,15 @@ package com.minecraftonline.griefalert.api.alerts.inspections;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
-
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * A data request.
+ */
 public final class Request implements Serializable {
 
   public static Request EMPTY = builder().build();
@@ -44,15 +46,10 @@ public final class Request implements Serializable {
   private final Set<UUID> grieferUuids;
   private final int maximum;
 
-  @Nonnull
-  public static Request.Builder builder() {
-    return new Request.Builder();
-  }
-
-  private Request(@Nonnull Set<GriefEvent> events,
-                  @Nonnull Set<String> targets,
-                  @Nonnull Set<UUID> officerUuids,
-                  @Nonnull Set<UUID> grieferUuids,
+  private Request(@NotNull Set<GriefEvent> events,
+                  @NotNull Set<String> targets,
+                  @NotNull Set<UUID> officerUuids,
+                  @NotNull Set<UUID> grieferUuids,
                   int maximum) {
     this.events = events;
     this.targets = targets;
@@ -61,26 +58,37 @@ public final class Request implements Serializable {
     this.maximum = maximum;
   }
 
-  @Nonnull
+  @NotNull
+  public static Request.Builder builder() {
+    return new Request.Builder();
+  }
+
+  @NotNull
   public Set<GriefEvent> getEvents() {
     return events;
   }
 
-  @Nonnull
+  @NotNull
   public Set<String> getTargets() {
     return targets;
   }
 
-  @Nonnull
+  @NotNull
   public Set<UUID> getOfficerUuids() {
     return officerUuids;
   }
 
-  @Nonnull
+  @NotNull
   public Set<UUID> getGrieferUuids() {
     return grieferUuids;
   }
 
+  /**
+   * Get the maximum number of returned values from the query.
+   *
+   * @return the maximum, if one exists
+   */
+  @NotNull
   public Optional<Integer> getMaximum() {
     if (maximum < 0) {
       return Optional.empty();
@@ -88,6 +96,9 @@ public final class Request implements Serializable {
     return Optional.of(maximum);
   }
 
+  /**
+   * A builder for a request.
+   */
   public static class Builder {
 
     private final Set<GriefEvent> events = Sets.newHashSet();
@@ -110,7 +121,7 @@ public final class Request implements Serializable {
      * @param event the event for filtering
      * @return the current builder for chaining
      */
-    public Builder addEvent(@Nonnull final GriefEvent event) {
+    public Builder addEvent(@NotNull final GriefEvent event) {
       Preconditions.checkNotNull(event);
       this.events.add(event);
       return this;
@@ -123,7 +134,7 @@ public final class Request implements Serializable {
      * @param target the target id for filtering
      * @return the current builder for chaining
      */
-    public Builder addTarget(@Nonnull final String target) {
+    public Builder addTarget(@NotNull final String target) {
       Preconditions.checkNotNull(target);
       this.targets.add(target);
       return this;
@@ -136,7 +147,7 @@ public final class Request implements Serializable {
      * @param officerUuid the player uuid for filtering
      * @return the current builder for chaining
      */
-    public Builder addOfficerUuid(@Nonnull final UUID officerUuid) {
+    public Builder addOfficerUuid(@NotNull final UUID officerUuid) {
       Preconditions.checkNotNull(officerUuid);
       this.officerUuids.add(officerUuid);
       return this;
@@ -149,7 +160,7 @@ public final class Request implements Serializable {
      * @param grieferUuid the player uuid for filtering
      * @return the current builder for chaining
      */
-    public Builder addGrieferUuid(@Nonnull final UUID grieferUuid) {
+    public Builder addGrieferUuid(@NotNull final UUID grieferUuid) {
       Preconditions.checkNotNull(grieferUuid);
       this.grieferUuid.add(grieferUuid);
       return this;

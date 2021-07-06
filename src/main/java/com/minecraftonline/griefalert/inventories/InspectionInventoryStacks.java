@@ -34,40 +34,36 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * A utility class to outline all the different items that make up the
+ * {@link InspectionInventory}.
+ */
 public final class InspectionInventoryStacks {
-
-  private InspectionInventoryStacks() {
-  }
 
   public static final ItemStack INFO = ItemStack.builder()
       .itemType(ItemTypes.BOOK)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, "Alert Info"))
       .add(Keys.ITEM_LORE, Lists.newArrayList(Text.of(TextColors.GRAY, "/ga info <index>")))
       .build();
-
   public static final ItemStack SHOW = ItemStack.builder()
       .itemType(ItemTypes.ENDER_EYE)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.BLUE, "Show Hologram"))
       .add(Keys.ITEM_LORE, Lists.newArrayList(Text.of(TextColors.GRAY, "/ga show <index>")))
       .build();
-
   public static final ItemStack TELEPORT = ItemStack.builder()
       .itemType(ItemTypes.ENDER_PEARL)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, "Teleport"))
       .build();
-
   public static final ItemStack FIX = ItemStack.builder()
       .itemType(ItemTypes.COBBLESTONE_WALL)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "Fix Grief"))
       .add(Keys.ITEM_LORE, Lists.newArrayList(Text.of(TextColors.GRAY, "/ga fix <index>")))
       .build();
-
   public static final ItemStack QUERY = ItemStack.builder()
       .itemType(ItemTypes.GOLDEN_SHOVEL)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.LIGHT_PURPLE, "Query Griefer"))
       .add(Keys.ITEM_LORE, Lists.newArrayList(Text.of(TextColors.GRAY, "/ga query -p <griefer>")))
       .build();
-
   public static final ItemStack TOOL = ItemStack.builder()
       .itemType(ItemTypes.STICK)
       .add(Keys.DISPLAY_NAME, Text.of(TextColors.DARK_GREEN, "GriefAlert Tool"))
@@ -77,11 +73,13 @@ public final class InspectionInventoryStacks {
           .level(1).build()))
       .quantity(1)
       .build();
-
   public static final ItemStack NONE = ItemStack.builder()
       .itemType(ItemTypes.STAINED_GLASS_PANE)
       .add(Keys.DISPLAY_NAME, Text.of())
       .add(Keys.DYE_COLOR, DyeColors.GRAY)
       .build();
+
+  private InspectionInventoryStacks() {
+  }
 
 }

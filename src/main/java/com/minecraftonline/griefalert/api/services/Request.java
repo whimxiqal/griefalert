@@ -28,7 +28,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
-
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
@@ -50,11 +49,6 @@ public final class Request implements Serializable {
   private final Set<UUID> playerUuids;
   private final int maximum;
 
-  @Nonnull
-  public static Request.Builder builder() {
-    return new Request.Builder();
-  }
-
   private Request(@Nonnull Set<GriefEvent> events,
                   @Nonnull Set<String> targets,
                   @Nonnull Set<UUID> playerUuids,
@@ -63,6 +57,11 @@ public final class Request implements Serializable {
     this.targets = targets;
     this.playerUuids = playerUuids;
     this.maximum = maximum;
+  }
+
+  @Nonnull
+  public static Request.Builder builder() {
+    return new Request.Builder();
   }
 
   @Nonnull
@@ -80,6 +79,11 @@ public final class Request implements Serializable {
     return playerUuids;
   }
 
+  /**
+   * Get the maximum number of returned values from the query.
+   *
+   * @return the maximum, if one exists
+   */
   public Optional<Integer> getMaximum() {
     if (maximum < 0) {
       return Optional.empty();
@@ -87,6 +91,9 @@ public final class Request implements Serializable {
     return Optional.of(maximum);
   }
 
+  /**
+   * A builder for a request.
+   */
   public static class Builder {
 
     private final Set<GriefEvent> events = Sets.newHashSet();

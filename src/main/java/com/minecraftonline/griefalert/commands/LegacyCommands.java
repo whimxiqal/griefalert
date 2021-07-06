@@ -27,7 +27,6 @@ package com.minecraftonline.griefalert.commands;
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.commands.common.LegacyCommand;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.util.List;
 import javax.annotation.Nonnull;
 
@@ -37,18 +36,18 @@ import javax.annotation.Nonnull;
 public final class LegacyCommands {
 
   /**
-   * Private constructor so this class cannot be instantiated.
-   */
-  private LegacyCommands() {
-  }
-
-  /**
    * Immutable list of deprecated commands.
    */
   private static final List<LegacyCommand> list = Lists.newArrayList(
       LegacyCommand.of(Permissions.GRIEFALERT_COMMAND_CHECK, "gcheck", "griefalert check"),
       LegacyCommand.of(Permissions.GRIEFALERT_COMMAND_QUERY, "grecent", "griefalert query")
   );
+
+  /**
+   * Private constructor so this class cannot be instantiated.
+   */
+  private LegacyCommands() {
+  }
 
   @Nonnull
   public static List<LegacyCommand> get() {

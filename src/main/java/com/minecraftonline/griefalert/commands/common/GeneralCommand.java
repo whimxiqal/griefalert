@@ -26,13 +26,12 @@ package com.minecraftonline.griefalert.commands.common;
 
 import com.minecraftonline.griefalert.api.data.Permission;
 import com.minecraftonline.griefalert.util.Format;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -41,11 +40,8 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-
-import javax.annotation.Nonnull;
 
 /**
  * An abstract class for all MinecraftOnline commands from which to extend. This
@@ -57,38 +53,9 @@ public abstract class GeneralCommand implements CommandExecutor {
   private final Text description;
   private final List<GeneralCommand> commandChildren = new LinkedList<>();
   private final List<String> aliases = new LinkedList<>();
-  private CommandElement commandElement = GenericArguments.none();
   private final Map<String, Text> flagDescriptions = new HashMap<>();
   private final Map<String, Boolean> flagValueState = new HashMap<>();
-
-  public enum FlagDescription {
-    AFTER("a",
-        Text.of("Use events ", TextColors.AQUA, " after", TextColors.RESET, " this date"),
-        true),
-    BEFORE("b",
-        Text.of("Use events ", TextColors.AQUA, " before", TextColors.RESET, " this date"),
-        true),
-    PLAYER("p",
-        Text.of("Use events caused by this ", TextColors.AQUA, "player"),
-        true),
-    TARGET("t",
-           Text.of("Use events in which this block or other object was the ", TextColors.AQUA, "target"),
-        true),
-    EVENT("e",
-        Text.of("Use events caused via this ", TextColors.AQUA, "event"),
-        true);
-    ;
-    String flag;
-    Text description;
-    boolean hasValue;
-
-    FlagDescription(String flag, Text description, boolean hasValue) {
-      this.flag = flag;
-      this.description = description;
-      this.hasValue = hasValue;
-    }
-  }
-
+  private CommandElement commandElement = GenericArguments.none();
 
   /**
    * A general Grief Alert command object.
@@ -105,6 +72,7 @@ public abstract class GeneralCommand implements CommandExecutor {
     }
   }
 
+
   public GeneralCommand(Permission permission,
                         Text description,
                         String primaryAlias) {
@@ -120,10 +88,6 @@ public abstract class GeneralCommand implements CommandExecutor {
     this.commandChildren.add(child);
   }
 
-  protected final void setCommandElement(CommandElement commandElement) {
-    this.commandElement = commandElement;
-  }
-
   @SuppressWarnings("WeakerAccess")
   protected final List<GeneralCommand> getChildren() {
     return this.commandChildren;
@@ -136,6 +100,10 @@ public abstract class GeneralCommand implements CommandExecutor {
   @SuppressWarnings("unused")
   public final CommandElement getCommandElement() {
     return this.commandElement;
+  }
+
+  protected final void setCommandElement(CommandElement commandElement) {
+    this.commandElement = commandElement;
   }
 
   public final void addFlagDescription(FlagDescription flagDescription) {
@@ -184,8 +152,8 @@ public abstract class GeneralCommand implements CommandExecutor {
                           "-", entry.getKey(),
                           TextColors.DARK_GRAY, "]"),
                           Text.of(isValueFlag
-                              ? Text.of(TextColors.GREEN, "Flag - Requires Value")
-                              : Text.of(TextColors.GOLD, "Flag"),
+                                  ? Text.of(TextColors.GREEN, "Flag - Requires Value")
+                                  : Text.of(TextColors.GOLD, "Flag"),
                               Format.endLine(),
                               TextColors.RESET, entry.getValue()));
                     })
@@ -230,6 +198,37 @@ public abstract class GeneralCommand implements CommandExecutor {
 
   Permission getPermission() {
     return permission;
+  }
+
+  /**
+   * An enumeration of all descriptions of flags for better documentation
+   * in help menus on commands.
+   */
+  public enum FlagDescription {
+    AFTER("a",
+        Text.of("Use events ", TextColors.AQUA, " after", TextColors.RESET, " this date"),
+        true),
+    BEFORE("b",
+        Text.of("Use events ", TextColors.AQUA, " before", TextColors.RESET, " this date"),
+        true),
+    PLAYER("p",
+        Text.of("Use events caused by this ", TextColors.AQUA, "player"),
+        true),
+    TARGET("t",
+        Text.of("Use events in which this block or other object was the ", TextColors.AQUA, "target"),
+        true),
+    EVENT("e",
+        Text.of("Use events caused via this ", TextColors.AQUA, "event"),
+        true);
+    String flag;
+    Text description;
+    boolean hasValue;
+
+    FlagDescription(String flag, Text description, boolean hasValue) {
+      this.flag = flag;
+      this.description = description;
+      this.hasValue = hasValue;
+    }
   }
 
 }

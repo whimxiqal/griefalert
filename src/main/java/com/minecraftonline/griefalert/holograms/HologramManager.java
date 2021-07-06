@@ -31,11 +31,9 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 import de.randombyte.holograms.api.HologramsService;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
@@ -51,8 +49,8 @@ public class HologramManager {
 
   private final Logger log = GriefAlert.getInstance().getLogger();
   private final Set<HologramsService.Hologram> alertHolograms = Sets.newHashSet();
-  private HologramsService hologramsService;
   private final boolean error;
+  private HologramsService hologramsService;
 
   /**
    * General constructor.
@@ -80,7 +78,7 @@ public class HologramManager {
     if (error) {
       log.error(String.format(
           "Error creating a hologram at %s",
-          alert.getGriefPosition().toString()));
+          alert.getGriefPosition()));
       return;
     }
 

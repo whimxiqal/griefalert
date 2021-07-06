@@ -33,11 +33,9 @@ import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.util.Collections;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -47,6 +45,9 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * A command to query the local alert cache and show a filtered list of recent alerts.
+ */
 public class QueryCommand extends GeneralCommand {
 
   private static final int DEFAULT_MAXIMUM_QUERIES = 100;
@@ -73,10 +74,13 @@ public class QueryCommand extends GeneralCommand {
     addFlagDescription(FlagDescription.TARGET);
     addFlagDescription(FlagDescription.EVENT);
     addFlagDescription("m",
-        Text.of("Only retrieve a certain ", TextColors.AQUA, "maximum ", TextColors.RESET, "number of alerts"),
+        Text.of("Only retrieve a certain ",
+            TextColors.AQUA, "maximum ",
+            TextColors.RESET, "number of alerts"),
         true);
     addFlagDescription("s",
-        Text.of(TextColors.AQUA, "Spread", TextColors.RESET, " all alerts into individual ones"),
+        Text.of(TextColors.AQUA, "Spread",
+            TextColors.RESET, " all alerts into individual ones"),
         false);
   }
 

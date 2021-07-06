@@ -28,20 +28,26 @@ import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
-
 import java.util.Optional;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.blockray.BlockRay;
 
+/**
+ * A utility class to enumerate {@link Detail}s.
+ */
 public final class Details {
 
   private Details() {
   }
 
+  /**
+   * Get a detail which determines a player from an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> player() {
     return Detail.of(
         "Player",
@@ -50,6 +56,11 @@ public final class Details {
         true);
   }
 
+  /**
+   * Get a detail which determines the event from an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> event() {
     return Detail.of(
         "Event",
@@ -58,6 +69,11 @@ public final class Details {
         true);
   }
 
+  /**
+   * Get a detail which determines the target from an alert.
+   *
+   * @return the target
+   */
   public static Detail<Alert> target() {
     return Detail.of(
         "Target",
@@ -66,6 +82,11 @@ public final class Details {
         true);
   }
 
+  /**
+   * Get a detail which determines the location from an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> location() {
     return Detail.of(
         "Location",
@@ -75,6 +96,11 @@ public final class Details {
         true);
   }
 
+  /**
+   * Get a detail which determines the time from an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> time() {
     return Detail.of(
         "Time",
@@ -82,6 +108,11 @@ public final class Details {
         alert -> Optional.of(Format.date(alert.getCreated())));
   }
 
+  /**
+   * Get a detail which determines Sponge's block creator player from an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> blockCreator() {
     return Detail.of(
         "Block Creator",
@@ -95,6 +126,12 @@ public final class Details {
             .map(Format::userName));
   }
 
+  /**
+   * Get a detail which determines the location at which a player is looking
+   * from an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> lookingAt() {
     return Detail.of(
         "Looking At",
@@ -109,6 +146,12 @@ public final class Details {
                     hit.getLocation().getBlockType().getId()))));
   }
 
+  /**
+   * Get a detail which determines what is in a player's hand at the time
+   * of an alert.
+   *
+   * @return the detail
+   */
   public static Detail<Alert> inHand() {
     return Detail.of(
         "In Hand",

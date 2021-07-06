@@ -10,8 +10,11 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.Details;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.ArtData;
@@ -20,11 +23,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.text.Text;
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+/**
+ * An alert caused by an entity.
+ */
 public abstract class EntityAlert extends SpongeAlert {
 
   private final String entitySnapshotContainer;
@@ -53,6 +54,11 @@ public abstract class EntityAlert extends SpongeAlert {
             .map(art -> Format.hover(art.getName(), "ID: " + art.getId()))));
   }
 
+  /**
+   * Get the entity snapshot associated with this alert.
+   *
+   * @return the data container of the entity snapshot
+   */
   public DataContainer getEntitySnapshot() {
     try {
       return DataFormats.JSON.read(entitySnapshotContainer);

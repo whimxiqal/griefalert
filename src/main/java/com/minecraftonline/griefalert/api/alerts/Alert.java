@@ -29,12 +29,10 @@ import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.AlertService;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.text.Text;
 
 /**
