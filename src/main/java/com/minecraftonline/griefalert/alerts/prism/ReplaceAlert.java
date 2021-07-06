@@ -30,10 +30,12 @@ import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.api.alerts.Detail;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.util.Format;
+import java.util.Date;
 import org.spongepowered.api.Sponge;
 
-import java.util.Date;
-
+/**
+ * An alert that is caused by the replacement of a block with another block.
+ */
 public class ReplaceAlert extends BlockAlert {
 
   // the original block id is saved in getTarget()
@@ -66,7 +68,7 @@ public class ReplaceAlert extends BlockAlert {
     builder.setEarliest(Date.from(getCreated().toInstant().minusSeconds(1)));
     builder.setLatest(Date.from(getCreated().toInstant().plusSeconds(1)));
     builder.addEvent(Sponge.getRegistry().getType(PrismEvent.class, getGriefEvent().getId()).orElseThrow(() ->
-            new RuntimeException("PrismAlert stored an invalid GriefEvent: " + getGriefEvent().getId())));
+        new RuntimeException("PrismAlert stored an invalid GriefEvent: " + getGriefEvent().getId())));
     builder.addWorldUuid(getWorldUuid());
     builder.setxRange(getGriefPosition().getX(), getGriefPosition().getX());
     builder.setyRange(getGriefPosition().getY(), getGriefPosition().getY());
@@ -74,45 +76,5 @@ public class ReplaceAlert extends BlockAlert {
 
     return builder.build();
   }
-
-  //  @Override
-//  public void addQueryConditionsTo(Query query) {
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Player,
-//        MatchRule.EQUALS,
-//        this.getGriefer().getUniqueId().toString()));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Target,
-//        MatchRule.EQUALS,
-//        Pattern.compile(this.replacementBlockId.replace('_', ' '))));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Created,
-//        MatchRule.GREATER_THAN_EQUAL,
-//        Date.from(this.getCreated().toInstant().minusSeconds(1))));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Created,
-//        MatchRule.LESS_THAN_EQUAL,
-//        Date.from(this.getCreated().toInstant().plusSeconds(1))));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.EventName,
-//        MatchRule.EQUALS,
-//        GriefEvents.PLACE.getId()));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Location.then(DataQueries.WorldUuid),
-//        MatchRule.EQUALS,
-//        this.getGriefLocation().getExtent().getUniqueId().toString()));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Location.then(DataQueries.X),
-//        MatchRule.EQUALS,
-//        this.getGriefLocation().getPosition().getFloorX()));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Location.then(DataQueries.Y),
-//        MatchRule.EQUALS,
-//        this.getGriefLocation().getPosition().getFloorY()));
-//    query.addCondition(FieldCondition.of(
-//        DataQueries.Location.then(DataQueries.Z),
-//        MatchRule.EQUALS,
-//        this.getGriefLocation().getPosition().getFloorZ()));
-//  }
 
 }

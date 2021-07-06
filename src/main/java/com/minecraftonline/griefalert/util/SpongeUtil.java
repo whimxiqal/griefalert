@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -38,9 +37,10 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
 
-
+/**
+ * A utility class for all-things Sponge.
+ */
 public final class SpongeUtil {
 
   /**
@@ -67,7 +67,8 @@ public final class SpongeUtil {
    */
   public static Optional<List<String>> getArmorStandContent(DataContainer entitySnapshot) {
 
-    Optional<List<DataView>> attributesOptional = entitySnapshot.getViewList(DataQuery.of("UnsafeData").then("ArmorItems"));
+    Optional<List<DataView>> attributesOptional = entitySnapshot.getViewList(DataQuery.of("UnsafeData")
+        .then("ArmorItems"));
     if (!attributesOptional.isPresent()) {
       return Optional.empty();
     }
@@ -93,6 +94,12 @@ public final class SpongeUtil {
     return Sponge.getServer().getWorld(worldUuid);
   }
 
+  /**
+   * Get a list of worlds that have the given dimension type.
+   *
+   * @param dimensionType the dimension type
+   * @return the list of worlds with the dimension type
+   */
   public static List<World> worldsWithDimension(DimensionType dimensionType) {
     return Sponge.getServer()
         .getWorlds()

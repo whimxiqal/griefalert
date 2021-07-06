@@ -27,7 +27,6 @@ package com.minecraftonline.griefalert.storage;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.configuration.Setting;
 import com.minecraftonline.griefalert.util.enums.Settings;
-
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
@@ -35,12 +34,25 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+/**
+ * A helper class to manage configuration.
+ */
 public class ConfigHelper {
+
+  /**
+   * Create and initialize this helper class for managing the configuration data. This constructor
+   * initializes a new file if one does not exist and it loads
+   *
+   * @param configPath The path to the configuration
+   * @param root       The root node of the configuration object
+   */
+  public ConfigHelper(Path configPath, CommentedConfigurationNode root) {
+    initialize(configPath, root);
+    load(root);
+  }
 
   private Collection<Setting<?>> allSettings() {
     List<Setting<?>> settings = new LinkedList<>();
@@ -55,18 +67,6 @@ public class ConfigHelper {
           }
         });
     return settings;
-  }
-
-  /**
-   * Create and initialize this helper class for managing the configuration data. This constructor
-   * initializes a new file if one does not exist and it loads
-   *
-   * @param configPath The path to the configuration
-   * @param root       The root node of the configuration object
-   */
-  public ConfigHelper(Path configPath, CommentedConfigurationNode root) {
-    initialize(configPath, root);
-    load(root);
   }
 
   /**

@@ -25,10 +25,8 @@
 package com.minecraftonline.griefalert.api.configuration;
 
 import com.google.common.reflect.TypeToken;
-
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
-
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
@@ -46,6 +44,21 @@ public final class Setting<T> {
   private final Predicate<T> verification;
   private final String errorMessage;
   private T value;
+
+  private Setting(@Nonnull String name,
+                  @Nonnull T defaultValue,
+                  @Nonnull String comment,
+                  @Nonnull Predicate<T> verification,
+                  @Nonnull String errorMessage,
+                  @Nonnull Class<T> type) {
+    this.name = name;
+    this.defaultValue = defaultValue;
+    this.value = defaultValue;
+    this.comment = comment;
+    this.verification = verification;
+    this.errorMessage = errorMessage;
+    this.type = type;
+  }
 
   /**
    * The {@link Setting} factory.
@@ -68,21 +81,6 @@ public final class Setting<T> {
                                   @Nonnull String errorMessage,
                                   @Nonnull Class<Z> type) {
     return new Setting<>(name, defaultValue, comment, verification, errorMessage, type);
-  }
-
-  private Setting(@Nonnull String name,
-                  @Nonnull T defaultValue,
-                  @Nonnull String comment,
-                  @Nonnull Predicate<T> verification,
-                  @Nonnull String errorMessage,
-                  @Nonnull Class<T> type) {
-    this.name = name;
-    this.defaultValue = defaultValue;
-    this.value = defaultValue;
-    this.comment = comment;
-    this.verification = verification;
-    this.errorMessage = errorMessage;
-    this.type = type;
   }
 
   @Nonnull
@@ -115,7 +113,9 @@ public final class Setting<T> {
   public void setValueFromConfig(@Nonnull ConfigurationNode node)
       throws IllegalStateException, ObjectMappingException {
     if (node.getNode(this.getName()).isVirtual()) {
-      throw new IllegalStateException("The setting " + name + " doesn't exist in the configuration. Using default value.");
+      throw new IllegalStateException("The setting "
+          + name
+          + " doesn't exist in the configuration. Using default value.");
     }
     this.value = node.getNode(this.getName()).getValue(TypeToken.of(type));
     verify();
@@ -130,7 +130,7 @@ public final class Setting<T> {
       throw new IllegalStateException(String.format(
           "%s Using default value: %s",
           errorMessage,
-          defaultValue.toString()));
+          defaultValue));
     }
   }
 

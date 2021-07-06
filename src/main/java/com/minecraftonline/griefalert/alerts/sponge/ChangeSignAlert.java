@@ -14,7 +14,8 @@ import com.minecraftonline.griefalert.api.templates.Arg;
 import com.minecraftonline.griefalert.api.templates.Templates;
 import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
-
+import com.minecraftonline.griefalert.util.Grammar;
+import com.minecraftonline.griefalert.util.enums.Settings;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -22,9 +23,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-
-import com.minecraftonline.griefalert.util.Grammar;
-import com.minecraftonline.griefalert.util.enums.Settings;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.entity.Transform;
@@ -33,9 +31,11 @@ import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
+/**
+ * An alert caused by the changing of the contents of a sign.
+ */
 public class ChangeSignAlert implements Alert {
 
   private final GriefProfile griefProfile;
@@ -53,7 +53,7 @@ public class ChangeSignAlert implements Alert {
    * An alert to throw when someone throws a {@link ChangeSignEvent}.
    *
    * @param griefProfile the profile flagging this event
-   * @param event the event triggering this alert
+   * @param event        the event triggering this alert
    */
   public ChangeSignAlert(GriefProfile griefProfile, ChangeSignEvent event) {
     this.griefProfile = griefProfile;

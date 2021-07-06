@@ -26,17 +26,18 @@ package com.minecraftonline.griefalert.util;
 
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
+/**
+ * A utility class to hold static methods relating to communication.
+ */
 public final class Communication {
 
   /**

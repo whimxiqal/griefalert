@@ -28,20 +28,21 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 
+/**
+ * A command to reload grief profiles from storage.
+ */
 public class ReloadCommand extends GeneralCommand {
 
   ReloadCommand() {
     super(Permissions.GRIEFALERT_COMMAND_RELOAD, Text.of(
-        "Reload all Grief Profiles from host"
+        "Reload all Grief Profiles from storage"
     ));
     addAlias("reload");
     setCommandElement(GenericArguments.optional(

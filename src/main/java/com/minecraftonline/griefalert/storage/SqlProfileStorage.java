@@ -26,9 +26,9 @@ package com.minecraftonline.griefalert.storage;
 
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.sql.SqlService;
@@ -54,6 +53,12 @@ public class SqlProfileStorage implements ProfileStorage {
   private final SqlService sqlService;
   private final String jdbcUrl;
 
+  /**
+   * Default constructor.
+   *
+   * @param jdbcUrl url for JDBC connection
+   * @throws SQLException if error
+   */
   public SqlProfileStorage(@Nonnull String jdbcUrl) throws SQLException {
     this.jdbcUrl = jdbcUrl;
     GriefAlert.getInstance().getLogger().info(jdbcUrl);
@@ -87,12 +92,12 @@ public class SqlProfileStorage implements ProfileStorage {
           profile.getGriefEvent().getId());
       statement.setString(2,
           profile.getTarget());
-//      statement.setBoolean(3,
-//          profile.isIgnoredIn(DimensionTypes.OVERWORLD));
-//      statement.setBoolean(4,
-//          profile.isIgnoredIn(DimensionTypes.NETHER));
-//      statement.setBoolean(5,
-//          profile.isIgnoredIn(DimensionTypes.THE_END));
+      //      statement.setBoolean(3,
+      //          profile.isIgnoredIn(DimensionTypes.OVERWORLD));
+      //      statement.setBoolean(4,
+      //          profile.isIgnoredIn(DimensionTypes.NETHER));
+      //      statement.setBoolean(5,
+      //          profile.isIgnoredIn(DimensionTypes.THE_END));
       statement.setString(6,
           profile.getColored(GriefProfile.Colorable.EVENT)
               .map(TextColor::getName)
@@ -154,15 +159,15 @@ public class SqlProfileStorage implements ProfileStorage {
 
         final GriefProfile.Builder profileBuilder = GriefProfile.builder(event, rs.getString(2));
 
-//        if (rs.getBoolean(3)) {
-//          profileBuilder.addIgnored(DimensionTypes.OVERWORLD);
-//        }
-//        if (rs.getBoolean(4)) {
-//          profileBuilder.addIgnored(DimensionTypes.NETHER);
-//        }
-//        if (rs.getBoolean(5)) {
-//          profileBuilder.addIgnored(DimensionTypes.THE_END);
-//        }
+        //        if (rs.getBoolean(3)) {
+        //          profileBuilder.addIgnored(DimensionTypes.OVERWORLD);
+        //        }
+        //        if (rs.getBoolean(4)) {
+        //          profileBuilder.addIgnored(DimensionTypes.NETHER);
+        //        }
+        //        if (rs.getBoolean(5)) {
+        //          profileBuilder.addIgnored(DimensionTypes.THE_END);
+        //        }
 
         Sponge.getRegistry()
             .getType(

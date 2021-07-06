@@ -27,6 +27,9 @@ package com.minecraftonline.griefalert.commands.common;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 
+/**
+ * A key used in commands as flags and their descriptions.
+ */
 public class CommandKey {
 
   private final Text key;

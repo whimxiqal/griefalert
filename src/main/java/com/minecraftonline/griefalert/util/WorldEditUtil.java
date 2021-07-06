@@ -30,6 +30,9 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 
+/**
+ * A utility class to handle WorldEdit behaviors.
+ */
 public final class WorldEditUtil {
 
   /**

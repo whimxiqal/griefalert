@@ -24,8 +24,6 @@
 
 package com.minecraftonline.griefalert.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.helion3.prism.api.data.PrismEvent;
@@ -38,12 +36,10 @@ import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.Request;
 import com.minecraftonline.griefalert.commands.CheckCommand;
 import com.minecraftonline.griefalert.util.enums.Settings;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,10 +48,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import com.minecraftonline.hermes.service.NameService;
 import org.apache.commons.lang3.StringUtils;
-import org.spongepowered.api.Sponge;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -67,19 +61,23 @@ import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * A utility class to format messages for the purpose of sending users
+ * neat and useful information.
+ */
 public final class Format {
-
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private Format() {
-  }
 
   public static final TextColor GRIEF_ALERT_THEME = TextColors.DARK_PURPLE;
   public static final TextColor ALERT_EVENT_COLOR = TextColors.RED;
   public static final TextColor ALERT_TARGET_COLOR = TextColors.RED;
   public static final TextColor ALERT_WORLD_COLOR = TextColors.RED;
   public static final TextColor CLICK_COMMAND_COLOR = TextColors.LIGHT_PURPLE;
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private Format() {
+  }
 
   /**
    * Returns content formatted as an error message.
@@ -97,8 +95,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  public static Text error(Text content) {
-    checkNotNull(content);
+  public static Text error(@NotNull Text content) {
     return Text.of(prefix(), TextColors.RED, content);
   }
 
@@ -118,9 +115,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  @SuppressWarnings("WeakerAccess")
-  public static Text heading(Text content) {
-    checkNotNull(content);
+  public static Text heading(@NotNull Text content) {
     return Text.of(prefix(), TextColors.GOLD, content);
   }
 
@@ -141,9 +136,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  @SuppressWarnings("WeakerAccess")
-  public static Text message(Text content) {
-    checkNotNull(content);
+  public static Text message(@NotNull Text content) {
     return Text.of(TextColors.WHITE, content);
   }
 
@@ -164,9 +157,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  @SuppressWarnings("WeakerAccess")
-  public static Text subduedHeading(Text content) {
-    checkNotNull(content);
+  public static Text subduedHeading(@NotNull Text content) {
     return Text.of(prefix(), TextColors.GRAY, content);
   }
 
@@ -186,8 +177,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  public static Text success(Text content) {
-    checkNotNull(content);
+  public static Text success(@NotNull Text content) {
     return Text.of(prefix(), TextColors.GREEN, content);
   }
 
@@ -207,8 +197,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  public static Text info(Text content) {
-    checkNotNull(content);
+  public static Text info(@NotNull Text content) {
     return Text.of(prefix(), TextColors.YELLOW, content);
   }
 
@@ -229,8 +218,7 @@ public final class Format {
    * @param content Text Content to format
    * @return Text Formatted content.
    */
-  public static Text bonus(Text content) {
-    checkNotNull(content);
+  public static Text bonus(@NotNull Text content) {
     return Text.of(TextColors.GRAY, content);
   }
 
@@ -357,6 +345,9 @@ public final class Format {
    * @return The Text form of the grief checker's name
    */
   public static Text userName(User user) {
+    // TODO use a name formatting service
+    return Text.of(user.getName());
+    /*
     return Sponge.getServiceManager()
         .provide(NameService.class)
         .flatMap(service -> service.getNameData(user))
@@ -365,6 +356,7 @@ public final class Format {
             .onHover(TextActions.showText(data.getFullName()))
             .build())
         .orElse(Text.of(user.getName()));
+     */
   }
 
   /**
@@ -392,6 +384,13 @@ public final class Format {
         .build();
   }
 
+  /**
+   * Build a formatted alert message from an alert.
+   *
+   * @param alert the alert
+   * @param index the index of the alert in the larger alert structure
+   * @return the formatted message
+   */
   public static Text buildBroadcast(Alert alert, int index) {
     return Text.of(
         // TODO fix shrink function (and make shrink value configurable)
@@ -400,6 +399,14 @@ public final class Format {
         CheckCommand.clickToCheck(index));
   }
 
+  /**
+   * Shorten a formatted message input my removing unnecessary words with
+   * shorter alternatives.
+   *
+   * @param input the original formatted message
+   * @param size  the desired maximum size
+   * @return the shrunken message
+   */
   public static Text shrink(Text input, int size) {
     Text replacement = input;
     if (shrunkenLength(replacement) > size) {
@@ -424,6 +431,12 @@ public final class Format {
     return input.toPlain().replace(".", "").length();
   }
 
+  /**
+   * Format a request into a message.
+   *
+   * @param request the request
+   * @return the formatted message
+   */
   public static Text request(Request request) {
     List<Text> tokens = Lists.newLinkedList();
     if (!request.getPlayerUuids().isEmpty()) {
@@ -472,6 +485,12 @@ public final class Format {
             : Text.joinWith(Text.of(", "), tokens)).get(request).get();
   }
 
+  /**
+   * Format a prism request into a message.
+   *
+   * @param request the request
+   * @return the formatted message
+   */
   public static Text request(com.helion3.prism.api.services.Request request) {
     List<Text> tokens = Lists.newLinkedList();
     if (!request.getPlayerUuids().isEmpty()) {
@@ -535,6 +554,12 @@ public final class Format {
             : Text.joinWith(Text.of(", "), tokens)).get(request).get();
   }
 
+  /**
+   * Format a dimension type into a message.
+   *
+   * @param type the dimension type
+   * @return the formatted message
+   */
   public static Text dimension(@Nonnull DimensionType type) {
     if (type.equals(DimensionTypes.OVERWORLD)) {
       return Text.of("overworld");
@@ -585,6 +610,12 @@ public final class Format {
         .build();
   }
 
+  /**
+   * Format a grief profile into a message.
+   *
+   * @param griefProfile the grief profile
+   * @return the formatted message
+   */
   public static Text profile(@Nonnull GriefProfile griefProfile) {
     List<Text> details = new LinkedList<>();
     Detail.of(
@@ -603,7 +634,8 @@ public final class Format {
         Format.item(griefProfile.getTarget()))
         .get(griefProfile).ifPresent(details::add);
     if (griefProfile.isTranslucent()) {
-      Detail.of("Trnslt.", "The translucency of the profile, which ignores events which have already been considered not grief",
+      Detail.of("Trnslt.", "The translucency of the profile, "
+              + "which ignores events which have already been considered not grief",
           Text.of("yes")).get(griefProfile).ifPresent(details::add);
     }
     Optional.of(griefProfile.getIgnored()).filter(ignored -> !ignored.isEmpty())

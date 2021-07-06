@@ -25,7 +25,6 @@
 package com.minecraftonline.griefalert.api.alerts;
 
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandSource;
 
 /**

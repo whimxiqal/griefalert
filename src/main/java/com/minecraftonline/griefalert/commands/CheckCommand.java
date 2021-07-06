@@ -25,16 +25,13 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.util.NoSuchElementException;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -44,6 +41,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * A command for an officer to check ("inspect") an alert.
+ */
 public class CheckCommand extends GeneralCommand {
 
   CheckCommand() {
@@ -60,11 +60,26 @@ public class CheckCommand extends GeneralCommand {
             .flag("p")
             .buildWith(GenericArguments.none())));
     addFlagDescription("f",
-        Text.of(TextColors.AQUA, "Force", TextColors.RESET, " the teleportation, even if no safe location could be found"),
+        Text.of(TextColors.AQUA, "Force",
+            TextColors.RESET, " the teleportation, even if no safe location could be found"),
         false);
     addFlagDescription("p",
-        Text.of("Teleport to the", TextColors.AQUA, " player", TextColors.RESET, "'s location of the grief event \ninstead of the block location"),
+        Text.of("Teleport to the",
+            TextColors.AQUA, " player",
+            TextColors.RESET, "'s location of the grief event \ninstead of the block location"),
         false);
+  }
+
+  /**
+   * Get a clickable message that allows the officer to check the alert.
+   *
+   * @param index the index of the alert saved in the cache
+   * @return the formatted <code>Text</code>
+   */
+  public static Text clickToCheck(int index) {
+    return Format.command(String.valueOf(index),
+        String.format("/griefalert check %s", index),
+        Text.of("Check this alert"));
   }
 
   @Nonnull
@@ -81,7 +96,9 @@ public class CheckCommand extends GeneralCommand {
         return CommandResult.success();
       }
       try {
-        GriefAlert.getInstance().getAlertService().inspect(index, player, args.hasAny("f"), !args.hasAny("p"));
+        GriefAlert.getInstance().getAlertService().inspect(index, player,
+            args.hasAny("f"),
+            !args.hasAny("p"));
         return CommandResult.success();
       } catch (IndexOutOfBoundsException e) {
         throw Errors.noAlertException();
@@ -89,19 +106,6 @@ public class CheckCommand extends GeneralCommand {
     } else {
       throw Errors.playerOnlyException();
     }
-  }
-
-
-  /**
-   * Get a clickable message that allows the officer to check the alert.
-   *
-   * @param index the index of the alert saved in the cache
-   * @return the formatted <code>Text</code>
-   */
-  public static Text clickToCheck(int index) {
-    return Format.command(String.valueOf(index),
-        String.format("/griefalert check %s", index),
-        Text.of("Check this alert"));
   }
 
 }

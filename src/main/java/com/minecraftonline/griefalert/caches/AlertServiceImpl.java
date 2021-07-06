@@ -38,8 +38,6 @@ import com.minecraftonline.griefalert.api.events.PreInspectAlertEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.api.services.Request;
-import com.minecraftonline.griefalert.api.structures.HashMapStack;
-import com.minecraftonline.griefalert.api.structures.MapStack;
 import com.minecraftonline.griefalert.api.structures.RotatingArrayList;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
 import com.minecraftonline.griefalert.commands.CheckCommand;
@@ -51,7 +49,6 @@ import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -77,7 +74,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.SerializationException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.NotNull;
@@ -95,6 +91,9 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * The implementation for the {@link AlertService} interface.
+ */
 public final class AlertServiceImpl implements AlertService {
 
   // A map relating each player to a list of consecutive similar alerts for silencing
@@ -170,15 +169,19 @@ public final class AlertServiceImpl implements AlertService {
     }
 
     updateRepeatHistory(alert);
-    Set<Map.Entry<UUID, AlertInspection>> inspectionSetCopy = new HashSet<>(officerInspectHistory.column(output).entrySet());
-    inspectionSetCopy.forEach(inspectionEntry -> officerInspectHistory.remove(inspectionEntry.getKey(), output));
+    Set<Map.Entry<UUID, AlertInspection>> inspectionSetCopy = new HashSet<>(officerInspectHistory
+        .column(output)
+        .entrySet());
+    inspectionSetCopy.forEach(inspectionEntry ->
+        officerInspectHistory.remove(inspectionEntry.getKey(), output));
 
     //.forEach(((uuid, inspection) -> officerInspectHistory.remove(uuid, output)));
     return output;
   }
 
   private void updateRepeatHistory(@Nonnull final Alert alert) {
-    RecentAlertHistory history = grieferRepeatHistory.computeIfAbsent(alert.getGrieferUuid(), uuid -> new RecentAlertHistory());
+    RecentAlertHistory history = grieferRepeatHistory.computeIfAbsent(alert.getGrieferUuid(),
+        uuid -> new RecentAlertHistory());
     if (history.put(alert.getGriefProfile())) {
       alert.setSilent(true);
     }
@@ -218,7 +221,8 @@ public final class AlertServiceImpl implements AlertService {
         .filter(alert -> filters.getPlayerUuids().isEmpty()
             || filters.getPlayerUuids().contains(alert.get().getGrieferUuid()))
         .filter(alert -> filters.getEvents().isEmpty()
-            || filters.getEvents().stream().map(GriefEvent::getId).anyMatch(id -> id.equals(alert.get().getGriefEvent().getId())))
+            || filters.getEvents().stream().map(GriefEvent::getId).anyMatch(id ->
+            id.equals(alert.get().getGriefEvent().getId())))
         .filter(alert -> filters.getTargets().isEmpty()
             || filters.getTargets().stream().anyMatch(str -> alert.get().getTarget().contains(str)));
     if (filters.getMaximum().isPresent()) {
@@ -498,7 +502,9 @@ public final class AlertServiceImpl implements AlertService {
     }
 
     if (Settings.INSPECTION_RETURN_TIMEOUT.getValue() >= 0) {
-      if (inspection.getInspected().isBefore(Instant.now().minus(Settings.INSPECTION_RETURN_TIMEOUT.getValue(), ChronoUnit.MINUTES))) {
+      if (inspection.getInspected()
+          .isBefore(Instant.now()
+          .minus(Settings.INSPECTION_RETURN_TIMEOUT.getValue(), ChronoUnit.MINUTES))) {
         officer.sendMessage(Format.error("Your return location has expired"));
         return false;
       }
@@ -529,7 +535,8 @@ public final class AlertServiceImpl implements AlertService {
   public boolean openPanel(@Nonnull Player officer) {
     Optional<AlertInspection> lastInspection = getLastInspection(officer.getUniqueId());
     if (lastInspection.isPresent()) {
-      InspectionInventory.openInspectionPanel(officer, getInspectionsByTime(officer.getUniqueId()).getLast().getAlertIndex());
+      InspectionInventory.openInspectionPanel(officer,
+          getInspectionsByTime(officer.getUniqueId()).getLast().getAlertIndex());
       return true;
     } else {
       return false;

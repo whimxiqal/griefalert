@@ -25,20 +25,17 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-
-import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.alerts.GeneralAlert;
+import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -48,6 +45,9 @@ import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * A command to get formatted and itemized information about an {@link Alert}.
+ */
 public class InfoCommand extends GeneralCommand {
 
   InfoCommand() {

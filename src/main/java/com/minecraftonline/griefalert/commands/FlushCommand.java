@@ -29,9 +29,7 @@ import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Communication;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -40,6 +38,9 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * A command to flush the alert cache.
+ */
 public class FlushCommand extends GeneralCommand {
 
   FlushCommand() {
@@ -52,7 +53,8 @@ public class FlushCommand extends GeneralCommand {
         .flag("a")
         .buildWith(GenericArguments.none()));
     addFlagDescription("a",
-        Text.of(TextColors.AQUA, "Accept", TextColors.RESET, " the warning message and perform the cache flush"),
+        Text.of(TextColors.AQUA, "Accept",
+            TextColors.RESET, " the warning message and perform the cache flush"),
         false);
   }
 

@@ -27,6 +27,9 @@ package com.minecraftonline.griefalert.alerts.prism;
 import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
 
+/**
+ * An alert that is caused by the placing of a block.
+ */
 public class PlaceAlert extends BlockAlert {
 
   public PlaceAlert(GriefProfile griefProfile, PrismRecord prismRecord) {

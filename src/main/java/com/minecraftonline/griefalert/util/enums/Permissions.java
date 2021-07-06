@@ -27,19 +27,10 @@ package com.minecraftonline.griefalert.util.enums;
 import com.minecraftonline.griefalert.api.data.Permission;
 import org.spongepowered.api.service.permission.Subject;
 
+/**
+ * A utility class to enumerate GriefAlert permissions.
+ */
 public final class Permissions {
-
-  /**
-   * Ensure util class cannot be instantiated with private constructor.
-   */
-  private Permissions() {
-  }
-
-  public static boolean has(Subject user, Permission permission) {
-    return user.hasPermission(permission.get());
-  }
-
-  /* === COMMANDS === */
 
   /* Generic command permissions for staff members */
   public static final Permission GRIEFALERT_COMMAND = Permission.of(
@@ -49,6 +40,8 @@ public final class Permissions {
   public static final Permission GRIEFALERT_COMMAND_CHECK = Permission.of(
       "griefalert.staff.command.check"
   );
+
+  /* === COMMANDS === */
   /* Can use 'info' command */
   public static final Permission GRIEFALERT_COMMAND_INFO = Permission.of(
       "griefalert.staff.command.info"
@@ -85,9 +78,6 @@ public final class Permissions {
   public static final Permission GRIEFALERT_COMMAND_ENABLETOOL = Permission.of(
       "griefalert.admin.command.enabletool"
   );
-
-  /* === ABILITIES === */
-
   /* Receive incoming alert messages */
   public static final Permission GRIEFALERT_MESSAGING = Permission.of(
       "griefalert.staff.messaging"
@@ -96,6 +86,8 @@ public final class Permissions {
   public static final Permission GRIEFALERT_SILENT = Permission.of(
       "griefalert.staff.silent"
   );
+
+  /* === ABILITIES === */
   /* Can use the tool */
   public static final Permission GRIEFALERT_TOOL = Permission.of(
       "griefalert.staff.tool"
@@ -104,5 +96,15 @@ public final class Permissions {
   public static final Permission SELF_FIX = Permission.of(
       "griefalert.admin.selffix"
   );
+
+  /**
+   * Ensure util class cannot be instantiated with private constructor.
+   */
+  private Permissions() {
+  }
+
+  public static boolean has(Subject user, Permission permission) {
+    return user.hasPermission(permission.get());
+  }
 
 }

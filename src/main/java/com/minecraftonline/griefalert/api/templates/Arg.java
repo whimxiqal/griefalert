@@ -24,6 +24,9 @@
 
 package com.minecraftonline.griefalert.api.templates;
 
+/**
+ * A type of {@link Template} argument.
+ */
 public enum Arg {
 
   PREFIX,

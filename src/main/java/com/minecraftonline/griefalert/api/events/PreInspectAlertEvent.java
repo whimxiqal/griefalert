@@ -25,10 +25,8 @@
 package com.minecraftonline.griefalert.api.events;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
-
 import java.util.UUID;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -49,6 +47,14 @@ public final class PreInspectAlertEvent extends AbstractEvent {
   private final Cause cause;
   private final UUID officerUuid;
 
+  private PreInspectAlertEvent(@Nonnull final Alert alert,
+                               @Nonnull final Cause cause,
+                               @Nonnull final UUID officerUuid) {
+    this.alert = alert;
+    this.cause = cause;
+    this.officerUuid = officerUuid;
+  }
+
   /**
    * Post a new {@link PreInspectAlertEvent} to Sponge's event manager.
    *
@@ -67,14 +73,6 @@ public final class PreInspectAlertEvent extends AbstractEvent {
                 .add(EventContextKeys.PLUGIN, plugin)
                 .build()),
         source.getUniqueId()));
-  }
-
-  private PreInspectAlertEvent(@Nonnull final Alert alert,
-                               @Nonnull final Cause cause,
-                               @Nonnull final UUID officerUuid) {
-    this.alert = alert;
-    this.cause = cause;
-    this.officerUuid = officerUuid;
   }
 
   @Nonnull

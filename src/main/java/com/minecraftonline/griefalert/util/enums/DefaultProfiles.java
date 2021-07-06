@@ -26,12 +26,10 @@ package com.minecraftonline.griefalert.util.enums;
 
 import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-
+import com.minecraftonline.griefalert.util.SpongeUtil;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.minecraftonline.griefalert.util.SpongeUtil;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.ItemTypes;
@@ -39,11 +37,20 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.World;
 
+/**
+ * A utility class to manage default {@link GriefProfile}s when first starting a server
+ * with GriefAlert for the first time.
+ */
 public final class DefaultProfiles {
 
   private DefaultProfiles() {
   }
 
+  /**
+   * Give a list of all default profiles to use for the first use of GriefAlert.
+   *
+   * @return all default profiles
+   */
   public static List<GriefProfile> getAll() {
     return Arrays.asList(
         // ====================================================================================
@@ -65,7 +72,8 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.ANVIL.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BEACON.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BED.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BEDROCK.getId()).putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BEDROCK.getId())
+            .putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BEETROOTS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BIRCH_DOOR.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.BIRCH_FENCE.getId()).build(),
@@ -102,7 +110,8 @@ public final class DefaultProfiles {
             .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COBBLESTONE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COBBLESTONE_WALL.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COMMAND_BLOCK.getId()).putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.COMMAND_BLOCK.getId())
+            .putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.CONCRETE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.CONCRETE_POWDER.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.CRAFTING_TABLE.getId()).build(),
@@ -261,7 +270,8 @@ public final class DefaultProfiles {
             .build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_TORCH.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REDSTONE_WIRE.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REPEATING_COMMAND_BLOCK.getId()).putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.REPEATING_COMMAND_BLOCK.getId())
+            .putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SANDSTONE.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SANDSTONE_STAIRS.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.SAPLING.getId()).build(),
@@ -295,7 +305,8 @@ public final class DefaultProfiles {
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.STONE_SLAB2.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.STONEBRICK.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.STRUCTURE_BLOCK.getId()).build(),
-        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.STRUCTURE_VOID.getId()).putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
+        GriefProfile.builder(GriefEvents.BREAK, BlockTypes.STRUCTURE_VOID.getId())
+            .putColored(GriefProfile.Colorable.TARGET, TextColors.GRAY).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.TORCH.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.TRAPDOOR.getId()).build(),
         GriefProfile.builder(GriefEvents.BREAK, BlockTypes.TRAPPED_CHEST.getId()).build(),

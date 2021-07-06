@@ -24,6 +24,7 @@
 
 package com.minecraftonline.griefalert.tool;
 
+import java.util.Optional;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
@@ -34,8 +35,9 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import java.util.Optional;
-
+/**
+ * Magic class to help with defining a GriefAlert tool.
+ */
 public class ToolManipulator extends AbstractBooleanData<ToolManipulator, ImmutableToolManipulator> {
   public static final DataQuery QUERY = DataQuery.of("griefalerttool");
 
@@ -72,6 +74,9 @@ public class ToolManipulator extends AbstractBooleanData<ToolManipulator, Immuta
     return 0;
   }
 
+  /**
+   * A builder for the manipulator.
+    */
   public static class Builder implements DataManipulatorBuilder<ToolManipulator, ImmutableToolManipulator> {
 
     @Override

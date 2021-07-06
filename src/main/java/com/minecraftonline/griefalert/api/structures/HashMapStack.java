@@ -25,7 +25,6 @@
 package com.minecraftonline.griefalert.api.structures;
 
 import com.google.common.collect.Maps;
-
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Stack;

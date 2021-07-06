@@ -26,13 +26,15 @@ package com.minecraftonline.griefalert.api.data;
 
 import com.google.common.collect.Lists;
 import com.helion3.prism.util.PrismEvents;
-
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
+/**
+ * A utility class to enumerate all possible {@link GriefEvent}s.
+ */
 public final class GriefEvents {
 
   public static final GriefEvent ATTACK = GriefEvent
@@ -75,6 +77,7 @@ public final class GriefEvents {
           return Optional.empty();
         }
 
+        @NotNull
         @Override
         public Collection<GriefEvent> getAll() {
           return Lists.newArrayList(

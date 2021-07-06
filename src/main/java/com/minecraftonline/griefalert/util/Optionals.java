@@ -26,6 +26,9 @@ package com.minecraftonline.griefalert.util;
 
 import java.util.Optional;
 
+/**
+ * A utility class to help with optionals.
+ */
 public final class Optionals {
 
   /**

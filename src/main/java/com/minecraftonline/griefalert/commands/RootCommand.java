@@ -30,9 +30,7 @@ import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Reference;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -42,6 +40,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
+/**
+ * The root command for all GriefAlert commands.
+ */
 public class RootCommand extends GeneralCommand {
 
   /**
@@ -65,7 +66,7 @@ public class RootCommand extends GeneralCommand {
     addChild(new FixCommand());
     addChild(new PanelCommand());
     addChild(new ToolCommand());
-    addChild(new EnabletoolCommand());
+    addChild(new EnableToolCommand());
     addChild(new ApplierCommand(
         Text.of("Rollback to previous states"),
         ApplierCommand.ApplyType.ROLLBACK,

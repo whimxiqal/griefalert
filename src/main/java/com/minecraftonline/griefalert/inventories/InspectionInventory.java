@@ -32,6 +32,10 @@ import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.SpongeUtil;
 import com.minecraftonline.griefalert.util.enums.Permissions;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -47,14 +51,13 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
-
+/**
+ * A utility class to store information about an inventory menu for an inspection
+ * for ease of administration and moderation while using GriefAlert.
+ */
 public class InspectionInventory {
 
-  private final static Map<Integer, InventoryItem> inventoryItems = Lists.newArrayList(
+  private static final Map<Integer, InventoryItem> inventoryItems = Lists.newArrayList(
       new InventoryItem(
           InspectionInventoryStacks.TOOL,
           8,
@@ -65,7 +68,9 @@ public class InspectionInventory {
                   .getAlertService()
                   .getAlert(alertIndex)
                   .getGrieferUuid())
-                  .orElseThrow(() -> new RuntimeException(String.format("Query command failed while %s using panel", officer.getName())))
+                  .orElseThrow(() -> new RuntimeException(String.format(
+                      "Query command failed while %s using panel",
+                      officer.getName())))
                   .getName())),
       new InventoryItem(
           InspectionInventoryStacks.INFO,
@@ -84,7 +89,9 @@ public class InspectionInventory {
                   .getAlertService()
                   .getAlert(alertIndex)
                   .getGrieferUuid())
-                  .orElseThrow(() -> new RuntimeException(String.format("Query command failed while %s using panel", officer.getName())))
+                  .orElseThrow(() -> new RuntimeException(String.format(
+                      "Query command failed while %s using panel",
+                      officer.getName())))
                   .getName())),
       new InventoryItem(
           InspectionInventoryStacks.SHOW,
@@ -106,14 +113,21 @@ public class InspectionInventory {
           Permissions.GRIEFALERT_COMMAND_CHECK,
           (officer, alertIndex) -> {
             Alert alert = GriefAlert.getInstance().getAlertService().getAlert(alertIndex);
-            if (!officer.setTransformSafely(new Transform<>(Alerts.getWorld(alert), alert.getGrieferPosition(), alert.getGrieferRotation()))) {
+            if (!officer.setTransformSafely(new Transform<>(Alerts.getWorld(alert),
+                alert.getGrieferPosition(),
+                alert.getGrieferRotation()))) {
               officer.sendMessage(Format.error("Could not teleport you safely"));
             }
           }))
       .stream()
       .collect(Collectors.toMap(InventoryItem::getSlotIndex, item -> item));
 
-
+  /**
+   * Opens the inventory for the officer to use as a GUI.
+   *
+   * @param officer the officer requesting the panel
+   * @param alertIndex the alert which defines the content of the panel
+   */
   public static void openInspectionPanel(Player officer, int alertIndex) {
 
     Inventory inventory = Inventory.builder()
@@ -128,7 +142,8 @@ public class InspectionInventory {
         .listener(
             ClickInventoryEvent.class,
             clickInventoryEvent -> {
-              Optional<SlotIndex> slotIndexOptional = clickInventoryEvent.getSlot().flatMap(slot -> slot.getInventoryProperty(SlotIndex.class));
+              Optional<SlotIndex> slotIndexOptional = clickInventoryEvent.getSlot().flatMap(slot ->
+                  slot.getInventoryProperty(SlotIndex.class));
               if (slotIndexOptional.isPresent()) {
                 if (inventoryItems.containsKey(slotIndexOptional.get().getValue())) {
                   clickInventoryEvent.setCancelled(true);
@@ -160,12 +175,15 @@ public class InspectionInventory {
 
   private static class InventoryItem implements BiConsumer<Player, Integer> {
 
-    private ItemStack itemStack;
-    private int slotIndex;
-    private BiConsumer<Player, Integer> onClick;
-    private Permission permission;
+    private final ItemStack itemStack;
+    private final int slotIndex;
+    private final BiConsumer<Player, Integer> onClick;
+    private final Permission permission;
 
-    public InventoryItem(ItemStack itemStack, int slotIndex, Permission permission, BiConsumer<Player, Integer> onClick) {
+    public InventoryItem(ItemStack itemStack,
+                         int slotIndex,
+                         Permission permission,
+                         BiConsumer<Player, Integer> onClick) {
       this.itemStack = itemStack;
       this.slotIndex = slotIndex;
       this.permission = permission;

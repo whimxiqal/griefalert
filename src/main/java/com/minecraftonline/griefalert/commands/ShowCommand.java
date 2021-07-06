@@ -33,11 +33,9 @@ import com.minecraftonline.griefalert.util.Errors;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -65,9 +63,10 @@ class ShowCommand extends GeneralCommand {
         GenericArguments.integer(CommandKeys.ALERT_INDEX.get())));
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
+  public CommandResult execute(@NotNull CommandSource src,
+                               @NotNull CommandContext args) throws CommandException {
     if (src instanceof Player) {
       Player player = (Player) src;
       Optional<Integer> index;
@@ -98,7 +97,8 @@ class ShowCommand extends GeneralCommand {
       }
 
       boolean differentWorld = !alert.getWorldUuid().equals(player.getLocation().getExtent().getUniqueId());
-      boolean tooFar = alert.getGriefPosition().distance(player.getLocation().getBlockPosition()) > MINIMUM_DISTANCE_TO_SHOW;
+      boolean tooFar = alert.getGriefPosition().distance(player.getLocation().getBlockPosition())
+          > MINIMUM_DISTANCE_TO_SHOW;
       if (differentWorld || tooFar) {
         throw new CommandException(Format.error("You need to be closer to the grief location!"));
       }

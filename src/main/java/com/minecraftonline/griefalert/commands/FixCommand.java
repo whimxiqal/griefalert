@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableMap;
 import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.alerts.Fixable;
-import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.templates.Arg;
 import com.minecraftonline.griefalert.api.templates.Templates;
@@ -41,13 +40,11 @@ import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.enums.AlertTags;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.time.Instant;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -61,6 +58,9 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 
+/**
+ * A command to "fix" an alert by undoing the changes associated with the alert.
+ */
 public class FixCommand extends GeneralCommand {
 
   private static final int FIX_TIMEOUT_SECONDS = 1800;  // 30 minutes
@@ -77,7 +77,8 @@ public class FixCommand extends GeneralCommand {
         .buildWith(
             GenericArguments.optional(GenericArguments.integer(CommandKeys.ALERT_INDEX.get()))));
     addFlagDescription("c",
-        Text.of("Collects the item from the griefer's inventory. \nThe griefer may or may not have picked it up!"),
+        Text.of("Collects the item from the griefer's inventory. \n"
+            + "The griefer may or may not have picked it up!"),
         false);
   }
 

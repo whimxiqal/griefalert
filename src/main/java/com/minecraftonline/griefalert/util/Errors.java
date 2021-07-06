@@ -26,13 +26,14 @@ package com.minecraftonline.griefalert.util;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-
+/**
+ * A utility class to provide error messages.
+ */
 public final class Errors {
 
   /**
@@ -57,7 +58,7 @@ public final class Errors {
    * Send a receiver an error message conveying the inability to set a Location
    * safely.
    *
-   * @param receiver  the receiver of the message
+   * @param receiver the receiver of the message
    * @param location the inaccessible location
    */
   public static void sendCannotTeleportSafely(ChatTypeMessageReceiver receiver,
@@ -77,6 +78,12 @@ public final class Errors {
     return new CommandException(Format.error("Cannot find player: " + username));
   }
 
+  /**
+   * A command exception which informs the user that the command could not be parsed
+   * and also suggests the "help" command for the overall plugin.
+   *
+   * @return the command exception
+   */
   public static CommandException parseException() {
     return new CommandException(Format.error(
         "Your arguments couldn't be parsed. Try ",

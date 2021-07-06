@@ -36,15 +36,12 @@ import com.minecraftonline.griefalert.util.Alerts;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.Grammar;
 import com.minecraftonline.griefalert.util.enums.Details;
-
+import com.minecraftonline.griefalert.util.enums.Settings;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.annotation.Nonnull;
-
-import com.minecraftonline.griefalert.util.enums.Settings;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.action.TextActions;
@@ -60,8 +57,8 @@ public abstract class GeneralAlert implements Alert {
   private final GriefProfile griefProfile;
 
   private final List<Detail<Alert>> details = Lists.newLinkedList();
-  private boolean silent = false;
   private final Date created;
+  private boolean silent = false;
 
   protected GeneralAlert(GriefProfile griefProfile) {
     this.griefProfile = griefProfile;

@@ -25,17 +25,15 @@
 package com.minecraftonline.griefalert.commands;
 
 import com.minecraftonline.griefalert.GriefAlert;
-import com.minecraftonline.griefalert.api.storage.ProfileStorage;
-import com.minecraftonline.griefalert.commands.common.CommandKey;
-import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
+import com.minecraftonline.griefalert.api.storage.ProfileStorage;
+import com.minecraftonline.griefalert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.General;
 import com.minecraftonline.griefalert.util.enums.CommandKeys;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
 import com.minecraftonline.griefalert.util.enums.Permissions;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +41,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -56,6 +53,9 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+/**
+ * A command to alter the list of profiles, which flag alerts.
+ */
 public class ProfileCommand extends GeneralCommand {
 
   ProfileCommand() {
@@ -78,6 +78,9 @@ public class ProfileCommand extends GeneralCommand {
     return CommandResult.success();
   }
 
+  /**
+   * A command add a profile to the database.
+   */
   public static class AddCommand extends GeneralCommand {
 
     AddCommand() {
@@ -168,6 +171,9 @@ public class ProfileCommand extends GeneralCommand {
 
   }
 
+  /**
+   * A command to edit a profile.
+   */
   public static class EditCommand extends GeneralCommand {
 
     EditCommand() {
@@ -270,7 +276,8 @@ public class ProfileCommand extends GeneralCommand {
           src.sendMessage(Format.error("GriefProfile editing failed"));
           // Add back the old one because this one failed
           if (!profileStorage.write(oldProfile)) {
-            src.sendMessage(Format.error("Also, the old version could not be reestablished! Please recreate this profile."));
+            src.sendMessage(Format.error("Also, the old version could not be reestablished! "
+                + "Please recreate this profile."));
           }
           return CommandResult.empty();
         }
@@ -286,7 +293,9 @@ public class ProfileCommand extends GeneralCommand {
 
   }
 
-
+  /**
+   * A command to remove a profile.
+   */
   public static class RemoveCommand extends GeneralCommand {
 
     RemoveCommand() {
@@ -330,6 +339,9 @@ public class ProfileCommand extends GeneralCommand {
 
   }
 
+  /**
+   * A command to count the registered profiles.
+   */
   public static class CountCommand extends GeneralCommand {
 
     CountCommand() {
@@ -352,6 +364,9 @@ public class ProfileCommand extends GeneralCommand {
 
   }
 
+  /**
+   * A command to list all registered profiles.
+   */
   public static class ListCommand extends GeneralCommand {
 
     ListCommand() {
@@ -419,6 +434,9 @@ public class ProfileCommand extends GeneralCommand {
     }
   }
 
+  /**
+   * A command to list the event types for profiles.
+   */
   public static class EventsCommand extends GeneralCommand {
 
     EventsCommand() {

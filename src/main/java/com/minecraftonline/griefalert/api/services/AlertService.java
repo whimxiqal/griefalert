@@ -25,13 +25,10 @@
 package com.minecraftonline.griefalert.api.services;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
-
+import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
@@ -42,25 +39,6 @@ import org.spongepowered.api.text.channel.MessageReceiver;
  * @author PietElite
  */
 public interface AlertService {
-
-  enum Sort {
-    /**
-     * Sorts earliest first.
-     */
-    CHRONOLOGICAL,
-    /**
-     * Sorts latest first.
-     */
-    REVERSE_CHRONOLOGICAL,
-    /**
-     * Sorts by {@link Alert} retrieval code. Lowest first.
-     */
-    INDEX,
-    /**
-     * Sorts by {@link Alert} retrieval code. Highest first.
-     */
-    REVERSE_INDEX
-  }
 
   /**
    * Save this alert in a local cache and broadcast it to the necessary in-game players.
@@ -153,5 +131,27 @@ public interface AlertService {
               @Nonnull Request filters,
               @Nonnull Sort sort,
               boolean spread);
+
+  /**
+   * Generic sorting options for a sequence of {@link Alert}s.
+   */
+  enum Sort {
+    /**
+     * Sorts earliest first.
+     */
+    CHRONOLOGICAL,
+    /**
+     * Sorts latest first.
+     */
+    REVERSE_CHRONOLOGICAL,
+    /**
+     * Sorts by {@link Alert} retrieval code. Lowest first.
+     */
+    INDEX,
+    /**
+     * Sorts by {@link Alert} retrieval code. Highest first.
+     */
+    REVERSE_INDEX
+  }
 
 }

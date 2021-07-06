@@ -83,6 +83,14 @@ import com.minecraftonline.griefalert.GriefAlert;
 import com.minecraftonline.griefalert.util.Format;
 import com.minecraftonline.griefalert.util.enums.Permissions;
 import com.minecraftonline.griefalert.util.enums.Settings;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -95,10 +103,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.event.item.inventory.AffectItemStackEvent;
 import org.spongepowered.api.event.item.inventory.AffectSlotEvent;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
-import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
@@ -106,8 +112,6 @@ import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -115,15 +119,9 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
-
+/**
+ * A collection of listeners for handling events relating to the GriefAlert tool.
+ */
 public class ToolHandler {
 
   private boolean toolEnabled = true;
@@ -140,6 +138,11 @@ public class ToolHandler {
         fix(event, location));
   }
 
+  /**
+   * A listener to cancel interaction with entities.
+   *
+   * @param event the event
+   */
   @Listener(order = Order.FIRST)
   public void onInteractEntity(InteractEntityEvent event) {
     event.getCause().first(Player.class)
@@ -149,9 +152,17 @@ public class ToolHandler {
         .ifPresent(tool -> event.setCancelled(true));
   }
 
+  /**
+   * A listener to handle slot events to ensure the tool
+   * doesn't get into the wrong hands.
+   *
+   * @param event the event
+   */
   @Listener(order = Order.FIRST)
-  public void InventoryEvent(AffectSlotEvent event) {
-    if (event instanceof ChangeInventoryEvent.Held) return;  // They can switch to it
+  public void onInventoryEvent(AffectSlotEvent event) {
+    if (event instanceof ChangeInventoryEvent.Held) {
+      return;  // They can switch to it
+    }
     event.getTransactions().forEach(slotTransaction -> {
       if (isTool(slotTransaction.getFinal())) {
         slotTransaction.setCustom(ItemStack.empty());
@@ -160,12 +171,12 @@ public class ToolHandler {
   }
 
   @Listener(order = Order.FIRST)
-  public void DropToolEvent(DropItemEvent.Dispense event) {
+  public void onDropToolEvent(DropItemEvent.Dispense event) {
     clearTools(event.getEntities());
   }
 
   @Listener(order = Order.FIRST)
-  public void DropToolEvent(DropItemEvent.Destruct event) {
+  public void onDropToolEvent(DropItemEvent.Destruct event) {
     clearTools(event.getEntities());
   }
 
@@ -212,11 +223,12 @@ public class ToolHandler {
                     .setxRange(location.getBlockX(), location.getBlockX())
                     .setyRange(location.getBlockY(), location.getBlockY())
                     .setzRange(location.getBlockZ(), location.getBlockZ())
-                    .addFlag(Flag.QUIET);
+                    /*.addFlag(Flag.QUIET)*/;  // TODO add back once Prism is combined with GriefAlert
                 if (Settings.TOOL_ROLLBACK_RANGE.getValue() < 0) {
                   builder.setEarliest(Date.from(Instant.EPOCH));
                 } else {
-                  builder.setEarliest(Date.from(Instant.now().minus(Settings.TOOL_ROLLBACK_RANGE.getValue(), ChronoUnit.HOURS)));
+                  builder.setEarliest(Date.from(Instant.now().minus(Settings.TOOL_ROLLBACK_RANGE.getValue(),
+                      ChronoUnit.HOURS)));
                 }
                 AtomicReference<GameProfile> profileReference = new AtomicReference<>();
                 Optional<UUID> uuid = grieferUuid(tool);
@@ -243,7 +255,8 @@ public class ToolHandler {
                 try {
                   if (prism.isPresent()) {
                     if (profileReference.get() != null && !profileReference.get().getName().isPresent()) {
-                      player.sendMessage(Format.success("Undoing events by ", TextColors.GOLD, profileReference.get().getName().get()));
+                      player.sendMessage(Format.success("Undoing events by ",
+                          TextColors.GOLD, profileReference.get().getName().get()));
                     }
                     prism.get().rollback(player, builder.build());
                   } else {
@@ -284,14 +297,21 @@ public class ToolHandler {
         .map(Value::get);
   }
 
-  public void setToolEnabled(boolean toolEnabled) {
-    this.toolEnabled = toolEnabled;
-  }
-
   public boolean isToolEnabled() {
     return toolEnabled;
   }
 
+  public void setToolEnabled(boolean toolEnabled) {
+    this.toolEnabled = toolEnabled;
+  }
+
+  /**
+   * Get the an instance of the tool.
+   *
+   * @param playerName the targeted player's (griefer) name
+   * @param playerUuid the targeted player's (griefer) uuid
+   * @return the tool
+   */
   public ItemStack tool(String playerName, UUID playerUuid) {
     ItemStack itemStack = ItemStack.builder()
         .itemType(ItemTypes.STICK)

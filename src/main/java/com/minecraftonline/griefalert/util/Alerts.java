@@ -25,6 +25,7 @@
 package com.minecraftonline.griefalert.util;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
+import javax.annotation.Nonnull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.User;
@@ -32,19 +33,32 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nonnull;
-
+/**
+ * A utility class for managing {@link Alert}s.
+ */
 public final class Alerts {
 
   private Alerts() {
   }
 
+  /**
+   * Get a griefer from an alert.
+   *
+   * @param alert the alert
+   * @return the user stored in the Alert
+   */
   public static User getGriefer(@Nonnull Alert alert) {
     return Sponge.getServiceManager().provide(UserStorageService.class)
         .flatMap(users -> users.get(alert.getGrieferUuid()))
         .orElseThrow(() -> new RuntimeException("Alert stores an invalid User UUID"));
   }
 
+  /**
+   * Build the griefer's transform from the Alert.
+   *
+   * @param alert the alert
+   * @return the transform
+   */
   public static Transform<World> buildTransform(@Nonnull Alert alert) {
     return new Transform<>(
         getWorld(alert),
@@ -52,6 +66,12 @@ public final class Alerts {
         alert.getGrieferRotation());
   }
 
+  /**
+   * Get the world from the Alert.
+   *
+   * @param alert the alert
+   * @return the world
+   */
   public static World getWorld(@Nonnull Alert alert) {
     return Sponge.getServer()
         .getWorld(alert.getWorldUuid())

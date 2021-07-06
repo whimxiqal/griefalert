@@ -42,6 +42,7 @@ public final class Permission {
 
   /**
    * Factory method of a {@link Permission}.
+   *
    * @param perm the string representation
    * @return generated {@link Permission}
    */

@@ -28,13 +28,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.api.data.SignText;
-
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
@@ -43,6 +41,9 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * A utility class for managing Prism objects.
+ */
 public final class PrismUtil {
 
   /**

@@ -34,6 +34,9 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
 
+/**
+ * A utility class to manage dates and times.
+ */
 public final class DateUtil {
 
   private DateUtil() {

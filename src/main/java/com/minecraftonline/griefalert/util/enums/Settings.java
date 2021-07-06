@@ -26,9 +26,11 @@ package com.minecraftonline.griefalert.util.enums;
 
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.api.configuration.Setting;
-
 import java.text.SimpleDateFormat;
 
+/**
+ * A utility class for enumerating all settings found in configuration.
+ */
 public final class Settings {
 
   public static final Setting<Integer> ALERTS_CODE_LIMIT = Setting.of(
@@ -92,7 +94,8 @@ public final class Settings {
   public static final Setting<Integer> MAX_HIDDEN_REPEATED_EVENTS_TIMEOUT = Setting.of(
       "max_hidden_repeated_events_timeout",
       30,
-      "Maximum number of seconds within which a subsequent identical alert could be silenced. Set to -1 to disable",
+      "Maximum number of seconds within which a subsequent identical alert could be silenced. "
+          + "Set to -1 to disable",
       val -> (val >= -1) && (val <= 3600),
       "The max_hidden_repeated_events configuration value is out of the "
           + "acceptable range {-1, 3600}. ",

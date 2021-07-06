@@ -26,7 +26,6 @@ package com.minecraftonline.griefalert.api.storage;
 
 import com.minecraftonline.griefalert.api.data.GriefEvent;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,8 +41,7 @@ public interface ProfileStorage {
    * Write a {@link GriefProfile} into persistent storage.
    *
    * @param profile The GriefProfile to add
-   * @return false if a {@link GriefProfile} already exists too similar to the
-   * input {@link GriefProfile}
+   * @return false if a grief profile already exists too similar to the input grief profile
    * @throws Exception if error
    */
   boolean write(@Nonnull final GriefProfile profile) throws Exception;
@@ -60,7 +58,7 @@ public interface ProfileStorage {
       throws Exception;
 
   /**
-   * Gets a copy of this {@link GriefProfile}
+   * Gets a copy of the grief profile.
    *
    * @param griefEvent The {@link GriefEvent} of this profile to see
    * @param target     The target id of this profile to see

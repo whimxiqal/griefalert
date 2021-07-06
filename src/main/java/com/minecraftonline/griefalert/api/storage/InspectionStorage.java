@@ -27,7 +27,6 @@ package com.minecraftonline.griefalert.api.storage;
 import com.minecraftonline.griefalert.api.alerts.inspections.AlertInspection;
 import com.minecraftonline.griefalert.api.alerts.inspections.Request;
 import com.minecraftonline.griefalert.api.records.GriefProfile;
-
 import java.util.Collection;
 import javax.annotation.Nonnull;
 
@@ -42,9 +41,7 @@ public interface InspectionStorage {
    * Write a {@link AlertInspection} into persistent storage.
    *
    * @param inspection The GriefProfile to add
-   * @return false if a {@link AlertInspection} already exists too similar to the
-   *         input {@link AlertInspection}
-   * @throws Exception if error
+   * @return false if a {@link AlertInspection} already exists too similar to the input one
    */
   boolean write(@Nonnull final AlertInspection inspection);
 
@@ -52,7 +49,6 @@ public interface InspectionStorage {
    * Get all {@link GriefProfile}s saved in persistent storage.
    *
    * @return a collection of {@link GriefProfile}s
-   * @throws Exception if error
    */
   @Nonnull
   Collection<AlertInspection> query(@Nonnull final Request request);

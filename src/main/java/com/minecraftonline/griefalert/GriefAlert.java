@@ -27,38 +27,36 @@ package com.minecraftonline.griefalert;
 import com.google.inject.Inject;
 import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import com.helion3.prism.api.services.PrismService;
+import com.minecraftonline.griefalert.api.data.GriefEvent;
+import com.minecraftonline.griefalert.api.data.GriefEvents;
+import com.minecraftonline.griefalert.api.services.AlertService;
 import com.minecraftonline.griefalert.api.storage.InspectionStorage;
+import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.caches.AlertServiceImpl;
 import com.minecraftonline.griefalert.caches.ProfileCache;
-import com.minecraftonline.griefalert.commands.common.LegacyCommand;
-import com.minecraftonline.griefalert.api.data.GriefEvent;
-import com.minecraftonline.griefalert.api.services.AlertService;
-import com.minecraftonline.griefalert.api.storage.ProfileStorage;
 import com.minecraftonline.griefalert.commands.LegacyCommands;
 import com.minecraftonline.griefalert.commands.RootCommand;
+import com.minecraftonline.griefalert.commands.common.LegacyCommand;
 import com.minecraftonline.griefalert.holograms.HologramManager;
 import com.minecraftonline.griefalert.listeners.PrismRecordListener;
 import com.minecraftonline.griefalert.listeners.SpongeListeners;
 import com.minecraftonline.griefalert.storage.ConfigHelper;
 import com.minecraftonline.griefalert.storage.inspections.MySqlInspectionStorage;
 import com.minecraftonline.griefalert.storage.inspections.SqliteInspectionStorage;
-import com.minecraftonline.griefalert.storage.profiles.ProfileStorageJSON;
-import com.minecraftonline.griefalert.util.General;
-import com.minecraftonline.griefalert.util.Reference;
-import com.minecraftonline.griefalert.api.data.GriefEvents;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.sql.SQLException;
-
-import com.minecraftonline.griefalert.util.enums.Settings;
+import com.minecraftonline.griefalert.storage.profiles.ProfileStorageJson;
 import com.minecraftonline.griefalert.tool.ImmutableToolGrieferManipulator;
 import com.minecraftonline.griefalert.tool.ImmutableToolManipulator;
 import com.minecraftonline.griefalert.tool.Keys;
 import com.minecraftonline.griefalert.tool.ToolGrieferManipulator;
 import com.minecraftonline.griefalert.tool.ToolHandler;
 import com.minecraftonline.griefalert.tool.ToolManipulator;
+import com.minecraftonline.griefalert.util.General;
+import com.minecraftonline.griefalert.util.Reference;
+import com.minecraftonline.griefalert.util.enums.Settings;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.sql.SQLException;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
@@ -87,11 +85,11 @@ import org.spongepowered.api.util.TypeTokens;
  * @author PietElite
  */
 @Plugin(id = Reference.ID,
-        name = Reference.NAME,
-        description = Reference.DESCRIPTION,
-        dependencies = {@Dependency(id = "prism", version = "3.0.3"),
-                @Dependency(id = "holograms"),
-                @Dependency(id = "worldedit")})
+    name = Reference.NAME,
+    description = Reference.DESCRIPTION,
+    dependencies = {@Dependency(id = "prism", version = "3.0.3"),
+        @Dependency(id = "holograms"),
+        @Dependency(id = "worldedit")})
 public final class GriefAlert {
 
   private static GriefAlert instance;
@@ -142,6 +140,10 @@ public final class GriefAlert {
   private HologramManager hologramManager;
   private InspectionStorage inspectionStorage;
   private ToolHandler toolHandler;
+
+  public static GriefAlert getInstance() {
+    return instance;
+  }
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
@@ -216,7 +218,7 @@ public final class GriefAlert {
       }
     } catch (SQLException e) {
       GriefAlert.getInstance().getLogger().error(
-              "Error while creating storage engine for profiles.");
+          "Error while creating storage engine for profiles.");
       e.printStackTrace();
     }
 
@@ -224,9 +226,16 @@ public final class GriefAlert {
     registerListeners();
   }
 
+  /**
+   * A handler for the post initialization event.
+   *
+   * @param event the event
+   */
   @Listener
   public void onPostInitializationEvent(GamePostInitializationEvent event) {
-    Sponge.getServiceManager().setProvider(GriefAlert.getInstance(), AlertService.class, new AlertServiceImpl());
+    Sponge.getServiceManager().setProvider(GriefAlert.getInstance(),
+        AlertService.class,
+        new AlertServiceImpl());
   }
 
   @Listener
@@ -244,7 +253,7 @@ public final class GriefAlert {
     // Register all the commands with Sponge
     registerCommands();
     try {
-      profileStorage = new ProfileStorageJSON();
+      profileStorage = new ProfileStorageJson();
     } catch (Exception e) {
       GriefAlert.getInstance().getLogger().error("Error while creating storage engine for profiles.");
       e.printStackTrace();
@@ -264,6 +273,11 @@ public final class GriefAlert {
     reload();
   }
 
+  /**
+   * A handler for a stopping server event.
+   *
+   * @param event the event
+   */
   @Listener
   public void onStoppingServer(GameStoppingServerEvent event) {
     if (alertService instanceof AlertServiceImpl) {
@@ -283,30 +297,29 @@ public final class GriefAlert {
       e.printStackTrace();
     }
     configHelper.load(rootNode);
-    profileStorage = new ProfileStorageJSON();
+    profileStorage = new ProfileStorageJson();
     profileCache.reload();
   }
-
 
   private void registerCommands() {
     RootCommand rootCommand = new RootCommand();
     Sponge.getCommandManager().register(
-            this,
-            rootCommand.buildCommandSpec(),
-            rootCommand.getAliases());
+        this,
+        rootCommand.buildCommandSpec(),
+        rootCommand.getAliases());
     for (LegacyCommand command : LegacyCommands.get()) {
       Sponge.getCommandManager().register(
-              this,
-              command.buildCommandSpec(),
-              command.getAliases());
+          this,
+          command.buildCommandSpec(),
+          command.getAliases());
     }
   }
 
   private void registerListeners() {
     Sponge.getEventManager().registerListener(
-            this,
-            PrismRecordPreSaveEvent.class,
-            new PrismRecordListener()
+        this,
+        PrismRecordPreSaveEvent.class,
+        new PrismRecordListener()
     );
     SpongeListeners.register(this);
   }
@@ -361,10 +374,6 @@ public final class GriefAlert {
 
   public Logger getLogger() {
     return logger;
-  }
-
-  public static GriefAlert getInstance() {
-    return instance;
   }
 
   public PluginContainer getPluginContainer() {

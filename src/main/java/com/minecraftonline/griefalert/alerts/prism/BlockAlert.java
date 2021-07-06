@@ -37,6 +37,9 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.text.Text;
 
+/**
+ * An Alert relating specifically to events pertaining to blocks.
+ */
 public abstract class BlockAlert extends PrismAlert {
 
   private final String originalBlockState;

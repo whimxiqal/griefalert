@@ -26,9 +26,7 @@ package com.minecraftonline.griefalert.api.events;
 
 import com.minecraftonline.griefalert.api.alerts.Alert;
 import com.minecraftonline.griefalert.api.structures.RotatingList;
-
 import javax.annotation.Nonnull;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
@@ -49,9 +47,16 @@ public final class PreBroadcastAlertEvent extends AbstractEvent {
   private final Alert alert;
   private final Cause cause;
 
+  private PreBroadcastAlertEvent(@Nonnull final Alert alert,
+                                 @Nonnull final Cause cause) {
+    this.alert = alert;
+    this.cause = cause;
+  }
+
   /**
    * Post a new {@link PreBroadcastAlertEvent}.
-   *  @param alert  the alert which is about to be broadcast
+   *
+   * @param alert  the alert which is about to be broadcast
    * @param cause  the player who triggered the alert in the first place
    * @param plugin the container representing the handling plugin
    */
@@ -65,12 +70,6 @@ public final class PreBroadcastAlertEvent extends AbstractEvent {
             .build(EventContext.builder()
                 .add(EventContextKeys.PLUGIN, plugin)
                 .build())));
-  }
-
-  private PreBroadcastAlertEvent(@Nonnull final Alert alert,
-                                 @Nonnull final Cause cause) {
-    this.alert = alert;
-    this.cause = cause;
   }
 
   @Nonnull
