@@ -36,7 +36,7 @@ repositories {
 
 archivesBaseName = 'griefalert' // Project Base Name Here
 group = 'com.minecraftonline.sponge' // This is a MinecraftOnline project
-version = '1.4.0' // Project Version
+version = '2.0.0' // Project Version
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -48,16 +48,29 @@ compileJava {
 }
 
 dependencies {
+    // Sponge
     implementation 'org.spongepowered:spongeapi:7.2.0'
+
+    // WorldEdit
     implementation 'com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT'
     implementation 'com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT'
-    implementation fileTree(dir: 'libs', include: '*.jar')
-//    shadow fileTree(dir: 'libs', include: 'shadow/*.jar')
+
+    // Holograms
     implementation 'com.github.randombyte-developer:holograms:v3.2.0'
-    implementation 'org.xerial:sqlite-jdbc:3.8.11.2'
-    implementation 'mysql:mysql-connector-java:8.0.19'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.5.4'
+
+    // Database connectors
+    shadow 'org.mongodb:mongo-java-driver:3.12.8'
+    shadow 'org.xerial:sqlite-jdbc:3.36.0.1'
+    shadow 'mysql:mysql-connector-java:8.0.25'
+    shadow 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
+    implementation 'com.zaxxer:HikariCP:3.4.5'
+
+    // JUnit
     testImplementation('junit:junit:4.13')
+
+    // Lombok
+    implementation 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
 }
 
 sponge.plugin.meta {
