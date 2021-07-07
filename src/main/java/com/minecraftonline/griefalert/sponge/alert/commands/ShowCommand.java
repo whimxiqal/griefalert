@@ -48,6 +48,8 @@ import org.spongepowered.api.text.Text;
 /**
  * Class for handling command which shows a hologram displaying information about
  * a player at the location of grief.
+ *
+ * @author PietElite
  */
 class ShowCommand extends GeneralCommand {
 

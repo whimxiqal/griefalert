@@ -55,6 +55,8 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 /**
  * A command to alter the list of profiles, which flag alerts.
+ *
+ * @author PietElite
  */
 public class ProfileCommand extends GeneralCommand {
 

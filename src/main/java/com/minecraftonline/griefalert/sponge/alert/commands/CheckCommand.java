@@ -43,6 +43,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command for an officer to check ("inspect") an alert.
+ *
+ * @author PietElite
  */
 public class CheckCommand extends GeneralCommand {
 

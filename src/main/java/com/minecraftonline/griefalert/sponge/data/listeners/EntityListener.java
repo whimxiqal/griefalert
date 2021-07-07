@@ -37,6 +37,9 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
+/**
+ * @author viveleroi
+ */
 public class EntityListener {
 
   /**

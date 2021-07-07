@@ -32,6 +32,9 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author viveleroi
+ */
 public class FlagClean extends SimpleFlagHandler {
     /**
      * Flag which allows illegal blocks/item entities to be drained from an applier region.

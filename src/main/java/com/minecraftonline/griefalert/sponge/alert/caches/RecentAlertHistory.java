@@ -37,6 +37,8 @@ import org.spongepowered.api.scheduler.Task;
 /**
  * A structure to store recent alerts for a single cause (as in a player).
  * This structure is in place to ensure alert silencing behavior.
+ *
+ * @author PietElite
  */
 public class RecentAlertHistory {
 

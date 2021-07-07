@@ -37,6 +37,8 @@ import org.spongepowered.api.util.blockray.BlockRay;
 
 /**
  * A utility class to enumerate {@link Detail}s.
+ *
+ * @author PietElite
  */
 public final class Details {
 

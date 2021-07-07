@@ -49,6 +49,9 @@ import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * @author viveleroi
+ */
 public class InventoryListener {
 
   /**

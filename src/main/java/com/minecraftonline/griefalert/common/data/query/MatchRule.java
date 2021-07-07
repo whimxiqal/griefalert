@@ -23,6 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.query;
 
+/**
+ * @author viveleroi
+ */
 public enum MatchRule {
     EXCLUDES,
     INCLUDES,

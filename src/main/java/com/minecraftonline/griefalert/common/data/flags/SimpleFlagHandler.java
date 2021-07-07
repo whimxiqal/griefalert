@@ -25,6 +25,9 @@ package com.minecraftonline.griefalert.common.data.flags;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * @author viveleroi
+ */
 public abstract class SimpleFlagHandler implements FlagHandler {
   private final ImmutableList<String> aliases;
 

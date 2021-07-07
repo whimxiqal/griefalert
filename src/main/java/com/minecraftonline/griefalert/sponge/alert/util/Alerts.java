@@ -35,6 +35,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * A utility class for managing {@link Alert}s.
+ *
+ * @author PietElite
  */
 public final class Alerts {
 

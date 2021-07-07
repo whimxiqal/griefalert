@@ -33,6 +33,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * A utility class to provide error messages.
+ *
+ * @author PietElite
  */
 public final class Errors {
 

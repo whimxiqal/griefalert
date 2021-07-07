@@ -41,6 +41,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * Represents a block change event record.
+ *
+ * @author viveleroi
  */
 public class BlockResult extends ResultComplete implements Actionable {
   @Override

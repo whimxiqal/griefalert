@@ -47,6 +47,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command to get formatted and itemized information about an {@link Alert}.
+ *
+ * @author PietElite
  */
 public class InfoCommand extends GeneralCommand {
 

@@ -28,6 +28,9 @@ import com.minecraftonline.griefalert.common.data.records.Result;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.CatalogType;
 
+/**
+ * @author viveleroi
+ */
 public class PrismEvent implements CatalogType {
 
   private final String id;

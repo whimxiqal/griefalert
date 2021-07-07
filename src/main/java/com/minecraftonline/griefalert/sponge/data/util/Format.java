@@ -36,6 +36,9 @@ import org.spongepowered.api.world.World;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * @author viveleroi
+ */
 // TODO combine with com.minecraftonline.griefalert.sponge.alert.util
 public class Format {
 

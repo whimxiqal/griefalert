@@ -37,6 +37,9 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntitySnapshot.Builder;
 
+/**
+ * @author viveleroi
+ */
 public class EntityResult extends ResultComplete implements Actionable {
   @Override
   public ActionableResult rollback() {

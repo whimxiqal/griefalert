@@ -28,6 +28,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * A utility class for static methods pertaining to enforcing proper grammar rules.
+ *
+ * @author PietElite
  */
 public final class Grammar {
 

@@ -41,6 +41,8 @@ import org.spongepowered.api.world.Location;
 
 /**
  * A managing class for creating holograms for the purposes of GriefAlert.
+ *
+ * @author PietElite
  */
 public class HologramManager {
 

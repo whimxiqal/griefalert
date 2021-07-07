@@ -40,6 +40,8 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 /**
  * Magic method to help define a GriefAlert tool with a specific griefer.
+ *
+ * @author PietElite
  */
 public class ToolGrieferManipulator
     extends AbstractSingleData<UUID, ToolGrieferManipulator, ImmutableToolGrieferManipulator> {

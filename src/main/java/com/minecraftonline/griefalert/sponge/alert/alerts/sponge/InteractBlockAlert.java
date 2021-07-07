@@ -10,6 +10,8 @@ import org.spongepowered.api.world.Location;
 
 /**
  * An alert caused by block interaction.
+ *
+ * @author PietElite
  */
 public class InteractBlockAlert extends SpongeAlert {
 

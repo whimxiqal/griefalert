@@ -30,6 +30,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * An enumeration of templates for ease of use.
+ *
+ * @author PietElite
  */
 public class Templates {
 

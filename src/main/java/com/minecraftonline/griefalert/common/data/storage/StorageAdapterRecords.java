@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.spongepowered.api.data.DataContainer;
 
+/**
+ * @author viveleroi
+ */
 public interface StorageAdapterRecords {
 
   /**

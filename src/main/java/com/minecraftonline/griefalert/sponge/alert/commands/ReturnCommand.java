@@ -40,6 +40,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * A command for an officer to return a location prior to an inspection.
+ *
+ * @author PietElite
  */
 public class ReturnCommand extends GeneralCommand {
 

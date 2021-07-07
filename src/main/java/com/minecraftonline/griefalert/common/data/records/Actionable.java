@@ -23,8 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.records;
 
-import java.util.concurrent.CompletableFuture;
-
+/**
+ * @author viveleroi
+ */
 public interface Actionable {
     /**
      * Reverses the result of this event on a subject

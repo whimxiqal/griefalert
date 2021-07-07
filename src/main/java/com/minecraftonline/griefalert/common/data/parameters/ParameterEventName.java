@@ -35,6 +35,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public class ParameterEventName extends SimpleParameterHandler {
   private final Pattern pattern = Pattern.compile("[~|!]?[\\w,-]+");
 

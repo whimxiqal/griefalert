@@ -33,7 +33,11 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class ExtinguishCommand {
     private ExtinguishCommand() {}
 

@@ -46,7 +46,11 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class ApplierCommand {
 
   private ApplierCommand() {

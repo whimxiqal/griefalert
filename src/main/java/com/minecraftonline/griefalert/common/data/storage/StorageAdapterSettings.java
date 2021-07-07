@@ -25,6 +25,9 @@ package com.minecraftonline.griefalert.common.data.storage;
 
 import java.util.UUID;
 
+/**
+ * @author viveleroi
+ */
 public interface StorageAdapterSettings {
     /**
      * Remove a meta setting by its key

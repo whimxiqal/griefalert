@@ -27,6 +27,9 @@ package com.minecraftonline.griefalert.common.data.services;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public interface DataService {
 
   /**

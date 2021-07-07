@@ -25,6 +25,9 @@ package com.minecraftonline.griefalert.common.data.parameters;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * @author viveleroi
+ */
 public abstract class SimpleParameterHandler implements ParameterHandler {
   protected final ImmutableList<String> aliases;
 

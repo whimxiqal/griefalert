@@ -43,6 +43,7 @@ import org.spongepowered.api.text.format.TextColors;
  *
  * @param <P> the type of object which is given to retrieve the formatted text
  *            for any individual use of a Detail.
+ * @author PietElite
  */
 public final class Detail<P extends Serializable> implements Serializable {
 

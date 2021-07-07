@@ -24,7 +24,7 @@
 
 package com.minecraftonline.griefalert.common;
 
-import com.minecraftonline.griefalert.common.data.struct.CommonLogger;
+import com.minecraftonline.griefalert.common.bridge.CommonLogger;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

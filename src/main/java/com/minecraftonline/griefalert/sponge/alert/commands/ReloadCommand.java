@@ -37,6 +37,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * A command to reload grief profiles from storage.
+ *
+ * @author PietElite
  */
 public class ReloadCommand extends GeneralCommand {
 

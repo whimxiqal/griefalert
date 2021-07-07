@@ -52,6 +52,9 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.profile.GameProfile;
 
+/**
+ * @author viveleroi
+ */
 public class DataUtil {
 
   private static final CharSequenceTranslator CHAR_SEQUENCE_TRANSLATOR = StringEscapeUtils.ESCAPE_JAVA.with(

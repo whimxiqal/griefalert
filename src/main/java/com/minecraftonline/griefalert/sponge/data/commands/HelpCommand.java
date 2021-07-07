@@ -28,7 +28,11 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class HelpCommand {
   private HelpCommand() {
   }

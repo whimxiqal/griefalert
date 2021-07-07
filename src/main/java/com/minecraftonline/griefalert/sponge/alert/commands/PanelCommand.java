@@ -39,6 +39,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * A command to start a panel.
+ *
+ * @author PietElite
  */
 public class PanelCommand extends GeneralCommand {
 

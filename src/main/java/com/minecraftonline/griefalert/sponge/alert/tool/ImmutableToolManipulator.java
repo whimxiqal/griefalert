@@ -30,6 +30,8 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
 /**
  * A magic class to help define the GriefAlert tool.
+ *
+ * @author PietElite
  */
 public class ImmutableToolManipulator
     extends AbstractImmutableBooleanData<ImmutableToolManipulator, ToolManipulator> {

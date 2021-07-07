@@ -30,6 +30,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public interface FlagHandler {
   /**
    * Returns whether this flag is allowed for the current command source.

@@ -46,6 +46,8 @@ import org.spongepowered.api.text.format.TextStyles;
 /**
  * An abstract class for all MinecraftOnline commands from which to extend. This
  * class provides consistency to commands structure and visuals.
+ *
+ * @author PietElite
  */
 public abstract class GeneralCommand implements CommandExecutor {
 

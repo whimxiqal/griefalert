@@ -36,6 +36,8 @@ import javax.annotation.Nonnull;
 
 /**
  * A store for all filtering information necessary to locate logged events.
+ *
+ * @author viveleroi
  */
 public final class DataRequest implements Serializable {
 

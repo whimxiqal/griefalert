@@ -93,6 +93,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * The implementation for the {@link AlertService} interface.
+ *
+ * @author PietElite
  */
 public final class AlertServiceImpl implements AlertService {
 

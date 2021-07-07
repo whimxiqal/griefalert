@@ -36,6 +36,8 @@ import java.util.Date;
 
 /**
  * A utility class to manage dates and times.
+ *
+ * @author PietElite
  */
 public final class DateUtil {
 

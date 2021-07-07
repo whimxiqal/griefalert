@@ -29,6 +29,8 @@ import org.spongepowered.api.service.permission.Subject;
 
 /**
  * A utility class to enumerate GriefAlert permissions.
+ *
+ * @author PietElite
  */
 public final class Permissions {
 

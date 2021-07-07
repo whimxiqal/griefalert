@@ -16,7 +16,7 @@ import org.spongepowered.api.event.entity.AttackEntityEvent;
 /**
  * An {@link Alert} for the Attack {@link GriefEvent}.
  *
- * @see GriefEvents
+ * @author PietElite
  */
 public class AttackEntityAlert extends EntityAlert {
 

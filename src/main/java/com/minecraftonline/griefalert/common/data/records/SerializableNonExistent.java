@@ -32,6 +32,8 @@ import org.spongepowered.api.data.DataContainer;
  * For example, an entity rollback produces an entity but there's
  * no valid original value. This allows us to safely represent
  * that without having to wrap/extend the transaction class.
+ *
+ * @author viveleroi
  */
 public class SerializableNonExistent implements DataSerializable {
 

@@ -40,6 +40,8 @@ import javax.annotation.Nonnull;
 
 /**
  * Storage implementation for inspection storage using SQLite.
+ *
+ * @author PietElite
  */
 public class SqliteInspectionStorage implements InspectionStorage {
 

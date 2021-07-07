@@ -37,6 +37,8 @@ import org.spongepowered.api.text.channel.MessageReceiver;
 
 /**
  * A utility class to hold static methods relating to communication.
+ *
+ * @author PietElite
  */
 public final class Communication {
 

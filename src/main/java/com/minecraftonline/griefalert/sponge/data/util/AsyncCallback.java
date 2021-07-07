@@ -26,6 +26,9 @@ package com.minecraftonline.griefalert.sponge.data.util;
 import com.minecraftonline.griefalert.common.data.records.Result;
 import java.util.List;
 
+/**
+ * @author viveleroi
+ */
 public class AsyncCallback {
   public void success(List<Result> results) {
   }

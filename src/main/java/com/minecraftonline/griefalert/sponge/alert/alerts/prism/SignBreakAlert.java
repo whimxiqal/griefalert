@@ -34,6 +34,8 @@ import java.util.Optional;
 
 /**
  * An alert caused by breaking a sign.
+ *
+ * @author PietElite
  */
 public class SignBreakAlert extends PrismAlert {
 

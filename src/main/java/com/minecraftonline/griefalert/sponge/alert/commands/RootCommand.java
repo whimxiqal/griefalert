@@ -42,6 +42,8 @@ import org.spongepowered.api.text.format.TextStyles;
 
 /**
  * The root command for all GriefAlert commands.
+ *
+ * @author PietElite
  */
 public class RootCommand extends GeneralCommand {
 

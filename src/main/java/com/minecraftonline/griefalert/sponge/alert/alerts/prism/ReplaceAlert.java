@@ -35,6 +35,8 @@ import org.spongepowered.api.Sponge;
 
 /**
  * An alert that is caused by the replacement of a block with another block.
+ *
+ * @author PietElite
  */
 public class ReplaceAlert extends BlockAlert {
 

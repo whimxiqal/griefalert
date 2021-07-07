@@ -39,6 +39,9 @@ import org.bson.codecs.EncoderContext;
 import org.bson.codecs.IntegerCodec;
 import org.bson.codecs.LongCodec;
 
+/**
+ * @author viveleroi
+ */
 public class PrimitiveArrayCodec implements Codec<PrimitiveArray> {
 
   private final ByteCodec byteCodec = new ByteCodec();

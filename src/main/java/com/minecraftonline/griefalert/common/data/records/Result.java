@@ -30,6 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 
+/**
+ * @author viveleroi
+ */
 public abstract class Result {
 
   public DataContainer data;

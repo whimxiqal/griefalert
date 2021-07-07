@@ -43,6 +43,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * A utility class for managing Prism objects.
+ *
+ * @author PietElite
  */
 public final class PrismUtil {
 

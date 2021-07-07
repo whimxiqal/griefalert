@@ -29,6 +29,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * Utility class to enumerate a series of {@link CommandKey}s.
+ *
+ * @author PietElite
  */
 public final class CommandKeys {
 

@@ -40,6 +40,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command to flush the alert cache.
+ *
+ * @author PietElite
  */
 public class FlushCommand extends GeneralCommand {
 

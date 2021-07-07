@@ -23,6 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.storage;
 
+/**
+ * @author viveleroi
+ */
 public class StorageWriteResult implements StorageResult {
 
 }

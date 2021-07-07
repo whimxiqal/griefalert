@@ -41,6 +41,9 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
+/**
+ * @author viveleroi
+ */
 public class LookupCallback extends AsyncCallback {
 
   private final QuerySession querySession;

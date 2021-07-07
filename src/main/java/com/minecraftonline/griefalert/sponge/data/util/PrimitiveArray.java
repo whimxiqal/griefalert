@@ -35,6 +35,8 @@ import org.bson.Document;
 
 /**
  * https://wiki.vg/NBT - NBT only supports Byte, Int and Long Arrays
+ *
+ * @author viveleroi
  */
 public class PrimitiveArray {
 

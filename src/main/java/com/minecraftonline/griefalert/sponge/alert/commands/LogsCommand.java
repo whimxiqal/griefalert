@@ -61,6 +61,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Command to query the logs from Prism throughout a WorldEdit region.
+ *
+ * @author PietElite
  */
 public class LogsCommand extends GeneralCommand {
 

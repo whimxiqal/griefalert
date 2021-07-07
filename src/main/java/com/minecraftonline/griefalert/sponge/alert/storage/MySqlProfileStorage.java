@@ -46,8 +46,9 @@ import org.spongepowered.api.text.format.TextColor;
 /**
  * Deprecated ProfileStorage implementation.
  *
- * @deprecated now using ProfileStorageJSON
+ * @author PietElite
  */
+// TODO implement
 public class MySqlProfileStorage implements ProfileStorage {
 
   private static final String TABLE_NAME = "GriefAlertProfiles";

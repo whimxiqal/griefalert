@@ -32,6 +32,8 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
 /**
  * A magic class to help handle the GriefAlert tool.
+ *
+ * @author PietElite
  */
 public class ImmutableToolGrieferManipulator
     extends AbstractImmutableSingleData<UUID, ImmutableToolGrieferManipulator, ToolGrieferManipulator> {

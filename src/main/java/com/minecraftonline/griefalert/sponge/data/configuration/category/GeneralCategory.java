@@ -30,6 +30,11 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.List;
 
+/**
+ * @author viveleroi
+ */
+// TODO port to new config
+@Deprecated
 @ConfigSerializable
 public class GeneralCategory {
 

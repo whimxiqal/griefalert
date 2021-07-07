@@ -32,6 +32,8 @@ import javax.annotation.Nonnull;
 
 /**
  * Helper final class to provide commands which are not used anymore.
+ *
+ * @author PietElite
  */
 public final class LegacyCommands {
 

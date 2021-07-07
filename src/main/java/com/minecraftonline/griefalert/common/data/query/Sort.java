@@ -23,6 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.query;
 
+/**
+ * @author viveleroi
+ */
 public enum Sort {
     // Set sorting values for MongoDB/MySQL/H2 sorting.
     NEWEST_FIRST(-1, "DESC"),

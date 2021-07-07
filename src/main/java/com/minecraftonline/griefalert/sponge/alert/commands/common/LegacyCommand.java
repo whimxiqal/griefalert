@@ -36,6 +36,8 @@ import org.spongepowered.api.text.Text;
 /**
  * A command class for an old command on MinecraftOnline. The command will be
  * generated but it will simply route the user to a new command.
+ *
+ * @author PietElite
  */
 public final class LegacyCommand extends GeneralCommand {
 

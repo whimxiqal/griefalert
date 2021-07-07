@@ -13,6 +13,8 @@ import org.spongepowered.api.event.Event;
 
 /**
  * An abstract alert caused by Sponge, as opposed by Prism.
+ *
+ * @author PietElite
  */
 public abstract class SpongeAlert extends GeneralAlert {
 

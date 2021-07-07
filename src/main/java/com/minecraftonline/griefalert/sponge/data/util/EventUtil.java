@@ -31,6 +31,9 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 
+/**
+ * @author viveleroi
+ */
 public class EventUtil {
     private EventUtil() {}
 

@@ -30,7 +30,11 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class InspectCommand {
   private InspectCommand() {
   }

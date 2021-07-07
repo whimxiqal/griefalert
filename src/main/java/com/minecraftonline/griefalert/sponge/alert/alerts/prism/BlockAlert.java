@@ -39,6 +39,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * An Alert relating specifically to events pertaining to blocks.
+ *
+ * @author PietElite
  */
 public abstract class BlockAlert extends PrismAlert {
 

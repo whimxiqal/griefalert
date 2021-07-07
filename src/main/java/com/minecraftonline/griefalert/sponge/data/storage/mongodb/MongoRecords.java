@@ -62,6 +62,9 @@ import org.spongepowered.api.data.DataView;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * @author viveleroi
+ */
 public class MongoRecords implements StorageAdapterRecords {
 
   private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);

@@ -33,6 +33,8 @@ import org.spongepowered.api.event.impl.AbstractEvent;
  * An event to be thrown when a PrismRecord is ready to be saved. Other
  * plugins can catch this event and read the PrismRecord or cancel the
  * event.
+ *
+ * @author viveleroi
  */
 public class PrismRecordPreSaveEvent extends AbstractEvent implements Cancellable {
 

@@ -39,6 +39,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command to enable the use of the GriefAlert tool.
+ *
+ * @author PietElite
  */
 public class EnableToolCommand extends GeneralCommand {
 

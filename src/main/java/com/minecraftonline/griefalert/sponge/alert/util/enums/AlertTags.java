@@ -31,6 +31,8 @@ import org.spongepowered.api.text.Text;
  * A utility class to hold static methods which generate various "tags",
  * which are helpful clickable {@link Text} objects to make running
  * commands easier.
+ *
+ * @author PietElite
  */
 public final class AlertTags {
 

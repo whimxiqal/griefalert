@@ -87,7 +87,7 @@ import com.minecraftonline.griefalert.sponge.data.queues.RecordingQueueManager;
 import com.minecraftonline.griefalert.sponge.data.storage.h2.H2StorageAdapter;
 import com.minecraftonline.griefalert.sponge.data.storage.mongodb.MongoStorageAdapter;
 import com.minecraftonline.griefalert.sponge.data.storage.mysql.MySQLStorageAdapter;
-import com.minecraftonline.griefalert.sponge.data.struct.SpongeCommonLogger;
+import com.minecraftonline.griefalert.sponge.bridge.SpongeCommonLogger;
 import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import java.io.File;
 import java.io.IOException;

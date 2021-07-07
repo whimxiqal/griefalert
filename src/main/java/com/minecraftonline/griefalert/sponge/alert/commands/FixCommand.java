@@ -60,6 +60,8 @@ import org.spongepowered.api.text.TextElement;
 
 /**
  * A command to "fix" an alert by undoing the changes associated with the alert.
+ *
+ * @author PietElite
  */
 public class FixCommand extends GeneralCommand {
 

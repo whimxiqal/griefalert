@@ -29,6 +29,8 @@ import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 
 /**
  * An alert that is caused by the placing of a block.
+ *
+ * @author PietElite
  */
 public class PlaceAlert extends BlockAlert {
 

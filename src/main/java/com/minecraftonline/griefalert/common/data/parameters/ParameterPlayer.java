@@ -38,6 +38,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.profile.GameProfile;
 
+/**
+ * @author viveleroi
+ */
 public class ParameterPlayer extends SimpleParameterHandler {
   private final Pattern pattern = Pattern.compile("[\\w,:-]+");
 

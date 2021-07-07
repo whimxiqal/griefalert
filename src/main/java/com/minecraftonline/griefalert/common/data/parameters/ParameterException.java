@@ -24,6 +24,9 @@
 
 package com.minecraftonline.griefalert.common.data.parameters;
 
+/**
+ * @author viveleroi
+ */
 public class ParameterException extends Exception {
   private static final long serialVersionUID = -707073105399589815L;
 

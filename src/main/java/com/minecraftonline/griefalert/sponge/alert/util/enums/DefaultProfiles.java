@@ -40,6 +40,8 @@ import org.spongepowered.api.world.World;
 /**
  * A utility class to manage default {@link GriefProfile}s when first starting a server
  * with GriefAlert for the first time.
+ *
+ * @author PietElite
  */
 public final class DefaultProfiles {
 

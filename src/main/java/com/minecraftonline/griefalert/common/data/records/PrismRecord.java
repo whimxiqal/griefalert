@@ -63,6 +63,8 @@ import org.spongepowered.api.world.World;
  *          .location(player.getLocation())
  *          .buildAndSave();
  * }</pre>
+ *
+ * @author viveleroi
  */
 public class PrismRecord {
 

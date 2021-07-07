@@ -23,6 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.records;
 
+/**
+ * @author viveleroi
+ */
 public enum SkipReason {
     /**
      * Block isn't safe and may not be places in the world.

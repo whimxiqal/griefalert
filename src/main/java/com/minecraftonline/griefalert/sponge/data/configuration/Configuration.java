@@ -36,6 +36,11 @@ import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * @author viveleroi
+ */
+// TODO port to new config
+@Deprecated
 public class Configuration {
 
   private ConfigurationLoader<CommentedConfigurationNode> configurationLoader;

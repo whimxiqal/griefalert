@@ -43,6 +43,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Profile storage that uses JSON as its implementation format.
+ *
+ * @author PietElite
  */
 public class ProfileStorageJson implements ProfileStorage {
 

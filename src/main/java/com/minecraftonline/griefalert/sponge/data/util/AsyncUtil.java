@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.spongepowered.api.Sponge;
 
+/**
+ * @author viveleroi
+ */
 public class AsyncUtil {
   private AsyncUtil() {
   }

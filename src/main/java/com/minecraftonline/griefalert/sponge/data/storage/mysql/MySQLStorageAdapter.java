@@ -37,6 +37,9 @@ import java.sql.SQLException;
 import java.util.Date;
 import org.spongepowered.api.scheduler.Task;
 
+/**
+ * @author viveleroi
+ */
 public class MySQLStorageAdapter implements StorageAdapter {
 
   private static HikariDataSource db;

@@ -22,32 +22,17 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.sponge.data.struct;
+package com.minecraftonline.griefalert.common.bridge;
 
-import com.minecraftonline.griefalert.common.data.struct.CommonLogger;
-import org.slf4j.Logger;
+/**
+ * @author PietElite
+ */
+public interface CommonLogger {
 
-public class SpongeCommonLogger implements CommonLogger {
+  void logInfo(String message);
 
-  private final Logger logger;
+  void logWarn(String message);
 
-  public SpongeCommonLogger(Logger logger) {
-    this.logger = logger;
-  }
-
-  @Override
-  public void logInfo(String message) {
-    logger.info(message);
-  }
-
-  @Override
-  public void logWarn(String message) {
-    logger.warn(message);
-  }
-
-  @Override
-  public void logError(String message) {
-    logger.error(message);
-  }
+  void logError(String message);
 
 }

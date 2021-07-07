@@ -35,6 +35,8 @@ import org.spongepowered.api.world.extent.Extent;
  * Contains a group of conditions. Each group should be compared
  * separately, and each field within each group should be compared
  * as part of the group.
+ *
+ * @author viveleroi
  */
 public final class ConditionGroup implements Condition {
   private final List<Condition> conditions = new ArrayList<>();

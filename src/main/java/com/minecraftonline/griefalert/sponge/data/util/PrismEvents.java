@@ -37,6 +37,9 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
+/**
+ * @author viveleroi
+ */
 public final class PrismEvents {
 
   public static final PrismEvent BLOCK_BREAK = PrismEvent.of("break", "Block Break", "broke", BlockResult.class);

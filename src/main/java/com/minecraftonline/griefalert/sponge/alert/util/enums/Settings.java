@@ -30,6 +30,8 @@ import java.text.SimpleDateFormat;
 
 /**
  * A utility class for enumerating all settings found in configuration.
+ *
+ * @author PietElite
  */
 public final class Settings {
 

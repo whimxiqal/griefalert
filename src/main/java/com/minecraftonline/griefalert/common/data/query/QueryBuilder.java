@@ -40,6 +40,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.text.Text;
 
+/**
+ * @author viveleroi
+ */
 public class QueryBuilder {
   private static final Pattern flagPattern = Pattern.compile("(-)([^\\s]+)?");
 

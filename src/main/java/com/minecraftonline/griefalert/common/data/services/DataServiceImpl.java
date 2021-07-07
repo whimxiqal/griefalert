@@ -38,6 +38,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public class DataServiceImpl implements DataService {
 
   @Override

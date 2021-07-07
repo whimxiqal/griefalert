@@ -35,6 +35,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * An inspection request.
+ *
+ * @author PietElite
  */
 public final class InspectionRequest implements Serializable {
 

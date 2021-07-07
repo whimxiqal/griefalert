@@ -23,6 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.filters;
 
+/**
+ * @author viveleroi
+ */
 public enum FilterMode {
     BLACKLIST,
     WHITELIST

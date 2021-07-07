@@ -27,6 +27,8 @@ package com.minecraftonline.griefalert.common.data.records;
  * Represents aggregate results from a query. Individual records are grouped
  * together and lose record-specific data like location, a specific timestamp,
  * etc.
+ *
+ * @author viveleroi
  */
 public class ResultAggregate extends Result {
 

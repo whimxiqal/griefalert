@@ -26,6 +26,8 @@ package com.minecraftonline.griefalert.sponge.alert.util;
 
 /**
  * A utility class to store static variables pertaining to this project.
+ *
+ * @author PietElite
  */
 public final class Reference {
 

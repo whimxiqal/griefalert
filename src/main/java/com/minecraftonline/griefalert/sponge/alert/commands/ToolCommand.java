@@ -48,6 +48,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command to get a GriefAlert tool.
+ *
+ * @author PietElite
  */
 public class ToolCommand extends GeneralCommand {
 

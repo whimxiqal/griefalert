@@ -36,6 +36,8 @@ import org.spongepowered.api.command.CommandSource;
 /**
  * Represents a record query session, which includes the actual
  * {@link Query} as well as the source, and result set meta data.
+ *
+ * @author viveleroi
  */
 public class QuerySession {
   protected List<Flag> flags = new ArrayList<>();

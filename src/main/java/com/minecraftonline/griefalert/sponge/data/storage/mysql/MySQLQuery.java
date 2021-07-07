@@ -30,6 +30,9 @@ import com.minecraftonline.griefalert.common.data.query.SQLQuery;
 import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import com.minecraftonline.griefalert.sponge.data.util.TypeUtil;
 
+/**
+ * @author viveleroi
+ */
 public class MySQLQuery extends SQLQuery {
   public MySQLQuery(String query) {
     super(query);

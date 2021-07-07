@@ -29,6 +29,8 @@ import org.spongepowered.api.text.action.TextActions;
 
 /**
  * A key used in commands as flags and their descriptions.
+ *
+ * @author PietElite
  */
 public class CommandKey {
 

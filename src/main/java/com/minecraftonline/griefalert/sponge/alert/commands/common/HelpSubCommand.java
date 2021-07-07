@@ -33,6 +33,8 @@ import org.spongepowered.api.text.Text;
 /**
  * A sub-command for any {@link GeneralCommand} which allows for the viewing of
  * other sub-commands for usage.
+ *
+ * @author PietElite
  */
 public class HelpSubCommand extends GeneralCommand {
 

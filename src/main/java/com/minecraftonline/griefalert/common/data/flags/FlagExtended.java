@@ -31,6 +31,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public class FlagExtended extends SimpleFlagHandler {
   /**
    * Flag which displays all available data for each record.

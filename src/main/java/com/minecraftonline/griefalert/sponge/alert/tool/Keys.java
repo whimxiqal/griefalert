@@ -30,6 +30,8 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 /**
  * Sponge keys enumeration utility class.
+ *
+ * @author PietElite
  */
 public class Keys {
   /**

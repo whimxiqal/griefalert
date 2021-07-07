@@ -25,6 +25,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * An alert caused by an entity.
+ *
+ * @author PietElite
  */
 public abstract class EntityAlert extends SpongeAlert {
 

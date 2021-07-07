@@ -39,6 +39,8 @@ import javax.annotation.Nonnull;
 
 /**
  * Storage implementation for inspections in MySQL.
+ *
+ * @author PietElite
  */
 public class MySqlInspectionStorage implements InspectionStorage {
 

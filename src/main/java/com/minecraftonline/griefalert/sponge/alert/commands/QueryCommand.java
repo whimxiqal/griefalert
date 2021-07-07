@@ -47,6 +47,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command to query the local alert cache and show a filtered list of recent alerts.
+ *
+ * @author PietElite
  */
 public class QueryCommand extends GeneralCommand {
 

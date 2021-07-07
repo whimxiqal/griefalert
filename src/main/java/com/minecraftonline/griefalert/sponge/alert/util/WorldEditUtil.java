@@ -32,6 +32,8 @@ import com.sk89q.worldedit.sponge.SpongeWorld;
 
 /**
  * A utility class to handle WorldEdit behaviors.
+ *
+ * @author PietElite
  */
 public final class WorldEditUtil {
 

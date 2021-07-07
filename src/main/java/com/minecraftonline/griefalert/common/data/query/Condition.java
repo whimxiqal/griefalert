@@ -26,6 +26,8 @@ package com.minecraftonline.griefalert.common.data.query;
 /**
  * Represents a condition used to filter database results.
  * May either be a group or a single field condition.
+ *
+ * @author viveleroi
  */
 public interface Condition {
 

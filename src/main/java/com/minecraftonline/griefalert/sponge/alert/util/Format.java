@@ -65,6 +65,8 @@ import org.spongepowered.api.world.World;
 /**
  * A utility class to format messages for the purpose of sending users
  * neat and useful information.
+ *
+ * @author PietElite
  */
 public final class Format {
 

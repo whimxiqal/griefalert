@@ -12,6 +12,8 @@ import org.spongepowered.api.text.Text;
 
 /**
  * An alert type which uses a {@link GriefEvents#ITEM_APPLY} event.
+ *
+ * @author PietElite
  */
 public class ApplyAlert extends SpongeAlert {
 

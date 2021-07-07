@@ -28,6 +28,8 @@ import java.util.Optional;
 
 /**
  * A utility class to help with optionals.
+ *
+ * @author PietElite
  */
 public final class Optionals {
 

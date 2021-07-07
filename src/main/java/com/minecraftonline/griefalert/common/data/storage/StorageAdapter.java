@@ -24,6 +24,9 @@
 
 package com.minecraftonline.griefalert.common.data.storage;
 
+/**
+ * @author viveleroi
+ */
 public interface StorageAdapter {
     /**
      * Establishes an active connection to the storage engine. Any DB

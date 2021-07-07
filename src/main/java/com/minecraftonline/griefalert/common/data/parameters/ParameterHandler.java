@@ -32,6 +32,9 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public interface ParameterHandler {
   /**
    * Returns whether this parameter is allowed for the current

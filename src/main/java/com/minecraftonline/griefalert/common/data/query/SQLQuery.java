@@ -36,6 +36,8 @@ import org.spongepowered.api.data.DataQuery;
 
 /**
  * Super simple SQL query builder.
+ *
+ * @author viveleroi
  */
 public class SQLQuery {
 

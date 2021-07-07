@@ -37,6 +37,8 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 /**
  * Magic class to help with defining a GriefAlert tool.
+ *
+ * @author PietElite
  */
 public class ToolManipulator extends AbstractBooleanData<ToolManipulator, ImmutableToolManipulator> {
   public static final DataQuery QUERY = DataQuery.of("griefalerttool");

@@ -35,7 +35,11 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class PrismCommands {
   private PrismCommands() {
   }

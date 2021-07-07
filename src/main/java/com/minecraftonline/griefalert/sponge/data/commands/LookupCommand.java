@@ -33,7 +33,11 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class LookupCommand {
   private LookupCommand() {
   }

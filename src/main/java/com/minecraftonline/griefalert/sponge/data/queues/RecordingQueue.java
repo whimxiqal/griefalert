@@ -27,6 +27,9 @@ import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.spongepowered.api.data.DataContainer;
 
+/**
+ * @author viveleroi
+ */
 public class RecordingQueue {
 
   private static final LinkedBlockingQueue<PrismRecord> queue = new LinkedBlockingQueue<>();

@@ -24,41 +24,41 @@
 
 package com.minecraftonline.griefalert.sponge.data.util;
 
-import static org.spongepowered.api.data.DataQuery.of;
-
 import org.spongepowered.api.data.DataQuery;
 
+/**
+ * @author viveleroi
+ */
 public final class DataQueries {
 
-    private DataQueries() {
-    }
+  public static final DataQuery BlockType = DataQuery.of("BlockType");
+  public static final DataQuery BlockState = DataQuery.of("BlockState");
+  public static final DataQuery Cause = DataQuery.of("Cause");
+  public static final DataQuery Container = DataQuery.of("Container");
+  public static final DataQuery ContentVersion = DataQuery.of("ContentVersion");
+  public static final DataQuery Count = DataQuery.of("Count");
+  public static final DataQuery Created = DataQuery.of("Created");
+  public static final DataQuery Entity = DataQuery.of("Entity");
+  public static final DataQuery EntityType = DataQuery.of("EntityType");
+  public static final DataQuery EventName = DataQuery.of("EventName");
+  public static final DataQuery Id = DataQuery.of("Id");
+  public static final DataQuery Location = DataQuery.of("Location");
+  public static final DataQuery OriginalBlock = DataQuery.of("Original");
+  public static final DataQuery Player = DataQuery.of("Player");
+  public static final DataQuery Position = DataQuery.of("Position");
+  public static final DataQuery Quantity = DataQuery.of("Quantity");
+  public static final DataQuery ReplacementBlock = DataQuery.of("Replacement");
+  public static final DataQuery Rotation = DataQuery.of("Rotation");
+  public static final DataQuery Target = DataQuery.of("Target");
+  public static final DataQuery UnsafeData = DataQuery.of("UnsafeData");
+  public static final DataQuery WorldName = DataQuery.of("WorldName");
+  public static final DataQuery WorldUuid = DataQuery.of("WorldUuid");
+  public static final DataQuery X = DataQuery.of("X");
+  public static final DataQuery Y = DataQuery.of("Y");
+  public static final DataQuery Z = DataQuery.of("Z");
+  // Pending cleanup from Sponge?
+  public static final DataQuery Pos = DataQuery.of("Pos");
 
-    public static final DataQuery BlockType = of("BlockType");
-    public static final DataQuery BlockState = of("BlockState");
-    public static final DataQuery Cause = of("Cause");
-    public static final DataQuery Container = of("Container");
-    public static final DataQuery ContentVersion = of("ContentVersion");
-    public static final DataQuery Count = of("Count");
-    public static final DataQuery Created = of("Created");
-    public static final DataQuery Entity = of("Entity");
-    public static final DataQuery EntityType = of("EntityType");
-    public static final DataQuery EventName = of("EventName");
-    public static final DataQuery Id = of("Id");
-    public static final DataQuery Location = of("Location");
-    public static final DataQuery OriginalBlock = of("Original");
-    public static final DataQuery Player = of("Player");
-    public static final DataQuery Position = of("Position");
-    public static final DataQuery Quantity = of("Quantity");
-    public static final DataQuery ReplacementBlock = of("Replacement");
-    public static final DataQuery Rotation = of("Rotation");
-    public static final DataQuery Target = of("Target");
-    public static final DataQuery UnsafeData = of("UnsafeData");
-    public static final DataQuery WorldName = of("WorldName");
-    public static final DataQuery WorldUuid = of("WorldUuid");
-    public static final DataQuery X = of("X");
-    public static final DataQuery Y = of("Y");
-    public static final DataQuery Z = of("Z");
-
-    // Pending cleanup from Sponge?
-    public static final DataQuery Pos = of("Pos");
+  private DataQueries() {
+  }
 }

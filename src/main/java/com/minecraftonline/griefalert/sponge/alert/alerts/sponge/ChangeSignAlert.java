@@ -8,8 +8,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.common.alert.templates.Arg;
 import com.minecraftonline.griefalert.common.alert.templates.Templates;
 import com.minecraftonline.griefalert.sponge.alert.util.Alerts;
@@ -35,6 +35,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * An alert caused by the changing of the contents of a sign.
+ *
+ * @author PietElite
  */
 public class ChangeSignAlert implements Alert {
 

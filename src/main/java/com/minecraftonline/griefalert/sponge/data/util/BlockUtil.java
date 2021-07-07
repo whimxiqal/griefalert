@@ -35,6 +35,9 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 
+/**
+ * @author viveleroi
+ */
 public class BlockUtil {
     private BlockUtil() {}
 

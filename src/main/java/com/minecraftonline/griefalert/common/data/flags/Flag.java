@@ -23,6 +23,9 @@
  */
 package com.minecraftonline.griefalert.common.data.flags;
 
+/**
+ * @author viveleroi
+ */
 public enum Flag {
     /**
      * Trigger illegal block/item drop cleanup during a rollback.

@@ -28,6 +28,9 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.spongepowered.api.data.Transaction;
 
+/**
+ * @author viveleroi
+ */
 public class ActionableResult {
   private final boolean changeWasApplied;
   private final SkipReason skipReason;

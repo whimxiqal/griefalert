@@ -35,6 +35,9 @@ import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
 
+/**
+ * @author viveleroi
+ */
 public class RecordingQueueManager implements Runnable {
 
   @Override

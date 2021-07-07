@@ -34,6 +34,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
  * A setting which is used in the Configuration.
  *
  * @param <T> the type this setting's value
+ * @author PietElite
  */
 public final class Setting<T> {
 

@@ -27,6 +27,9 @@ import com.minecraftonline.griefalert.common.data.flags.Flag;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import com.minecraftonline.griefalert.common.data.query.SQLQuery;
 
+/**
+ * @author viveleroi
+ */
 public class H2SQLQuery extends SQLQuery {
   public H2SQLQuery(String query) {
     super(query);

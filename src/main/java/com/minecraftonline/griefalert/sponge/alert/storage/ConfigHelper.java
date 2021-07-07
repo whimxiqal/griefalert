@@ -39,6 +39,8 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /**
  * A helper class to manage configuration.
+ *
+ * @author PietElite
  */
 public class ConfigHelper {
 

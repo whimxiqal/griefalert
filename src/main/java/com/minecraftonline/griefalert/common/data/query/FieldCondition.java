@@ -32,6 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Represents a condition for a specific field. May exist alone
  * in a query, or within a group.
+ *
+ * @author viveleroi
  */
 public final class FieldCondition implements Condition {
   private final DataQuery field;

@@ -41,6 +41,9 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
+/**
+ * @author viveleroi
+ */
 public class MongoStorageAdapter implements StorageAdapter {
 
   protected static String collectionEventRecordsName;

@@ -120,6 +120,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * A collection of listeners for handling events relating to the GriefAlert tool.
+ *
+ * @author PietElite
  */
 public class ToolHandler {
 

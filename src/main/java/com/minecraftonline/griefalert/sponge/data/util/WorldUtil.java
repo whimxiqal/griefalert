@@ -32,6 +32,9 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * @author viveleroi
+ */
 public class WorldUtil {
 
   private WorldUtil() {

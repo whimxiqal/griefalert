@@ -33,6 +33,8 @@ import org.spongepowered.api.Sponge;
 
 /**
  * An alert that is caused by death.
+ *
+ * @author PietElite
  */
 public class DeathAlert extends PrismAlert {
 

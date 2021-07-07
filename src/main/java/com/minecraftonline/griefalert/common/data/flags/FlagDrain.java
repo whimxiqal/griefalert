@@ -31,6 +31,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public class FlagDrain extends SimpleFlagHandler {
   /**
    * Flag which allows liquids to be drained from an applier region.

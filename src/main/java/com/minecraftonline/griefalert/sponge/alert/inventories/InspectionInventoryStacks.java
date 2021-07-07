@@ -37,6 +37,8 @@ import org.spongepowered.api.text.format.TextColors;
 /**
  * A utility class to outline all the different items that make up the
  * {@link InspectionInventory}.
+ *
+ * @author PietElite
  */
 public final class InspectionInventoryStacks {
 

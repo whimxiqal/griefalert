@@ -48,6 +48,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * <code>Alert</code> for all which derive from Prism.
+ *
+ * @author PietElite
  */
 public abstract class PrismAlert extends GeneralAlert implements Fixable {
 

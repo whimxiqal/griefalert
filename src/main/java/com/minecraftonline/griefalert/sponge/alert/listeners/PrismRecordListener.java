@@ -50,6 +50,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * A listener for Prism's event that is fired before a record is saved.
+ *
+ * @author PietElite
  */
 public class PrismRecordListener implements EventListener<PrismRecordPreSaveEvent> {
 

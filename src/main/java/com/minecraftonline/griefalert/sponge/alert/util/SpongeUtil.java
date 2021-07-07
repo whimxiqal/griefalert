@@ -40,6 +40,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * A utility class for all-things Sponge.
+ *
+ * @author PietElite
  */
 public final class SpongeUtil {
 

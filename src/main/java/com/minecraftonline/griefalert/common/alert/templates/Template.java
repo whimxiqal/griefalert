@@ -28,6 +28,8 @@ import org.spongepowered.api.text.TextTemplate;
 
 /**
  * A wrapper around a Sponge {@link TextTemplate}.
+ *
+ * @author PietElite
  */
 public class Template {
 

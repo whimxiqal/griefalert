@@ -34,6 +34,8 @@ import org.spongepowered.api.registry.CatalogRegistryModule;
 
 /**
  * A utility class to enumerate all possible {@link GriefEvent}s.
+ *
+ * @author PietElite
  */
 public final class GriefEvents {
 

@@ -26,6 +26,8 @@ package com.minecraftonline.griefalert.common.alert.templates;
 
 /**
  * A type of {@link Template} argument.
+ *
+ * @author PietElite
  */
 public enum Arg {
 

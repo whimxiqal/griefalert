@@ -40,6 +40,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+/**
+ * @author viveleroi
+ */
 public class ParameterRadius extends SimpleParameterHandler {
   private final Pattern pattern = Pattern.compile("[\\w,:-]+");
 

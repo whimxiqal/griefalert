@@ -26,6 +26,9 @@ package com.minecraftonline.griefalert.common.data.query;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author viveleroi
+ */
 public final class Query {
     private final List<Condition> conditions = new ArrayList<>();
     private int limit = 1000;

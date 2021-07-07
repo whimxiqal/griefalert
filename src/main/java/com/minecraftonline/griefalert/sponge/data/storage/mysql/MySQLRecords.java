@@ -53,6 +53,9 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
+/**
+ * @author viveleroi
+ */
 public class MySQLRecords implements StorageAdapterRecords {
 
   private final String tablePrefix = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getTablePrefix();

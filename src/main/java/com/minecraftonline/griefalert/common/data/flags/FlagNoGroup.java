@@ -31,6 +31,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public class FlagNoGroup extends SimpleFlagHandler {
   /**
    * Flag which disables record grouping.

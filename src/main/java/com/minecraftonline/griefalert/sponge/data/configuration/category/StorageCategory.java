@@ -27,6 +27,11 @@ package com.minecraftonline.griefalert.sponge.data.configuration.category;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+/**
+ * @author viveleroi
+ */
+// TODO port to new config
+@Deprecated
 @ConfigSerializable
 public class StorageCategory {
 

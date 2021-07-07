@@ -54,6 +54,8 @@ import org.spongepowered.api.text.format.TextColors;
 /**
  * A utility class to store information about an inventory menu for an inspection
  * for ease of administration and moderation while using GriefAlert.
+ *
+ * @author PietElite
  */
 public class InspectionInventory {
 

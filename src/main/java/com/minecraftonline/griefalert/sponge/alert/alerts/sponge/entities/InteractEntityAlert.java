@@ -11,6 +11,8 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 
 /**
  * An alert caused by interacting with an entity.
+ *
+ * @author PietElite
  */
 public class InteractEntityAlert extends EntityAlert {
 

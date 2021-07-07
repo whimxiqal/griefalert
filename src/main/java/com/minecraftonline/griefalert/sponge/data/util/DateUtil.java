@@ -28,6 +28,9 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author viveleroi
+ */
 public class DateUtil {
   private static final Pattern relativeTimeDeclaration = Pattern.compile("([0-9]+)(s|h|m|d|w)");
 

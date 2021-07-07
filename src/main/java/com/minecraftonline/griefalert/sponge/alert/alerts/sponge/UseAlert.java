@@ -11,6 +11,8 @@ import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 /**
  * An alert caused by "using" an item, which is really just interacting
  * with an item secondarily (right clicking).
+ *
+ * @author PietElite
  */
 public class UseAlert extends SpongeAlert {
 

@@ -35,6 +35,8 @@ import java.util.Optional;
  * Represents a complete copy of event record data from
  * a query result. Used for displaying individual entries
  * or for non-lookup actions.
+ *
+ * @author viveleroi
  */
 public class ResultComplete extends Result {
 

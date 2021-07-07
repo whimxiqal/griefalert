@@ -48,6 +48,8 @@ import org.spongepowered.api.scheduler.Task;
 
 /**
  * A collection of listeners.
+ *
+ * @author PietElite
  */
 public final class SpongeListeners {
 

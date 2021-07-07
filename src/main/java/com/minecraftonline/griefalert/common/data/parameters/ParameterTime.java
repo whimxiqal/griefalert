@@ -40,6 +40,9 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
+/**
+ * @author viveleroi
+ */
 public class ParameterTime extends SimpleParameterHandler {
   private final Pattern pattern = Pattern.compile("[\\w,:-]+");
 

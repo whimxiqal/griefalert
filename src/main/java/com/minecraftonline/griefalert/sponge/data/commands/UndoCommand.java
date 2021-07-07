@@ -39,7 +39,11 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.BlockChangeFlags;
 
+/**
+ * @author viveleroi
+ */
 // TODO remove
+@Deprecated
 public class UndoCommand {
   private UndoCommand() {
   }
