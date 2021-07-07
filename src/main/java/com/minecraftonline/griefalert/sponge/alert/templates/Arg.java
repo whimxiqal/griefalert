@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.alert.templates;
+package com.minecraftonline.griefalert.sponge.alert.templates;
 
 /**
  * A type of {@link Template} argument.
