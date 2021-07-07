@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.alert.templates;
+package com.minecraftonline.griefalert.sponge.alert.templates;
 
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
 import org.spongepowered.api.text.TextTemplate;

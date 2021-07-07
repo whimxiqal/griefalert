@@ -25,7 +25,7 @@
 package com.minecraftonline.griefalert.sponge.data.commands;
 
 import com.google.common.collect.Lists;
-import com.minecraftonline.griefalert.common.data.records.ActionableResult;
+import com.minecraftonline.griefalert.sponge.data.records.ActionableResult;
 import com.minecraftonline.griefalert.sponge.data.util.Format;
 import java.util.HashMap;
 import java.util.List;

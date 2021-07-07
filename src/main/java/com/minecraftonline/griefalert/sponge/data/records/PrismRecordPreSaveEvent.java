@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.data.records;
+package com.minecraftonline.griefalert.sponge.data.records;
 
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.event.Cancellable;

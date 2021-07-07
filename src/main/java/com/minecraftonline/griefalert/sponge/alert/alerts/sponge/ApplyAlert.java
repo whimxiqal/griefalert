@@ -4,14 +4,14 @@ package com.minecraftonline.griefalert.sponge.alert.alerts.sponge;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.text.Text;
 
 /**
- * An alert type which uses a {@link GriefEvents#ITEM_APPLY} event.
+ * An alert type which uses a {@link GriefEvent#ITEM_APPLY} event.
  *
  * @author PietElite
  */

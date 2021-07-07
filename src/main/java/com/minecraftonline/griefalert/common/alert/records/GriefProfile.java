@@ -29,8 +29,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.common.alert.services.AlertService;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
@@ -86,7 +86,7 @@ public final class GriefProfile implements Serializable {
    */
   @NotNull
   public GriefEvent getGriefEvent() {
-    return Sponge.getRegistry().getType(GriefEvent.class, eventId)
+    return GriefEvent.getRegistry().getOptional(eventId)
         .orElseThrow(() -> new RuntimeException(
             "GriefProfile contained an invalid GriefEvent id: "
                 + eventId));

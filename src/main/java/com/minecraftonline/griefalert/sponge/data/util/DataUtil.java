@@ -33,7 +33,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
-import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.sponge.data.records.Result;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;

@@ -25,13 +25,13 @@
 package com.minecraftonline.griefalert.sponge.alert.listeners;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.sponge.alert.alerts.sponge.ApplyAlert;
 import com.minecraftonline.griefalert.sponge.alert.alerts.sponge.ChangeSignAlert;
 import com.minecraftonline.griefalert.sponge.alert.alerts.sponge.InteractBlockAlert;
 import com.minecraftonline.griefalert.sponge.alert.alerts.sponge.UseAlert;
 import com.minecraftonline.griefalert.sponge.alert.alerts.sponge.entities.AttackEntityAlert;
 import com.minecraftonline.griefalert.sponge.alert.alerts.sponge.entities.InteractEntityAlert;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -73,7 +73,7 @@ public final class SpongeListeners {
       SpongeGriefAlert.getSpongeInstance()
           .getProfileCache()
           .getProfileOf(
-              GriefEvents.ITEM_USE,
+              GriefEvent.ITEM_USE,
               event.getItemStack().getType().getId(),
               player.getLocation().getExtent())
           .ifPresent((profile) ->
@@ -96,7 +96,7 @@ public final class SpongeListeners {
       SpongeGriefAlert.getSpongeInstance()
           .getProfileCache()
           .getProfileOf(
-              GriefEvents.INTERACT,
+              GriefEvent.INTERACT,
               event.getTargetBlock().getState().getType().getId(),
               player.getLocation().getExtent())
           .ifPresent(profile ->
@@ -109,7 +109,7 @@ public final class SpongeListeners {
       player.getItemInHand(HandTypes.MAIN_HAND)
           .flatMap(stack -> SpongeGriefAlert.getSpongeInstance()
               .getProfileCache().getProfileOf(
-                  GriefEvents.ITEM_APPLY,
+                  GriefEvent.ITEM_APPLY,
                   stack.getType().getId(),
                   player.getLocation().getExtent()))
           .ifPresent(profile ->
@@ -132,7 +132,7 @@ public final class SpongeListeners {
       SpongeGriefAlert.getSpongeInstance()
           .getProfileCache()
           .getProfileOf(
-              GriefEvents.INTERACT,
+              GriefEvent.INTERACT,
               event.getTargetEntity().getType().getId(),
               player.getLocation().getExtent())
           .ifPresent((profile) ->
@@ -164,7 +164,7 @@ public final class SpongeListeners {
           SpongeGriefAlert.getSpongeInstance()
               .getProfileCache()
               .getProfileOf(
-                  GriefEvents.ATTACK,
+                  GriefEvent.ATTACK,
                   event.getTargetEntity().getType().getId(),
                   player.getLocation().getExtent())
               .ifPresent(profile ->
@@ -183,7 +183,7 @@ public final class SpongeListeners {
         SpongeGriefAlert.getSpongeInstance()
             .getProfileCache()
             .getProfileOf(
-                GriefEvents.ATTACK,
+                GriefEvent.ATTACK,
                 event.getTargetEntity().getType().getId(),
                 player.getLocation().getExtent())
             .ifPresent(profile ->
@@ -210,7 +210,7 @@ public final class SpongeListeners {
             SpongeGriefAlert.getSpongeInstance()
                 .getProfileCache()
                 .getProfileOf(
-                    GriefEvents.EDIT,
+                    GriefEvent.EDIT,
                     event.getTargetTile().getBlock().getType().getId(),
                     player.getLocation().getExtent()))
         .ifPresent(griefProfile ->

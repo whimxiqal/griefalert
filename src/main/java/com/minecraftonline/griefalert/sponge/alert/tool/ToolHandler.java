@@ -78,10 +78,10 @@ import com.google.common.collect.Lists;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
 import com.minecraftonline.griefalert.common.data.services.DataRequest;
 import com.minecraftonline.griefalert.common.data.services.DataService;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.util.Format;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Permissions;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Settings;
-import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -219,8 +219,8 @@ public class ToolHandler {
               Task.builder().async().execute(() -> {
                 DataRequest.Builder builder = DataRequest.builder()
                     .setLatest(Date.from(Instant.now()))
-                    .addEvent(PrismEvents.BLOCK_BREAK)
-                    .addEvent(PrismEvents.BLOCK_PLACE)
+                    .addEvent(PrismEvent.BLOCK_BREAK)
+                    .addEvent(PrismEvent.BLOCK_PLACE)
                     .setxRange(location.getBlockX(), location.getBlockX())
                     .setyRange(location.getBlockY(), location.getBlockY())
                     .setzRange(location.getBlockZ(), location.getBlockZ())

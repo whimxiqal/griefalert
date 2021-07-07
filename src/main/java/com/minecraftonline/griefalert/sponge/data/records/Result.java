@@ -22,12 +22,11 @@
  * THE SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.data.records;
+package com.minecraftonline.griefalert.sponge.data.records;
 
 import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import org.apache.commons.lang3.StringUtils;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 
 /**
@@ -53,11 +52,11 @@ public abstract class Result {
     }
 
     // Pull record class for this event, if any
-    Class<? extends Result> resultRecordClass = Sponge.getRegistry().getType(PrismEvent.class, id)
-        .map(PrismEvent::getResultClass)
-        .orElseThrow(() -> new UnsupportedOperationException(id + " is not supported"));
-
-    return resultRecordClass.newInstance();
+    PrismEvent event = PrismEvent.getRegistry().get(id);
+    if (event == null) {
+      throw new UnsupportedOperationException(id + " is not supported");
+    }
+    return event.getResultClass().newInstance();
   }
 
   /**
@@ -67,7 +66,7 @@ public abstract class Result {
    */
   public String getEventVerb() {
     String id = getEventId();
-    PrismEvent event = Sponge.getRegistry().getType(PrismEvent.class, id).orElse(null);
+    PrismEvent event = PrismEvent.getRegistry().get(id);
     if (event != null) {
       if (StringUtils.isNotBlank(event.getPastTense())) {
         return event.getPastTense();
@@ -97,7 +96,7 @@ public abstract class Result {
    */
   public String getEventName() {
     String id = getEventId();
-    PrismEvent event = Sponge.getRegistry().getType(PrismEvent.class, id).orElse(null);
+    PrismEvent event = PrismEvent.getRegistry().get(id);
     if (event != null && StringUtils.isNotBlank(event.getName())) {
       return event.getName();
     }

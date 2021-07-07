@@ -24,50 +24,62 @@
 
 package com.minecraftonline.griefalert.common.data.struct;
 
-import com.minecraftonline.griefalert.common.data.records.Result;
-import javax.annotation.Nonnull;
-import org.spongepowered.api.CatalogType;
+import com.minecraftonline.griefalert.common.bridge.EnumRegistry;
+import com.minecraftonline.griefalert.sponge.data.records.BlockResult;
+import com.minecraftonline.griefalert.sponge.data.records.EntityResult;
+import com.minecraftonline.griefalert.sponge.data.records.Result;
+import com.minecraftonline.griefalert.sponge.data.records.ResultComplete;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * An event type that is logged in database.
+ *
  * @author viveleroi
+ * @author PietElite
  */
-public class PrismEvent implements CatalogType {
+public enum PrismEvent {
 
+  BLOCK_BREAK("break", "Block Break", "broke", BlockResult.class),
+  BLOCK_DECAY("decay", "Block Decay", "decayed", BlockResult.class),
+  BLOCK_GROW("grow", "Block Grow", "grew", BlockResult.class),
+  BLOCK_PLACE("place", "Block Place", "placed", BlockResult.class),
+  ENTITY_DEATH("death", "Entity Death", "killed", EntityResult.class),
+  COMMAND_EXECUTE("command", "Command Execute", "executed", ResultComplete.class),
+  INVENTORY_CLOSE("close", "Inventory Close", "closed", ResultComplete.class),
+  INVENTORY_OPEN("open", "Inventory Open", "opened", ResultComplete.class),
+  ITEM_DROP("drop", "Item Drop", "dropped", ResultComplete.class),
+  ITEM_INSERT("insert", "Item Insert", "inserted", ResultComplete.class),
+  ITEM_PICKUP("pickup", "Item Pickup", "picked up", ResultComplete.class),
+  ITEM_REMOVE("remove", "Item Remove", "removed", ResultComplete.class),
+  PLAYER_DISCONNECT("disconnect", "Player Disconnect", "left", ResultComplete.class),
+  PLAYER_JOIN("join", "Player Join", "joined", ResultComplete.class);
+
+  @Getter
+  @NotNull
+  private static final EnumRegistry<PrismEvent> registry = new EnumRegistry<>(event ->
+      event.id, PrismEvent.class);
+  @Getter
+  @NotNull
   private final String id;
+  @Getter
+  @NotNull
   private final String name;
+  @Getter
+  @NotNull
   private final String pastTense;
+  @Getter
+  @NotNull
   private final Class<? extends Result> resultClass;
 
-  private PrismEvent(@Nonnull String id, @Nonnull String name, @Nonnull String pastTense, @Nonnull Class<? extends Result> resultClass) {
+  PrismEvent(@NotNull String id,
+             @NotNull String name,
+             @NotNull String pastTense,
+             @NotNull Class<? extends Result> resultClass) {
     this.id = id;
     this.name = name;
     this.pastTense = pastTense;
     this.resultClass = resultClass;
   }
 
-  public static PrismEvent of(@Nonnull String id, @Nonnull String name, @Nonnull String pastTense, @Nonnull Class<? extends Result> resultClass) {
-    return new PrismEvent(id, name, pastTense, resultClass);
-  }
-
-  @Override
-  @Nonnull
-  public String getId() {
-    return id;
-  }
-
-  @Override
-  @Nonnull
-  public String getName() {
-    return name;
-  }
-
-  @Nonnull
-  public String getPastTense() {
-    return pastTense;
-  }
-
-  @Nonnull
-  public Class<? extends Result> getResultClass() {
-    return resultClass;
-  }
 }

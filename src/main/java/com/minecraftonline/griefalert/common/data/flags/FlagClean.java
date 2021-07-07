@@ -26,36 +26,35 @@ package com.minecraftonline.griefalert.common.data.flags;
 import com.google.common.collect.ImmutableList;
 import com.minecraftonline.griefalert.common.data.query.Query;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
-import org.spongepowered.api.command.CommandSource;
-
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * @author viveleroi
  */
 public class FlagClean extends SimpleFlagHandler {
-    /**
-     * Flag which allows illegal blocks/item entities to be drained from an applier region.
-     */
-    public FlagClean() {
-        super(ImmutableList.of("clean"));
-    }
+  /**
+   * Flag which allows illegal blocks/item entities to be drained from an applier region.
+   */
+  public FlagClean() {
+    super(ImmutableList.of("clean"));
+  }
 
-    @Override
-    public boolean acceptsSource(@Nullable CommandSource source) {
-        return true;
-    }
+  @Override
+  public boolean acceptsSource(@Nullable CommandSource source) {
+    return true;
+  }
 
-    @Override
-    public boolean acceptsValue(String value) {
-        return true;
-    }
+  @Override
+  public boolean acceptsValue(String value) {
+    return true;
+  }
 
-    @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, @Nullable String value, Query query) {
-        session.addFlag(Flag.CLEAN);
-        return Optional.empty();
-    }
+  @Override
+  public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, @Nullable String value, Query query) {
+    session.addFlag(Flag.CLEAN);
+    return Optional.empty();
+  }
 }

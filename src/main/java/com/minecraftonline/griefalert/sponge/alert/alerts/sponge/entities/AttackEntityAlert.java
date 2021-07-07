@@ -5,7 +5,6 @@ package com.minecraftonline.griefalert.sponge.alert.alerts.sponge.entities;
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
 import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
 import com.minecraftonline.griefalert.sponge.alert.util.Format;
 import java.util.UUID;

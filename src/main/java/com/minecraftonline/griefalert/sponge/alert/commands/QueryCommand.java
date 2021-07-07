@@ -67,7 +67,7 @@ public class QueryCommand extends GeneralCommand {
         .valueFlag(
             GenericArguments.string(CommandKeys.TARGET.get()), "t")
         .valueFlag(
-            GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class), "e")
+            GenericArguments.choices(CommandKeys.GA_EVENT.get(), GriefEvent.getRegistry().toMap()), "e")
         .valueFlag(
             GenericArguments.integer(CommandKeys.MAXIMUM.get()), "m")
         .flag("s")

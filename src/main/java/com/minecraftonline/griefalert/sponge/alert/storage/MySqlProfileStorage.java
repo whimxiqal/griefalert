@@ -25,7 +25,6 @@
 package com.minecraftonline.griefalert.sponge.alert.storage;
 
 import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
 import com.minecraftonline.griefalert.common.alert.storage.ProfileStorage;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Settings;
@@ -154,10 +153,7 @@ public class MySqlProfileStorage implements ProfileStorage {
     ResultSet rs = connection.prepareStatement(command).executeQuery();
 
     while (rs.next()) {
-      GriefEvent event = GriefEvents.REGISTRY_MODULE
-          .getById(rs.getString(1))
-          .orElseThrow(() -> new RuntimeException(
-              "Saved GriefEvent ID in MySQL database does not match any GriefEvent."));
+      GriefEvent event = GriefEvent.getRegistry().require(rs.getString(1));
 
       final GriefProfile.Builder profileBuilder = GriefProfile.builder(event, rs.getString(2));
 

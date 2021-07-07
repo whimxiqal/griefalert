@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.data.records;
+package com.minecraftonline.griefalert.sponge.data.records;
 
 import com.google.common.base.Preconditions;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
@@ -32,7 +32,6 @@ import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import com.minecraftonline.griefalert.sponge.data.util.DataUtil;
 import java.util.Date;
 import java.util.Optional;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
@@ -352,7 +351,6 @@ public class PrismRecord {
      * @return A new prism record
      */
     public PrismRecord build() {
-      Preconditions.checkState(Sponge.getRegistry().getType(PrismEvent.class, getEvent()).isPresent(), getEvent() + " is not registered");
       return new PrismRecord(getEvent(), getSource(), getDataContainer());
     }
 

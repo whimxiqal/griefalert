@@ -30,7 +30,7 @@ import com.minecraftonline.griefalert.common.data.flags.Flag;
 import com.minecraftonline.griefalert.common.data.query.Query;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import com.minecraftonline.griefalert.common.data.query.SQLQuery;
-import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.sponge.data.records.Result;
 import com.minecraftonline.griefalert.common.data.storage.StorageAdapterRecords;
 import com.minecraftonline.griefalert.common.data.storage.StorageDeleteResult;
 import com.minecraftonline.griefalert.common.data.storage.StorageWriteResult;

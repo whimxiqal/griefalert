@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.alert.events;
+package com.minecraftonline.griefalert.sponge.alert.events;
 
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
 import java.util.UUID;

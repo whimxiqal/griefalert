@@ -29,11 +29,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.minecraftonline.griefalert.common.GriefAlert;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.alert.services.AlertService;
 import com.minecraftonline.griefalert.common.alert.storage.InspectionStorage;
 import com.minecraftonline.griefalert.common.alert.storage.ProfileStorage;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.common.data.filters.FilterList;
 import com.minecraftonline.griefalert.common.data.filters.FilterMode;
 import com.minecraftonline.griefalert.common.data.flags.FlagClean;
@@ -49,8 +48,6 @@ import com.minecraftonline.griefalert.common.data.parameters.ParameterHandler;
 import com.minecraftonline.griefalert.common.data.parameters.ParameterPlayer;
 import com.minecraftonline.griefalert.common.data.parameters.ParameterRadius;
 import com.minecraftonline.griefalert.common.data.parameters.ParameterTime;
-import com.minecraftonline.griefalert.common.data.records.ActionableResult;
-import com.minecraftonline.griefalert.common.data.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.common.data.services.DataService;
 import com.minecraftonline.griefalert.common.data.services.DataServiceImpl;
 import com.minecraftonline.griefalert.common.data.storage.StorageAdapter;
@@ -76,6 +73,7 @@ import com.minecraftonline.griefalert.sponge.alert.tool.ToolManipulator;
 import com.minecraftonline.griefalert.sponge.alert.util.General;
 import com.minecraftonline.griefalert.sponge.alert.util.Reference;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Settings;
+import com.minecraftonline.griefalert.sponge.bridge.SpongeCommonLogger;
 import com.minecraftonline.griefalert.sponge.data.commands.PrismCommands;
 import com.minecraftonline.griefalert.sponge.data.configuration.Config;
 import com.minecraftonline.griefalert.sponge.data.configuration.Configuration;
@@ -84,11 +82,11 @@ import com.minecraftonline.griefalert.sponge.data.listeners.EntityListener;
 import com.minecraftonline.griefalert.sponge.data.listeners.InventoryListener;
 import com.minecraftonline.griefalert.sponge.data.listeners.RequiredInteractListener;
 import com.minecraftonline.griefalert.sponge.data.queues.RecordingQueueManager;
+import com.minecraftonline.griefalert.sponge.data.records.ActionableResult;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecordPreSaveEvent;
 import com.minecraftonline.griefalert.sponge.data.storage.h2.H2StorageAdapter;
 import com.minecraftonline.griefalert.sponge.data.storage.mongodb.MongoStorageAdapter;
 import com.minecraftonline.griefalert.sponge.data.storage.mysql.MySQLStorageAdapter;
-import com.minecraftonline.griefalert.sponge.bridge.SpongeCommonLogger;
-import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -142,53 +140,67 @@ public final class SpongeGriefAlert extends GriefAlert {
   private static SpongeGriefAlert spongeInstance;
 
   // Injected features directly from Sponge
-
+  private final Set<UUID> activeWands = Sets.newHashSet();
+  private final FilterList filterList = new FilterList(FilterMode.BLACKLIST);
+  private final Set<FlagHandler> flagHandlers = Sets.newHashSet();
+  private final Map<UUID, List<ActionableResult>> lastActionResults = Maps.newHashMap();
+  private final Set<ParameterHandler> parameterHandlers = Sets.newHashSet();
+  private final Set<PrismEvent> prismEvents = Sets.newHashSet();
+  private final RecordingQueueManager recordingQueueManager = new RecordingQueueManager();
   @Inject
   @Getter
   private Logger logger;
-
   @Inject
   @Getter
   private PluginContainer pluginContainer;
-
   @Inject
   @DefaultConfig(sharedRoot = false)
   @Getter
   private ConfigurationLoader<CommentedConfigurationNode> configManager;
-
   /**
    * The root node of the configuration file, using the configuration manager.
    */
 
   private CommentedConfigurationNode rootNode;
-
   @Inject
   @ConfigDir(sharedRoot = false)
-  @Getter private File configDirectory;
-
+  @Getter
+  private File configDirectory;
   @Inject
   @DefaultConfig(sharedRoot = false)
-  @Getter private Path defaultConfig;
-
+  @Getter
+  private Path defaultConfig;
   @Inject
-  @Getter private PluginContainer container;
-
+  @Getter
+  private PluginContainer container;
   // Services
-  @Getter private DataService dataService;
-  @Getter private AlertService alertService;
-
+  @Getter
+  private DataService dataService;
+  @Getter
+  private AlertService alertService;
   // Custom classes to help manage plugin
-  @Getter private ProfileCache profileCache;
-  @Getter private ConfigHelper configHelper;
-  @Getter private ProfileStorage profileStorage;
-  @Getter private HologramManager hologramManager;
-  @Getter private InspectionStorage inspectionStorage;
-  @Getter private ToolHandler toolHandler;
+  @Getter
+  private ProfileCache profileCache;
+  @Getter
+  private ConfigHelper configHelper;
+  @Getter
+  private ProfileStorage profileStorage;
+  @Getter
+  private HologramManager hologramManager;
+  @Getter
+  private InspectionStorage inspectionStorage;
+  @Getter
+  private ToolHandler toolHandler;
+  private Configuration configuration;
+  private StorageAdapter storageAdapter;
 
   @Listener
   public void onConstruction(GameConstructionEvent event) {
     spongeInstance = this;
-    registerCatalogTypes();
+
+    // Initialize enum registries
+    PrismEvent.getRegistry().initialize();
+    GriefEvent.getRegistry().initialize();
 
     // Common GriefAlert instance information
     this.commonLogger = new SpongeCommonLogger(this.logger);
@@ -196,7 +208,6 @@ public final class SpongeGriefAlert extends GriefAlert {
 
     // OLD PRISM CODE
     configuration = new Configuration(getDefaultConfig());
-    Sponge.getRegistry().registerModule(PrismEvent.class, PrismEvents.REGISTRY_MODULE);
   }
 
   /**
@@ -286,6 +297,8 @@ public final class SpongeGriefAlert extends GriefAlert {
         new AlertServiceImpl());
   }
 
+  // === OLD PRISM CODE ===
+
   @Listener
   public void onLoadComplete(GameLoadCompleteEvent event) {
     hologramManager = new HologramManager();
@@ -372,25 +385,9 @@ public final class SpongeGriefAlert extends GriefAlert {
     SpongeListeners.register(this);
   }
 
-  private void registerCatalogTypes() {
-    Sponge.getRegistry().registerModule(GriefEvent.class, GriefEvents.REGISTRY_MODULE);
-  }
-
   public File getDataDirectory() {
     return new File(configDirectory.getParentFile().getParentFile().getPath() + "/" + "griefalert");
   }
-
-  // === OLD PRISM CODE ===
-
-  private Configuration configuration;
-  private StorageAdapter storageAdapter;
-  private final Set<UUID> activeWands = Sets.newHashSet();
-  private final FilterList filterList = new FilterList(FilterMode.BLACKLIST);
-  private final Set<FlagHandler> flagHandlers = Sets.newHashSet();
-  private final Map<UUID, List<ActionableResult>> lastActionResults = Maps.newHashMap();
-  private final Set<ParameterHandler> parameterHandlers = Sets.newHashSet();
-  private final Set<PrismEvent> prismEvents = Sets.newHashSet();
-  private final RecordingQueueManager recordingQueueManager = new RecordingQueueManager();
 
   @Listener
   public void onPreInitialization(GamePreInitializationEvent event) {
