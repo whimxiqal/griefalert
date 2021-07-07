@@ -48,7 +48,7 @@ public class Configuration {
             this.configurationLoader = HoconConfigurationLoader.builder().setPath(path).build();
             this.objectMapper = ObjectMapper.forClass(com.helion3.prism.configuration.Config.class).bindToNew();
         } catch (Exception ex) {
-            Prism.getInstance().getLogger().error("Encountered an error while initializing configuration", ex);
+            SpongeGriefAlert.getSpongeInstance().getLogger().error("Encountered an error while initializing configuration", ex);
         }
     }
 
@@ -57,15 +57,15 @@ public class Configuration {
             ConfigurationNode configurationNode = getConfigurationLoader().load();
 
             if (!configurationNode.isVirtual() && configurationNode.getNode("general", "schema-version").isVirtual()) {
-                Prism.getInstance().getLogger().info("Converting Configuration...");
+                SpongeGriefAlert.getSpongeInstance().getLogger().info("Converting Configuration...");
                 convertConfiguration(configurationNode);
             } else {
                 getObjectMapper().populate(configurationNode);
             }
 
-            Prism.getInstance().getLogger().info("Successfully loaded configuration file.");
+            SpongeGriefAlert.getSpongeInstance().getLogger().info("Successfully loaded configuration file.");
         } catch (Exception ex) {
-            Prism.getInstance().getLogger().error("Encountered an error while loading config", ex);
+            SpongeGriefAlert.getSpongeInstance().getLogger().error("Encountered an error while loading config", ex);
         }
     }
 
@@ -74,9 +74,9 @@ public class Configuration {
             ConfigurationNode configurationNode = getConfigurationLoader().createEmptyNode();
             getObjectMapper().serialize(configurationNode);
             getConfigurationLoader().save(configurationNode);
-            Prism.getInstance().getLogger().info("Successfully saved configuration file.");
+            SpongeGriefAlert.getSpongeInstance().getLogger().info("Successfully saved configuration file.");
         } catch (Exception ex) {
-            Prism.getInstance().getLogger().error("Encountered an error while saving config", ex);
+            SpongeGriefAlert.getSpongeInstance().getLogger().error("Encountered an error while saving config", ex);
         }
     }
 

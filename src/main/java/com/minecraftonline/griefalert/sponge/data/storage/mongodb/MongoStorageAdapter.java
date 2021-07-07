@@ -57,7 +57,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      *
      */
     public MongoStorageAdapter() {
-        databaseName = Prism.getInstance().getConfig().getStorageCategory().getDatabase();
+        databaseName = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getDatabase();
 
         // Collections
         collectionEventRecordsName = "records";
@@ -72,12 +72,12 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     @Override
     public boolean connect() throws Exception {
-        ServerAddress address = new ServerAddress(Prism.getInstance().getConfig().getStorageCategory().getAddress(), ServerAddress.defaultPort());
+        ServerAddress address = new ServerAddress(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getAddress(), ServerAddress.defaultPort());
 
         MongoCredential credential = MongoCredential.createCredential(
-                Prism.getInstance().getConfig().getStorageCategory().getUsername(),
+                SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getUsername(),
                 databaseName,
-                Prism.getInstance().getConfig().getStorageCategory().getPassword().toCharArray()
+                SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getPassword().toCharArray()
         );
 
         CodecRegistry codecRegistry = CodecRegistries.fromRegistries(

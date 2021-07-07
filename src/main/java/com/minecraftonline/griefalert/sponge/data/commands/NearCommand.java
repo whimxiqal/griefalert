@@ -43,7 +43,7 @@ public class NearCommand {
             .description(Text.of("Alias of /pr l r:(default radius)"))
             .permission("prism.lookup")
             .executor((source, args) -> {
-                int radius = Prism.getInstance().getConfig().getDefaultCategory().getRadius();
+                int radius = SpongeGriefAlert.getSpongeInstance().getConfig().getDefaultCategory().getRadius();
 
                 source.sendMessage(Format.heading("Querying records..."));
 

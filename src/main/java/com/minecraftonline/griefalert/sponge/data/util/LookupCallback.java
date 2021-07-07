@@ -80,7 +80,7 @@ public class LookupCallback extends AsyncCallback {
   @Override
   public void error(Exception ex) {
     this.querySession.getCommandSource().sendMessage(com.helion3.prism.util.Format.error("An error occurred. Please see the console."));
-    Prism.getInstance().getLogger().error("Exception thrown by {}", getClass().getSimpleName(), ex);
+    SpongeGriefAlert.getSpongeInstance().getLogger().error("Exception thrown by {}", getClass().getSimpleName(), ex);
   }
 
   private Text buildResult(Result result) {

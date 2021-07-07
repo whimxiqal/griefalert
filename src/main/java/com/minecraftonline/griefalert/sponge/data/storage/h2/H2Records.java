@@ -55,7 +55,7 @@ import com.helion3.prism.util.DataUtil;
 
 public class H2Records implements StorageAdapterRecords {
 
-    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
+    private final String tablePrefix = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getTablePrefix();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
@@ -134,7 +134,7 @@ public class H2Records implements StorageAdapterRecords {
         CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
         SQLQuery query = H2SQLQuery.from(session);
-        Prism.getInstance().getLogger().debug("H2 SQL Query: " + query);
+        SpongeGriefAlert.getSpongeInstance().getLogger().debug("H2 SQL Query: " + query);
 
         try (Connection conn = H2StorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
             List<UUID> uuidsPendingLookup = new ArrayList<>();
@@ -169,7 +169,7 @@ public class H2Records implements StorageAdapterRecords {
                                 data.set(key, extra.get(key).get());
                             }
                         } catch (Exception ex) {
-                            Prism.getInstance().getLogger().error("Failed to deserialize {} at {}", target, loc.toString());
+                            SpongeGriefAlert.getSpongeInstance().getLogger().error("Failed to deserialize {} at {}", target, loc.toString());
                             throw ex;
                         }
                     }

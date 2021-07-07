@@ -59,7 +59,7 @@ import com.helion3.prism.util.TypeUtil;
 
 public class MySQLRecords implements StorageAdapterRecords {
 
-    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
+    private final String tablePrefix = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getTablePrefix();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
@@ -119,7 +119,7 @@ public class MySQLRecords implements StorageAdapterRecords {
             }
 
             if (containers.size() != extraData.size()) {
-                Prism.getInstance().getLogger().debug("Container has more information than we have extra entries for.");
+                SpongeGriefAlert.getSpongeInstance().getLogger().debug("Container has more information than we have extra entries for.");
             }
 
             writeExtraData(extraDataMap);
@@ -159,7 +159,7 @@ public class MySQLRecords implements StorageAdapterRecords {
 
         // Build query
         SQLQuery query = MySQLQuery.from(session);
-        Prism.getInstance().getLogger().debug("MySQL Query: " + query);
+        SpongeGriefAlert.getSpongeInstance().getLogger().debug("MySQL Query: " + query);
 
         try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
@@ -193,7 +193,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                                 data.set(key, extra.get(key).get());
                             }
                         } catch (Exception ex) {
-                            Prism.getInstance().getLogger().error("Failed to deserialize {} at {}", target, loc.toString());
+                            SpongeGriefAlert.getSpongeInstance().getLogger().error("Failed to deserialize {} at {}", target, loc.toString());
                             throw ex;
                         }
                     }

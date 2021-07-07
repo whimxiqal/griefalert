@@ -24,11 +24,11 @@
 
 package com.minecraftonline.griefalert.sponge.data.configuration;
 
-import com.helion3.prism.configuration.category.DefaultCategory;
-import com.helion3.prism.configuration.category.EventCategory;
-import com.helion3.prism.configuration.category.GeneralCategory;
-import com.helion3.prism.configuration.category.LimitCategory;
-import com.helion3.prism.configuration.category.StorageCategory;
+import com.minecraftonline.griefalert.sponge.data.configuration.category.DefaultCategory;
+import com.minecraftonline.griefalert.sponge.data.configuration.category.EventCategory;
+import com.minecraftonline.griefalert.sponge.data.configuration.category.GeneralCategory;
+import com.minecraftonline.griefalert.sponge.data.configuration.category.LimitCategory;
+import com.minecraftonline.griefalert.sponge.data.configuration.category.StorageCategory;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 

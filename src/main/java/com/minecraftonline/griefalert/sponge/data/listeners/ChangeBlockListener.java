@@ -56,22 +56,22 @@ public class ChangeBlockListener {
         }
 
         if (event.getCause().allOf(PluginContainer.class).stream().map(PluginContainer::getId).anyMatch(id ->
-                Prism.getInstance().getConfig().getGeneralCategory().getBlacklist().contains(id))) {
+                SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().getBlacklist().contains(id))) {
             // Don't do anything
             return;
         }
 
-        if (event.getCause().first(Player.class).map(Player::getUniqueId).map(Prism.getInstance().getActiveWands()::contains).orElse(false)) {
+        if (event.getCause().first(Player.class).map(Player::getUniqueId).map(SpongeGriefAlert.getSpongeInstance().getActiveWands()::contains).orElse(false)) {
             // Cancel and exit event here, not supposed to place/track a block with an active wand.
             event.setCancelled(true);
             return;
         }
 
         if (event.getTransactions().isEmpty()
-                || (!Prism.getInstance().getConfig().getEventCategory().isBlockBreak()
-                && !Prism.getInstance().getConfig().getEventCategory().isBlockDecay()
-                && !Prism.getInstance().getConfig().getEventCategory().isBlockGrow()
-                && !Prism.getInstance().getConfig().getEventCategory().isBlockPlace())) {
+                || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockBreak()
+                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockDecay()
+                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockGrow()
+                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockPlace())) {
             return;
         }
 
@@ -90,7 +90,7 @@ public class ChangeBlockListener {
                     .location(transaction.getOriginal().getLocation().get());
 
             if (event instanceof ChangeBlockEvent.Break) {
-                if (!Prism.getInstance().getConfig().getEventCategory().isBlockBreak()
+                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockBreak()
                         || BlockUtil.rejectBreakCombination(originalBlockType, finalBlockType)
                         || EventUtil.rejectBreakEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
                     continue;
@@ -101,7 +101,7 @@ public class ChangeBlockListener {
                         .target(originalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else if (event instanceof ChangeBlockEvent.Decay) {
-                if (!Prism.getInstance().getConfig().getEventCategory().isBlockDecay()) {
+                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockDecay()) {
                     continue;
                 }
 
@@ -110,7 +110,7 @@ public class ChangeBlockListener {
                         .target(originalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else if (event instanceof ChangeBlockEvent.Grow) {
-                if (!Prism.getInstance().getConfig().getEventCategory().isBlockGrow()) {
+                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockGrow()) {
                     continue;
                 }
 
@@ -119,7 +119,7 @@ public class ChangeBlockListener {
                         .target(finalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else /* if (event instanceof ChangeBlockEvent.Place) */ {
-                if (!Prism.getInstance().getConfig().getEventCategory().isBlockPlace()
+                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockPlace()
                         || BlockUtil.rejectPlaceCombination(originalBlockType, finalBlockType)
                         || EventUtil.rejectPlaceEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
                     continue;

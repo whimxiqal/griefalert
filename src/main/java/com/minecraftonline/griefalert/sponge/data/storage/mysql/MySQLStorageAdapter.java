@@ -41,9 +41,9 @@ import org.spongepowered.api.scheduler.Task;
 
 public class MySQLStorageAdapter implements StorageAdapter {
 
-    private final String expiration = Prism.getInstance().getConfig().getStorageCategory().getExpireRecords();
-    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
-    private final int purgeBatchLimit = Prism.getInstance().getConfig().getStorageCategory().getPurgeBatchLimit();
+    private final String expiration = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getExpireRecords();
+    private final String tablePrefix = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getTablePrefix();
+    private final int purgeBatchLimit = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getPurgeBatchLimit();
     private final StorageAdapterRecords records;
     private static HikariDataSource db;
     private final String dns;
@@ -55,8 +55,8 @@ public class MySQLStorageAdapter implements StorageAdapter {
         records = new MySQLRecords();
 
         dns = String.format("jdbc:mysql://%s/%s",
-                Prism.getInstance().getConfig().getStorageCategory().getAddress(),
-                Prism.getInstance().getConfig().getStorageCategory().getDatabase()
+                SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getAddress(),
+                SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getDatabase()
         );
     }
 
@@ -76,18 +76,18 @@ public class MySQLStorageAdapter implements StorageAdapter {
             // Get data source
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(dns);
-            String mysqlDriver = Prism.getInstance().getConfig().getStorageCategory().getMysqlDriver();
+            String mysqlDriver = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getMysqlDriver();
             if (mysqlDriver.equalsIgnoreCase("MySQL")) {
                 config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             } else if (mysqlDriver.equalsIgnoreCase("MariaDB")) {
                 config.setDriverClassName("org.mariadb.jdbc.Driver");
             } else {
-                Prism.getInstance().getLogger().error("Invalid input for MySQL Driver configuration: " + mysqlDriver);
+                SpongeGriefAlert.getSpongeInstance().getLogger().error("Invalid input for MySQL Driver configuration: " + mysqlDriver);
             }
-            config.setUsername(Prism.getInstance().getConfig().getStorageCategory().getUsername());
-            config.setPassword(Prism.getInstance().getConfig().getStorageCategory().getPassword());
-            config.setMaximumPoolSize(Prism.getInstance().getConfig().getStorageCategory().getMaximumPoolSize());
-            config.setMinimumIdle(Prism.getInstance().getConfig().getStorageCategory().getMinimumIdle());
+            config.setUsername(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getUsername());
+            config.setPassword(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getPassword());
+            config.setMaximumPoolSize(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getMaximumPoolSize());
+            config.setMinimumIdle(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getMinimumIdle());
 
             db = new HikariDataSource(config);
 
@@ -95,12 +95,12 @@ public class MySQLStorageAdapter implements StorageAdapter {
             createTables();
 
             // Purge async
-            if (Prism.getInstance().getConfig().getStorageCategory().isShouldExpire()) {
+            if (SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().isShouldExpire()) {
                 Task.builder()
                     .async()
                     .name("PrismMySQLPurge")
                     .execute(this::purge)
-                    .submit(Prism.getInstance().getPluginContainer());
+                    .submit(SpongeGriefAlert.getSpongeInstance().getPluginContainer());
             }
 
             return true;
@@ -155,15 +155,15 @@ public class MySQLStorageAdapter implements StorageAdapter {
                     + "DEFAULT COLLATE utf8_general_ci;";
             conn.prepareStatement(extra).execute();
 
-            if (Prism.getInstance().getConfig().getGeneralCategory().getSchemaVersion() == 1) {
+            if (SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().getSchemaVersion() == 1) {
                 // Expand target: 55 -> 255
                 conn.prepareStatement(String.format("ALTER TABLE %srecords MODIFY %s varchar(255);",
                         tablePrefix,
                         DataQueries.Target
                 )).execute();
 
-                Prism.getInstance().getConfig().getGeneralCategory().setSchemaVersion(2);
-                Prism.getInstance().getConfiguration().saveConfiguration();
+                SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().setSchemaVersion(2);
+                SpongeGriefAlert.getSpongeInstance().getConfiguration().saveConfiguration();
             }
         }
     }
@@ -173,7 +173,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
      */
     protected void purge() {
         try {
-            Prism.getInstance().getLogger().info("Purging MySQL database...");
+            SpongeGriefAlert.getSpongeInstance().getLogger().info("Purging MySQL database...");
             long purged = 0;
             while (true) {
                 int count = purgeRecords();
@@ -182,12 +182,12 @@ public class MySQLStorageAdapter implements StorageAdapter {
                 }
 
                 purged += count;
-                Prism.getInstance().getLogger().info("Deleted {} records", purged);
+                SpongeGriefAlert.getSpongeInstance().getLogger().info("Deleted {} records", purged);
             }
 
-            Prism.getInstance().getLogger().info("Finished purging MySQL database");
+            SpongeGriefAlert.getSpongeInstance().getLogger().info("Finished purging MySQL database");
         } catch (Exception ex) {
-            Prism.getInstance().getLogger().error("Encountered an error while purging MySQL database", ex);
+            SpongeGriefAlert.getSpongeInstance().getLogger().error("Encountered an error while purging MySQL database", ex);
         }
     }
 

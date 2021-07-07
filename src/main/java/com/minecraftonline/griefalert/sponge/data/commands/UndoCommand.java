@@ -53,7 +53,7 @@ public class UndoCommand {
           }
 
           // TODO get actionable results correctly
-          List<ActionableResult> results = Lists.newArrayList(); //Prism.getInstance().getLastActionResults().get(((Player) source).getUniqueId());
+          List<ActionableResult> results = Lists.newArrayList(); //SpongeGriefAlert.getSpongeInstance().getLastActionResults().get(((Player) source).getUniqueId());
           if (results == null || results.isEmpty()) {
             throw new CommandException(Format.error("You have no valid actions to undo."));
           }

@@ -79,12 +79,12 @@ public class ApplierCommand {
    * @param sort
    */
   public static void runApplier(QuerySession session, Sort sort) {
-    session.getQuery().setLimit(Prism.getInstance().getConfig().getLimitCategory().getMaximumActionable());
+    session.getQuery().setLimit(.getInstance().getConfig().getLimitCategory().getMaximumActionable());
     CommandSource source = session.getCommandSource();
     try {
       List<ActionableResult> actionResults = new ArrayList<>();
       // Iterate query results
-      CompletableFuture<List<Result>> futureResults = Prism.getInstance().getStorageAdapter().records().query(session, false);
+      CompletableFuture<List<Result>> futureResults = SpongeGriefAlert.getSpongeInstance().getStorageAdapter().records().query(session, false);
       futureResults.thenAccept(results -> {
         if (results.isEmpty()) {
           source.sendMessage(Format.error("No results."));
@@ -110,7 +110,7 @@ public class ApplierCommand {
                 }
               });
               sendResults(source, actionResults);
-            }).submit(Prism.getInstance());
+            }).submit(SpongeGriefAlert.getSpongeInstance());
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -170,7 +170,7 @@ public class ApplierCommand {
     ));
 
     if (source instanceof Player) {
-      Prism.getInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
+      SpongeGriefAlert.getSpongeInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
     }
   }
 }

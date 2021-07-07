@@ -55,7 +55,7 @@ public class RequiredInteractListener {
     @Listener(order = Order.EARLY)
     public void onInteractBlock(InteractBlockEvent event, @First Player player) {
         // Wand support
-        if (!Prism.getInstance().getActiveWands().contains(player.getUniqueId())) {
+        if (!SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
             return;
         }
 
@@ -104,7 +104,7 @@ public class RequiredInteractListener {
     @Listener(order = Order.EARLY)
     public void onInteractEntity(InteractEntityEvent event, @First Player player) {
         // Wand support
-        if (!Prism.getInstance().getActiveWands().contains(player.getUniqueId())) {
+        if (!SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
             return;
         }
 

@@ -155,7 +155,7 @@ public class DataUtil {
             if (value.isPresent()) {
                 data.set(unescapeQuery(entry.getKey()), value.get());
             } else {
-                Prism.getInstance().getLogger().error(String.format("Failed to transform %s data.", entry.getKey()));
+                SpongeGriefAlert.getSpongeInstance().getLogger().error(String.format("Failed to transform %s data.", entry.getKey()));
             }
         }
 
@@ -243,7 +243,7 @@ public class DataUtil {
                     } else if (object.getClass().isEnum()) {
                         // convertedList.add(object.toString());
                     } else {
-                        Prism.getInstance().getLogger().error("Unsupported json list data type: " + object.getClass().getName() + " for key " + key);
+                        SpongeGriefAlert.getSpongeInstance().getLogger().error("Unsupported json list data type: " + object.getClass().getName() + " for key " + key);
                     }
 
                     if (!convertedList.isEmpty()) {
@@ -263,7 +263,7 @@ public class DataUtil {
             } else if (value.getClass().isArray()) {
                 jsonObject.add(key, gson.toJsonTree(new PrimitiveArray(value)));
             } else {
-                // Prism.getInstance().getLogger().error("Unsupported json data type: " + value.getClass().getName() + " for key " + key);
+                // SpongeGriefAlert.getSpongeInstance().getLogger().error("Unsupported json data type: " + value.getClass().getName() + " for key " + key);
             }
         }
 
@@ -315,7 +315,7 @@ public class DataUtil {
                 throw new IllegalArgumentException("Attempted to overwrite " + path.toString());
             }
 
-            Prism.getInstance().getLogger().warn("Attempted to overwrite {} with the same value", path.toString(), new Exception());
+            SpongeGriefAlert.getSpongeInstance().getLogger().warn("Attempted to overwrite {} with the same value", path.toString(), new Exception());
             return;
         }
 

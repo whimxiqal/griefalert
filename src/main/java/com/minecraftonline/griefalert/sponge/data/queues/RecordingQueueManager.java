@@ -51,7 +51,7 @@ public class RecordingQueueManager implements Runnable {
 
             if (record != null) {
                 // Prepare PrismRecord for sending to a PrismRecordEvent
-                PluginContainer plugin = Prism.getInstance().getPluginContainer();
+                PluginContainer plugin = SpongeGriefAlert.getSpongeInstance().getPluginContainer();
                 EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
 
                 PrismRecordPreSaveEvent preSaveEvent = new PrismRecordPreSaveEvent(record,
@@ -68,7 +68,7 @@ public class RecordingQueueManager implements Runnable {
 
         if (eventsSaveBatch.size() > 0) {
             try {
-                Prism.getInstance().getStorageAdapter().records().write(eventsSaveBatch);
+                SpongeGriefAlert.getSpongeInstance().getStorageAdapter().records().write(eventsSaveBatch);
             } catch (Exception e) {
                 // @todo handle failures
                 e.printStackTrace();

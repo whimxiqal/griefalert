@@ -60,8 +60,8 @@ public class InventoryListener {
     @Listener(order = Order.POST)
     public void onClickInventory(ClickInventoryEvent event, @Root Player player) {
         if (event.getTransactions().isEmpty()
-                || (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()
-                && !Prism.getInstance().getConfig().getEventCategory().isItemRemove())) {
+                || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()
+                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove())) {
             return;
         }
 
@@ -109,11 +109,11 @@ public class InventoryListener {
 
                 // Remove - Splitting stack
                 if (transaction.getOriginal().getQuantity() > transaction.getFinal().getQuantity()) {
-                    if (!Prism.getInstance().getConfig().getEventCategory().isItemRemove()) {
+                    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove()) {
                         continue;
                     }
 
-                    Prism.getInstance().getLogger().debug("Item Remove - {} x{}",
+                    SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Remove - {} x{}",
                             transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
 
                     eventBuilder
@@ -126,11 +126,11 @@ public class InventoryListener {
 
                 // Insert - Existing stack
                 if (transaction.getOriginal().getQuantity() < transaction.getFinal().getQuantity()) {
-                    if (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()) {
+                    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()) {
                         continue;
                     }
 
-                    Prism.getInstance().getLogger().debug("Item Insert - {} x{}",
+                    SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
                             transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
 
                     eventBuilder
@@ -144,11 +144,11 @@ public class InventoryListener {
 
             // Remove
             if (transaction.getOriginal().getType() != ItemTypes.NONE) {
-                if (!Prism.getInstance().getConfig().getEventCategory().isItemRemove()) {
+                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove()) {
                     continue;
                 }
 
-                Prism.getInstance().getLogger().debug("Item Remove - {} x{}",
+                SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Remove - {} x{}",
                         transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
 
                 eventBuilder
@@ -161,11 +161,11 @@ public class InventoryListener {
 
             // Insert
             if (transaction.getOriginal().getType() == ItemTypes.NONE) {
-                if (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()) {
+                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()) {
                     continue;
                 }
 
-                Prism.getInstance().getLogger().debug("Item Insert - {} x{}",
+                SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
                         transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
 
                 eventBuilder.event(PrismEvents.ITEM_INSERT)
@@ -175,7 +175,7 @@ public class InventoryListener {
                 continue;
             }
 
-            Prism.getInstance().getLogger().warn("Failed to handle ClickInventoryEvent");
+            SpongeGriefAlert.getSpongeInstance().getLogger().warn("Failed to handle ClickInventoryEvent");
         }
     }
 
@@ -187,7 +187,7 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onChangeInventoryPickup(ChangeInventoryEvent.Pickup event, @Root Player player) {
-        if (event.getTransactions().isEmpty() || !Prism.getInstance().getConfig().getEventCategory().isItemPickup()) {
+        if (event.getTransactions().isEmpty() || !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemPickup()) {
             return;
         }
 
@@ -198,7 +198,7 @@ public class InventoryListener {
                 quantity -= transaction.getOriginal().getQuantity();
             }
 
-            Prism.getInstance().getLogger().debug("Inventory pickup - {} x{}", itemStack.getType().getId(), quantity);
+            SpongeGriefAlert.getSpongeInstance().getLogger().debug("Inventory pickup - {} x{}", itemStack.getType().getId(), quantity);
 
             PrismRecord.create()
                     .source(event.getCause())
@@ -217,7 +217,7 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onDropItemDispense(DropItemEvent.Dispense event, @Root Player player) {
-        if (event.getEntities().isEmpty() || !Prism.getInstance().getConfig().getEventCategory().isItemDrop()) {
+        if (event.getEntities().isEmpty() || !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemDrop()) {
             return;
         }
 
@@ -232,7 +232,7 @@ public class InventoryListener {
             }
 
             ItemStackSnapshot itemStack = item.item().get();
-            Prism.getInstance().getLogger().debug("Inventory dropped - {} x{}", itemStack.getType().getId(), itemStack.getQuantity());
+            SpongeGriefAlert.getSpongeInstance().getLogger().debug("Inventory dropped - {} x{}", itemStack.getType().getId(), itemStack.getQuantity());
 
             PrismRecord.create()
                     .source(event.getCause())
@@ -252,7 +252,7 @@ public class InventoryListener {
     @Listener(order = Order.POST)
     public void onInteractInventory(InteractInventoryEvent event, @Root Player player) {
         if (!(event.getTargetInventory() instanceof CarriedInventory)
-                || (!Prism.getInstance().getConfig().getEventCategory().isInventoryClose() && !Prism.getInstance().getConfig().getEventCategory().isInventoryOpen())) {
+                || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose() && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen())) {
             return;
         }
 
@@ -279,9 +279,9 @@ public class InventoryListener {
                 .container(title)
                 .location(location);
 
-        if (event instanceof InteractInventoryEvent.Close && Prism.getInstance().getConfig().getEventCategory().isInventoryClose()) {
+        if (event instanceof InteractInventoryEvent.Close && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose()) {
             eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();
-        } else if (event instanceof InteractInventoryEvent.Open && Prism.getInstance().getConfig().getEventCategory().isInventoryOpen()) {
+        } else if (event instanceof InteractInventoryEvent.Open && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen()) {
             eventBuilder.event(PrismEvents.INVENTORY_OPEN).buildAndSave();
         }
     }
