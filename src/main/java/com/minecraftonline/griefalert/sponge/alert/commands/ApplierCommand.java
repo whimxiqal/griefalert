@@ -77,7 +77,8 @@ public final class ApplierCommand extends GeneralCommand {
         .valueFlag(GenericArguments.string(CommandKeys.BEFORE.get()), "b")
         .valueFlag(GenericArguments.string(CommandKeys.PLAYER.get()), "p")
         .valueFlag(GenericArguments.string(CommandKeys.PRISM_TARGET.get()), "t")
-        .valueFlag(GenericArguments.catalogedElement(CommandKeys.PRISM_EVENT.get(), PrismEvent.class), "e")
+        .valueFlag(GenericArguments.choices(CommandKeys.PRISM_EVENT.get(), PrismEvent.getRegistry().toMap()),
+            "e")
         .flag("f")
         .buildWith(GenericArguments.none()));
     addFlagDescription(FlagDescription.AFTER);

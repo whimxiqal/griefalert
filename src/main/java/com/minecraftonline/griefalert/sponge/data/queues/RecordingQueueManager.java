@@ -24,8 +24,8 @@
 package com.minecraftonline.griefalert.sponge.data.queues;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
-import com.minecraftonline.griefalert.common.data.records.PrismRecordPreSaveEvent;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecordPreSaveEvent;
 import java.util.ArrayList;
 import java.util.List;
 import org.spongepowered.api.Sponge;

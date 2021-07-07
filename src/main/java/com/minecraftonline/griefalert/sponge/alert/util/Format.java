@@ -32,7 +32,6 @@ import com.minecraftonline.griefalert.common.alert.alerts.Detail;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
 import com.minecraftonline.griefalert.common.alert.services.AlertRequest;
 import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.data.services.DataRequest;
 import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.commands.CheckCommand;
@@ -41,6 +40,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -624,9 +624,7 @@ public final class Format {
     Detail.of(
         "Event",
         "The event type for this profile; one of: "
-            + GriefEvents.REGISTRY_MODULE.getAll()
-            .stream().map(GriefEvent::getId)
-            .collect(Collectors.joining(", ")),
+            + Arrays.stream(GriefEvent.values()).map(GriefEvent::getId).collect(Collectors.joining(", ")),
         Format.hover(
             griefProfile.getGriefEvent().getId(),
             griefProfile.getGriefEvent().getDescription()))

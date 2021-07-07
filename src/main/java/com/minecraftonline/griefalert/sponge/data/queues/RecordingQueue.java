@@ -23,7 +23,7 @@
  */
 package com.minecraftonline.griefalert.sponge.data.queues;
 
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.spongepowered.api.data.DataContainer;
 

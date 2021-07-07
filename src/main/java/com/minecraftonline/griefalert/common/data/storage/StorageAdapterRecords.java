@@ -26,7 +26,7 @@ package com.minecraftonline.griefalert.common.data.storage;
 
 import com.minecraftonline.griefalert.common.data.query.Query;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
-import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.sponge.data.records.Result;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.spongepowered.api.data.DataContainer;

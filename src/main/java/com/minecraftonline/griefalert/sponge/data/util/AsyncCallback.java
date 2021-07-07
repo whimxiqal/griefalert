@@ -23,7 +23,7 @@
  */
 package com.minecraftonline.griefalert.sponge.data.util;
 
-import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.sponge.data.records.Result;
 import java.util.List;
 
 /**

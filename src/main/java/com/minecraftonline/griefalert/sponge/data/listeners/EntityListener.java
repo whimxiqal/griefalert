@@ -25,8 +25,8 @@
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
-import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -55,7 +55,7 @@ public class EntityListener {
 
     PrismRecord.create()
         .player(player)
-        .event(PrismEvents.PLAYER_DISCONNECT)
+        .event(PrismEvent.PLAYER_DISCONNECT)
         .location(player.getLocation())
         .buildAndSave();
   }
@@ -73,7 +73,7 @@ public class EntityListener {
 
     PrismRecord.create()
         .player(player)
-        .event(PrismEvents.PLAYER_JOIN)
+        .event(PrismEvent.PLAYER_JOIN)
         .location(player.getLocation())
         .buildAndSave();
   }
@@ -91,7 +91,7 @@ public class EntityListener {
 
     PrismRecord.create()
         .source(event.getCause())
-        .event(PrismEvents.ENTITY_DEATH)
+        .event(PrismEvent.ENTITY_DEATH)
         .entity(event.getTargetEntity())
         .buildAndSave();
   }
@@ -109,7 +109,7 @@ public class EntityListener {
 
     PrismRecord.create()
         .source(event.getCause())
-        .event(PrismEvents.COMMAND_EXECUTE)
+        .event(PrismEvent.COMMAND_EXECUTE)
         .location(player.getLocation())
         .target(event.getCommand())
         .buildAndSave();

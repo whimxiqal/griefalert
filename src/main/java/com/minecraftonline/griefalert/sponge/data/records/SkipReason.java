@@ -21,29 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-package com.minecraftonline.griefalert.common.data.records;
-
-import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.data.DataContainer;
+package com.minecraftonline.griefalert.sponge.data.records;
 
 /**
- * Represents a non-existent value for use with a Transaction.
- * For example, an entity rollback produces an entity but there's
- * no valid original value. This allows us to safely represent
- * that without having to wrap/extend the transaction class.
- *
  * @author viveleroi
  */
-public class SerializableNonExistent implements DataSerializable {
+public enum SkipReason {
+    /**
+     * Block isn't safe and may not be places in the world.
+     */
+    ILLEGAL_BLOCK,
 
-    @Override
-    public int getContentVersion() {
-        return 1;
-    }
+    /**
+     * World or location are missing. Likely if a record was made for
+     * a world which no longer exists.
+     */
+    INVALID_LOCATION,
 
-    @Override
-    public DataContainer toContainer() {
-        return DataContainer.createNew();
-    }
+    /**
+     * Data is invalid. Likely due to mods being removed or
+     * data being changed between updates.
+     */
+    INVALID,
+
+    /**
+     * Location or target we're attempting to change exists in
+     * a state we don't expect. For example, if you try to rollback
+     * a block but someone has already placed a new block in that
+     * spot.
+     */
+    OCCUPIED,
+
+    /**
+     * Action has yet to be implemented.
+     */
+    UNIMPLEMENTED,
+
+    /**
+     * An unknown error occurred.
+     */
+    UNKNOWN
 }

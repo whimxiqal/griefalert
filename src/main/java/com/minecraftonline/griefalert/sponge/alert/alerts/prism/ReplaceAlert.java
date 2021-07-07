@@ -26,12 +26,11 @@ package com.minecraftonline.griefalert.sponge.alert.alerts.prism;
 
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 import com.minecraftonline.griefalert.common.data.services.DataRequest;
 import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.util.Format;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import java.util.Date;
-import org.spongepowered.api.Sponge;
 
 /**
  * An alert that is caused by the replacement of a block with another block.
@@ -69,7 +68,7 @@ public class ReplaceAlert extends BlockAlert {
     builder.addTarget(this.replacementBlockId);
     builder.setEarliest(Date.from(getCreated().toInstant().minusSeconds(1)));
     builder.setLatest(Date.from(getCreated().toInstant().plusSeconds(1)));
-    builder.addEvent(Sponge.getRegistry().getType(PrismEvent.class, getGriefEvent().getId()).orElseThrow(() ->
+    builder.addEvent(PrismEvent.getRegistry().getOptional(getGriefEvent().getId()).orElseThrow(() ->
         new RuntimeException("PrismAlert stored an invalid GriefEvent: " + getGriefEvent().getId())));
     builder.addWorldUuid(getWorldUuid());
     builder.setxRange(getGriefPosition().getX(), getGriefPosition().getX());

@@ -34,7 +34,7 @@ import com.minecraftonline.griefalert.common.data.query.FieldCondition;
 import com.minecraftonline.griefalert.common.data.query.MatchRule;
 import com.minecraftonline.griefalert.common.data.query.Query;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
-import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.sponge.data.records.Result;
 import com.minecraftonline.griefalert.common.data.storage.StorageAdapterRecords;
 import com.minecraftonline.griefalert.common.data.storage.StorageDeleteResult;
 import com.minecraftonline.griefalert.common.data.storage.StorageWriteResult;

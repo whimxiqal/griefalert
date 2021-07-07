@@ -27,7 +27,7 @@ package com.minecraftonline.griefalert.sponge.alert.alerts.prism;
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
 import com.minecraftonline.griefalert.common.alert.struct.SignText;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import com.minecraftonline.griefalert.sponge.alert.util.Format;
 import com.minecraftonline.griefalert.sponge.alert.util.PrismUtil;
 import java.util.Optional;

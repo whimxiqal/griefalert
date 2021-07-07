@@ -25,8 +25,8 @@
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
-import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
@@ -120,7 +120,7 @@ public class InventoryListener {
               transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
 
           eventBuilder
-              .event(PrismEvents.ITEM_INSERT)
+              .event(PrismEvent.ITEM_INSERT)
               .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
               .buildAndSave();
 
@@ -137,7 +137,7 @@ public class InventoryListener {
               transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
 
           eventBuilder
-              .event(PrismEvents.ITEM_REMOVE)
+              .event(PrismEvent.ITEM_REMOVE)
               .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
               .buildAndSave();
 
@@ -155,7 +155,7 @@ public class InventoryListener {
             transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
 
         eventBuilder
-            .event(PrismEvents.ITEM_REMOVE)
+            .event(PrismEvent.ITEM_REMOVE)
             .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
             .buildAndSave();
 
@@ -171,7 +171,7 @@ public class InventoryListener {
         SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
             transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
 
-        eventBuilder.event(PrismEvents.ITEM_INSERT)
+        eventBuilder.event(PrismEvent.ITEM_INSERT)
             .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
             .buildAndSave();
 
@@ -205,7 +205,7 @@ public class InventoryListener {
 
       PrismRecord.create()
           .source(event.getCause())
-          .event(PrismEvents.ITEM_PICKUP)
+          .event(PrismEvent.ITEM_PICKUP)
           .itemStack(itemStack, quantity)
           .location(player.getLocation())
           .buildAndSave();
@@ -239,7 +239,7 @@ public class InventoryListener {
 
       PrismRecord.create()
           .source(event.getCause())
-          .event(PrismEvents.ITEM_DROP)
+          .event(PrismEvent.ITEM_DROP)
           .itemStack(itemStack)
           .location(player.getLocation())
           .buildAndSave();
@@ -283,9 +283,9 @@ public class InventoryListener {
         .location(location);
 
     if (event instanceof InteractInventoryEvent.Close && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose()) {
-      eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();
+      eventBuilder.event(PrismEvent.INVENTORY_CLOSE).buildAndSave();
     } else if (event instanceof InteractInventoryEvent.Open && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen()) {
-      eventBuilder.event(PrismEvents.INVENTORY_OPEN).buildAndSave();
+      eventBuilder.event(PrismEvent.INVENTORY_OPEN).buildAndSave();
     }
   }
 }

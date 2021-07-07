@@ -25,10 +25,10 @@
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import com.minecraftonline.griefalert.sponge.data.util.BlockUtil;
 import com.minecraftonline.griefalert.sponge.data.util.EventUtil;
-import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Transaction;
@@ -100,7 +100,7 @@ public class ChangeBlockListener {
         }
 
         eventBuilder
-            .event(PrismEvents.BLOCK_BREAK)
+            .event(PrismEvent.BLOCK_BREAK)
             .target(originalBlockType.getId().replace("_", " "))
             .buildAndSave();
       } else if (event instanceof ChangeBlockEvent.Decay) {
@@ -109,7 +109,7 @@ public class ChangeBlockListener {
         }
 
         eventBuilder
-            .event(PrismEvents.BLOCK_DECAY)
+            .event(PrismEvent.BLOCK_DECAY)
             .target(originalBlockType.getId().replace("_", " "))
             .buildAndSave();
       } else if (event instanceof ChangeBlockEvent.Grow) {
@@ -118,7 +118,7 @@ public class ChangeBlockListener {
         }
 
         eventBuilder
-            .event(PrismEvents.BLOCK_GROW)
+            .event(PrismEvent.BLOCK_GROW)
             .target(finalBlockType.getId().replace("_", " "))
             .buildAndSave();
       } else /* if (event instanceof ChangeBlockEvent.Place) */ {
@@ -129,7 +129,7 @@ public class ChangeBlockListener {
         }
 
         eventBuilder
-            .event(PrismEvents.BLOCK_PLACE)
+            .event(PrismEvent.BLOCK_PLACE)
             .target(finalBlockType.getId().replace("_", " "))
             .buildAndSave();
       }

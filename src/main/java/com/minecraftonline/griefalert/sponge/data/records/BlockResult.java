@@ -22,13 +22,13 @@
  * THE SOFTWARE.
  */
 
-package com.minecraftonline.griefalert.common.data.records;
+package com.minecraftonline.griefalert.sponge.data.records;
 
 import com.google.common.base.Preconditions;
 import com.minecraftonline.griefalert.sponge.data.util.BlockUtil;
 import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import java.util.Optional;
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockSnapshot.Builder;
@@ -100,7 +100,7 @@ public class BlockResult extends ResultComplete implements Actionable {
 
   }
 
-  public DataView formatBlockData(DataView finalBlock, @Nonnull Object optionalLocation) {
+  public DataView formatBlockData(DataView finalBlock, @NotNull Object optionalLocation) {
     Preconditions.checkNotNull(optionalLocation, "The location you are formatting cannot be null.");
     DataView location = (DataView) optionalLocation;
     DataView position = DataContainer.createNew();

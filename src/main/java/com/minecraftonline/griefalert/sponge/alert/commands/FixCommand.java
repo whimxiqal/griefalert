@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
 import com.minecraftonline.griefalert.common.alert.alerts.Fixable;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.sponge.alert.templates.Arg;
 import com.minecraftonline.griefalert.sponge.alert.templates.Templates;
 import com.minecraftonline.griefalert.sponge.alert.commands.common.GeneralCommand;
@@ -140,10 +140,10 @@ public class FixCommand extends GeneralCommand {
               .build();
           Communication.getStaffBroadcastChannel().send(message);
           if (args.hasAny("c")) {
-            if (!alert.getGriefEvent().equals(GriefEvents.BREAK)) {
+            if (!alert.getGriefEvent().equals(GriefEvent.BREAK)) {
               src.sendMessage(Format.error(
                   "You may only collect an item from someone if they ",
-                  Format.action(GriefEvents.BREAK),
+                  Format.action(GriefEvent.BREAK),
                   " it"));
             } else {
               if (removeItem(Alerts.getGriefer(alert), alert.getTarget())) {

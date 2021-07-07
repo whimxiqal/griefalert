@@ -25,15 +25,15 @@
 package com.minecraftonline.griefalert.sponge.alert.commands;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
 import com.minecraftonline.griefalert.common.alert.storage.ProfileStorage;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
 import com.minecraftonline.griefalert.sponge.alert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.sponge.alert.util.Format;
 import com.minecraftonline.griefalert.sponge.alert.util.General;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.CommandKeys;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Permissions;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -90,7 +90,7 @@ public class ProfileCommand extends GeneralCommand {
       addAlias("add");
       addAlias("a");
       setCommandElement(GenericArguments.seq(
-          GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+          GenericArguments.choices(CommandKeys.GA_EVENT.get(), GriefEvent.getRegistry().toMap()),
           GenericArguments.string(CommandKeys.GA_TARGET.get()),
           GenericArguments.flags()
               .valueFlag(GenericArguments.world(
@@ -183,7 +183,7 @@ public class ProfileCommand extends GeneralCommand {
       addAlias("edit");
       addAlias("e");
       setCommandElement(GenericArguments.seq(
-          GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+          GenericArguments.choices(CommandKeys.GA_EVENT.get(), GriefEvent.getRegistry().toMap()),
           GenericArguments.string(CommandKeys.GA_TARGET.get()),
           GenericArguments.flags()
               .valueFlag(GenericArguments.world(
@@ -305,7 +305,7 @@ public class ProfileCommand extends GeneralCommand {
       addAlias("remove");
       addAlias("r");
       setCommandElement(GenericArguments.seq(
-          GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+          GenericArguments.choices(CommandKeys.GA_EVENT.get(), GriefEvent.getRegistry().toMap()),
           GenericArguments.string(CommandKeys.GA_TARGET.get())));
     }
 
@@ -377,7 +377,7 @@ public class ProfileCommand extends GeneralCommand {
       addAlias("l");
       setCommandElement(GenericArguments.flags()
           .valueFlag(
-              GenericArguments.catalogedElement(CommandKeys.GA_EVENT.get(), GriefEvent.class),
+              GenericArguments.choices(CommandKeys.GA_EVENT.get(), GriefEvent.getRegistry().toMap()),
               "e")
           .valueFlag(
               GenericArguments.string(CommandKeys.TARGET.get()),
@@ -453,8 +453,7 @@ public class ProfileCommand extends GeneralCommand {
           "GriefAlert Events: ",
           Text.joinWith(
               Format.bonus(", "),
-              GriefEvents.REGISTRY_MODULE.getAll()
-                  .stream()
+              Arrays.stream(GriefEvent.values())
                   .map(griefEvent ->
                       Format.hover(griefEvent.getId(), griefEvent.getDescription()))
                   .collect(Collectors.toList()))));

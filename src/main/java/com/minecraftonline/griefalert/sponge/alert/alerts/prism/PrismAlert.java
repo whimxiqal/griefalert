@@ -29,11 +29,11 @@ import com.flowpowered.math.vector.Vector3i;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
 import com.minecraftonline.griefalert.common.alert.alerts.Fixable;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
-import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 import com.minecraftonline.griefalert.common.data.services.DataRequest;
 import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.alerts.GeneralAlert;
 import com.minecraftonline.griefalert.sponge.alert.util.PrismUtil;
+import com.minecraftonline.griefalert.sponge.data.records.PrismRecord;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -127,12 +127,8 @@ public abstract class PrismAlert extends GeneralAlert implements Fixable {
         .addTarget(getTarget())
         .setEarliest(Date.from(getCreated().toInstant().minusSeconds(1)))
         .setLatest(Date.from(getCreated().toInstant().plusSeconds(1)))
-        .addEvent(Sponge.getRegistry()
-            .getType(PrismEvent.class, getGriefEvent().getId())
-            .orElseThrow(() ->
-                new RuntimeException(
-                    "PrismAlert stored an invalid GriefEvent: "
-                        + getGriefEvent().getId())))
+        .addEvent(PrismEvent.getRegistry().getOptional(getGriefEvent().getId()).orElseThrow(() ->
+            new RuntimeException("PrismAlert stored an invalid GriefEvent: " + getGriefEvent().getId())))
         .addWorldUuid(getWorldUuid())
         .setxRange(getGriefPosition().getX(), getGriefPosition().getX())
         .setyRange(getGriefPosition().getY(), getGriefPosition().getY())
