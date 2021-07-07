@@ -21,12 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.common.data.parameters;
 
 public class ParameterException extends Exception {
-    private static final long serialVersionUID = -707073105399589815L;
+  private static final long serialVersionUID = -707073105399589815L;
 
-    public ParameterException(String msg) {
-        super(msg);
-    }
+  public ParameterException(String msg) {
+    super(msg);
+  }
 }

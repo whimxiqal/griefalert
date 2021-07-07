@@ -24,12 +24,14 @@
 
 package com.minecraftonline.griefalert.sponge.alert.alerts.prism;
 
-import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Details;
 
 /**
  * A block alert that is caused by breaking the block.
+ *
+ * @author PietElite
  */
 public class BreakAlert extends BlockAlert {
 

@@ -24,62 +24,60 @@
 package com.minecraftonline.griefalert.common.data.flags;
 
 import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.query.Sort;
-import org.spongepowered.api.command.CommandSource;
-
-import javax.annotation.Nullable;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.common.data.query.Sort;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
+import org.spongepowered.api.command.CommandSource;
 
 public class FlagOrder extends SimpleFlagHandler {
-    /**
-     * Flag which sets the sort order.
-     */
-    public FlagOrder() {
-        super(ImmutableList.of("ord", "order"));
-    }
+  /**
+   * Flag which sets the sort order.
+   */
+  public FlagOrder() {
+    super(ImmutableList.of("ord", "order"));
+  }
 
-    @Override
-    public boolean acceptsSource(@Nullable CommandSource source) {
+  @Override
+  public boolean acceptsSource(@Nullable CommandSource source) {
+    return true;
+  }
+
+  @Override
+  public boolean acceptsValue(String value) {
+    switch (value) {
+      case "new":
+      case "newest":
+      case "desc":
+      case "old":
+      case "oldest":
+      case "asc":
         return true;
+      default:
+        return false;
     }
+  }
 
-    @Override
-    public boolean acceptsValue(String value) {
-        switch (value) {
-            case "new":
-            case "newest":
-            case "desc":
-            case "old":
-            case "oldest":
-            case "asc":
-                return true;
-            default:
-                return false;
-        }
+  @Override
+  public Optional<CompletableFuture<?>> process(QuerySession session, String flag, @Nullable String value, Query query) {
+    if (value != null) {
+      switch (value) {
+        case "new":
+        case "newest":
+        case "desc":
+          session.setSortBy(Sort.NEWEST_FIRST);
+          break;
+        case "old":
+        case "oldest":
+        case "asc":
+        default:
+          session.setSortBy(Sort.OLDEST_FIRST);
+      }
+    } else {
+      session.setSortBy(Sort.OLDEST_FIRST);
     }
-
-    @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String flag, @Nullable String value, Query query) {
-        if (value != null) {
-            switch (value) {
-                case "new":
-                case "newest":
-                case "desc":
-                    session.setSortBy(Sort.NEWEST_FIRST);
-                    break;
-                case "old":
-                case "oldest":
-                case "asc":
-                default:
-                    session.setSortBy(Sort.OLDEST_FIRST);
-            }
-        }
-        else {
-            session.setSortBy(Sort.OLDEST_FIRST);
-        }
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

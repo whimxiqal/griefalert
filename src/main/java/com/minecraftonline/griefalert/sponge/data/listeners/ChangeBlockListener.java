@@ -24,11 +24,11 @@
 
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.util.BlockUtil;
-import com.helion3.prism.util.EventUtil;
-import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.sponge.data.util.BlockUtil;
+import com.minecraftonline.griefalert.sponge.data.util.EventUtil;
+import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Transaction;
@@ -40,96 +40,96 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public class ChangeBlockListener {
 
-    /**
-     * Listens to the base change block event.
-     *
-     * @param event ChangeBlockEvent
-     */
-    @Listener(order = Order.POST)
-    public void onChangeBlock(ChangeBlockEvent event) {
+  /**
+   * Listens to the base change block event.
+   *
+   * @param event ChangeBlockEvent
+   */
+  @Listener(order = Order.POST)
+  public void onChangeBlock(ChangeBlockEvent event) {
 
-        if (!(event instanceof ChangeBlockEvent.Break
-                || event instanceof ChangeBlockEvent.Place
-                || event instanceof ChangeBlockEvent.Decay
-                || event instanceof ChangeBlockEvent.Grow)) {
-            return;  // Don't bother
-        }
-
-        if (event.getCause().allOf(PluginContainer.class).stream().map(PluginContainer::getId).anyMatch(id ->
-                SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().getBlacklist().contains(id))) {
-            // Don't do anything
-            return;
-        }
-
-        if (event.getCause().first(Player.class).map(Player::getUniqueId).map(SpongeGriefAlert.getSpongeInstance().getActiveWands()::contains).orElse(false)) {
-            // Cancel and exit event here, not supposed to place/track a block with an active wand.
-            event.setCancelled(true);
-            return;
-        }
-
-        if (event.getTransactions().isEmpty()
-                || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockBreak()
-                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockDecay()
-                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockGrow()
-                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockPlace())) {
-            return;
-        }
-
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            if (!transaction.isValid() || !transaction.getOriginal().getLocation().isPresent()) {
-                continue;
-            }
-
-            BlockType originalBlockType = transaction.getOriginal().getState().getType();
-            BlockType finalBlockType = transaction.getFinal().getState().getType();
-
-            PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
-                    .source(event.getCause())
-                    .blockOriginal(transaction.getOriginal())
-                    .blockReplacement(transaction.getFinal())
-                    .location(transaction.getOriginal().getLocation().get());
-
-            if (event instanceof ChangeBlockEvent.Break) {
-                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockBreak()
-                        || BlockUtil.rejectBreakCombination(originalBlockType, finalBlockType)
-                        || EventUtil.rejectBreakEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
-                    continue;
-                }
-
-                eventBuilder
-                        .event(PrismEvents.BLOCK_BREAK)
-                        .target(originalBlockType.getId().replace("_", " "))
-                        .buildAndSave();
-            } else if (event instanceof ChangeBlockEvent.Decay) {
-                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockDecay()) {
-                    continue;
-                }
-
-                eventBuilder
-                        .event(PrismEvents.BLOCK_DECAY)
-                        .target(originalBlockType.getId().replace("_", " "))
-                        .buildAndSave();
-            } else if (event instanceof ChangeBlockEvent.Grow) {
-                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockGrow()) {
-                    continue;
-                }
-
-                eventBuilder
-                        .event(PrismEvents.BLOCK_GROW)
-                        .target(finalBlockType.getId().replace("_", " "))
-                        .buildAndSave();
-            } else /* if (event instanceof ChangeBlockEvent.Place) */ {
-                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockPlace()
-                        || BlockUtil.rejectPlaceCombination(originalBlockType, finalBlockType)
-                        || EventUtil.rejectPlaceEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
-                    continue;
-                }
-
-                eventBuilder
-                        .event(PrismEvents.BLOCK_PLACE)
-                        .target(finalBlockType.getId().replace("_", " "))
-                        .buildAndSave();
-            }
-        }
+    if (!(event instanceof ChangeBlockEvent.Break
+        || event instanceof ChangeBlockEvent.Place
+        || event instanceof ChangeBlockEvent.Decay
+        || event instanceof ChangeBlockEvent.Grow)) {
+      return;  // Don't bother
     }
+
+    if (event.getCause().allOf(PluginContainer.class).stream().map(PluginContainer::getId).anyMatch(id ->
+        SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().getBlacklist().contains(id))) {
+      // Don't do anything
+      return;
+    }
+
+    if (event.getCause().first(Player.class).map(Player::getUniqueId).map(SpongeGriefAlert.getSpongeInstance().getActiveWands()::contains).orElse(false)) {
+      // Cancel and exit event here, not supposed to place/track a block with an active wand.
+      event.setCancelled(true);
+      return;
+    }
+
+    if (event.getTransactions().isEmpty()
+        || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockBreak()
+        && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockDecay()
+        && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockGrow()
+        && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockPlace())) {
+      return;
+    }
+
+    for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+      if (!transaction.isValid() || !transaction.getOriginal().getLocation().isPresent()) {
+        continue;
+      }
+
+      BlockType originalBlockType = transaction.getOriginal().getState().getType();
+      BlockType finalBlockType = transaction.getFinal().getState().getType();
+
+      PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
+          .source(event.getCause())
+          .blockOriginal(transaction.getOriginal())
+          .blockReplacement(transaction.getFinal())
+          .location(transaction.getOriginal().getLocation().get());
+
+      if (event instanceof ChangeBlockEvent.Break) {
+        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockBreak()
+            || BlockUtil.rejectBreakCombination(originalBlockType, finalBlockType)
+            || EventUtil.rejectBreakEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
+          continue;
+        }
+
+        eventBuilder
+            .event(PrismEvents.BLOCK_BREAK)
+            .target(originalBlockType.getId().replace("_", " "))
+            .buildAndSave();
+      } else if (event instanceof ChangeBlockEvent.Decay) {
+        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockDecay()) {
+          continue;
+        }
+
+        eventBuilder
+            .event(PrismEvents.BLOCK_DECAY)
+            .target(originalBlockType.getId().replace("_", " "))
+            .buildAndSave();
+      } else if (event instanceof ChangeBlockEvent.Grow) {
+        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockGrow()) {
+          continue;
+        }
+
+        eventBuilder
+            .event(PrismEvents.BLOCK_GROW)
+            .target(finalBlockType.getId().replace("_", " "))
+            .buildAndSave();
+      } else /* if (event instanceof ChangeBlockEvent.Place) */ {
+        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isBlockPlace()
+            || BlockUtil.rejectPlaceCombination(originalBlockType, finalBlockType)
+            || EventUtil.rejectPlaceEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
+          continue;
+        }
+
+        eventBuilder
+            .event(PrismEvents.BLOCK_PLACE)
+            .target(finalBlockType.getId().replace("_", " "))
+            .buildAndSave();
+      }
+    }
+  }
 }

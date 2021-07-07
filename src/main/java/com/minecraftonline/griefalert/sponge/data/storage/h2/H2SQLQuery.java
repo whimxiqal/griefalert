@@ -23,37 +23,37 @@
  */
 package com.minecraftonline.griefalert.sponge.data.storage.h2;
 
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.query.SQLQuery;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.common.data.query.SQLQuery;
 
 public class H2SQLQuery extends SQLQuery {
-    public H2SQLQuery(String query) {
-        super(query);
+  public H2SQLQuery(String query) {
+    super(query);
+  }
+
+  /**
+   * Constructs an H2 SQL query from a given QuerySession.
+   *
+   * @param session QuerySession
+   * @return SQLQuery
+   */
+  public static SQLQuery from(QuerySession session) {
+    Builder query = SQLQuery.builder().select().from(tablePrefix + "records AS r");
+    if (!session.hasFlag(Flag.NO_GROUP)) {
+      query.col("COUNT(*) AS total");
+      query.group("eventName", "target", "player", "cause");
+    } else {
+      query.col("*").leftJoin(tablePrefix + "extra AS e", "r.id = e.record_id");
     }
 
-    /**
-     * Constructs an H2 SQL query from a given QuerySession.
-     *
-     * @param session QuerySession
-     * @return SQLQuery
-     */
-    public static SQLQuery from(QuerySession session) {
-        Builder query = SQLQuery.builder().select().from(tablePrefix + "records AS r");
-        if (!session.hasFlag(Flag.NO_GROUP)) {
-            query.col("COUNT(*) AS total");
-            query.group("eventName", "target", "player", "cause");
-        } else {
-            query.col("*").leftJoin(tablePrefix + "extra AS e", "r.id = e.record_id");
-        }
+    query.conditions(session.getQuery().getConditions());
 
-        query.conditions(session.getQuery().getConditions());
-
-        // Sort by timestamp if we're not grouping
-        if (session.hasFlag(Flag.NO_GROUP)) {
-            query.order("created " + session.getSortBy().getString());
-        }
-
-        return query.build();
+    // Sort by timestamp if we're not grouping
+    if (session.hasFlag(Flag.NO_GROUP)) {
+      query.order("created " + session.getSortBy().getString());
     }
+
+    return query.build();
+  }
 }

@@ -21,87 +21,85 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.common.data.parameters;
 
+import com.google.common.collect.ImmutableList;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.query.ConditionGroup;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.sponge.data.util.Format;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
-
-import org.spongepowered.api.entity.living.player.Player;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.common.collect.ImmutableList;
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.Format;
-
 public class ParameterRadius extends SimpleParameterHandler {
-    private final Pattern pattern = Pattern.compile("[\\w,:-]+");
+  private final Pattern pattern = Pattern.compile("[\\w,:-]+");
 
-    /**
-     * Parameter handling a radius around a single location.
-     */
-    public ParameterRadius() {
-        super(ImmutableList.of("r", "radius"));
+  /**
+   * Parameter handling a radius around a single location.
+   */
+  public ParameterRadius() {
+    super(ImmutableList.of("r", "radius"));
+  }
+
+  @Override
+  public boolean acceptsSource(@Nullable CommandSource source) {
+    return (source instanceof Player);
+  }
+
+  @Override
+  public boolean acceptsValue(String value) {
+    return pattern.matcher(value).matches();
+  }
+
+  @Override
+  public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
+    if (session.getCommandSource() instanceof Player) {
+      Player player = (Player) session.getCommandSource();
+      Location<World> location = player.getLocation();
+
+      int radius = Integer.parseInt(value);
+      int maxRadius = SpongeGriefAlert.getSpongeInstance().getConfig().getLimitCategory().getMaximumRadius();
+
+      // Enforce max radius unless player has override perms
+      if (radius > maxRadius && !player.hasPermission("prism.override.radius")) {
+        // @todo move this
+        player.sendMessage(Format.subduedHeading(String.format("Limiting radius to maximum of %d", maxRadius)));
+        radius = maxRadius;
+      }
+
+      session.setRadius(radius);
+
+      query.addCondition(ConditionGroup.from(location, radius));
     }
 
-    @Override
-    public boolean acceptsSource(@Nullable CommandSource source) {
-        return (source instanceof Player);
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
+    if (session.getCommandSource() instanceof Player) {
+      // Default radius from config
+      int defaultRadius = SpongeGriefAlert.getSpongeInstance().getConfig().getDefaultCategory().getRadius();
+
+      // Player location
+      Location<World> location = ((Player) session.getCommandSource()).getLocation();
+
+      query.addCondition(ConditionGroup.from(location, defaultRadius));
+
+      session.setRadius(defaultRadius);
+
+      return Optional.of(Pair.of(aliases.get(0), "" + defaultRadius));
     }
 
-    @Override
-    public boolean acceptsValue(String value) {
-        return pattern.matcher(value).matches();
-    }
-
-    @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        if (session.getCommandSource() instanceof Player) {
-            Player player = (Player) session.getCommandSource();
-            Location<World> location = player.getLocation();
-
-            int radius = Integer.parseInt(value);
-            int maxRadius = SpongeGriefAlert.getSpongeInstance().getConfig().getLimitCategory().getMaximumRadius();
-
-            // Enforce max radius unless player has override perms
-            if (radius > maxRadius && !player.hasPermission("prism.override.radius")) {
-                // @todo move this
-                player.sendMessage(Format.subduedHeading(String.format("Limiting radius to maximum of %d", maxRadius)));
-                radius = maxRadius;
-            }
-
-            session.setRadius(radius);
-
-            query.addCondition(ConditionGroup.from(location, radius));
-        }
-
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
-        if (session.getCommandSource() instanceof Player) {
-            // Default radius from config
-            int defaultRadius = SpongeGriefAlert.getSpongeInstance().getConfig().getDefaultCategory().getRadius();
-
-            // Player location
-            Location<World> location = ((Player) session.getCommandSource()).getLocation();
-
-            query.addCondition(ConditionGroup.from(location, defaultRadius));
-
-            session.setRadius(defaultRadius);
-
-            return Optional.of(Pair.of(aliases.get(0), "" + defaultRadius));
-        }
-
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

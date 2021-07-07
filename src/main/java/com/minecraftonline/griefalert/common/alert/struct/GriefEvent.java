@@ -24,7 +24,7 @@
 
 package com.minecraftonline.griefalert.common.alert.struct;
 
-import com.helion3.prism.api.data.PrismEvent;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import java.io.Serializable;
 import javax.annotation.Nonnull;
 import org.spongepowered.api.CatalogType;

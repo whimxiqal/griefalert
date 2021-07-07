@@ -23,8 +23,6 @@
  */
 package com.minecraftonline.griefalert.common.data.storage;
 
-import com.helion3.prism.api.storage.StorageResult;
-
 public class StorageWriteResult implements StorageResult {
 
 }

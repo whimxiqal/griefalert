@@ -23,6 +23,8 @@
  */
 package com.minecraftonline.griefalert.sponge.data.commands;
 
+import com.minecraftonline.griefalert.sponge.data.util.Format;
+import com.minecraftonline.griefalert.sponge.data.util.WorldUtil;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -30,9 +32,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import com.helion3.prism.util.Format;
-import com.helion3.prism.util.WorldUtil;
 
 // TODO remove
 public class ExtinguishCommand {

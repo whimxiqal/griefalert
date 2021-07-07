@@ -24,26 +24,26 @@
 package com.minecraftonline.griefalert.common.data.parameters;
 
 import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.parameters.ParameterHandler;
 
 public abstract class SimpleParameterHandler implements ParameterHandler {
-    protected final ImmutableList<String> aliases;
+  protected final ImmutableList<String> aliases;
 
-    /**
-     * Super constructor for most parameter handlers.
-     * @param aliases ImmutableList<String> Command aliases which match this handler
-     */
-    public SimpleParameterHandler(ImmutableList<String> aliases) {
-        this.aliases = aliases;
-    }
+  /**
+   * Super constructor for most parameter handlers.
+   *
+   * @param aliases ImmutableList<String> Command aliases which match this handler
+   */
+  public SimpleParameterHandler(ImmutableList<String> aliases) {
+    this.aliases = aliases;
+  }
 
-    @Override
-    public ImmutableList<String> getAliases() {
-        return aliases;
-    }
+  @Override
+  public ImmutableList<String> getAliases() {
+    return aliases;
+  }
 
-    @Override
-    public boolean handles(String alias) {
-        return aliases.contains(alias);
-    }
+  @Override
+  public boolean handles(String alias) {
+    return aliases.contains(alias);
+  }
 }

@@ -25,11 +25,11 @@
 package com.minecraftonline.griefalert.sponge.alert.commands;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.helion3.prism.api.data.PrismEvent;
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.services.PrismService;
-import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
+import com.minecraftonline.griefalert.common.data.services.DataRequest;
+import com.minecraftonline.griefalert.common.data.services.DataService;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.sponge.alert.util.DateUtil;
 import com.minecraftonline.griefalert.sponge.alert.util.Errors;
@@ -101,7 +101,7 @@ public class LogsCommand extends GeneralCommand {
 
       Task.builder().async().execute(() -> {
 
-        Request.Builder builder = Request.builder();
+        DataRequest.Builder builder = DataRequest.builder();
 
         // Add location query with WE
         SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(player.getLocation().getExtent());
@@ -156,13 +156,13 @@ public class LogsCommand extends GeneralCommand {
           builder.addFlag(Flag.NO_GROUP);
         }
 
-        Request request = builder.build();
+        DataRequest request = builder.build();
 
         player.sendMessage(Format.request(request));
-        Optional<PrismService> prism = Sponge.getServiceManager().provide(PrismService.class);
+        Optional<DataService> dataService = Sponge.getServiceManager().provide(DataService.class);
         try {
-          if (prism.isPresent()) {
-            prism.get().lookup(player, request);
+          if (dataService.isPresent()) {
+            dataService.get().lookup(player, request);
           } else {
             throw new RuntimeException("Could not get PrismService from Sponge Service Manager");
           }

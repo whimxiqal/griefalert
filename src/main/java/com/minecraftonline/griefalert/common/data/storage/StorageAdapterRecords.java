@@ -29,35 +29,35 @@ import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import com.minecraftonline.griefalert.common.data.records.Result;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.spongepowered.api.data.DataContainer;
 
 public interface StorageAdapterRecords {
-    /**
-     * Writes a collection of events to storage
-     *
-     * @param containers List<DataContainers></DataContainers> to persist
-     * @return {@link StorageWriteResult}
-     * @throws Exception
-     */
-    StorageWriteResult write(List<DataContainer> containers) throws Exception;
 
-    /**
-     * Execute a query session for a list of resulting actions
-     *
-     * @param session QuerySession
-     * @param translate Translate player UUIDs -> Last known names
-     * @return List of {@link Result}
-     * @throws Exception Abstract DB or query/handler exceptions
-     */
-    CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception;
+  /**
+   * Writes a collection of events to storage
+   *
+   * @param containers List<DataContainers></DataContainers> to persist
+   * @return {@link StorageWriteResult}
+   * @throws Exception
+   */
+  StorageWriteResult write(List<DataContainer> containers) throws Exception;
 
-    /**
-     * Given a {@link Query} this will remove all matching records.
-     *
-     * @param query Query conditions indicating what we're purging
-     * @return {@link StorageDeleteResult}
-     * @throws Exception Abstract DB or query/handler exceptions
-     */
-    StorageDeleteResult delete(Query query) throws Exception;
+  /**
+   * Execute a query session for a list of resulting actions
+   *
+   * @param session   QuerySession
+   * @param translate Translate player UUIDs -> Last known names
+   * @return List of {@link Result}
+   * @throws Exception Abstract DB or query/handler exceptions
+   */
+  CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception;
+
+  /**
+   * Given a {@link Query} this will remove all matching records.
+   *
+   * @param query Query conditions indicating what we're purging
+   * @return {@link StorageDeleteResult}
+   * @throws Exception Abstract DB or query/handler exceptions
+   */
+  StorageDeleteResult delete(Query query) throws Exception;
 }

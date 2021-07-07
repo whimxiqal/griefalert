@@ -21,46 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.sponge.data.storage.mysql;
 
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.TypeUtil;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.common.data.query.SQLQuery;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
+import com.minecraftonline.griefalert.sponge.data.util.TypeUtil;
 
 public class MySQLQuery extends SQLQuery {
-    public MySQLQuery(String query) {
-        super(query);
+  public MySQLQuery(String query) {
+    super(query);
+  }
+
+  /**
+   * Constructs a MySQL SQL query from a given QuerySession.
+   *
+   * @param session QuerySession
+   * @return SQLQuery
+   */
+  public static SQLQuery from(QuerySession session) {
+    Builder builder = SQLQuery.builder().select().from(tablePrefix + "records AS r");
+    if (!session.hasFlag(Flag.NO_GROUP)) {
+      builder.group(
+          DataQueries.EventName.toString(),
+          DataQueries.Target.toString(),
+          DataQueries.Player.toString(),
+          DataQueries.Cause.toString(),
+          "DATE_FORMAT(created, '%Y-%m-%d')"
+      ).col("COUNT(*) AS total").col("DATE_FORMAT(created, '%Y-%m-%d') as created");
+    } else {
+      builder.col("*").leftJoin(tablePrefix + "extra AS e", "r.id = e.record_id");
     }
 
-    /**
-     * Constructs a MySQL SQL query from a given QuerySession.
-     *
-     * @param session QuerySession
-     * @return SQLQuery
-     */
-    public static SQLQuery from(QuerySession session) {
-        Builder builder = SQLQuery.builder().select().from(tablePrefix + "records AS r");
-        if (!session.hasFlag(Flag.NO_GROUP)) {
-            builder.group(
-                    DataQueries.EventName.toString(),
-                    DataQueries.Target.toString(),
-                    DataQueries.Player.toString(),
-                    DataQueries.Cause.toString(),
-                    "DATE_FORMAT(created, '%Y-%m-%d')"
-            ).col("COUNT(*) AS total").col("DATE_FORMAT(created, '%Y-%m-%d') as created");
-        } else {
-            builder.col("*").leftJoin(tablePrefix + "extra AS e", "r.id = e.record_id");
-        }
+    builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
+    builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
+    builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
 
-        builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
-        builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
-        builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
+    // Get Sorting order.
+    builder.order("created " + session.getSortBy().getString());
 
-        // Get Sorting order.
-        builder.order("created " + session.getSortBy().getString());
-
-        return builder.build();
-    }
+    return builder.build();
+  }
 }

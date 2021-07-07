@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.sponge.data.storage.h2;
 
 import com.minecraftonline.griefalert.SpongeGriefAlert;
@@ -40,6 +41,13 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.sql.SqlService;
 
+// TODO remove and use SQLite
+
+/**
+ * Storage adapter for H2.
+ *
+ * @author viveleroi
+ */
 public class H2StorageAdapter implements StorageAdapter {
 
   private static HikariDataSource db;

@@ -24,6 +24,9 @@
 package com.minecraftonline.griefalert.common.data.query;
 
 import com.google.common.base.Preconditions;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.flags.FlagHandler;
+import com.minecraftonline.griefalert.common.data.parameters.ParameterException;
 import com.minecraftonline.griefalert.common.data.parameters.ParameterHandler;
 import com.minecraftonline.griefalert.sponge.data.util.Format;
 import java.util.ArrayList;
@@ -59,7 +62,7 @@ public class QueryBuilder {
    * @param arguments String Parameter: value string
    * @return {@link Query} Database query object
    */
-  public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String arguments) {
+  public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String arguments) throws ParameterException {
     return fromArguments(session, (arguments != null ? arguments.split(" ") : new String[]{}));
   }
 
@@ -70,7 +73,7 @@ public class QueryBuilder {
    * @param arguments String[] Parameter:value list
    * @return {@link Query} Database query object
    */
-  public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String[] arguments) {
+  public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String[] arguments) throws ParameterException {
     Preconditions.checkNotNull(session);
 
     Query query = new Query();
@@ -146,7 +149,8 @@ public class QueryBuilder {
    * @param flag    Flag
    * @return Optional<CompletableFuture < ?>>
    */
-  private static Optional<CompletableFuture<?>> parseFlagFromArgument(QuerySession session, Query query, String flag) throws ParameterException {
+  private static Optional<CompletableFuture<?>> parseFlagFromArgument(QuerySession session, Query query, String flag)
+      throws ParameterException {
     flag = flag.substring(1);
 
     // Determine the true alias and value

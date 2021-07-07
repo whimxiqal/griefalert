@@ -21,49 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.common.data.services;
 
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.FieldCondition;
-import com.helion3.prism.api.query.MatchRule;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.query.Sort;
-import com.helion3.prism.api.services.PrismService;
-import com.helion3.prism.api.services.Request;
-import com.helion3.prism.commands.ApplierCommand;
-import com.helion3.prism.util.AsyncUtil;
-import com.helion3.prism.util.DataQueries;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
+import com.minecraftonline.griefalert.common.data.query.ConditionGroup;
+import com.minecraftonline.griefalert.common.data.query.FieldCondition;
+import com.minecraftonline.griefalert.common.data.query.MatchRule;
+import com.minecraftonline.griefalert.common.data.query.Query;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
-import org.spongepowered.api.command.CommandSource;
-
-import javax.annotation.Nonnull;
+import com.minecraftonline.griefalert.common.data.query.Sort;
+import com.minecraftonline.griefalert.sponge.data.commands.ApplierCommand;
+import com.minecraftonline.griefalert.sponge.data.util.AsyncUtil;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import org.spongepowered.api.command.CommandSource;
 
 public class DataServiceImpl implements DataService {
 
   @Override
-  public void rollback(@Nonnull CommandSource source, @Nonnull com.helion3.prism.api.services.Request conditions) {
+  public void rollback(@Nonnull CommandSource source, @Nonnull DataRequest conditions) {
     QuerySession session = buildSession(source, conditions);
     session.addFlag(Flag.NO_GROUP);
     ApplierCommand.runApplier(session, Sort.NEWEST_FIRST);
   }
 
   @Override
-  public void restore(@Nonnull CommandSource source, @Nonnull com.helion3.prism.api.services.Request conditions) {
+  public void restore(@Nonnull CommandSource source, @Nonnull DataRequest conditions) {
     QuerySession session = buildSession(source, conditions);
     session.addFlag(Flag.NO_GROUP);
     ApplierCommand.runApplier(session, Sort.OLDEST_FIRST);
   }
 
   @Override
-  public void lookup(@Nonnull CommandSource source, @Nonnull com.helion3.prism.api.services.Request conditions) {
+  public void lookup(@Nonnull CommandSource source, @Nonnull DataRequest conditions) {
     AsyncUtil.lookup(buildSession(source, conditions));
   }
 
   private QuerySession buildSession(CommandSource source, DataRequest conditions) {
     final QuerySession session = new QuerySession(source);
-    com.helion3.prism.api.query.Query query = session.newQuery();
+    Query query = session.newQuery();
 
     ConditionGroup eventConditionGroup = new ConditionGroup(ConditionGroup.Operator.OR);
     conditions.getEvents().forEach(event ->

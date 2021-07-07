@@ -26,8 +26,8 @@ package com.minecraftonline.griefalert.sponge.alert.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.helion3.prism.util.DataQueries;
 import com.minecraftonline.griefalert.common.alert.struct.SignText;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;

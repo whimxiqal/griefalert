@@ -23,37 +23,37 @@
  */
 package com.minecraftonline.griefalert.sponge.data.commands;
 
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.query.ConditionGroup;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.sponge.data.util.AsyncUtil;
+import com.minecraftonline.griefalert.sponge.data.util.Format;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
-
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.AsyncUtil;
-import com.helion3.prism.util.Format;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 // TODO remove
 public class NearCommand {
-    private NearCommand() {}
+  private NearCommand() {
+  }
 
-    public static CommandSpec getCommand() {
-        return CommandSpec.builder()
-            .description(Text.of("Alias of /pr l r:(default radius)"))
-            .permission("prism.lookup")
-            .executor((source, args) -> {
-                int radius = SpongeGriefAlert.getSpongeInstance().getConfig().getDefaultCategory().getRadius();
+  public static CommandSpec getCommand() {
+    return CommandSpec.builder()
+        .description(Text.of("Alias of /pr l r:(default radius)"))
+        .permission("prism.lookup")
+        .executor((source, args) -> {
+          int radius = SpongeGriefAlert.getSpongeInstance().getConfig().getDefaultCategory().getRadius();
 
-                source.sendMessage(Format.heading("Querying records..."));
+          source.sendMessage(Format.heading("Querying records..."));
 
-                // Create a new query session
-                final QuerySession session = new QuerySession(source);
-                session.newQuery().addCondition(ConditionGroup.from(((Player) source).getLocation(), radius));
+          // Create a new query session
+          final QuerySession session = new QuerySession(source);
+          session.newQuery().addCondition(ConditionGroup.from(((Player) source).getLocation(), radius));
 
-                // Pass off to an async lookup helper
-                AsyncUtil.lookup(session);
-                return CommandResult.success();
-            }).build();
-    }
+          // Pass off to an async lookup helper
+          AsyncUtil.lookup(session);
+          return CommandResult.success();
+        }).build();
+  }
 }

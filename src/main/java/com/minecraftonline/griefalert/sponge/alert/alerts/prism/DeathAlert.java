@@ -24,10 +24,10 @@
 
 package com.minecraftonline.griefalert.sponge.alert.alerts.prism;
 
-import com.helion3.prism.api.data.PrismEvent;
-import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.common.data.services.DataRequest;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import java.util.Date;
 import org.spongepowered.api.Sponge;
 
@@ -41,8 +41,8 @@ public class DeathAlert extends PrismAlert {
   }
 
   @Override
-  protected Request getRollbackRequest() {
-    Request.Builder builder = Request.builder();
+  protected DataRequest getRollbackRequest() {
+    DataRequest.Builder builder = DataRequest.builder();
 
     builder.addPlayerUuid(getGrieferUuid());
     builder.addTarget(getTarget().replace("minecraft:", ""));

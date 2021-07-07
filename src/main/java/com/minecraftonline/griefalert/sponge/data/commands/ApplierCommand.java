@@ -24,10 +24,15 @@
 
 package com.minecraftonline.griefalert.sponge.data.commands;
 
+import com.minecraftonline.griefalert.SpongeGriefAlert;
 import com.minecraftonline.griefalert.common.data.flags.Flag;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import com.minecraftonline.griefalert.common.data.query.Sort;
+import com.minecraftonline.griefalert.common.data.records.Actionable;
+import com.minecraftonline.griefalert.common.data.records.ActionableResult;
+import com.minecraftonline.griefalert.common.data.records.Result;
 import com.minecraftonline.griefalert.sponge.data.util.Format;
+import com.minecraftonline.griefalert.sponge.data.util.WorldUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +84,7 @@ public class ApplierCommand {
    * @param sort
    */
   public static void runApplier(QuerySession session, Sort sort) {
-    session.getQuery().setLimit(.getInstance().getConfig().getLimitCategory().getMaximumActionable());
+    session.getQuery().setLimit(SpongeGriefAlert.getSpongeInstance().getConfig().getLimitCategory().getMaximumActionable());
     CommandSource source = session.getCommandSource();
     try {
       List<ActionableResult> actionResults = new ArrayList<>();
@@ -157,17 +162,15 @@ public class ApplierCommand {
     tokens.put("appliedCount", "" + appliedCount);
     tokens.put("skippedCount", "" + skippedCount);
 
+    // TODO send the correct messages (Prism used a "Template" class to format the results)
     final String messageTemplate;
     if (skippedCount > 0) {
-      messageTemplate = Translation.from("rollback.success.withskipped");
+      messageTemplate = "rollback.success.withskipped";
     } else {
-      messageTemplate = Translation.from("rollback.success");
+      messageTemplate = "rollback.success";
     }
 
-    source.sendMessage(Format.heading(
-        Text.of(Template.parseTemplate(messageTemplate, tokens)),
-        " ", Format.bonus(Translation.from("rollback.success.bonus"))
-    ));
+    source.sendMessage(Format.heading("rollback.success.bonus"));
 
     if (source instanceof Player) {
       SpongeGriefAlert.getSpongeInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);

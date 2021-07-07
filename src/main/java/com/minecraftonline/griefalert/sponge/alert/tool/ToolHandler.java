@@ -75,13 +75,13 @@
 package com.minecraftonline.griefalert.sponge.alert.tool;
 
 import com.google.common.collect.Lists;
-import com.helion3.prism.api.services.PrismService;
-import com.helion3.prism.api.services.Request;
-import com.helion3.prism.util.PrismEvents;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.services.DataRequest;
+import com.minecraftonline.griefalert.common.data.services.DataService;
 import com.minecraftonline.griefalert.sponge.alert.util.Format;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Permissions;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Settings;
+import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -215,7 +215,7 @@ public class ToolHandler {
               event.setCancelled(true);
 
               Task.builder().async().execute(() -> {
-                Request.Builder builder = Request.builder()
+                DataRequest.Builder builder = DataRequest.builder()
                     .setLatest(Date.from(Instant.now()))
                     .addEvent(PrismEvents.BLOCK_BREAK)
                     .addEvent(PrismEvents.BLOCK_PLACE)
@@ -250,14 +250,14 @@ public class ToolHandler {
                   player.sendMessage(Format.error("This tool is expired, please make a new one"));
                   return;
                 }
-                Optional<PrismService> prism = Sponge.getServiceManager().provide(PrismService.class);
+                Optional<DataService> dataService = Sponge.getServiceManager().provide(DataService.class);
                 try {
-                  if (prism.isPresent()) {
+                  if (dataService.isPresent()) {
                     if (profileReference.get() != null && !profileReference.get().getName().isPresent()) {
                       player.sendMessage(Format.success("Undoing events by ",
                           TextColors.GOLD, profileReference.get().getName().get()));
                     }
-                    prism.get().rollback(player, builder.build());
+                    dataService.get().rollback(player, builder.build());
                   } else {
                     throw new RuntimeException("Could not get PrismService from Sponge Service Manager");
                   }

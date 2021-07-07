@@ -26,14 +26,15 @@ package com.minecraftonline.griefalert.sponge.alert.util;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.helion3.prism.api.data.PrismEvent;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
 import com.minecraftonline.griefalert.common.alert.alerts.Alert;
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
-import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
 import com.minecraftonline.griefalert.common.alert.services.AlertRequest;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvent;
+import com.minecraftonline.griefalert.common.alert.struct.GriefEvents;
+import com.minecraftonline.griefalert.common.data.services.DataRequest;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.commands.CheckCommand;
 import com.minecraftonline.griefalert.sponge.alert.util.enums.Settings;
 import java.net.MalformedURLException;
@@ -491,7 +492,7 @@ public final class Format {
    * @param request the request
    * @return the formatted message
    */
-  public static Text request(com.helion3.prism.api.services.Request request) {
+  public static Text request(DataRequest request) {
     List<Text> tokens = Lists.newLinkedList();
     if (!request.getPlayerUuids().isEmpty()) {
       Text.Builder builder = Text.builder();

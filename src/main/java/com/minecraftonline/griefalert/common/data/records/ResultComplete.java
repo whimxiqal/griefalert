@@ -21,72 +21,68 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.common.data.records;
 
-import com.helion3.prism.api.records.Result;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
+import com.minecraftonline.griefalert.sponge.data.util.DateUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
-
-import com.helion3.prism.Prism;
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.DateUtil;
 
 /**
  * Represents a complete copy of event record data from
  * a query result. Used for displaying individual entries
  * or for non-lookup actions.
- *
  */
 public class ResultComplete extends Result {
 
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat(SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().getDateFormat());
+  private final SimpleDateFormat dateFormatter = new SimpleDateFormat(SpongeGriefAlert.getSpongeInstance().getConfig().getGeneralCategory().getDateFormat());
 
-    /**
-     * Returns a user-friendly relative "time since" value.
-     *
-     * @return String "time since" value.
-     */
-    public String getRelativeTime() {
-        Optional<Object> date = data.get(DataQueries.Created);
-        String relativeTime = "";
+  /**
+   * Returns a user-friendly relative "time since" value.
+   *
+   * @return String "time since" value.
+   */
+  public String getRelativeTime() {
+    Optional<Object> date = data.get(DataQueries.Created);
+    String relativeTime = "";
 
-        if (date.isPresent()) {
-            Date created = null;
+    if (date.isPresent()) {
+      Date created = null;
 
-            if (date.get() instanceof Date) {
-                created = (Date) date.get();
-            }
-            else if (date.get() instanceof Long) {
-                created = new Date(((Long) date.get()) * 1000);
-            }
+      if (date.get() instanceof Date) {
+        created = (Date) date.get();
+      } else if (date.get() instanceof Long) {
+        created = new Date(((Long) date.get()) * 1000);
+      }
 
-            if (created != null) {
-                relativeTime = DateUtil.getTimeSince(created);
-            }
-        }
-
-        return relativeTime;
+      if (created != null) {
+        relativeTime = DateUtil.getTimeSince(created);
+      }
     }
 
-    /**
-     * Returns a full timestamp.
-     *
-     * @return String timestamp
-     */
-    public String getTime() {
-        Optional<Object> date = data.get(DataQueries.Created);
-        String time = "";
+    return relativeTime;
+  }
 
-        if (date.isPresent()) {
-            if (date.get() instanceof Date) {
-                time = dateFormatter.format((Date) date.get());
-            }
-            else if (date.get() instanceof Long) {
-                time = dateFormatter.format(new Date(((Long) date.get()) * 1000));
-            }
-        }
+  /**
+   * Returns a full timestamp.
+   *
+   * @return String timestamp
+   */
+  public String getTime() {
+    Optional<Object> date = data.get(DataQueries.Created);
+    String time = "";
 
-        return time;
+    if (date.isPresent()) {
+      if (date.get() instanceof Date) {
+        time = dateFormatter.format((Date) date.get());
+      } else if (date.get() instanceof Long) {
+        time = dateFormatter.format(new Date(((Long) date.get()) * 1000));
+      }
     }
+
+    return time;
+  }
 }

@@ -24,16 +24,12 @@
 
 package com.minecraftonline.griefalert.sponge.data.util;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.records.Result;
-import com.helion3.prism.api.records.ResultAggregate;
-import com.helion3.prism.api.records.ResultComplete;
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.Format;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
 import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.common.data.records.ResultAggregate;
+import com.minecraftonline.griefalert.common.data.records.ResultComplete;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -74,12 +70,12 @@ public class LookupCallback extends AsyncCallback {
 
   @Override
   public void empty() {
-    this.querySession.getCommandSource().sendMessage(com.helion3.prism.util.Format.error("Nothing found. See /pr ? for help."));
+    this.querySession.getCommandSource().sendMessage(Format.error("Nothing found. See /pr ? for help."));
   }
 
   @Override
   public void error(Exception ex) {
-    this.querySession.getCommandSource().sendMessage(com.helion3.prism.util.Format.error("An error occurred. Please see the console."));
+    this.querySession.getCommandSource().sendMessage(Format.error("An error occurred. Please see the console."));
     SpongeGriefAlert.getSpongeInstance().getLogger().error("Exception thrown by {}", getClass().getSimpleName(), ex);
   }
 
@@ -89,34 +85,34 @@ public class LookupCallback extends AsyncCallback {
     resultMessage.append(Text.of(TextColors.WHITE, result.getEventVerb(), " "));
 
     Text.Builder hoverMessage = Text.builder();
-    hoverMessage.append(com.helion3.prism.util.Format.prefix(), Text.NEW_LINE);
+    hoverMessage.append(Format.prefix(), Text.NEW_LINE);
     hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Source: ", TextColors.WHITE, result.getSourceName(), Text.NEW_LINE));
     hoverMessage.append(Text.of(TextColors.DARK_GRAY, "PrismEvent: ", TextColors.WHITE, result.getEventName(), Text.NEW_LINE));
 
-    String quantity = result.data.getString(com.helion3.prism.util.DataQueries.Quantity).orElse(null);
+    String quantity = result.data.getString(DataQueries.Quantity).orElse(null);
     if (StringUtils.isNotBlank(quantity)) {
       resultMessage.append(Text.of(TextColors.DARK_AQUA, quantity, " "));
       hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Quantity: ", TextColors.WHITE, quantity, Text.NEW_LINE));
     }
 
-    String target = result.data.getString(com.helion3.prism.util.DataQueries.Target).orElse("Unknown");
+    String target = result.data.getString(DataQueries.Target).orElse("Unknown");
     if (StringUtils.isNotBlank(target)) {
-      resultMessage.append(Text.of(TextColors.DARK_AQUA, com.helion3.prism.util.Format.item(target, false), " "));
+      resultMessage.append(Text.of(TextColors.DARK_AQUA, Format.item(target, false), " "));
       hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Target: ", TextColors.WHITE, target, Text.NEW_LINE));
     }
 
-    String id = result.data.getString(com.helion3.prism.util.DataQueries.Id).orElse(null);
+    String id = result.data.getString(DataQueries.Id).orElse(null);
     if (StringUtils.isNotBlank(id)) {
       hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Id: ", TextColors.WHITE, id, Text.NEW_LINE));
     }
 
-    String container = result.data.getString(com.helion3.prism.util.DataQueries.Container).orElse(null);
+    String container = result.data.getString(DataQueries.Container).orElse(null);
     if (StringUtils.isNotBlank(container)) {
       hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Container: ", TextColors.WHITE, container, Text.NEW_LINE));
     }
 
     if (result instanceof ResultAggregate) {
-      int count = result.data.getInt(com.helion3.prism.util.DataQueries.Count).orElse(0);
+      int count = result.data.getInt(DataQueries.Count).orElse(0);
       if (count > 0) {
         resultMessage.append(Text.of(TextColors.GREEN, "x", count, " "));
         hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Count: ", TextColors.WHITE, count));
@@ -129,14 +125,14 @@ public class LookupCallback extends AsyncCallback {
       resultMessage.append(Text.of(TextColors.WHITE, resultComplete.getRelativeTime()));
       hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Time: ", TextColors.WHITE, resultComplete.getTime(), Text.NEW_LINE));
 
-      DataView location = (DataView) resultComplete.data.get(com.helion3.prism.util.DataQueries.Location).orElse(null);
+      DataView location = (DataView) resultComplete.data.get(DataQueries.Location).orElse(null);
       if (location != null) {
-        int x = location.getInt(com.helion3.prism.util.DataQueries.X).orElse(0);
-        int y = location.getInt(com.helion3.prism.util.DataQueries.Y).orElse(0);
-        int z = location.getInt(com.helion3.prism.util.DataQueries.Z).orElse(0);
+        int x = location.getInt(DataQueries.X).orElse(0);
+        int y = location.getInt(DataQueries.Y).orElse(0);
+        int z = location.getInt(DataQueries.Z).orElse(0);
         World world = location.get(DataQueries.WorldUuid).flatMap(TypeUtil::uuidFromObject).flatMap(Sponge.getServer()::getWorld).orElse(null);
 
-        hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, com.helion3.prism.util.Format.location(x, y, z, world, false)));
+        hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, Format.location(x, y, z, world, false)));
         if (this.querySession.hasFlag(Flag.EXTENDED)) {
           resultMessage.append(Text.of(Text.NEW_LINE, TextColors.GRAY, " - ", Format.location(x, y, z, world, true)));
           hoverMessage.append(Text.of(Text.NEW_LINE, Text.NEW_LINE, TextColors.GRAY, "Click location to teleport."));

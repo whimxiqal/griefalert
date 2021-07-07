@@ -24,9 +24,9 @@
 
 package com.minecraftonline.griefalert.sponge.alert.alerts.prism;
 
-import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.common.alert.alerts.Detail;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 import com.minecraftonline.griefalert.sponge.alert.util.General;
 import com.minecraftonline.griefalert.sponge.alert.util.PrismUtil;
 import java.io.IOException;

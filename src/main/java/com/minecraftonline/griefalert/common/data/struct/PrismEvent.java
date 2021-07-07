@@ -24,48 +24,47 @@
 
 package com.minecraftonline.griefalert.common.data.struct;
 
-import com.helion3.prism.api.records.Result;
-import org.spongepowered.api.CatalogType;
-
+import com.minecraftonline.griefalert.common.data.records.Result;
 import javax.annotation.Nonnull;
+import org.spongepowered.api.CatalogType;
 
 public class PrismEvent implements CatalogType {
 
-    private final String id;
-    private final String name;
-    private final String pastTense;
-    private final Class<? extends Result> resultClass;
+  private final String id;
+  private final String name;
+  private final String pastTense;
+  private final Class<? extends Result> resultClass;
 
-    private PrismEvent(@Nonnull String id, @Nonnull String name, @Nonnull String pastTense, @Nonnull Class<? extends Result> resultClass) {
-        this.id = id;
-        this.name = name;
-        this.pastTense = pastTense;
-        this.resultClass = resultClass;
-    }
+  private PrismEvent(@Nonnull String id, @Nonnull String name, @Nonnull String pastTense, @Nonnull Class<? extends Result> resultClass) {
+    this.id = id;
+    this.name = name;
+    this.pastTense = pastTense;
+    this.resultClass = resultClass;
+  }
 
-    public static PrismEvent of(@Nonnull String id, @Nonnull String name, @Nonnull String pastTense, @Nonnull Class<? extends Result> resultClass) {
-        return new PrismEvent(id, name, pastTense, resultClass);
-    }
+  public static PrismEvent of(@Nonnull String id, @Nonnull String name, @Nonnull String pastTense, @Nonnull Class<? extends Result> resultClass) {
+    return new PrismEvent(id, name, pastTense, resultClass);
+  }
 
-    @Override
-    @Nonnull
-    public String getId() {
-        return id;
-    }
+  @Override
+  @Nonnull
+  public String getId() {
+    return id;
+  }
 
-    @Override
-    @Nonnull
-    public String getName() {
-        return name;
-    }
+  @Override
+  @Nonnull
+  public String getName() {
+    return name;
+  }
 
-    @Nonnull
-    public String getPastTense() {
-        return pastTense;
-    }
+  @Nonnull
+  public String getPastTense() {
+    return pastTense;
+  }
 
-    @Nonnull
-    public Class<? extends Result> getResultClass() {
-        return resultClass;
-    }
+  @Nonnull
+  public Class<? extends Result> getResultClass() {
+    return resultClass;
+  }
 }

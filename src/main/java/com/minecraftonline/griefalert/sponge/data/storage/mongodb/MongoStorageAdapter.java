@@ -24,12 +24,11 @@
 
 package com.minecraftonline.griefalert.sponge.data.storage.mongodb;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.storage.StorageAdapter;
-import com.helion3.prism.api.storage.StorageAdapterRecords;
-import com.helion3.prism.api.storage.StorageAdapterSettings;
-import com.helion3.prism.storage.mongodb.MongoRecords;
-import com.helion3.prism.storage.mongodb.codec.PrimitiveArrayCodec;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.storage.StorageAdapter;
+import com.minecraftonline.griefalert.common.data.storage.StorageAdapterRecords;
+import com.minecraftonline.griefalert.common.data.storage.StorageAdapterSettings;
+import com.minecraftonline.griefalert.sponge.data.storage.mongodb.codec.PrimitiveArrayCodec;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -37,119 +36,112 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
-
 import java.util.concurrent.TimeUnit;
-
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
 public class MongoStorageAdapter implements StorageAdapter {
 
-    private static MongoClient mongoClient = null;
-    private static MongoDatabase database;
-    private final com.helion3.prism.storage.mongodb.MongoRecords records;
-    private final String databaseName;
+  protected static String collectionEventRecordsName;
+  private static MongoClient mongoClient = null;
+  private static MongoDatabase database;
+  private final MongoRecords records;
+  private final String databaseName;
 
-    protected static String collectionEventRecordsName;
+  public MongoStorageAdapter() {
+    databaseName = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getDatabase();
 
-    /**
-     *
-     */
-    public MongoStorageAdapter() {
-        databaseName = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getDatabase();
+    // Collections
+    collectionEventRecordsName = "records";
 
-        // Collections
-        collectionEventRecordsName = "records";
+    records = new MongoRecords();
+  }
 
-        records = new MongoRecords();
+  /**
+   * @param collectionName
+   * @return
+   */
+  protected static MongoCollection<Document> getCollection(String collectionName) {
+    try {
+      return database.getCollection(collectionName);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    return null;
+  }
 
-    /**
-     * Establish connections to the database
-     *
-     * @return Whether we could connect properly
-     */
-    @Override
-    public boolean connect() throws Exception {
-        ServerAddress address = new ServerAddress(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getAddress(), ServerAddress.defaultPort());
+  /**
+   * Establish connections to the database
+   *
+   * @return Whether we could connect properly
+   */
+  @Override
+  public boolean connect() throws Exception {
+    ServerAddress address = new ServerAddress(SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getAddress(), ServerAddress.defaultPort());
 
-        MongoCredential credential = MongoCredential.createCredential(
-                SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getUsername(),
-                databaseName,
-                SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getPassword().toCharArray()
-        );
+    MongoCredential credential = MongoCredential.createCredential(
+        SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getUsername(),
+        databaseName,
+        SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getPassword().toCharArray()
+    );
 
-        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
-                MongoClient.getDefaultCodecRegistry(),
-                CodecRegistries.fromCodecs(new PrimitiveArrayCodec())
-        );
+    CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+        MongoClient.getDefaultCodecRegistry(),
+        CodecRegistries.fromCodecs(new PrimitiveArrayCodec())
+    );
 
-        mongoClient = new MongoClient(address, credential, MongoClientOptions.builder().codecRegistry(codecRegistry).build());
+    mongoClient = new MongoClient(address, credential, MongoClientOptions.builder().codecRegistry(codecRegistry).build());
 
-        // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
+    // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
 
-        // Connect to the database
-        database = mongoClient.getDatabase(databaseName);
+    // Connect to the database
+    database = mongoClient.getDatabase(databaseName);
 
-        // Create indexes
-        try {
-            getCollection(collectionEventRecordsName).createIndex(
-                    new Document("Location.X", 1).append("Location.Z", 1).append("Location.Y", 1).append("Created", -1));
-            getCollection(collectionEventRecordsName).createIndex(new Document("Created", -1).append("EventName", 1));
+    // Create indexes
+    try {
+      getCollection(collectionEventRecordsName).createIndex(
+          new Document("Location.X", 1).append("Location.Z", 1).append("Location.Y", 1).append("Created", -1));
+      getCollection(collectionEventRecordsName).createIndex(new Document("Created", -1).append("EventName", 1));
 
-            // TTL
-            IndexOptions options = new IndexOptions().expireAfter(0L, TimeUnit.SECONDS);
-            getCollection(collectionEventRecordsName).createIndex(new Document("Expires", 1), options);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+      // TTL
+      IndexOptions options = new IndexOptions().expireAfter(0L, TimeUnit.SECONDS);
+      getCollection(collectionEventRecordsName).createIndex(new Document("Expires", 1), options);
+      return true;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
     }
+  }
 
-    @Override
-    public StorageAdapterRecords records() {
-        return records;
-    }
+  @Override
+  public StorageAdapterRecords records() {
+    return records;
+  }
 
-    @Override
-    public StorageAdapterSettings settings() {
-        return null;
-    }
+  @Override
+  public StorageAdapterSettings settings() {
+    return null;
+  }
 
-   /**
-    *
-    * @param collectionName
-    * @return
-    */
-   protected static MongoCollection<Document> getCollection(String collectionName) {
-       try {
-           return database.getCollection(collectionName);
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-       return null;
-   }
+  /**
+   * Close connections.
+   */
+  @Override
+  public void close() {
+    mongoClient.close();
+  }
 
-    /**
-     * Close connections.
-     */
-    @Override
-    public void close() {
-        mongoClient.close();
-    }
-
-    /**
-     * Test the connection, returns true if valid and ready, false if
-     * error/null.
-     *
-     * @return
-     * @throws Exception If connection fails
-     */
-    // @todo implement
-    @Override
-    public boolean testConnection() throws Exception {
-        return false;
-    }
+  /**
+   * Test the connection, returns true if valid and ready, false if
+   * error/null.
+   *
+   * @return
+   * @throws Exception If connection fails
+   */
+  // @todo implement
+  @Override
+  public boolean testConnection() throws Exception {
+    return false;
+  }
 }

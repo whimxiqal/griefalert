@@ -26,10 +26,10 @@ package com.minecraftonline.griefalert.sponge.alert.commands;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
-import com.helion3.prism.api.data.PrismEvent;
-import com.helion3.prism.api.services.PrismService;
-import com.helion3.prism.api.services.Request;
 import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.services.DataRequest;
+import com.minecraftonline.griefalert.common.data.services.DataService;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
 import com.minecraftonline.griefalert.sponge.alert.commands.common.GeneralCommand;
 import com.minecraftonline.griefalert.sponge.alert.util.DateUtil;
 import com.minecraftonline.griefalert.sponge.alert.util.Errors;
@@ -61,6 +61,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 /**
  * A command to rollback or restore changes using Prism.
+ *
+ * @author PietElite
  */
 public final class ApplierCommand extends GeneralCommand {
 
@@ -98,7 +100,7 @@ public final class ApplierCommand extends GeneralCommand {
 
       Task.builder().async().execute(() -> {
 
-        Request.Builder requestBuilder = Request.builder();
+        DataRequest.Builder requestBuilder = DataRequest.builder();
 
         // Add location query with WE
         SpongeWorld spongeWorld = SpongeWorldEdit.inst().getWorld(player.getLocation().getExtent());
@@ -162,9 +164,9 @@ public final class ApplierCommand extends GeneralCommand {
 
         args.<PrismEvent>getAll(CommandKeys.PRISM_EVENT.get()).forEach(requestBuilder::addEvent);
 
-        Request request = requestBuilder.build();
+        DataRequest request = requestBuilder.build();
         player.sendMessage(Format.request(request));
-        Optional<PrismService> prism = Sponge.getServiceManager().provide(PrismService.class);
+        Optional<DataService> prism = Sponge.getServiceManager().provide(DataService.class);
         try {
           if (prism.isPresent()) {
             if (applyType.equals(ApplyType.ROLLBACK)) {

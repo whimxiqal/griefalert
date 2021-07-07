@@ -24,342 +24,336 @@
 
 package com.minecraftonline.griefalert.sponge.data.storage.mongodb;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-
-import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 import com.google.common.collect.Lists;
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.*;
-import com.helion3.prism.api.records.Result;
-import com.helion3.prism.util.PrimitiveArray;
-import org.bson.Document;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-
 import com.google.common.collect.Range;
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.ConditionGroup.Operator;
-import com.helion3.prism.api.storage.StorageAdapterRecords;
-import com.helion3.prism.api.storage.StorageDeleteResult;
-import com.helion3.prism.api.storage.StorageWriteResult;
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.DataUtil;
-import com.helion3.prism.util.DateUtil;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
+import com.minecraftonline.griefalert.common.data.query.Condition;
+import com.minecraftonline.griefalert.common.data.query.ConditionGroup;
+import com.minecraftonline.griefalert.common.data.query.FieldCondition;
+import com.minecraftonline.griefalert.common.data.query.MatchRule;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.common.data.records.Result;
+import com.minecraftonline.griefalert.common.data.storage.StorageAdapterRecords;
+import com.minecraftonline.griefalert.common.data.storage.StorageDeleteResult;
+import com.minecraftonline.griefalert.common.data.storage.StorageWriteResult;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
+import com.minecraftonline.griefalert.sponge.data.util.DataUtil;
+import com.minecraftonline.griefalert.sponge.data.util.DateUtil;
+import com.minecraftonline.griefalert.sponge.data.util.PrimitiveArray;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.WriteModel;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import org.bson.Document;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MongoRecords implements StorageAdapterRecords {
 
-    private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
-    private final String expiration = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getExpireRecords();
-    private final boolean expires = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().isShouldExpire();
+  private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
+  private final String expiration = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().getExpireRecords();
+  private final boolean expires = SpongeGriefAlert.getSpongeInstance().getConfig().getStorageCategory().isShouldExpire();
 
-    /**
-     * Converts a DataView to a Document, recursively if needed.
-     *
-     * @param view Data view/container.
-     * @return Document for Mongo storage.
-     */
-    private Document documentFromView(DataView view) {
-        Document document = new Document();
+  /**
+   * Converts a DataView to a Document, recursively if needed.
+   *
+   * @param view Data view/container.
+   * @return Document for Mongo storage.
+   */
+  private Document documentFromView(DataView view) {
+    Document document = new Document();
 
-        Set<DataQuery> keys = view.getKeys(false);
-        for (DataQuery query : keys) {
-            String key = DataUtil.escapeQuery(query);
-            Object value = view.get(query).orElse(null);
+    Set<DataQuery> keys = view.getKeys(false);
+    for (DataQuery query : keys) {
+      String key = DataUtil.escapeQuery(query);
+      Object value = view.get(query).orElse(null);
 
-            if (value == null) {
-                // continue
-            } else if (value instanceof Collection) {
-                List<Object> convertedList = Lists.newArrayList();
-                for (Object object : (Collection<?>) value) {
-                    if (object == null) {
-                        // continue
-                    } else if (object instanceof DataView) {
-                        convertedList.add(documentFromView((DataView) object));
-                    } else if (DataUtil.isPrimitiveType(object)) {
-                        convertedList.add(object);
-                    } else if (object.getClass().isArray()) {
-                        document.append(key, new PrimitiveArray(object));
-                    } else if (object.getClass().isEnum()) {
-                        // Ignoring, this data should exist elsewhere in the document.
-                        // this is ConnectedDirections and other vanilla manipulators
-                        // convertedList.add(object.toString());
-                    }  else {
-                        SpongeGriefAlert.getSpongeInstance().getLogger().error("Unsupported list data type: " + object.getClass().getName());
-                    }
-                }
-
-                if (!convertedList.isEmpty()) {
-                    document.append(key, convertedList);
-                }
-            } else if (value instanceof DataView) {
-                document.append(key, documentFromView((DataView) value));
-            } else if (value.getClass().isArray()) {
-                document.append(key, new PrimitiveArray(value));
-            } else {
-                if (key.equals(DataQueries.Player.toString())) {
-                    document.append(DataQueries.Player.toString(), value);
-                } else {
-                    document.append(key, value);
-                }
-            }
+      if (value == null) {
+        // continue
+      } else if (value instanceof Collection) {
+        List<Object> convertedList = Lists.newArrayList();
+        for (Object object : (Collection<?>) value) {
+          if (object == null) {
+            // continue
+          } else if (object instanceof DataView) {
+            convertedList.add(documentFromView((DataView) object));
+          } else if (DataUtil.isPrimitiveType(object)) {
+            convertedList.add(object);
+          } else if (object.getClass().isArray()) {
+            document.append(key, new PrimitiveArray(object));
+          } else if (object.getClass().isEnum()) {
+            // Ignoring, this data should exist elsewhere in the document.
+            // this is ConnectedDirections and other vanilla manipulators
+            // convertedList.add(object.toString());
+          } else {
+            SpongeGriefAlert.getSpongeInstance().getLogger().error("Unsupported list data type: " + object.getClass().getName());
+          }
         }
 
-        return document;
+        if (!convertedList.isEmpty()) {
+          document.append(key, convertedList);
+        }
+      } else if (value instanceof DataView) {
+        document.append(key, documentFromView((DataView) value));
+      } else if (value.getClass().isArray()) {
+        document.append(key, new PrimitiveArray(value));
+      } else {
+        if (key.equals(DataQueries.Player.toString())) {
+          document.append(DataQueries.Player.toString(), value);
+        } else {
+          document.append(key, value);
+        }
+      }
     }
 
-    /**
-     * Convert a mongo Document to a DataContainer.
-     * @param document Mongo document.
-     * @return Data container.
-     */
-    private DataContainer documentToDataContainer(Document document) {
-        DataContainer result = DataContainer.createNew();
+    return document;
+  }
 
-        for (String key : document.keySet()) {
-            DataQuery query = DataUtil.unescapeQuery(key);
-            Object value = document.get(key);
+  /**
+   * Convert a mongo Document to a DataContainer.
+   *
+   * @param document Mongo document.
+   * @return Data container.
+   */
+  private DataContainer documentToDataContainer(Document document) {
+    DataContainer result = DataContainer.createNew();
 
-            if (value instanceof Document) {
-                PrimitiveArray primitiveArray = PrimitiveArray.of((Document) value);
-                if (primitiveArray != null) {
-                    result.set(query, primitiveArray.getArray());
-                    continue;
-                }
+    for (String key : document.keySet()) {
+      DataQuery query = DataUtil.unescapeQuery(key);
+      Object value = document.get(key);
 
-                result.set(query, documentToDataContainer((Document) value));
-            } else {
-                result.set(query, value);
-            }
+      if (value instanceof Document) {
+        PrimitiveArray primitiveArray = PrimitiveArray.of((Document) value);
+        if (primitiveArray != null) {
+          result.set(query, primitiveArray.getArray());
+          continue;
         }
 
-        return result;
-   }
+        result.set(query, documentToDataContainer((Document) value));
+      } else {
+        result.set(query, value);
+      }
+    }
 
-   @Override
-   public StorageWriteResult write(List<DataContainer> containers) throws Exception {
-       MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
+    return result;
+  }
 
-       // Build an array of documents
-       List<WriteModel<Document>> documents = new ArrayList<>();
-       for (DataContainer container : containers) {
-           Document document = documentFromView(container);
+  @Override
+  public StorageWriteResult write(List<DataContainer> containers) throws Exception {
+    MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
-           // SpongeGriefAlert.getSpongeInstance().getLogger().debug(DataUtil.jsonFromDataView(container).toString());
+    // Build an array of documents
+    List<WriteModel<Document>> documents = new ArrayList<>();
+    for (DataContainer container : containers) {
+      Document document = documentFromView(container);
 
-           // TTL
-           if (expires) {
-               document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
-           }
+      // SpongeGriefAlert.getSpongeInstance().getLogger().debug(DataUtil.jsonFromDataView(container).toString());
 
-           // Insert
-           documents.add(new InsertOneModel<>(document));
-       }
+      // TTL
+      if (expires) {
+        document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
+      }
 
-       // Write
-       collection.bulkWrite(documents, bulkWriteOptions);
+      // Insert
+      documents.add(new InsertOneModel<>(document));
+    }
 
-       // @todo implement real results, BulkWriteResult
+    // Write
+    collection.bulkWrite(documents, bulkWriteOptions);
 
-       return new StorageWriteResult();
-   }
+    // @todo implement real results, BulkWriteResult
 
-   /**
-    * Recursive method of building condition documents.
-    *
-    * @param fieldsOrGroups List<Condition>
-    * @return Document
-    */
-   private Document buildConditions(List<Condition> fieldsOrGroups) {
-       Document conditions = new Document();
+    return new StorageWriteResult();
+  }
 
-       for (Condition fieldOrGroup : fieldsOrGroups) {
-           if (fieldOrGroup instanceof ConditionGroup) {
-               ConditionGroup group = (ConditionGroup) fieldOrGroup;
-               Document subDoc = buildConditions(group.getConditions());
+  /**
+   * Recursive method of building condition documents.
+   *
+   * @param fieldsOrGroups List<Condition>
+   * @return Document
+   */
+  private Document buildConditions(List<Condition> fieldsOrGroups) {
+    Document conditions = new Document();
 
-               if (group.getOperator().equals(Operator.OR)) {
-                   conditions.append("$or", subDoc);
-               } else {
-                   conditions.putAll(subDoc);
-               }
-           } else {
-               FieldCondition field = (FieldCondition) fieldOrGroup;
+    for (Condition fieldOrGroup : fieldsOrGroups) {
+      if (fieldOrGroup instanceof ConditionGroup) {
+        ConditionGroup group = (ConditionGroup) fieldOrGroup;
+        Document subDoc = buildConditions(group.getConditions());
 
-               Document matcher;
-               if (conditions.containsKey(field.getFieldName().toString())) {
-                   matcher = (Document) conditions.get(field.getFieldName().toString());
-               } else {
-                   matcher = new Document();
-               }
+        if (group.getOperator().equals(ConditionGroup.Operator.OR)) {
+          conditions.append("$or", subDoc);
+        } else {
+          conditions.putAll(subDoc);
+        }
+      } else {
+        FieldCondition field = (FieldCondition) fieldOrGroup;
 
-               // Match an array of items
-               if (field.getValue() instanceof List) {
-                   matcher.append(field.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin", field.getValue());
-                   conditions.put(field.getFieldName().toString(), matcher);
-               }
+        Document matcher;
+        if (conditions.containsKey(field.getFieldName().toString())) {
+          matcher = (Document) conditions.get(field.getFieldName().toString());
+        } else {
+          matcher = new Document();
+        }
 
-               else if (field.getMatchRule().equals(MatchRule.EQUALS)) {
-                   conditions.put(field.getFieldName().toString(), field.getValue());
-               }
+        // Match an array of items
+        if (field.getValue() instanceof List) {
+          matcher.append(field.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin", field.getValue());
+          conditions.put(field.getFieldName().toString(), matcher);
+        } else if (field.getMatchRule().equals(MatchRule.EQUALS)) {
+          conditions.put(field.getFieldName().toString(), field.getValue());
+        } else if (field.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
+          matcher.append("$gte", field.getValue());
+          conditions.put(field.getFieldName().toString(), matcher);
+        } else if (field.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
+          matcher.append("$lte", field.getValue());
+          conditions.put(field.getFieldName().toString(), matcher);
+        } else if (field.getMatchRule().equals(MatchRule.BETWEEN)) {
+          if (!(field.getValue() instanceof Range)) {
+            throw new IllegalArgumentException("\"Between\" match value must be a Range.");
+          }
 
-               else if (field.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
-                   matcher.append("$gte", field.getValue());
-                   conditions.put(field.getFieldName().toString(), matcher);
-               }
+          Range<?> range = (Range<?>) field.getValue();
 
-               else if (field.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
-                   matcher.append("$lte", field.getValue());
-                   conditions.put(field.getFieldName().toString(), matcher);
-               }
+          Document between = new Document("$gte", range.lowerEndpoint()).append("$lte", range.upperEndpoint());
+          conditions.put(field.getFieldName().toString(), between);
+        }
+      }
+    }
 
-               else if (field.getMatchRule().equals(MatchRule.BETWEEN)) {
-                   if (!(field.getValue() instanceof Range)) {
-                       throw new IllegalArgumentException("\"Between\" match value must be a Range.");
-                   }
+    return conditions;
+  }
 
-                   Range<?> range = (Range<?>) field.getValue();
+  @Override
+  public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
+    Query query = session.getQuery();
+    checkNotNull(query);
 
-                   Document between = new Document("$gte", range.lowerEndpoint()).append("$lte", range.upperEndpoint());
-                   conditions.put(field.getFieldName().toString(), between);
-               }
-           }
-       }
+    // Prepare results
+    List<Result> results = new ArrayList<>();
+    CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
-       return conditions;
-   }
+    // Get collection
+    MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
-   @Override
-   public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
-       Query query = session.getQuery();
-       checkNotNull(query);
+    // Append all conditions
+    Document matcher = new Document("$match", buildConditions(query.getConditions()));
 
-       // Prepare results
-       List<Result> results = new ArrayList<>();
-       CompletableFuture<List<Result>> future = new CompletableFuture<>();
+    // Sorting. Newest first for rollback and oldest first for restore.
+    Document sortFields = new Document();
+    sortFields.put(DataQueries.Created.toString(), session.getSortBy().getValue());
+    Document sorter = new Document("$sort", sortFields);
 
-       // Get collection
-       MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
+    // Offset/Limit
+    Document limit = new Document("$limit", query.getLimit());
 
-       // Append all conditions
-       Document matcher = new Document("$match", buildConditions(query.getConditions()));
+    // Build aggregators
+    final AggregateIterable<Document> aggregated;
+    if (!session.hasFlag(Flag.NO_GROUP)) {
+      // Grouping fields
+      Document groupFields = new Document();
+      groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
+      groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
+      groupFields.put(DataQueries.Cause.toString(), "$" + DataQueries.Cause);
+      groupFields.put(DataQueries.Target.toString(), "$" + DataQueries.Target);
+      // Entity
+      groupFields.put(DataQueries.Entity.toString(), "$" + DataQueries.Entity.then(DataQueries.EntityType));
+      // Day
+      groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$" + DataQueries.Created));
+      groupFields.put("month", new Document("$month", "$" + DataQueries.Created));
+      groupFields.put("year", new Document("$year", "$" + DataQueries.Created));
 
-       // Sorting. Newest first for rollback and oldest first for restore.
-       Document sortFields = new Document();
-       sortFields.put(DataQueries.Created.toString(), session.getSortBy().getValue());
-       Document sorter = new Document("$sort", sortFields);
+      Document groupHolder = new Document("_id", groupFields);
+      groupHolder.put(DataQueries.Count.toString(), new Document("$sum", 1));
 
-       // Offset/Limit
-       Document limit = new Document("$limit", query.getLimit());
+      Document group = new Document("$group", groupHolder);
 
-       // Build aggregators
-       final AggregateIterable<Document> aggregated;
-       if (!session.hasFlag(Flag.NO_GROUP)) {
-           // Grouping fields
-           Document groupFields = new Document();
-           groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
-           groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
-           groupFields.put(DataQueries.Cause.toString(), "$" + DataQueries.Cause);
-           groupFields.put(DataQueries.Target.toString(), "$" + DataQueries.Target);
-           // Entity
-           groupFields.put(DataQueries.Entity.toString(), "$" + DataQueries.Entity.then(DataQueries.EntityType));
-           // Day
-           groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$" + DataQueries.Created));
-           groupFields.put("month", new Document("$month", "$" + DataQueries.Created));
-           groupFields.put("year", new Document("$year", "$" + DataQueries.Created));
+      // Aggregation pipeline
+      List<Document> pipeline = new ArrayList<>();
+      pipeline.add(matcher);
+      pipeline.add(group);
+      pipeline.add(sorter);
+      pipeline.add(limit);
 
-           Document groupHolder = new Document("_id", groupFields);
-           groupHolder.put(DataQueries.Count.toString(), new Document("$sum", 1));
+      aggregated = collection.aggregate(pipeline);
+      SpongeGriefAlert.getSpongeInstance().getLogger().debug("MongoDB Query: " + pipeline);
+    } else {
+      // Aggregation pipeline
+      List<Document> pipeline = new ArrayList<>();
+      pipeline.add(matcher);
+      pipeline.add(sorter);
+      pipeline.add(limit);
 
-           Document group = new Document("$group", groupHolder);
+      aggregated = collection.aggregate(pipeline);
+      SpongeGriefAlert.getSpongeInstance().getLogger().debug("MongoDB Query: " + pipeline);
+    }
 
-           // Aggregation pipeline
-           List<Document> pipeline = new ArrayList<>();
-           pipeline.add(matcher);
-           pipeline.add(group);
-           pipeline.add(sorter);
-           pipeline.add(limit);
+    // Iterate results and build our event record list
+    try (MongoCursor<Document> cursor = aggregated.iterator()) {
+      List<UUID> uuidsPendingLookup = new ArrayList<>();
 
-           aggregated = collection.aggregate(pipeline);
-           SpongeGriefAlert.getSpongeInstance().getLogger().debug("MongoDB Query: " + pipeline);
-       } else {
-           // Aggregation pipeline
-           List<Document> pipeline = new ArrayList<>();
-           pipeline.add(matcher);
-           pipeline.add(sorter);
-           pipeline.add(limit);
+      while (cursor.hasNext()) {
+        // Mongo document
+        Document wrapper = cursor.next();
+        Document document = session.hasFlag(Flag.NO_GROUP) ? wrapper : (Document) wrapper.get("_id");
 
-           aggregated = collection.aggregate(pipeline);
-           SpongeGriefAlert.getSpongeInstance().getLogger().debug("MongoDB Query: " + pipeline);
-       }
+        DataContainer data = documentToDataContainer(document);
 
-       // Iterate results and build our event record list
-       try (MongoCursor<Document> cursor = aggregated.iterator()) {
-           List<UUID> uuidsPendingLookup = new ArrayList<>();
+        if (!session.hasFlag(Flag.NO_GROUP)) {
+          data.set(DataQueries.Count, wrapper.get(DataQueries.Count.toString()));
+        }
 
-           while (cursor.hasNext()) {
-               // Mongo document
-               Document wrapper = cursor.next();
-               Document document = session.hasFlag(Flag.NO_GROUP) ? wrapper : (Document) wrapper.get("_id");
+        // Build our result object
+        Result result = Result.from(wrapper.getString(DataQueries.EventName.toString()), !session.hasFlag(Flag.NO_GROUP));
 
-               DataContainer data = documentToDataContainer(document);
+        // Determine the final name of the event source
+        if (document.containsKey(DataQueries.Player.toString())) {
+          String uuid = document.getString(DataQueries.Player.toString());
+          data.set(DataQueries.Cause, uuid);
 
-               if (!session.hasFlag(Flag.NO_GROUP)) {
-                   data.set(DataQueries.Count, wrapper.get(DataQueries.Count.toString()));
-               }
+          if (translate) {
+            uuidsPendingLookup.add(UUID.fromString(uuid));
+          }
+        } else {
+          data.set(DataQueries.Cause, document.getString(DataQueries.Cause.toString()));
+        }
 
-               // Build our result object
-               Result result = Result.from(wrapper.getString(DataQueries.EventName.toString()), !session.hasFlag(Flag.NO_GROUP));
+        result.data = data;
+        results.add(result);
+      }
 
-               // Determine the final name of the event source
-               if (document.containsKey(DataQueries.Player.toString())) {
-                   String uuid = document.getString(DataQueries.Player.toString());
-                   data.set(DataQueries.Cause, uuid);
+      if (translate && !uuidsPendingLookup.isEmpty()) {
+        DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(future::complete);
+      } else {
+        future.complete(results);
+      }
+    }
 
-                   if (translate) {
-                       uuidsPendingLookup.add(UUID.fromString(uuid));
-                   }
-               } else {
-                   data.set(DataQueries.Cause, document.getString(DataQueries.Cause.toString()));
-               }
+    return future;
+  }
 
-               result.data = data;
-               results.add(result);
-           }
-
-           if (translate && !uuidsPendingLookup.isEmpty()) {
-               DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(future::complete);
-           } else {
-               future.complete(results);
-           }
-       }
-
-       return future;
-   }
-
-   /**
-    * Given a list of parameters, will remove all matching records.
-    *
-    * @param query Query conditions indicating what we're purging
-    * @return
-    */
-   // @todo implement
-   @Override
-   public StorageDeleteResult delete(Query query) {
-       return new StorageDeleteResult();
-   }
+  /**
+   * Given a list of parameters, will remove all matching records.
+   *
+   * @param query Query conditions indicating what we're purging
+   * @return
+   */
+  // @todo implement
+  @Override
+  public StorageDeleteResult delete(Query query) {
+    return new StorageDeleteResult();
+  }
 }

@@ -24,37 +24,35 @@
 package com.minecraftonline.griefalert.common.data.flags;
 
 import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-import org.spongepowered.api.command.CommandSource;
-
-import javax.annotation.Nullable;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
+import org.spongepowered.api.command.CommandSource;
 
 public class FlagExtended extends SimpleFlagHandler {
-    /**
-     * Flag which displays all available data for each record.
-     */
-    public FlagExtended() {
-        super(ImmutableList.of("ex", "extended"));
-    }
+  /**
+   * Flag which displays all available data for each record.
+   */
+  public FlagExtended() {
+    super(ImmutableList.of("ex", "extended"));
+  }
 
-    @Override
-    public boolean acceptsSource(@Nullable CommandSource source) {
-        return true;
-    }
+  @Override
+  public boolean acceptsSource(@Nullable CommandSource source) {
+    return true;
+  }
 
-    @Override
-    public boolean acceptsValue(String value) {
-        return true;
-    }
+  @Override
+  public boolean acceptsValue(String value) {
+    return true;
+  }
 
-    @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, @Nullable String value, Query query) {
-        session.addFlag(com.helion3.prism.api.flags.Flag.EXTENDED);
-        session.addFlag(Flag.NO_GROUP);
-        return Optional.empty();
-    }
+  @Override
+  public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, @Nullable String value, Query query) {
+    session.addFlag(Flag.EXTENDED);
+    session.addFlag(Flag.NO_GROUP);
+    return Optional.empty();
+  }
 }

@@ -24,9 +24,8 @@
 package com.minecraftonline.griefalert.common.data.flags;
 
 import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import org.spongepowered.api.command.CommandSource;
 
 import javax.annotation.Nullable;

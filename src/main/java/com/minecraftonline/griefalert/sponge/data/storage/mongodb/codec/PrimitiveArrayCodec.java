@@ -25,7 +25,8 @@
 package com.minecraftonline.griefalert.sponge.data.storage.mongodb.codec;
 
 import com.google.common.collect.Lists;
-import com.helion3.prism.util.PrimitiveArray;
+import com.minecraftonline.griefalert.sponge.data.util.PrimitiveArray;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonInvalidOperationException;
 import org.bson.BsonReader;
@@ -38,93 +39,91 @@ import org.bson.codecs.EncoderContext;
 import org.bson.codecs.IntegerCodec;
 import org.bson.codecs.LongCodec;
 
-import java.util.List;
-
 public class PrimitiveArrayCodec implements Codec<PrimitiveArray> {
 
-    private final ByteCodec byteCodec = new ByteCodec();
-    private final IntegerCodec integerCodec = new IntegerCodec();
-    private final LongCodec longCodec = new LongCodec();
+  private final ByteCodec byteCodec = new ByteCodec();
+  private final IntegerCodec integerCodec = new IntegerCodec();
+  private final LongCodec longCodec = new LongCodec();
 
-    @Override
-    public PrimitiveArray decode(BsonReader reader, DecoderContext decoderContext) {
-        reader.readStartDocument();
-        String key = reader.readString("key");
+  @Override
+  public PrimitiveArray decode(BsonReader reader, DecoderContext decoderContext) {
+    reader.readStartDocument();
+    String key = reader.readString("key");
 
-        List<Number> value = Lists.newArrayList();
-        if (StringUtils.equals(key, PrimitiveArray.BYTE_ARRAY_ID)) {
-            reader.readName("value");
-            reader.readStartArray();
-            while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                value.add(byteCodec.decode(reader, decoderContext));
-            }
+    List<Number> value = Lists.newArrayList();
+    if (StringUtils.equals(key, PrimitiveArray.BYTE_ARRAY_ID)) {
+      reader.readName("value");
+      reader.readStartArray();
+      while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+        value.add(byteCodec.decode(reader, decoderContext));
+      }
 
-            reader.readEndArray();
-        } else if (StringUtils.equals(key, PrimitiveArray.INT_ARRAY_ID)) {
-            reader.readName("value");
-            reader.readStartArray();
-            while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                value.add(integerCodec.decode(reader, decoderContext));
-            }
+      reader.readEndArray();
+    } else if (StringUtils.equals(key, PrimitiveArray.INT_ARRAY_ID)) {
+      reader.readName("value");
+      reader.readStartArray();
+      while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+        value.add(integerCodec.decode(reader, decoderContext));
+      }
 
-            reader.readEndArray();
-        } else if (StringUtils.equals(key, PrimitiveArray.LONG_ARRAY_ID)) {
-            reader.readName("value");
-            reader.readStartArray();
-            while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                value.add(longCodec.decode(reader, decoderContext));
-            }
+      reader.readEndArray();
+    } else if (StringUtils.equals(key, PrimitiveArray.LONG_ARRAY_ID)) {
+      reader.readName("value");
+      reader.readStartArray();
+      while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+        value.add(longCodec.decode(reader, decoderContext));
+      }
 
-            reader.readEndArray();
-        } else {
-            reader.readEndDocument();
-            throw new BsonInvalidOperationException("Unsupported primitive type");
-        }
-
-        reader.readEndDocument();
-        return new PrimitiveArray(key, value);
+      reader.readEndArray();
+    } else {
+      reader.readEndDocument();
+      throw new BsonInvalidOperationException("Unsupported primitive type");
     }
 
-    @Override
-    public void encode(BsonWriter writer, PrimitiveArray object, EncoderContext encoderContext) {
-        writer.writeStartDocument();
-        writer.writeString("key", object.getKey());
+    reader.readEndDocument();
+    return new PrimitiveArray(key, value);
+  }
 
-        Object array = object.getArray();
-        if (array instanceof byte[]) {
-            writer.writeName("value");
-            writer.writeStartArray();
-            for (byte value : (byte[]) array) {
-                byteCodec.encode(writer, value, encoderContext);
-            }
+  @Override
+  public void encode(BsonWriter writer, PrimitiveArray object, EncoderContext encoderContext) {
+    writer.writeStartDocument();
+    writer.writeString("key", object.getKey());
 
-            writer.writeEndArray();
-        } else if (array instanceof int[]) {
-            writer.writeName("value");
-            writer.writeStartArray();
-            for (int value : (int[]) array) {
-                integerCodec.encode(writer, value, encoderContext);
-            }
+    Object array = object.getArray();
+    if (array instanceof byte[]) {
+      writer.writeName("value");
+      writer.writeStartArray();
+      for (byte value : (byte[]) array) {
+        byteCodec.encode(writer, value, encoderContext);
+      }
 
-            writer.writeEndArray();
-        } else if (array instanceof long[]) {
-            writer.writeName("value");
-            writer.writeStartArray();
-            for (long value : (long[]) array) {
-                longCodec.encode(writer, value, encoderContext);
-            }
+      writer.writeEndArray();
+    } else if (array instanceof int[]) {
+      writer.writeName("value");
+      writer.writeStartArray();
+      for (int value : (int[]) array) {
+        integerCodec.encode(writer, value, encoderContext);
+      }
 
-            writer.writeEndArray();
-        } else {
-            writer.writeEndDocument();
-            throw new BsonInvalidOperationException("Unsupported primitive type");
-        }
+      writer.writeEndArray();
+    } else if (array instanceof long[]) {
+      writer.writeName("value");
+      writer.writeStartArray();
+      for (long value : (long[]) array) {
+        longCodec.encode(writer, value, encoderContext);
+      }
 
-        writer.writeEndDocument();
+      writer.writeEndArray();
+    } else {
+      writer.writeEndDocument();
+      throw new BsonInvalidOperationException("Unsupported primitive type");
     }
 
-    @Override
-    public Class<PrimitiveArray> getEncoderClass() {
-        return PrimitiveArray.class;
-    }
+    writer.writeEndDocument();
+  }
+
+  @Override
+  public Class<PrimitiveArray> getEncoderClass() {
+    return PrimitiveArray.class;
+  }
 }

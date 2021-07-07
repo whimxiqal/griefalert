@@ -24,9 +24,9 @@
 
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -39,76 +39,76 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 public class EntityListener {
 
-    /**
-     * Saves event records when a player disconnects.
-     *
-     * @param event ClientConnectionEvent.Disconnect
-     */
-    @Listener(order = Order.POST)
-    public void onClientConnectionDisconnect(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
-        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isPlayerDisconnect()) {
-            return;
-        }
-
-        PrismRecord.create()
-                .player(player)
-                .event(PrismEvents.PLAYER_DISCONNECT)
-                .location(player.getLocation())
-                .buildAndSave();
+  /**
+   * Saves event records when a player disconnects.
+   *
+   * @param event ClientConnectionEvent.Disconnect
+   */
+  @Listener(order = Order.POST)
+  public void onClientConnectionDisconnect(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
+    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isPlayerDisconnect()) {
+      return;
     }
 
-    /**
-     * Saves event records when a player joins.
-     *
-     * @param event ClientConnectionEvent.Join
-     */
-    @Listener(order = Order.POST)
-    public void onClientConnectionJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
-        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isPlayerJoin()) {
-            return;
-        }
+    PrismRecord.create()
+        .player(player)
+        .event(PrismEvents.PLAYER_DISCONNECT)
+        .location(player.getLocation())
+        .buildAndSave();
+  }
 
-        PrismRecord.create()
-                .player(player)
-                .event(PrismEvents.PLAYER_JOIN)
-                .location(player.getLocation())
-                .buildAndSave();
+  /**
+   * Saves event records when a player joins.
+   *
+   * @param event ClientConnectionEvent.Join
+   */
+  @Listener(order = Order.POST)
+  public void onClientConnectionJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isPlayerJoin()) {
+      return;
     }
 
-    /**
-     * Saves event records when an entity dies.
-     *
-     * @param event DestructEntityEvent.Death
-     */
-    @Listener(order = Order.POST)
-    public void onDestructEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Entity entity) {
-        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isEntityDeath()) {
-            return;
-        }
+    PrismRecord.create()
+        .player(player)
+        .event(PrismEvents.PLAYER_JOIN)
+        .location(player.getLocation())
+        .buildAndSave();
+  }
 
-        PrismRecord.create()
-                .source(event.getCause())
-                .event(PrismEvents.ENTITY_DEATH)
-                .entity(event.getTargetEntity())
-                .buildAndSave();
+  /**
+   * Saves event records when an entity dies.
+   *
+   * @param event DestructEntityEvent.Death
+   */
+  @Listener(order = Order.POST)
+  public void onDestructEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Entity entity) {
+    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isEntityDeath()) {
+      return;
     }
 
-    /**
-     * Saves event records when a player executes a command.
-     *
-     * @param event SendCommandEvent
-     */
-    @Listener(order = Order.POST)
-    public void onSendCommand(SendCommandEvent event, @Root Player player) {
-        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isCommandExecute()) {
-            return;
-        }
+    PrismRecord.create()
+        .source(event.getCause())
+        .event(PrismEvents.ENTITY_DEATH)
+        .entity(event.getTargetEntity())
+        .buildAndSave();
+  }
 
-        PrismRecord.create()
-                .source(event.getCause())
-                .event(PrismEvents.COMMAND_EXECUTE)
-                .location(player.getLocation())
-                .target(event.getCommand())
-                .buildAndSave();
+  /**
+   * Saves event records when a player executes a command.
+   *
+   * @param event SendCommandEvent
+   */
+  @Listener(order = Order.POST)
+  public void onSendCommand(SendCommandEvent event, @Root Player player) {
+    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isCommandExecute()) {
+      return;
     }
+
+    PrismRecord.create()
+        .source(event.getCause())
+        .event(PrismEvents.COMMAND_EXECUTE)
+        .location(player.getLocation())
+        .target(event.getCommand())
+        .buildAndSave();
+  }
 }

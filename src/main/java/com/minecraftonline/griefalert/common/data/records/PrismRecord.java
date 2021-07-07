@@ -25,11 +25,13 @@
 package com.minecraftonline.griefalert.common.data.records;
 
 import com.google.common.base.Preconditions;
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.data.PrismEvent;
-import com.helion3.prism.queues.RecordingQueue;
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.DataUtil;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
+import com.minecraftonline.griefalert.sponge.data.queues.RecordingQueue;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
+import com.minecraftonline.griefalert.sponge.data.util.DataUtil;
+import java.util.Date;
+import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
@@ -50,9 +52,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Date;
-import java.util.Optional;
-
 /**
  * An easy-to-understand factory class for Prism records,
  * By chaining methods together, you can build a record.
@@ -67,380 +66,380 @@ import java.util.Optional;
  */
 public class PrismRecord {
 
-    private final String event;
+  private final String event;
+  private final Object source;
+  private final DataContainer dataContainer;
+
+  /**
+   * A final, save-ready record.
+   *
+   * @param event         Event Id
+   * @param source        Source
+   * @param dataContainer DataContainer
+   */
+  private PrismRecord(String event, Object source, DataContainer dataContainer) {
+    this.event = event;
+    this.source = source;
+    this.dataContainer = dataContainer;
+  }
+
+  /**
+   * Create a new source builder.
+   *
+   * @return The created SourceBuilder instance
+   */
+  public static PrismRecord.SourceBuilder create() {
+    return new PrismRecord.SourceBuilder();
+  }
+
+  /**
+   * Save the current record.
+   */
+  public void save() {
+    DataUtil.writeToDataView(getDataContainer(), DataQueries.Created, new Date());
+    DataUtil.writeToDataView(getDataContainer(), DataQueries.EventName, getEvent());
+
+    DataQuery causeKey = DataQueries.Cause;
+    String causeValue = "environment";
+    if (getSource() instanceof Player) {
+      causeKey = DataQueries.Player;
+      causeValue = ((Player) getSource()).getUniqueId().toString();
+    } else if (getSource() instanceof Entity) {
+      causeValue = ((Entity) getSource()).getType().getName();
+    }
+
+    DataUtil.writeToDataView(getDataContainer(), causeKey, causeValue);
+
+    // Source filtered?
+    if (!SpongeGriefAlert.getSpongeInstance().getFilterList().allowsSource(getSource())) {
+      return;
+    }
+
+    // Original block filtered?
+    Optional<BlockType> originalBlockType = getDataContainer().getObject(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType), BlockType.class);
+    if (originalBlockType.map(SpongeGriefAlert.getSpongeInstance().getFilterList()::allows).orElse(false)) {
+      return;
+    }
+
+    // Replacement block filtered?
+    Optional<BlockType> replacementBlockType = getDataContainer().getObject(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType), BlockType.class);
+    if (replacementBlockType.map(SpongeGriefAlert.getSpongeInstance().getFilterList()::allows).orElse(false)) {
+      return;
+    }
+
+    // Queue the finished record for saving
+    RecordingQueue.add(this);
+  }
+
+  public String getEvent() {
+    return event;
+  }
+
+  public Object getSource() {
+    return source;
+  }
+
+  public DataContainer getDataContainer() {
+    return dataContainer;
+  }
+
+  /**
+   * Build record event/action details.
+   */
+  public static class EventBuilder {
+
     private final Object source;
-    private final DataContainer dataContainer;
+    private String event;
+    private DataContainer dataContainer;
+
+    protected EventBuilder(Object source) {
+      this.source = source;
+      this.event = "unknown";
+      this.dataContainer = DataContainer.createNew();
+    }
 
     /**
-     * A final, save-ready record.
+     * Helper method for writing original BlockSnapshot container data.
      *
-     * @param event         Event Id
-     * @param source        Source
-     * @param dataContainer DataContainer
+     * @param block The original BlockSnapshot to write
      */
-    private PrismRecord(String event, Object source, DataContainer dataContainer) {
-        this.event = event;
-        this.source = source;
-        this.dataContainer = dataContainer;
+    public EventBuilder blockOriginal(BlockSnapshot block) {
+      Preconditions.checkNotNull(block);
+
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.OriginalBlock, formatBlockDataContainer(block));
+      return this;
     }
 
     /**
-     * Save the current record.
-     */
-    public void save() {
-        DataUtil.writeToDataView(getDataContainer(), DataQueries.Created, new Date());
-        DataUtil.writeToDataView(getDataContainer(), DataQueries.EventName, getEvent());
-
-        DataQuery causeKey = DataQueries.Cause;
-        String causeValue = "environment";
-        if (getSource() instanceof Player) {
-            causeKey = DataQueries.Player;
-            causeValue = ((Player) getSource()).getUniqueId().toString();
-        } else if (getSource() instanceof Entity) {
-            causeValue = ((Entity) getSource()).getType().getName();
-        }
-
-        DataUtil.writeToDataView(getDataContainer(), causeKey, causeValue);
-
-        // Source filtered?
-        if (!SpongeGriefAlert.getSpongeInstance().getFilterList().allowsSource(getSource())) {
-            return;
-        }
-
-        // Original block filtered?
-        Optional<BlockType> originalBlockType = getDataContainer().getObject(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType), BlockType.class);
-        if (originalBlockType.map(SpongeGriefAlert.getSpongeInstance().getFilterList()::allows).orElse(false)) {
-            return;
-        }
-
-        // Replacement block filtered?
-        Optional<BlockType> replacementBlockType = getDataContainer().getObject(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType), BlockType.class);
-        if (replacementBlockType.map(SpongeGriefAlert.getSpongeInstance().getFilterList()::allows).orElse(false)) {
-            return;
-        }
-
-        // Queue the finished record for saving
-        RecordingQueue.add(this);
-    }
-
-    /**
-     * Create a new source builder.
+     * Helper method for writing replacement BlockSnapshot container data.
      *
-     * @return The created SourceBuilder instance
+     * @param block The replacement BlockSnapshot to write
      */
-    public static PrismRecord.SourceBuilder create() {
-        return new PrismRecord.SourceBuilder();
-    }
+    public EventBuilder blockReplacement(BlockSnapshot block) {
+      Preconditions.checkNotNull(block);
 
-    public String getEvent() {
-        return event;
-    }
-
-    public Object getSource() {
-        return source;
-    }
-
-    public DataContainer getDataContainer() {
-        return dataContainer;
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.ReplacementBlock, formatBlockDataContainer(block));
+      return this;
     }
 
     /**
-     * Build record event/action details.
+     * Helper method for writing container name.
+     *
+     * @param container The container name to write
      */
-    public static class EventBuilder {
+    public EventBuilder container(String container) {
+      Preconditions.checkNotNull(container);
 
-        private final Object source;
-        private String event;
-        private DataContainer dataContainer;
-
-        protected EventBuilder(Object source) {
-            this.source = source;
-            this.event = "unknown";
-            this.dataContainer = DataContainer.createNew();
-        }
-
-        /**
-         * Helper method for writing original BlockSnapshot container data.
-         *
-         * @param block The original BlockSnapshot to write
-         */
-        public EventBuilder blockOriginal(BlockSnapshot block) {
-            Preconditions.checkNotNull(block);
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.OriginalBlock, formatBlockDataContainer(block));
-            return this;
-        }
-
-        /**
-         * Helper method for writing replacement BlockSnapshot container data.
-         *
-         * @param block The replacement BlockSnapshot to write
-         */
-        public EventBuilder blockReplacement(BlockSnapshot block) {
-            Preconditions.checkNotNull(block);
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.ReplacementBlock, formatBlockDataContainer(block));
-            return this;
-        }
-
-        /**
-         * Helper method for writing container name.
-         *
-         * @param container The container name to write
-         */
-        public EventBuilder container(String container) {
-            Preconditions.checkNotNull(container);
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Container, container);
-            return this;
-        }
-
-        /**
-         * Helper method for writing Entity container data.
-         *
-         * @param entity The Entity to write
-         */
-        public EventBuilder entity(Entity entity) {
-            Preconditions.checkNotNull(entity);
-
-            DataContainer entityData = entity.toContainer();
-
-            Optional<DataView> position = entityData.getView(DataQueries.Position);
-            if (position.isPresent()) {
-                position.get().set(DataQueries.WorldUuid, entityData.get(DataQueries.WorldUuid).get());
-                DataUtil.writeToDataView(getDataContainer(), DataQueries.Location, position.get());
-
-                entityData.remove(DataQueries.Position);
-                entityData.remove(DataQueries.WorldUuid);
-            }
-
-            Optional<DataView> optionalUnsafeData = entityData.getView(DataQueries.UnsafeData);
-            if (optionalUnsafeData.isPresent()) {
-                DataView unsafeData = optionalUnsafeData.get();
-                unsafeData.remove(DataQueries.Rotation);
-                unsafeData.remove(DataQueries.Pos);
-                entityData.set(DataQueries.UnsafeData, unsafeData);
-            }
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Entity, entityData);
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Id, entity.getType().getId());
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, entity.get(Keys.DISPLAY_NAME).map(Text::toPlain).orElse(entity.getType().getName()));
-            return this;
-        }
-
-        /**
-         * Helper method for writing Item container data.
-         *
-         * @param item The Item to write
-         */
-        public EventBuilder item(Item item) {
-            Preconditions.checkNotNull(item);
-            Preconditions.checkArgument(item.item().exists());
-
-            itemStack(item.item().get());
-            location(item.getLocation());
-            return this;
-        }
-
-        /**
-         * Helper method for writing ItemStack container data.
-         *
-         * @param itemStack The ItemStack to write
-         */
-        public EventBuilder itemStack(ItemStack itemStack) {
-            Preconditions.checkNotNull(itemStack);
-            return itemStack(itemStack, itemStack.getQuantity());
-        }
-
-        /**
-         * Helper method for writing ItemStack container data.
-         *
-         * @param itemStack The ItemStack to write
-         * @param quantity  The quantity to write
-         */
-        public EventBuilder itemStack(ItemStack itemStack, int quantity) {
-            Preconditions.checkNotNull(itemStack);
-            Preconditions.checkArgument(itemStack.getType() != ItemTypes.NONE);
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, itemStack.getType().getId());
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Quantity, quantity);
-            return this;
-        }
-
-        /**
-         * Helper method for writing ItemStackSnapshot container data.
-         *
-         * @param itemStack The ItemStackSnapshot to write
-         */
-        public EventBuilder itemStack(ItemStackSnapshot itemStack) {
-            Preconditions.checkNotNull(itemStack);
-            return itemStack(itemStack, itemStack.getQuantity());
-        }
-
-        /**
-         * Helper method for writing ItemStackSnapshot container data.
-         *
-         * @param itemStack The ItemStackSnapshot to write
-         * @param quantity  The quantity to write
-         */
-        public EventBuilder itemStack(ItemStackSnapshot itemStack, int quantity) {
-            Preconditions.checkNotNull(itemStack);
-            Preconditions.checkArgument(itemStack.getType() != ItemTypes.NONE);
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, itemStack.getType().getId());
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Quantity, quantity);
-            return this;
-        }
-
-        /**
-         * Helper method for writing Location container data.
-         *
-         * @param location The location to write
-         */
-        public EventBuilder location(Location<World> location) {
-            Preconditions.checkNotNull(location);
-
-            DataContainer container = location.toContainer();
-            container.remove(DataQueries.BlockType);
-            container.remove(DataQueries.ContentVersion);
-            container.remove(DataQueries.WorldName);
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Location, location);
-            return this;
-        }
-
-        /**
-         * Helper method for writing target container data.
-         *
-         * @param target The target to write
-         */
-        public EventBuilder target(String target) {
-            Preconditions.checkNotNull(target);
-
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, target);
-            return this;
-        }
-
-        /**
-         * Removes unnecessary/duplicate data from a BlockSnapshot's DataContainer.
-         *
-         * @param block {@link BlockSnapshot BlockSnapshot}
-         * @return Formatted {@link DataContainer DataContainer}
-         */
-        private DataContainer formatBlockDataContainer(BlockSnapshot block) {
-            Preconditions.checkNotNull(block);
-            Preconditions.checkNotNull(block.getState(), "Missing BlockState: " + block.toString());
-
-            DataContainer blockData = block.toContainer();
-            blockData.remove(DataQueries.Position);
-            blockData.remove(DataQueries.WorldUuid);
-
-            DataView unsafeData = blockData.getObject(DataQueries.UnsafeData, DataView.class).orElse(null);
-            if (unsafeData != null) {
-                unsafeData.remove(DataQueries.X);
-                unsafeData.remove(DataQueries.Y);
-                unsafeData.remove(DataQueries.Z);
-                blockData.set(DataQueries.UnsafeData, unsafeData);
-            }
-
-            return blockData;
-        }
-
-        /**
-         * Creates a new {@link PrismRecord}.
-         *
-         * @return A new prism record
-         */
-        public PrismRecord build() {
-            Preconditions.checkState(Sponge.getRegistry().getType(PrismEvent.class, getEvent()).isPresent(), getEvent() + " is not registered");
-            return new PrismRecord(getEvent(), getSource(), getDataContainer());
-        }
-
-        /**
-         * Creates a new {@link PrismRecord} and immediately saves it.
-         */
-        public void buildAndSave() {
-            build().save();
-        }
-
-        private Object getSource() {
-            return source;
-        }
-
-        private String getEvent() {
-            return event;
-        }
-
-        public EventBuilder event(PrismEvent prismEvent) {
-            return event(prismEvent.getId());
-        }
-
-        public EventBuilder event(String event) {
-            this.event = event;
-            return this;
-        }
-
-        private DataContainer getDataContainer() {
-            return dataContainer;
-        }
-
-        public EventBuilder dataContainer(DataContainer dataContainer) {
-            this.dataContainer = dataContainer;
-            return this;
-        }
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Container, container);
+      return this;
     }
 
     /**
-     * Build record with event source.
+     * Helper method for writing Entity container data.
+     *
+     * @param entity The Entity to write
      */
-    public static class SourceBuilder {
+    public EventBuilder entity(Entity entity) {
+      Preconditions.checkNotNull(entity);
 
-        /**
-         * Set a cause based on a Cause chain.
-         *
-         * @param cause Cause of event.
-         * @return The created EventBuilder instance
-         */
-        public PrismRecord.EventBuilder source(Cause cause) {
-            Player player = cause.first(Player.class).orElse(null);
-            if (player != null) {
-                return new PrismRecord.EventBuilder(player);
-            }
+      DataContainer entityData = entity.toContainer();
 
-            EntityDamageSource attacker = cause.first(EntityDamageSource.class).orElse(null);
-            if (attacker != null) {
-                return new PrismRecord.EventBuilder(attacker);
-            }
+      Optional<DataView> position = entityData.getView(DataQueries.Position);
+      if (position.isPresent()) {
+        position.get().set(DataQueries.WorldUuid, entityData.get(DataQueries.WorldUuid).get());
+        DataUtil.writeToDataView(getDataContainer(), DataQueries.Location, position.get());
 
-            IndirectEntityDamageSource indirectAttacker = cause.first(IndirectEntityDamageSource.class).orElse(null);
-            if (indirectAttacker != null) {
-                return new PrismRecord.EventBuilder(indirectAttacker);
-            }
+        entityData.remove(DataQueries.Position);
+        entityData.remove(DataQueries.WorldUuid);
+      }
 
-            if (!cause.all().isEmpty()) {
-                return new PrismRecord.EventBuilder(cause.all().get(0));
-            }
+      Optional<DataView> optionalUnsafeData = entityData.getView(DataQueries.UnsafeData);
+      if (optionalUnsafeData.isPresent()) {
+        DataView unsafeData = optionalUnsafeData.get();
+        unsafeData.remove(DataQueries.Rotation);
+        unsafeData.remove(DataQueries.Pos);
+        entityData.set(DataQueries.UnsafeData, unsafeData);
+      }
 
-            return new PrismRecord.EventBuilder(null);
-        }
-
-        /**
-         * Set the Player responsible for this event.
-         *
-         * @param player Player responsible for this event
-         * @return The created EventBuilder instance
-         */
-        public PrismRecord.EventBuilder player(Player player) {
-            return new PrismRecord.EventBuilder(player);
-        }
-
-        /**
-         * Set the source non-Entity player responsible for this event.
-         *
-         * @param entity Entity responsible for this event
-         * @return The created EventBuilder instance
-         */
-        public PrismRecord.EventBuilder entity(Entity entity) {
-            return new PrismRecord.EventBuilder(entity);
-        }
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Entity, entityData);
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Id, entity.getType().getId());
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, entity.get(Keys.DISPLAY_NAME).map(Text::toPlain).orElse(entity.getType().getName()));
+      return this;
     }
+
+    /**
+     * Helper method for writing Item container data.
+     *
+     * @param item The Item to write
+     */
+    public EventBuilder item(Item item) {
+      Preconditions.checkNotNull(item);
+      Preconditions.checkArgument(item.item().exists());
+
+      itemStack(item.item().get());
+      location(item.getLocation());
+      return this;
+    }
+
+    /**
+     * Helper method for writing ItemStack container data.
+     *
+     * @param itemStack The ItemStack to write
+     */
+    public EventBuilder itemStack(ItemStack itemStack) {
+      Preconditions.checkNotNull(itemStack);
+      return itemStack(itemStack, itemStack.getQuantity());
+    }
+
+    /**
+     * Helper method for writing ItemStack container data.
+     *
+     * @param itemStack The ItemStack to write
+     * @param quantity  The quantity to write
+     */
+    public EventBuilder itemStack(ItemStack itemStack, int quantity) {
+      Preconditions.checkNotNull(itemStack);
+      Preconditions.checkArgument(itemStack.getType() != ItemTypes.NONE);
+
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, itemStack.getType().getId());
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Quantity, quantity);
+      return this;
+    }
+
+    /**
+     * Helper method for writing ItemStackSnapshot container data.
+     *
+     * @param itemStack The ItemStackSnapshot to write
+     */
+    public EventBuilder itemStack(ItemStackSnapshot itemStack) {
+      Preconditions.checkNotNull(itemStack);
+      return itemStack(itemStack, itemStack.getQuantity());
+    }
+
+    /**
+     * Helper method for writing ItemStackSnapshot container data.
+     *
+     * @param itemStack The ItemStackSnapshot to write
+     * @param quantity  The quantity to write
+     */
+    public EventBuilder itemStack(ItemStackSnapshot itemStack, int quantity) {
+      Preconditions.checkNotNull(itemStack);
+      Preconditions.checkArgument(itemStack.getType() != ItemTypes.NONE);
+
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, itemStack.getType().getId());
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Quantity, quantity);
+      return this;
+    }
+
+    /**
+     * Helper method for writing Location container data.
+     *
+     * @param location The location to write
+     */
+    public EventBuilder location(Location<World> location) {
+      Preconditions.checkNotNull(location);
+
+      DataContainer container = location.toContainer();
+      container.remove(DataQueries.BlockType);
+      container.remove(DataQueries.ContentVersion);
+      container.remove(DataQueries.WorldName);
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Location, location);
+      return this;
+    }
+
+    /**
+     * Helper method for writing target container data.
+     *
+     * @param target The target to write
+     */
+    public EventBuilder target(String target) {
+      Preconditions.checkNotNull(target);
+
+      DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, target);
+      return this;
+    }
+
+    /**
+     * Removes unnecessary/duplicate data from a BlockSnapshot's DataContainer.
+     *
+     * @param block {@link BlockSnapshot BlockSnapshot}
+     * @return Formatted {@link DataContainer DataContainer}
+     */
+    private DataContainer formatBlockDataContainer(BlockSnapshot block) {
+      Preconditions.checkNotNull(block);
+      Preconditions.checkNotNull(block.getState(), "Missing BlockState: " + block);
+
+      DataContainer blockData = block.toContainer();
+      blockData.remove(DataQueries.Position);
+      blockData.remove(DataQueries.WorldUuid);
+
+      DataView unsafeData = blockData.getObject(DataQueries.UnsafeData, DataView.class).orElse(null);
+      if (unsafeData != null) {
+        unsafeData.remove(DataQueries.X);
+        unsafeData.remove(DataQueries.Y);
+        unsafeData.remove(DataQueries.Z);
+        blockData.set(DataQueries.UnsafeData, unsafeData);
+      }
+
+      return blockData;
+    }
+
+    /**
+     * Creates a new {@link PrismRecord}.
+     *
+     * @return A new prism record
+     */
+    public PrismRecord build() {
+      Preconditions.checkState(Sponge.getRegistry().getType(PrismEvent.class, getEvent()).isPresent(), getEvent() + " is not registered");
+      return new PrismRecord(getEvent(), getSource(), getDataContainer());
+    }
+
+    /**
+     * Creates a new {@link PrismRecord} and immediately saves it.
+     */
+    public void buildAndSave() {
+      build().save();
+    }
+
+    private Object getSource() {
+      return source;
+    }
+
+    private String getEvent() {
+      return event;
+    }
+
+    public EventBuilder event(PrismEvent prismEvent) {
+      return event(prismEvent.getId());
+    }
+
+    public EventBuilder event(String event) {
+      this.event = event;
+      return this;
+    }
+
+    private DataContainer getDataContainer() {
+      return dataContainer;
+    }
+
+    public EventBuilder dataContainer(DataContainer dataContainer) {
+      this.dataContainer = dataContainer;
+      return this;
+    }
+  }
+
+  /**
+   * Build record with event source.
+   */
+  public static class SourceBuilder {
+
+    /**
+     * Set a cause based on a Cause chain.
+     *
+     * @param cause Cause of event.
+     * @return The created EventBuilder instance
+     */
+    public PrismRecord.EventBuilder source(Cause cause) {
+      Player player = cause.first(Player.class).orElse(null);
+      if (player != null) {
+        return new PrismRecord.EventBuilder(player);
+      }
+
+      EntityDamageSource attacker = cause.first(EntityDamageSource.class).orElse(null);
+      if (attacker != null) {
+        return new PrismRecord.EventBuilder(attacker);
+      }
+
+      IndirectEntityDamageSource indirectAttacker = cause.first(IndirectEntityDamageSource.class).orElse(null);
+      if (indirectAttacker != null) {
+        return new PrismRecord.EventBuilder(indirectAttacker);
+      }
+
+      if (!cause.all().isEmpty()) {
+        return new PrismRecord.EventBuilder(cause.all().get(0));
+      }
+
+      return new PrismRecord.EventBuilder(null);
+    }
+
+    /**
+     * Set the Player responsible for this event.
+     *
+     * @param player Player responsible for this event
+     * @return The created EventBuilder instance
+     */
+    public PrismRecord.EventBuilder player(Player player) {
+      return new PrismRecord.EventBuilder(player);
+    }
+
+    /**
+     * Set the source non-Entity player responsible for this event.
+     *
+     * @param entity Entity responsible for this event
+     * @return The created EventBuilder instance
+     */
+    public PrismRecord.EventBuilder entity(Entity entity) {
+      return new PrismRecord.EventBuilder(entity);
+    }
+  }
 }

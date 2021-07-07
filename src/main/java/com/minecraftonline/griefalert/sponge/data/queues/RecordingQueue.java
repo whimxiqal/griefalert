@@ -23,40 +23,40 @@
  */
 package com.minecraftonline.griefalert.sponge.data.queues;
 
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import com.helion3.prism.api.records.PrismRecord;
 import org.spongepowered.api.data.DataContainer;
 
 public class RecordingQueue {
 
-    private static final LinkedBlockingQueue<PrismRecord> queue = new LinkedBlockingQueue<>();
+  private static final LinkedBlockingQueue<PrismRecord> queue = new LinkedBlockingQueue<>();
 
-    private RecordingQueue(){}
+  private RecordingQueue() {
+  }
 
-    /**
-     * Adds a new Event to the recording queue.
-     *
-     * @param record Event to be queued for database write
-     */
-    public static void add(final PrismRecord record) {
-        if (record == null) {
-            throw new IllegalArgumentException("null PrismRecord given to Prism recording queue");
-        }
-
-        if (record.getDataContainer() == null) {
-            throw new IllegalArgumentException("PrismRecord with null container given to Prism recording queue.");
-        }
-
-        queue.add(record);
+  /**
+   * Adds a new Event to the recording queue.
+   *
+   * @param record Event to be queued for database write
+   */
+  public static void add(final PrismRecord record) {
+    if (record == null) {
+      throw new IllegalArgumentException("null PrismRecord given to Prism recording queue");
     }
 
-    /**
-     * Returns all unsaved events in the queue.
-     *
-     * @return Current unsaved {@link DataContainer} queue
-     */
-    public static LinkedBlockingQueue<PrismRecord> getQueue() {
-        return queue;
+    if (record.getDataContainer() == null) {
+      throw new IllegalArgumentException("PrismRecord with null container given to Prism recording queue.");
     }
+
+    queue.add(record);
+  }
+
+  /**
+   * Returns all unsaved events in the queue.
+   *
+   * @return Current unsaved {@link DataContainer} queue
+   */
+  public static LinkedBlockingQueue<PrismRecord> getQueue() {
+    return queue;
+  }
 }

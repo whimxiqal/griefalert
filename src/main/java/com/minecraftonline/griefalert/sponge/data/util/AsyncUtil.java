@@ -23,57 +23,54 @@
  */
 package com.minecraftonline.griefalert.sponge.data.util;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.records.Result;
-import com.helion3.prism.util.AsyncCallback;
-import com.helion3.prism.util.Format;
-import com.helion3.prism.util.LookupCallback;
-import org.spongepowered.api.Sponge;
-
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.common.data.records.Result;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.spongepowered.api.Sponge;
 
 public class AsyncUtil {
-    private AsyncUtil() {}
+  private AsyncUtil() {
+  }
 
-    /**
-     * Helper utility for running a lookup asynchronously.
-     *
-     * @param session QuerySession running this lookup.
-     */
-    public static void lookup(final QuerySession session) {
-        // Enforce lookup limits
-        session.getQuery().setLimit(SpongeGriefAlert.getSpongeInstance().getConfig().getLimitCategory().getMaximumLookup());
-        async(session, new LookupCallback(session));
-    }
+  /**
+   * Helper utility for running a lookup asynchronously.
+   *
+   * @param session QuerySession running this lookup.
+   */
+  public static void lookup(final QuerySession session) {
+    // Enforce lookup limits
+    session.getQuery().setLimit(SpongeGriefAlert.getSpongeInstance().getConfig().getLimitCategory().getMaximumLookup());
+    async(session, new LookupCallback(session));
+  }
 
-    /**
-     * Internal helper for executing database queries asynchronously.
-     *
-     * @param session QuerySession
-     * @param callback AsyncCallback describing the success, empty, and error callbacks.
-     */
-    private static void async(final QuerySession session, AsyncCallback callback) {
-        Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
-            try {
-                CompletableFuture<List<Result>> future = SpongeGriefAlert.getSpongeInstance().getStorageAdapter().records().query(session, true);
-                future.thenAccept(results -> {
-                    try {
-                        if (results.isEmpty()) {
-                            callback.empty();
-                        } else {
-                            callback.success(results);
-                        }
-                    } catch(Exception e) {
-                        session.getCommandSource().sendMessage(Format.error(e.getMessage()));
-                        e.printStackTrace();
-                    }
-                });
-            } catch (Exception e) {
-                callback.error(e);
-                e.printStackTrace();
+  /**
+   * Internal helper for executing database queries asynchronously.
+   *
+   * @param session  QuerySession
+   * @param callback AsyncCallback describing the success, empty, and error callbacks.
+   */
+  private static void async(final QuerySession session, AsyncCallback callback) {
+    Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
+      try {
+        CompletableFuture<List<Result>> future = SpongeGriefAlert.getSpongeInstance().getStorageAdapter().records().query(session, true);
+        future.thenAccept(results -> {
+          try {
+            if (results.isEmpty()) {
+              callback.empty();
+            } else {
+              callback.success(results);
             }
-        }).submit(SpongeGriefAlert.getSpongeInstance().getPluginContainer());
-    }
+          } catch (Exception e) {
+            session.getCommandSource().sendMessage(Format.error(e.getMessage()));
+            e.printStackTrace();
+          }
+        });
+      } catch (Exception e) {
+        callback.error(e);
+        e.printStackTrace();
+      }
+    }).submit(SpongeGriefAlert.getSpongeInstance().getPluginContainer());
+  }
 }

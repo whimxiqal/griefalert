@@ -25,7 +25,7 @@
 package com.minecraftonline.griefalert.common.alert.struct;
 
 import com.google.common.collect.Lists;
-import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nonnull;

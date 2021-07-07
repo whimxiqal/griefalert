@@ -21,71 +21,74 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.common.data.records;
 
-import com.helion3.prism.api.records.SkipReason;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
-
 import org.spongepowered.api.data.Transaction;
 
 public class ActionableResult {
-    private final boolean changeWasApplied;
-    private final com.helion3.prism.api.records.SkipReason skipReason;
-    private final Transaction<?> transaction;
+  private final boolean changeWasApplied;
+  private final SkipReason skipReason;
+  private final Transaction<?> transaction;
 
-    /**
-     * Build a skipped actionable result.
-     * @param skipReason Reason for skip.
-     * @return ActionableResult
-     */
-    public static ActionableResult skipped(com.helion3.prism.api.records.SkipReason skipReason) {
-        return new ActionableResult(skipReason);
-    }
+  private ActionableResult(@Nullable Transaction<?> transaction) {
+    this.transaction = transaction;
+    this.changeWasApplied = true;
+    this.skipReason = null;
+  }
 
-    /**
-     * Build a successful actionable result.
-     * @param transaction
-     * @return
-     */
-    public static ActionableResult success(@Nullable Transaction<?> transaction) {
-        return new ActionableResult(transaction);
-    }
+  private ActionableResult(SkipReason skipReason) {
+    this.transaction = null;
+    this.changeWasApplied = false;
+    this.skipReason = skipReason;
+  }
 
-    private ActionableResult(@Nullable Transaction<?> transaction) {
-        this.transaction = transaction;
-        this.changeWasApplied = true;
-        this.skipReason = null;
-    }
+  /**
+   * Build a skipped actionable result.
+   *
+   * @param skipReason Reason for skip.
+   * @return ActionableResult
+   */
+  public static ActionableResult skipped(SkipReason skipReason) {
+    return new ActionableResult(skipReason);
+  }
 
-    private ActionableResult(com.helion3.prism.api.records.SkipReason skipReason) {
-        this.transaction = null;
-        this.changeWasApplied = false;
-        this.skipReason = skipReason;
-    }
+  /**
+   * Build a successful actionable result.
+   *
+   * @param transaction
+   * @return
+   */
+  public static ActionableResult success(@Nullable Transaction<?> transaction) {
+    return new ActionableResult(transaction);
+  }
 
-    /**
-     * Get if actionable was applied.
-     * @return If actionable was applied.
-     */
-    public boolean applied() {
-        return changeWasApplied;
-    }
+  /**
+   * Get if actionable was applied.
+   *
+   * @return If actionable was applied.
+   */
+  public boolean applied() {
+    return changeWasApplied;
+  }
 
-    /**
-     * Get any resulting transaction, useful for reversals.
-     * @return Optional transaction.
-     */
-    public Optional<Transaction<?>> getTransaction() {
-        return Optional.ofNullable(transaction);
-    }
+  /**
+   * Get any resulting transaction, useful for reversals.
+   *
+   * @return Optional transaction.
+   */
+  public Optional<Transaction<?>> getTransaction() {
+    return Optional.ofNullable(transaction);
+  }
 
-    /**
-     * Returns the skip reason, if any.
-     * @return SKIP_REASON Reason a change was skipped.
-     */
-    public SkipReason getSkipReason() {
-        return skipReason;
-    }
+  /**
+   * Returns the skip reason, if any.
+   *
+   * @return SKIP_REASON Reason a change was skipped.
+   */
+  public SkipReason getSkipReason() {
+    return skipReason;
+  }
 }

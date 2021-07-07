@@ -23,49 +23,46 @@
  */
 package com.minecraftonline.griefalert.common.data.flags;
 
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
 import javax.annotation.Nullable;
-
 import org.spongepowered.api.command.CommandSource;
 
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-
 public interface FlagHandler {
-    /**
-     * Returns whether this flag is allowed for the current command source.
-     *
-     * @param source CommandSource of current flag.
-     * @return boolean Whether this command source may use this flag.
-     */
-    boolean acceptsSource(@Nullable CommandSource source);
+  /**
+   * Returns whether this flag is allowed for the current command source.
+   *
+   * @param source CommandSource of current flag.
+   * @return boolean Whether this command source may use this flag.
+   */
+  boolean acceptsSource(@Nullable CommandSource source);
 
-    /**
-     * Returns whether the given value(s) for the handler are acceptable.
-     *
-     * @param value String Value/input for the parameter
-     * @return boolean Whether this value is legal for this parameter.
-     */
-    boolean acceptsValue(String value);
+  /**
+   * Returns whether the given value(s) for the handler are acceptable.
+   *
+   * @param value String Value/input for the parameter
+   * @return boolean Whether this value is legal for this parameter.
+   */
+  boolean acceptsValue(String value);
 
-    /**
-     * Returns whether this handler responds to the given flag.
-     *
-     * @param flag String Flag to check against
-     * @return boolean Whether this handler responds to an flag.
-     */
-    boolean handles(String flag);
+  /**
+   * Returns whether this handler responds to the given flag.
+   *
+   * @param flag String Flag to check against
+   * @return boolean Whether this handler responds to an flag.
+   */
+  boolean handles(String flag);
 
-    /**
-     * Processes the given value into conditions which are then
-     * appended to the query.
-     *
-     * @param session Current Query Session
-     * @param flag String flag used
-     * @param value String value(s) given with flag
-     * @param query Query Current query object
-     */
-    Optional<CompletableFuture<?>> process(QuerySession session, @Nullable String flag, String value, Query query);
+  /**
+   * Processes the given value into conditions which are then
+   * appended to the query.
+   *
+   * @param session Current Query Session
+   * @param flag    String flag used
+   * @param value   String value(s) given with flag
+   * @param query   Query Current query object
+   */
+  Optional<CompletableFuture<?>> process(QuerySession session, @Nullable String flag, String value, Query query);
 }

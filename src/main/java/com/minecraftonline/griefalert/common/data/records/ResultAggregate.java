@@ -23,8 +23,6 @@
  */
 package com.minecraftonline.griefalert.common.data.records;
 
-import com.helion3.prism.api.records.Result;
-
 /**
  * Represents aggregate results from a query. Individual records are grouped
  * together and lose record-specific data like location, a specific timestamp,

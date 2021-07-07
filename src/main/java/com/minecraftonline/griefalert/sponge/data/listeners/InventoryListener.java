@@ -24,9 +24,9 @@
 
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.util.PrismEvents;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.sponge.data.util.PrismEvents;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
@@ -51,238 +51,238 @@ import org.spongepowered.api.world.World;
 
 public class InventoryListener {
 
-    /**
-     * Saves event records when a player interacts with an inventory.
-     *
-     * @param event  ClickInventoryEvent
-     * @param player Player
-     */
-    @Listener(order = Order.POST)
-    public void onClickInventory(ClickInventoryEvent event, @Root Player player) {
-        if (event.getTransactions().isEmpty()
-                || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()
-                && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove())) {
-            return;
-        }
-
-        for (SlotTransaction transaction : event.getTransactions()) {
-            if (!(transaction.getSlot().parent() instanceof CarriedInventory)) {
-                continue;
-            }
-
-            CarriedInventory<? extends Carrier> carriedInventory = (CarriedInventory<? extends Carrier>) transaction.getSlot().parent();
-            if (carriedInventory.getCarrier().filter(Player.class::isInstance).isPresent()) {
-                return;
-            }
-
-            // Get the location of the inventory otherwise fallback on the players location
-            Location<World> location = carriedInventory.getCarrier()
-                    .filter(Locatable.class::isInstance)
-                    .map(Locatable.class::cast)
-                    .map(Locatable::getLocation)
-                    .orElse(player.getLocation());
-
-            // Get the title of the inventory otherwise fallback on the class name
-            String title = carriedInventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME)
-                    .map(InventoryTitle::getValue)
-                    .map(Text::toPlain)
-                    .orElse(carriedInventory.getClass().getSimpleName());
-
-            int capacity = carriedInventory.first().capacity();
-            int index = transaction.getSlot().getInventoryProperty(SlotIndex.class).map(SlotIndex::getValue).orElse(-1);
-            if (index < 0 || index >= capacity) {
-                continue;
-            }
-
-            // Nothing happened - Player clicked an empty slot
-            if (transaction.getOriginal().getType() == ItemTypes.NONE && transaction.getFinal().getType() == ItemTypes.NONE) {
-                continue;
-            }
-
-            PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
-                    .source(event.getCause())
-                    .container(title)
-                    .location(location);
-
-
-            if (transaction.getOriginal().getType() == transaction.getFinal().getType()) {
-
-                // Remove - Splitting stack
-                if (transaction.getOriginal().getQuantity() > transaction.getFinal().getQuantity()) {
-                    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove()) {
-                        continue;
-                    }
-
-                    SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Remove - {} x{}",
-                            transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
-
-                    eventBuilder
-                            .event(PrismEvents.ITEM_INSERT)
-                            .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
-                            .buildAndSave();
-
-                    continue;
-                }
-
-                // Insert - Existing stack
-                if (transaction.getOriginal().getQuantity() < transaction.getFinal().getQuantity()) {
-                    if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()) {
-                        continue;
-                    }
-
-                    SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
-                            transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
-
-                    eventBuilder
-                            .event(PrismEvents.ITEM_REMOVE)
-                            .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
-                            .buildAndSave();
-
-                    continue;
-                }
-            }
-
-            // Remove
-            if (transaction.getOriginal().getType() != ItemTypes.NONE) {
-                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove()) {
-                    continue;
-                }
-
-                SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Remove - {} x{}",
-                        transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
-
-                eventBuilder
-                        .event(PrismEvents.ITEM_REMOVE)
-                        .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
-                        .buildAndSave();
-
-                continue;
-            }
-
-            // Insert
-            if (transaction.getOriginal().getType() == ItemTypes.NONE) {
-                if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()) {
-                    continue;
-                }
-
-                SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
-                        transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
-
-                eventBuilder.event(PrismEvents.ITEM_INSERT)
-                        .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
-                        .buildAndSave();
-
-                continue;
-            }
-
-            SpongeGriefAlert.getSpongeInstance().getLogger().warn("Failed to handle ClickInventoryEvent");
-        }
+  /**
+   * Saves event records when a player interacts with an inventory.
+   *
+   * @param event  ClickInventoryEvent
+   * @param player Player
+   */
+  @Listener(order = Order.POST)
+  public void onClickInventory(ClickInventoryEvent event, @Root Player player) {
+    if (event.getTransactions().isEmpty()
+        || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()
+        && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove())) {
+      return;
     }
 
-    /**
-     * Saves event records when a player picks up an item off of the ground.
-     *
-     * @param event  ChangeInventoryEvent.Pickup
-     * @param player Player
-     */
-    @Listener(order = Order.POST)
-    public void onChangeInventoryPickup(ChangeInventoryEvent.Pickup event, @Root Player player) {
-        if (event.getTransactions().isEmpty() || !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemPickup()) {
-            return;
+    for (SlotTransaction transaction : event.getTransactions()) {
+      if (!(transaction.getSlot().parent() instanceof CarriedInventory)) {
+        continue;
+      }
+
+      CarriedInventory<? extends Carrier> carriedInventory = (CarriedInventory<? extends Carrier>) transaction.getSlot().parent();
+      if (carriedInventory.getCarrier().filter(Player.class::isInstance).isPresent()) {
+        return;
+      }
+
+      // Get the location of the inventory otherwise fallback on the players location
+      Location<World> location = carriedInventory.getCarrier()
+          .filter(Locatable.class::isInstance)
+          .map(Locatable.class::cast)
+          .map(Locatable::getLocation)
+          .orElse(player.getLocation());
+
+      // Get the title of the inventory otherwise fallback on the class name
+      String title = carriedInventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME)
+          .map(InventoryTitle::getValue)
+          .map(Text::toPlain)
+          .orElse(carriedInventory.getClass().getSimpleName());
+
+      int capacity = carriedInventory.first().capacity();
+      int index = transaction.getSlot().getInventoryProperty(SlotIndex.class).map(SlotIndex::getValue).orElse(-1);
+      if (index < 0 || index >= capacity) {
+        continue;
+      }
+
+      // Nothing happened - Player clicked an empty slot
+      if (transaction.getOriginal().getType() == ItemTypes.NONE && transaction.getFinal().getType() == ItemTypes.NONE) {
+        continue;
+      }
+
+      PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
+          .source(event.getCause())
+          .container(title)
+          .location(location);
+
+
+      if (transaction.getOriginal().getType() == transaction.getFinal().getType()) {
+
+        // Remove - Splitting stack
+        if (transaction.getOriginal().getQuantity() > transaction.getFinal().getQuantity()) {
+          if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove()) {
+            continue;
+          }
+
+          SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Remove - {} x{}",
+              transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
+
+          eventBuilder
+              .event(PrismEvents.ITEM_INSERT)
+              .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
+              .buildAndSave();
+
+          continue;
         }
 
-        for (SlotTransaction transaction : event.getTransactions()) {
-            ItemStackSnapshot itemStack = transaction.getFinal();
-            int quantity = itemStack.getQuantity();
-            if (transaction.getOriginal().getType() != ItemTypes.NONE) {
-                quantity -= transaction.getOriginal().getQuantity();
-            }
+        // Insert - Existing stack
+        if (transaction.getOriginal().getQuantity() < transaction.getFinal().getQuantity()) {
+          if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()) {
+            continue;
+          }
 
-            SpongeGriefAlert.getSpongeInstance().getLogger().debug("Inventory pickup - {} x{}", itemStack.getType().getId(), quantity);
+          SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
+              transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
 
-            PrismRecord.create()
-                    .source(event.getCause())
-                    .event(PrismEvents.ITEM_PICKUP)
-                    .itemStack(itemStack, quantity)
-                    .location(player.getLocation())
-                    .buildAndSave();
+          eventBuilder
+              .event(PrismEvents.ITEM_REMOVE)
+              .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
+              .buildAndSave();
+
+          continue;
         }
+      }
+
+      // Remove
+      if (transaction.getOriginal().getType() != ItemTypes.NONE) {
+        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemRemove()) {
+          continue;
+        }
+
+        SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Remove - {} x{}",
+            transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
+
+        eventBuilder
+            .event(PrismEvents.ITEM_REMOVE)
+            .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
+            .buildAndSave();
+
+        continue;
+      }
+
+      // Insert
+      if (transaction.getOriginal().getType() == ItemTypes.NONE) {
+        if (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemInsert()) {
+          continue;
+        }
+
+        SpongeGriefAlert.getSpongeInstance().getLogger().debug("Item Insert - {} x{}",
+            transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
+
+        eventBuilder.event(PrismEvents.ITEM_INSERT)
+            .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
+            .buildAndSave();
+
+        continue;
+      }
+
+      SpongeGriefAlert.getSpongeInstance().getLogger().warn("Failed to handle ClickInventoryEvent");
+    }
+  }
+
+  /**
+   * Saves event records when a player picks up an item off of the ground.
+   *
+   * @param event  ChangeInventoryEvent.Pickup
+   * @param player Player
+   */
+  @Listener(order = Order.POST)
+  public void onChangeInventoryPickup(ChangeInventoryEvent.Pickup event, @Root Player player) {
+    if (event.getTransactions().isEmpty() || !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemPickup()) {
+      return;
     }
 
-    /**
-     * Saves event records when a player drops an item on to the ground.
-     *
-     * @param event  DropItemEvent.Dispense
-     * @param player Player
-     */
-    @Listener(order = Order.POST)
-    public void onDropItemDispense(DropItemEvent.Dispense event, @Root Player player) {
-        if (event.getEntities().isEmpty() || !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemDrop()) {
-            return;
-        }
+    for (SlotTransaction transaction : event.getTransactions()) {
+      ItemStackSnapshot itemStack = transaction.getFinal();
+      int quantity = itemStack.getQuantity();
+      if (transaction.getOriginal().getType() != ItemTypes.NONE) {
+        quantity -= transaction.getOriginal().getQuantity();
+      }
 
-        for (Entity entity : event.getEntities()) {
-            if (!(entity instanceof Item)) {
-                continue;
-            }
+      SpongeGriefAlert.getSpongeInstance().getLogger().debug("Inventory pickup - {} x{}", itemStack.getType().getId(), quantity);
 
-            Item item = (Item) entity;
-            if (!item.item().exists()) {
-                continue;
-            }
+      PrismRecord.create()
+          .source(event.getCause())
+          .event(PrismEvents.ITEM_PICKUP)
+          .itemStack(itemStack, quantity)
+          .location(player.getLocation())
+          .buildAndSave();
+    }
+  }
 
-            ItemStackSnapshot itemStack = item.item().get();
-            SpongeGriefAlert.getSpongeInstance().getLogger().debug("Inventory dropped - {} x{}", itemStack.getType().getId(), itemStack.getQuantity());
-
-            PrismRecord.create()
-                    .source(event.getCause())
-                    .event(PrismEvents.ITEM_DROP)
-                    .itemStack(itemStack)
-                    .location(player.getLocation())
-                    .buildAndSave();
-        }
+  /**
+   * Saves event records when a player drops an item on to the ground.
+   *
+   * @param event  DropItemEvent.Dispense
+   * @param player Player
+   */
+  @Listener(order = Order.POST)
+  public void onDropItemDispense(DropItemEvent.Dispense event, @Root Player player) {
+    if (event.getEntities().isEmpty() || !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isItemDrop()) {
+      return;
     }
 
-    /**
-     * Saves event records when a player closes or opens an Inventory.
-     *
-     * @param event  InteractInventoryEvent
-     * @param player Player
-     */
-    @Listener(order = Order.POST)
-    public void onInteractInventory(InteractInventoryEvent event, @Root Player player) {
-        if (!(event.getTargetInventory() instanceof CarriedInventory)
-                || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose() && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen())) {
-            return;
-        }
+    for (Entity entity : event.getEntities()) {
+      if (!(entity instanceof Item)) {
+        continue;
+      }
 
-        CarriedInventory<? extends Carrier> carriedInventory = (CarriedInventory<? extends Carrier>) event.getTargetInventory();
-        if (carriedInventory.getCarrier().filter(Player.class::isInstance).isPresent()) {
-            return;
-        }
+      Item item = (Item) entity;
+      if (!item.item().exists()) {
+        continue;
+      }
 
-        // Get the location of the inventory otherwise fallback on the players location
-        Location<World> location = carriedInventory.getCarrier()
-                .filter(Locatable.class::isInstance)
-                .map(Locatable.class::cast)
-                .map(Locatable::getLocation)
-                .orElse(player.getLocation());
+      ItemStackSnapshot itemStack = item.item().get();
+      SpongeGriefAlert.getSpongeInstance().getLogger().debug("Inventory dropped - {} x{}", itemStack.getType().getId(), itemStack.getQuantity());
 
-        // Get the title of the inventory otherwise fallback on the class name
-        String title = carriedInventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME)
-                .map(InventoryTitle::getValue)
-                .map(Text::toPlain)
-                .orElse(carriedInventory.getClass().getSimpleName());
-
-        PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
-                .source(event.getCause())
-                .container(title)
-                .location(location);
-
-        if (event instanceof InteractInventoryEvent.Close && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose()) {
-            eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();
-        } else if (event instanceof InteractInventoryEvent.Open && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen()) {
-            eventBuilder.event(PrismEvents.INVENTORY_OPEN).buildAndSave();
-        }
+      PrismRecord.create()
+          .source(event.getCause())
+          .event(PrismEvents.ITEM_DROP)
+          .itemStack(itemStack)
+          .location(player.getLocation())
+          .buildAndSave();
     }
+  }
+
+  /**
+   * Saves event records when a player closes or opens an Inventory.
+   *
+   * @param event  InteractInventoryEvent
+   * @param player Player
+   */
+  @Listener(order = Order.POST)
+  public void onInteractInventory(InteractInventoryEvent event, @Root Player player) {
+    if (!(event.getTargetInventory() instanceof CarriedInventory)
+        || (!SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose() && !SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen())) {
+      return;
+    }
+
+    CarriedInventory<? extends Carrier> carriedInventory = (CarriedInventory<? extends Carrier>) event.getTargetInventory();
+    if (carriedInventory.getCarrier().filter(Player.class::isInstance).isPresent()) {
+      return;
+    }
+
+    // Get the location of the inventory otherwise fallback on the players location
+    Location<World> location = carriedInventory.getCarrier()
+        .filter(Locatable.class::isInstance)
+        .map(Locatable.class::cast)
+        .map(Locatable::getLocation)
+        .orElse(player.getLocation());
+
+    // Get the title of the inventory otherwise fallback on the class name
+    String title = carriedInventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME)
+        .map(InventoryTitle::getValue)
+        .map(Text::toPlain)
+        .orElse(carriedInventory.getClass().getSimpleName());
+
+    PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
+        .source(event.getCause())
+        .container(title)
+        .location(location);
+
+    if (event instanceof InteractInventoryEvent.Close && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryClose()) {
+      eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();
+    } else if (event instanceof InteractInventoryEvent.Open && SpongeGriefAlert.getSpongeInstance().getConfig().getEventCategory().isInventoryOpen()) {
+      eventBuilder.event(PrismEvents.INVENTORY_OPEN).buildAndSave();
+    }
+  }
 }

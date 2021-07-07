@@ -24,115 +24,114 @@
 
 package com.minecraftonline.griefalert.common.data.records;
 
-import com.helion3.prism.api.data.PrismEvent;
+import com.minecraftonline.griefalert.common.data.struct.PrismEvent;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 
-import com.helion3.prism.util.DataQueries;
-
 public abstract class Result {
 
-    public DataContainer data;
+  public DataContainer data;
 
-    /**
-     * Returns a verb variant of the event group name.
-     *
-     * @return String verb variant of event group.
-     */
-    public String getEventVerb() {
-        String id = getEventId();
-        PrismEvent event = Sponge.getRegistry().getType(PrismEvent.class, id).orElse(null);
-        if (event != null) {
-            if (StringUtils.isNotBlank(event.getPastTense())) {
-                return event.getPastTense();
-            }
-
-            if (StringUtils.isNotBlank(event.getName())) {
-                return event.getName();
-            }
-        }
-
-        return id;
+  /**
+   * Instantiate an appropriate Result for the event.
+   *
+   * @param id          String id of event
+   * @param isAggregate boolean if aggregate
+   * @return Result
+   * @throws IllegalAccessException
+   * @throws InstantiationException
+   * @throws UnsupportedOperationException
+   */
+  public static Result from(String id, boolean isAggregate) throws IllegalAccessException, InstantiationException {
+    if (isAggregate) {
+      return new ResultAggregate();
     }
 
-    /**
-     * Returns the event id.
-     *
-     * @return String event id.
-     */
-    public String getEventId() {
-        return data.getString(DataQueries.EventName).orElse("unknown");
+    // Pull record class for this event, if any
+    Class<? extends Result> resultRecordClass = Sponge.getRegistry().getType(PrismEvent.class, id)
+        .map(PrismEvent::getResultClass)
+        .orElseThrow(() -> new UnsupportedOperationException(id + " is not supported"));
+
+    return resultRecordClass.newInstance();
+  }
+
+  /**
+   * Returns a verb variant of the event group name.
+   *
+   * @return String verb variant of event group.
+   */
+  public String getEventVerb() {
+    String id = getEventId();
+    PrismEvent event = Sponge.getRegistry().getType(PrismEvent.class, id).orElse(null);
+    if (event != null) {
+      if (StringUtils.isNotBlank(event.getPastTense())) {
+        return event.getPastTense();
+      }
+
+      if (StringUtils.isNotBlank(event.getName())) {
+        return event.getName();
+      }
     }
 
-    /**
-     * Returns the event name.
-     *
-     * @return String event name.
-     */
-    public String getEventName() {
-        String id = getEventId();
-        PrismEvent event = Sponge.getRegistry().getType(PrismEvent.class, id).orElse(null);
-        if (event != null && StringUtils.isNotBlank(event.getName())) {
-            return event.getName();
-        }
+    return id;
+  }
 
-        return id;
+  /**
+   * Returns the event id.
+   *
+   * @return String event id.
+   */
+  public String getEventId() {
+    return data.getString(DataQueries.EventName).orElse("unknown");
+  }
+
+  /**
+   * Returns the event name.
+   *
+   * @return String event name.
+   */
+  public String getEventName() {
+    String id = getEventId();
+    PrismEvent event = Sponge.getRegistry().getType(PrismEvent.class, id).orElse(null);
+    if (event != null && StringUtils.isNotBlank(event.getName())) {
+      return event.getName();
     }
 
-    /**
-     * Returns a user-friendly string describing the source.
-     *
-     * @return String source name.
-     */
-    public String getSourceName() {
-        return data.getString(DataQueries.Cause).orElse("unknown");
+    return id;
+  }
+
+  /**
+   * Returns a user-friendly string describing the source.
+   *
+   * @return String source name.
+   */
+  public String getSourceName() {
+    return data.getString(DataQueries.Cause).orElse("unknown");
+  }
+
+  /**
+   * Returns a user-friendly name of the target item,
+   * block, or entity of this event record.
+   *
+   * @return String target name.
+   */
+  public String getTargetName() {
+    return formatId(data.getString(DataQueries.Target).orElse(""));
+  }
+
+  /**
+   * Strips ID prefixes, like "minecraft:".
+   *
+   * @param id String ID
+   * @return String
+   */
+  private String formatId(String id) {
+    if (id.contains(":")) {
+      id = id.split(":")[1];
     }
 
-    /**
-     * Returns a user-friendly name of the target item,
-     * block, or entity of this event record.
-     *
-     * @return String target name.
-     */
-    public String getTargetName() {
-        return formatId(data.getString(DataQueries.Target).orElse(""));
-    }
-
-    /**
-     * Strips ID prefixes, like "minecraft:".
-     *
-     * @param id String ID
-     * @return String
-     */
-    private String formatId(String id) {
-        if (id.contains(":")) {
-            id = id.split(":")[1];
-        }
-
-        return id;
-    }
-
-    /**
-     * Instantiate an appropriate Result for the event.
-     *
-     * @param id String id of event
-     * @param isAggregate boolean if aggregate
-     * @return Result
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws UnsupportedOperationException
-     */
-    public static Result from(String id, boolean isAggregate) throws IllegalAccessException, InstantiationException {
-        if (isAggregate) {
-            return new ResultAggregate();
-        }
-
-        // Pull record class for this event, if any
-        Class<? extends Result> resultRecordClass = Sponge.getRegistry().getType(PrismEvent.class, id)
-                .map(PrismEvent::getResultClass)
-                .orElseThrow(() -> new UnsupportedOperationException(id + " is not supported"));
-
-        return resultRecordClass.newInstance();
-    }
+    return id;
+  }
 }

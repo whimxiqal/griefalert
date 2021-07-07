@@ -59,9 +59,10 @@ dependencies {
     implementation 'com.github.randombyte-developer:holograms:v3.2.0'
 
     // Database connectors
-    implementation 'org.xerial:sqlite-jdbc:3.8.11.2'
-    implementation 'mysql:mysql-connector-java:8.0.19'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.5.4'
+    shadow 'org.mongodb:mongo-java-driver:3.12.8'
+    shadow 'org.xerial:sqlite-jdbc:3.36.0.1'
+    shadow 'mysql:mysql-connector-java:8.0.25'
+    shadow 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
     implementation 'com.zaxxer:HikariCP:3.4.5'
 
     // JUnit

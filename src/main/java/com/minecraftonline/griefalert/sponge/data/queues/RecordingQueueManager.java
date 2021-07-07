@@ -23,16 +23,13 @@
  */
 package com.minecraftonline.griefalert.sponge.data.queues;
 
-import com.helion3.prism.queues.RecordingQueue;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
+import com.minecraftonline.griefalert.common.data.records.PrismRecordPreSaveEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
-
-import com.helion3.prism.Prism;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -40,39 +37,39 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public class RecordingQueueManager implements Runnable {
 
-    @Override
-    public synchronized void run() {
-        List<DataContainer> eventsSaveBatch = new ArrayList<>();
+  @Override
+  public synchronized void run() {
+    List<DataContainer> eventsSaveBatch = new ArrayList<>();
 
-        // Assume we're iterating everything in the queue
-        while (!com.helion3.prism.queues.RecordingQueue.getQueue().isEmpty()) {
-            // Poll the next event, append to list
-            PrismRecord record = RecordingQueue.getQueue().poll();
+    // Assume we're iterating everything in the queue
+    while (!RecordingQueue.getQueue().isEmpty()) {
+      // Poll the next event, append to list
+      PrismRecord record = RecordingQueue.getQueue().poll();
 
-            if (record != null) {
-                // Prepare PrismRecord for sending to a PrismRecordEvent
-                PluginContainer plugin = SpongeGriefAlert.getSpongeInstance().getPluginContainer();
-                EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
+      if (record != null) {
+        // Prepare PrismRecord for sending to a PrismRecordEvent
+        PluginContainer plugin = SpongeGriefAlert.getSpongeInstance().getPluginContainer();
+        EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
 
-                PrismRecordPreSaveEvent preSaveEvent = new PrismRecordPreSaveEvent(record,
-                    Cause.of(eventContext, plugin));
+        PrismRecordPreSaveEvent preSaveEvent = new PrismRecordPreSaveEvent(record,
+            Cause.of(eventContext, plugin));
 
-                // Tell Sponge that this PrismRecordEvent has occurred
-                Sponge.getEventManager().post(preSaveEvent);
+        // Tell Sponge that this PrismRecordEvent has occurred
+        Sponge.getEventManager().post(preSaveEvent);
 
-                if (!preSaveEvent.isCancelled()) {
-                    eventsSaveBatch.add(record.getDataContainer());
-                }
-            }
+        if (!preSaveEvent.isCancelled()) {
+          eventsSaveBatch.add(record.getDataContainer());
         }
-
-        if (eventsSaveBatch.size() > 0) {
-            try {
-                SpongeGriefAlert.getSpongeInstance().getStorageAdapter().records().write(eventsSaveBatch);
-            } catch (Exception e) {
-                // @todo handle failures
-                e.printStackTrace();
-            }
-        }
+      }
     }
+
+    if (eventsSaveBatch.size() > 0) {
+      try {
+        SpongeGriefAlert.getSpongeInstance().getStorageAdapter().records().write(eventsSaveBatch);
+      } catch (Exception e) {
+        // @todo handle failures
+        e.printStackTrace();
+      }
+    }
+  }
 }

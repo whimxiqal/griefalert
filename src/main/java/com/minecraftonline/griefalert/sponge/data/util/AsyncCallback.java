@@ -23,14 +23,16 @@
  */
 package com.minecraftonline.griefalert.sponge.data.util;
 
+import com.minecraftonline.griefalert.common.data.records.Result;
 import java.util.List;
 
-import com.helion3.prism.api.records.Result;
-
 public class AsyncCallback {
-    public void success(List<Result> results) {}
+  public void success(List<Result> results) {
+  }
 
-    public void empty() {}
+  public void empty() {
+  }
 
-    public void error(Exception e) {}
+  public void error(Exception e) {
+  }
 }

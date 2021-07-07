@@ -21,52 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.minecraftonline.griefalert.sponge.data.commands;
 
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.sponge.data.util.AsyncUtil;
+import com.minecraftonline.griefalert.sponge.data.util.Format;
 import java.util.concurrent.CompletableFuture;
-
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.AsyncUtil;
-import com.helion3.prism.util.Format;
+import org.spongepowered.api.text.Text;
 
 // TODO remove
 public class LookupCommand {
-    private LookupCommand() {}
+  private LookupCommand() {
+  }
 
-    public static CommandSpec getCommand() {
-        return CommandSpec.builder()
-            .description(Text.of("Search event records."))
-            .permission("prism.lookup")
-            .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("parameters"))))
-            .executor((source, args) -> {
-                // Create a new query session
-                final QuerySession session = new QuerySession(source);
+  public static CommandSpec getCommand() {
+    return CommandSpec.builder()
+        .description(Text.of("Search event records."))
+        .permission("prism.lookup")
+        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("parameters"))))
+        .executor((source, args) -> {
+          // Create a new query session
+          final QuerySession session = new QuerySession(source);
 
-                String parameters = null;
-                if (args.<String>getOne("parameters").isPresent()) {
-                    parameters = args.<String>getOne("parameters").get();
-                }
+          String parameters = null;
+          if (args.<String>getOne("parameters").isPresent()) {
+            parameters = args.<String>getOne("parameters").get();
+          }
 
-                source.sendMessage(Format.heading("Querying records..."));
+          source.sendMessage(Format.heading("Querying records..."));
 
-                try {
-                    CompletableFuture<Void> future = session.newQueryFromArguments(parameters);
-                    future.thenAccept((v) -> {
-                        // Pass off to an async lookup helper
-                        AsyncUtil.lookup(session);
-                    });
-                } catch(Exception e) {
-                    String message = e.getMessage() == null ? "Unknown error. Please check the console." : e.getMessage();
-                    source.sendMessage(Format.error(Text.of(message)));
-                    e.printStackTrace();
-                }
+          try {
+            CompletableFuture<Void> future = session.newQueryFromArguments(parameters);
+            future.thenAccept((v) -> {
+              // Pass off to an async lookup helper
+              AsyncUtil.lookup(session);
+            });
+          } catch (Exception e) {
+            String message = e.getMessage() == null ? "Unknown error. Please check the console." : e.getMessage();
+            source.sendMessage(Format.error(Text.of(message)));
+            e.printStackTrace();
+          }
 
-                return CommandResult.success();
-            }).build();
-    }
+          return CommandResult.success();
+        }).build();
+  }
 }

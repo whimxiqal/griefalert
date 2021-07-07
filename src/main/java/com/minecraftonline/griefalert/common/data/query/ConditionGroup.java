@@ -23,16 +23,12 @@
  */
 package com.minecraftonline.griefalert.common.data.query;
 
-import com.helion3.prism.api.query.Condition;
-import com.helion3.prism.api.query.MatchRule;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Range;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.Location;
-
-import com.google.common.collect.Range;
-import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.world.extent.Extent;
 
 /**
@@ -40,147 +36,148 @@ import org.spongepowered.api.world.extent.Extent;
  * separately, and each field within each group should be compared
  * as part of the group.
  */
-public final class ConditionGroup implements com.helion3.prism.api.query.Condition {
-    private final List<com.helion3.prism.api.query.Condition> conditions = new ArrayList<>();
-    private final Operator operator;
+public final class ConditionGroup implements Condition {
+  private final List<Condition> conditions = new ArrayList<>();
+  private final Operator operator;
 
-    public enum Operator {
-        AND, OR
-    }
+  /**
+   * Create a new group with a specific operator.
+   *
+   * @param operator
+   */
+  public ConditionGroup(Operator operator) {
+    this.operator = operator;
+  }
 
-    /**
-     * Create a new group with a specific operator.
-     * @param operator
-     */
-    public ConditionGroup(Operator operator) {
-        this.operator = operator;
-    }
+  /**
+   * Convenience method to build conditions for a single location.
+   *
+   * @param location Location<?>
+   * @return ConditionGroup
+   */
+  public static ConditionGroup from(Location<?> location) {
+    ConditionGroup conditions = new ConditionGroup(Operator.AND);
 
-    /**
-     * Add a condition.
-     *
-     * @param condition Condition
-     */
-    public void add(com.helion3.prism.api.query.Condition condition) {
-        conditions.add(condition);
-    }
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, location.getExtent().getUniqueId().toString()));
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.X), MatchRule.EQUALS, location.getBlockX()));
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Y), MatchRule.EQUALS, location.getBlockY()));
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), MatchRule.EQUALS, location.getBlockZ()));
 
-    /**
-     * Add a list of conditions.
-     *
-     * @param conditions List of conditions.
-     */
-    public void add(List<com.helion3.prism.api.query.Condition> conditions) {
-        this.conditions.addAll(conditions);
-    }
+    return conditions;
+  }
 
-    /**
-     * Get all conditions.
-     *
-     * @return List<Condition>
-     */
-    public List<Condition> getConditions() {
-        return conditions;
-    }
+  /**
+   * Convenience method to build conditions for a region of radius around a central location.
+   *
+   * @param location Location<?>
+   * @param radius   Integer
+   * @return ConditionGroup
+   */
+  public static ConditionGroup from(Location<?> location, int radius) {
+    ConditionGroup conditions = new ConditionGroup(Operator.AND);
 
-    /**
-     * Get the operator for this groups rules.
-     *
-     * @return Operator
-     */
-    public Operator getOperator() {
-        return operator;
-    }
+    // World
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, location.getExtent().getUniqueId().toString()));
 
-    /**
-     * Convenience method to build conditions for a single location.
-     *
-     * @param location Location<?>
-     * @return ConditionGroup
-     */
-    public static ConditionGroup from(Location<?> location) {
-        ConditionGroup conditions = new ConditionGroup(Operator.AND);
+    // X
+    Range<Integer> xRange = Range.open(location.getBlockX() - radius, location.getBlockX() + radius);
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.X), xRange));
 
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), com.helion3.prism.api.query.MatchRule.EQUALS, location.getExtent().getUniqueId().toString()));
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.X), com.helion3.prism.api.query.MatchRule.EQUALS, location.getBlockX()));
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Y), com.helion3.prism.api.query.MatchRule.EQUALS, location.getBlockY()));
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), com.helion3.prism.api.query.MatchRule.EQUALS, location.getBlockZ()));
+    // Y
+    Range<Integer> yRange = Range.open(location.getBlockY() - radius, location.getBlockY() + radius);
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Y), yRange));
 
-        return conditions;
-    }
+    // Z
+    Range<Integer> zRange = Range.open(location.getBlockZ() - radius, location.getBlockZ() + radius);
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), zRange));
 
-    /**
-     * Convenience method to build conditions for a region of radius around a central location.
-     *
-     * @param location Location<?>
-     * @param radius Integer
-     * @return ConditionGroup
-     */
-    public static ConditionGroup from(Location<?> location, int radius) {
-        ConditionGroup conditions = new ConditionGroup(Operator.AND);
+    return conditions;
+  }
 
-        // World
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), com.helion3.prism.api.query.MatchRule.EQUALS, location.getExtent().getUniqueId().toString()));
+  /**
+   * Convenience method to build conditions for a prismatic region marked with two corners.
+   *
+   * @param extent         Extent of both block locations
+   * @param blockLocation1 vector describing first location
+   * @param blockLocation2 vector describing second location
+   * @return ConditionGroup
+   */
+  public static ConditionGroup from(Extent extent, Vector3i blockLocation1, Vector3i blockLocation2) {
+    ConditionGroup conditions = new ConditionGroup(Operator.AND);
 
-        // X
-        Range<Integer> xRange = Range.open(location.getBlockX() - radius, location.getBlockX() + radius);
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.X), xRange));
+    // World
+    conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, extent.getUniqueId().toString()));
 
-        // Y
-        Range<Integer> yRange = Range.open(location.getBlockY() - radius, location.getBlockY() + radius);
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Y), yRange));
+    // X
+    conditions.add(FieldCondition.of(
+        DataQueries.Location.then(DataQueries.X),
+        MatchRule.GREATER_THAN_EQUAL,
+        Math.min(blockLocation1.getX(), blockLocation2.getX())));
+    conditions.add(FieldCondition.of(
+        DataQueries.Location.then(DataQueries.X),
+        MatchRule.LESS_THAN_EQUAL,
+        Math.max(blockLocation1.getX(), blockLocation2.getX())));
 
-        // Z
-        Range<Integer> zRange = Range.open(location.getBlockZ() - radius, location.getBlockZ() + radius);
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), zRange));
+    // Y
+    conditions.add(FieldCondition.of(
+        DataQueries.Location.then(DataQueries.Y),
+        MatchRule.GREATER_THAN_EQUAL,
+        Math.min(blockLocation1.getY(), blockLocation2.getY())));
+    conditions.add(FieldCondition.of(
+        DataQueries.Location.then(DataQueries.Y),
+        MatchRule.LESS_THAN_EQUAL,
+        Math.max(blockLocation1.getY(), blockLocation2.getY())));
 
-        return conditions;
-    }
+    // Z
+    conditions.add(FieldCondition.of(
+        DataQueries.Location.then(DataQueries.Z),
+        MatchRule.GREATER_THAN_EQUAL,
+        Math.min(blockLocation1.getZ(), blockLocation2.getZ())));
+    conditions.add(FieldCondition.of(
+        DataQueries.Location.then(DataQueries.Z),
+        MatchRule.LESS_THAN_EQUAL,
+        Math.max(blockLocation1.getZ(), blockLocation2.getZ())));
 
-    /**
-     * Convenience method to build conditions for a prismatic region marked with two corners.
-     *
-     * @param extent Extent of both block locations
-     * @param blockLocation1 vector describing first location
-     * @param blockLocation2 vector describing second location
-     * @return ConditionGroup
-     */
-    public static ConditionGroup from(Extent extent, Vector3i blockLocation1, Vector3i blockLocation2) {
-        ConditionGroup conditions = new ConditionGroup(Operator.AND);
+    return conditions;
+  }
 
-        // World
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), com.helion3.prism.api.query.MatchRule.EQUALS, extent.getUniqueId().toString()));
+  /**
+   * Add a condition.
+   *
+   * @param condition Condition
+   */
+  public void add(Condition condition) {
+    conditions.add(condition);
+  }
 
-        // X
-        conditions.add(FieldCondition.of(
-            DataQueries.Location.then(DataQueries.X),
-            com.helion3.prism.api.query.MatchRule.GREATER_THAN_EQUAL,
-            Math.min(blockLocation1.getX(), blockLocation2.getX())));
-        conditions.add(FieldCondition.of(
-            DataQueries.Location.then(DataQueries.X),
-            com.helion3.prism.api.query.MatchRule.LESS_THAN_EQUAL,
-            Math.max(blockLocation1.getX(), blockLocation2.getX())));
+  /**
+   * Add a list of conditions.
+   *
+   * @param conditions List of conditions.
+   */
+  public void add(List<Condition> conditions) {
+    this.conditions.addAll(conditions);
+  }
 
-        // Y
-        conditions.add(FieldCondition.of(
-            DataQueries.Location.then(DataQueries.Y),
-            com.helion3.prism.api.query.MatchRule.GREATER_THAN_EQUAL,
-            Math.min(blockLocation1.getY(), blockLocation2.getY())));
-        conditions.add(FieldCondition.of(
-            DataQueries.Location.then(DataQueries.Y),
-            com.helion3.prism.api.query.MatchRule.LESS_THAN_EQUAL,
-            Math.max(blockLocation1.getY(), blockLocation2.getY())));
+  /**
+   * Get all conditions.
+   *
+   * @return List<Condition>
+   */
+  public List<Condition> getConditions() {
+    return conditions;
+  }
 
-        // Z
-        conditions.add(FieldCondition.of(
-            DataQueries.Location.then(DataQueries.Z),
-            com.helion3.prism.api.query.MatchRule.GREATER_THAN_EQUAL,
-            Math.min(blockLocation1.getZ(), blockLocation2.getZ())));
-        conditions.add(FieldCondition.of(
-            DataQueries.Location.then(DataQueries.Z),
-            MatchRule.LESS_THAN_EQUAL,
-            Math.max(blockLocation1.getZ(), blockLocation2.getZ())));
+  /**
+   * Get the operator for this groups rules.
+   *
+   * @return Operator
+   */
+  public Operator getOperator() {
+    return operator;
+  }
 
-        return conditions;
-    }
+  public enum Operator {
+    AND, OR
+  }
 }

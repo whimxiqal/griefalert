@@ -23,47 +23,44 @@
  */
 package com.minecraftonline.griefalert.common.data.parameters;
 
+import com.google.common.collect.ImmutableList;
+import com.minecraftonline.griefalert.common.data.query.FieldCondition;
+import com.minecraftonline.griefalert.common.data.query.MatchRule;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.sponge.data.util.DataQueries;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
-
 import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.query.FieldCondition;
-import com.helion3.prism.api.query.MatchRule;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.DataQueries;
-
 public class ParameterEventName extends SimpleParameterHandler {
-    private final Pattern pattern = Pattern.compile("[~|!]?[\\w,-]+");
+  private final Pattern pattern = Pattern.compile("[~|!]?[\\w,-]+");
 
-    /**
-     * Parameter handling the event name field.
-     */
-    public ParameterEventName() {
-        // For backwards-compat, we're still using "a" for action.
-        // "e" is likely reserved for entity
-        super(ImmutableList.of("a", "event"));
-    }
+  /**
+   * Parameter handling the event name field.
+   */
+  public ParameterEventName() {
+    // For backwards-compat, we're still using "a" for action.
+    // "e" is likely reserved for entity
+    super(ImmutableList.of("a", "event"));
+  }
 
-    @Override
-    public boolean acceptsSource(@Nullable CommandSource source) {
-        return true;
-    }
+  @Override
+  public boolean acceptsSource(@Nullable CommandSource source) {
+    return true;
+  }
 
-    @Override
-    public boolean acceptsValue(String value) {
-        return pattern.matcher(value).matches();
-    }
+  @Override
+  public boolean acceptsValue(String value) {
+    return pattern.matcher(value).matches();
+  }
 
-    @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        query.addCondition(new FieldCondition(DataQueries.EventName, MatchRule.EQUALS, value));
+  @Override
+  public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
+    query.addCondition(new FieldCondition(DataQueries.EventName, MatchRule.EQUALS, value));
 
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

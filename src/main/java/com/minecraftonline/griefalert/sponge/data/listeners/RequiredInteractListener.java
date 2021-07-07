@@ -24,12 +24,12 @@
 
 package com.minecraftonline.griefalert.sponge.data.listeners;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.AsyncUtil;
-import com.helion3.prism.util.Format;
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.common.data.flags.Flag;
+import com.minecraftonline.griefalert.common.data.query.ConditionGroup;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
+import com.minecraftonline.griefalert.sponge.data.util.AsyncUtil;
+import com.minecraftonline.griefalert.sponge.data.util.Format;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -44,77 +44,77 @@ import org.spongepowered.api.world.World;
 
 public class RequiredInteractListener {
 
-    /**
-     * Listens for interactions by Players with active inspection wands.
-     * <br>
-     * This listener is required and does not track any events.
-     *
-     * @param event  InteractBlockEvent
-     * @param player Player
-     */
-    @Listener(order = Order.EARLY)
-    public void onInteractBlock(InteractBlockEvent event, @First Player player) {
-        // Wand support
-        if (!SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
-            return;
-        }
-
-        event.setCancelled(true);
-
-        // Ignore OffHand events
-        if (event instanceof InteractBlockEvent.Primary.OffHand || event instanceof InteractBlockEvent.Secondary.OffHand) {
-            return;
-        }
-
-        // Verify target block is valid
-        if (event.getTargetBlock() == BlockSnapshot.NONE || !event.getTargetBlock().getLocation().isPresent()) {
-            return;
-        }
-
-        // Location of block
-        Location<World> location = event.getTargetBlock().getLocation().get();
-
-        // Secondary click gets location relative to side clicked
-        if (event instanceof InteractBlockEvent.Secondary) {
-            location = location.getRelative(event.getTargetSide());
-        }
-
-        QuerySession session = new QuerySession(player);
-        // session.addFlag(Flag.EXTENDED);
-        session.addFlag(Flag.NO_GROUP);
-        session.newQuery().addCondition(ConditionGroup.from(location));
-
-        player.sendMessage(Text.of(
-                Format.prefix(), TextColors.GOLD,
-                "--- Inspecting ", Format.item(location.getBlockType().getId(), true),
-                " at ", location.getBlockX(), " ", location.getBlockY(), " ", location.getBlockZ(), " ---"));
-
-        // Pass off to an async lookup helper
-        AsyncUtil.lookup(session);
+  /**
+   * Listens for interactions by Players with active inspection wands.
+   * <br>
+   * This listener is required and does not track any events.
+   *
+   * @param event  InteractBlockEvent
+   * @param player Player
+   */
+  @Listener(order = Order.EARLY)
+  public void onInteractBlock(InteractBlockEvent event, @First Player player) {
+    // Wand support
+    if (!SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
+      return;
     }
 
-    /**
-     * Listens for interactions by Players with active inspection wands.
-     * <br>
-     * This listener is required and does not track any events.
-     *
-     * @param event  InteractEntityEvent
-     * @param player Player
-     */
-    @Listener(order = Order.EARLY)
-    public void onInteractEntity(InteractEntityEvent event, @First Player player) {
-        // Wand support
-        if (!SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
-            return;
-        }
+    event.setCancelled(true);
 
-        event.setCancelled(true);
-
-        // Ignore OffHand events
-        if (event instanceof InteractEntityEvent.Primary.OffHand || event instanceof InteractEntityEvent.Secondary.OffHand) {
-            return;
-        }
-
-        player.sendMessage(Format.error(Text.of("Cannot interact with entities while inspection is active!")));
+    // Ignore OffHand events
+    if (event instanceof InteractBlockEvent.Primary.OffHand || event instanceof InteractBlockEvent.Secondary.OffHand) {
+      return;
     }
+
+    // Verify target block is valid
+    if (event.getTargetBlock() == BlockSnapshot.NONE || !event.getTargetBlock().getLocation().isPresent()) {
+      return;
+    }
+
+    // Location of block
+    Location<World> location = event.getTargetBlock().getLocation().get();
+
+    // Secondary click gets location relative to side clicked
+    if (event instanceof InteractBlockEvent.Secondary) {
+      location = location.getRelative(event.getTargetSide());
+    }
+
+    QuerySession session = new QuerySession(player);
+    // session.addFlag(Flag.EXTENDED);
+    session.addFlag(Flag.NO_GROUP);
+    session.newQuery().addCondition(ConditionGroup.from(location));
+
+    player.sendMessage(Text.of(
+        Format.prefix(), TextColors.GOLD,
+        "--- Inspecting ", Format.item(location.getBlockType().getId(), true),
+        " at ", location.getBlockX(), " ", location.getBlockY(), " ", location.getBlockZ(), " ---"));
+
+    // Pass off to an async lookup helper
+    AsyncUtil.lookup(session);
+  }
+
+  /**
+   * Listens for interactions by Players with active inspection wands.
+   * <br>
+   * This listener is required and does not track any events.
+   *
+   * @param event  InteractEntityEvent
+   * @param player Player
+   */
+  @Listener(order = Order.EARLY)
+  public void onInteractEntity(InteractEntityEvent event, @First Player player) {
+    // Wand support
+    if (!SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
+      return;
+    }
+
+    event.setCancelled(true);
+
+    // Ignore OffHand events
+    if (event instanceof InteractEntityEvent.Primary.OffHand || event instanceof InteractEntityEvent.Secondary.OffHand) {
+      return;
+    }
+
+    player.sendMessage(Format.error(Text.of("Cannot interact with entities while inspection is active!")));
+  }
 }

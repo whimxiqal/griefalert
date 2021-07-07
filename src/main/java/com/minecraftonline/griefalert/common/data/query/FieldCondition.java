@@ -23,89 +23,86 @@
  */
 package com.minecraftonline.griefalert.common.data.query;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-
-import com.helion3.prism.api.query.Condition;
-import com.helion3.prism.api.query.MatchRule;
+import com.google.common.collect.Range;
 import org.spongepowered.api.data.DataQuery;
 
-import com.google.common.collect.Range;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a condition for a specific field. May exist alone
  * in a query, or within a group.
  */
 public final class FieldCondition implements Condition {
-    private final DataQuery field;
-    private final com.helion3.prism.api.query.MatchRule matchRule;
-    private final Object value;
+  private final DataQuery field;
+  private final MatchRule matchRule;
+  private final Object value;
 
-    /**
-     * Statically build a new condition.
-     *
-     * @param query DataQuery matching the field name.
-     * @param matchRule MatchRule describing comparison of values.
-     * @param value List, String or Number value.
-     * @return Condition
-     */
-    public static FieldCondition of(DataQuery query, com.helion3.prism.api.query.MatchRule matchRule, Object value) {
-        return new FieldCondition(query, matchRule, value);
-    }
+  /**
+   * Build a condition for use with querying the storage.
+   *
+   * @param field     DataQuery matching the field name.
+   * @param matchRule MatchRule describing comparison of values.
+   * @param value     List, String or Number value.
+   */
+  public FieldCondition(DataQuery field, MatchRule matchRule, Object value) {
+    checkNotNull(field);
+    checkNotNull(matchRule);
+    checkNotNull(value);
+    this.field = field;
+    this.matchRule = matchRule;
+    this.value = value;
+  }
 
-    /**
-     * Statically build a new condition.
-     *
-     * @param field DataQuery matching the field name.
-     * @param value Range of values.
-     * @return Condition
-     */
-    public static FieldCondition of(DataQuery field, Range<?> value) {
-        return new FieldCondition(field, com.helion3.prism.api.query.MatchRule.BETWEEN, value);
-    }
+  /**
+   * Statically build a new condition.
+   *
+   * @param query     DataQuery matching the field name.
+   * @param matchRule MatchRule describing comparison of values.
+   * @param value     List, String or Number value.
+   * @return Condition
+   */
+  public static FieldCondition of(DataQuery query, MatchRule matchRule, Object value) {
+    return new FieldCondition(query, matchRule, value);
+  }
 
-    /**
-     * Build a condition for use with querying the storage.
-     *
-     * @param field DataQuery matching the field name.
-     * @param matchRule MatchRule describing comparison of values.
-     * @param value List, String or Number value.
-     */
-    public FieldCondition(DataQuery field, com.helion3.prism.api.query.MatchRule matchRule, Object value) {
-        checkNotNull(field);
-        checkNotNull(matchRule);
-        checkNotNull(value);
-        this.field = field;
-        this.matchRule = matchRule;
-        this.value = value;
-    }
+  /**
+   * Statically build a new condition.
+   *
+   * @param field DataQuery matching the field name.
+   * @param value Range of values.
+   * @return Condition
+   */
+  public static FieldCondition of(DataQuery field, Range<?> value) {
+    return new FieldCondition(field, MatchRule.BETWEEN, value);
+  }
 
-    /**
-     * Returns the DataQuery name for the field
-     * this condition applies to.
-     *
-     * @return DataQuery DataQuery field name.
-     */
-    public DataQuery getFieldName() {
-        return field;
-    }
+  /**
+   * Returns the DataQuery name for the field
+   * this condition applies to.
+   *
+   * @return DataQuery DataQuery field name.
+   */
+  public DataQuery getFieldName() {
+    return field;
+  }
 
-    /**
-     * Returns the match rule for the given values.
-     *
-     * @return MatchRule Match rule for condition's value.
-     */
-    public MatchRule getMatchRule() {
-        return matchRule;
-    }
+  /**
+   * Returns the match rule for the given values.
+   *
+   * @return MatchRule Match rule for condition's value.
+   */
+  public MatchRule getMatchRule() {
+    return matchRule;
+  }
 
-    /**
-     * Returns the value to be used in the condition. How it's
-     * compared depends on the MatchRule.
-     *
-     * @return Object Any value of List, String, Number
-     */
-    public Object getValue() {
-        return value;
-    }
+  /**
+   * Returns the value to be used in the condition. How it's
+   * compared depends on the MatchRule.
+   *
+   * @return Object Any value of List, String, Number
+   */
+  public Object getValue() {
+    return value;
+  }
 }

@@ -66,9 +66,7 @@ public class PrismCommands {
                 Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi", TextColors.GRAY, ".\n"),
                 TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
                 TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
-                TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
-                TextColors.GRAY, "Site: ", Format.url(Reference.WEBSITE), "\n",
-                TextColors.GRAY, "Source: ", Format.url(Reference.SOURCE)
+                TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n"
             ));
 
             return CommandResult.success();

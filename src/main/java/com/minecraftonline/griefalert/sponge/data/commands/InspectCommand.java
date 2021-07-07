@@ -23,36 +23,36 @@
  */
 package com.minecraftonline.griefalert.sponge.data.commands;
 
+import com.minecraftonline.griefalert.SpongeGriefAlert;
+import com.minecraftonline.griefalert.sponge.data.util.Format;
 import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.command.CommandResult;
-
-import com.helion3.prism.Prism;
-import com.helion3.prism.util.Format;
 
 // TODO remove
 public class InspectCommand {
-    private InspectCommand(){}
+  private InspectCommand() {
+  }
 
-    public static CommandSpec getCommand() {
-        return CommandSpec.builder()
+  public static CommandSpec getCommand() {
+    return CommandSpec.builder()
         .permission("prism.inspect")
         .executor((source, args) -> {
-            if (source instanceof Player) {
-                Player player = (Player) source;
-                if (SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
-                    SpongeGriefAlert.getSpongeInstance().getActiveWands().remove(player.getUniqueId());
-                    source.sendMessage(Format.heading("Inspection wand disabled."));
-                } else {
-                    SpongeGriefAlert.getSpongeInstance().getActiveWands().add(player.getUniqueId());
-                    source.sendMessage(Format.heading("Inspection wand enabled."));
-                }
-
-                return CommandResult.success();
+          if (source instanceof Player) {
+            Player player = (Player) source;
+            if (SpongeGriefAlert.getSpongeInstance().getActiveWands().contains(player.getUniqueId())) {
+              SpongeGriefAlert.getSpongeInstance().getActiveWands().remove(player.getUniqueId());
+              source.sendMessage(Format.heading("Inspection wand disabled."));
             } else {
-                throw new CommandException(Format.error("You must be a player to use this command."));
+              SpongeGriefAlert.getSpongeInstance().getActiveWands().add(player.getUniqueId());
+              source.sendMessage(Format.heading("Inspection wand enabled."));
             }
+
+            return CommandResult.success();
+          } else {
+            throw new CommandException(Format.error("You must be a player to use this command."));
+          }
         }).build();
-    }
+  }
 }

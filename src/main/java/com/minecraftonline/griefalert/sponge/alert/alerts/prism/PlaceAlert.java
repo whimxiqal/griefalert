@@ -24,8 +24,8 @@
 
 package com.minecraftonline.griefalert.sponge.alert.alerts.prism;
 
-import com.helion3.prism.api.records.PrismRecord;
 import com.minecraftonline.griefalert.common.alert.records.GriefProfile;
+import com.minecraftonline.griefalert.common.data.records.PrismRecord;
 
 /**
  * An alert that is caused by the placing of a block.

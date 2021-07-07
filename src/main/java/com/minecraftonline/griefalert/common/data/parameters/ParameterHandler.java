@@ -23,69 +23,66 @@
  */
 package com.minecraftonline.griefalert.common.data.parameters;
 
+import com.google.common.collect.ImmutableList;
+import com.minecraftonline.griefalert.common.data.query.Query;
+import com.minecraftonline.griefalert.common.data.query.QuerySession;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
 import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-
 public interface ParameterHandler {
-    /**
-     * Returns whether this parameter is allowed for the current
-     * command source. Example: radius parameter only for Player.
-     *
-     * @param source CommandSource of current parameter.
-     * @return boolean Whether this command source may use this parameter.
-     */
-    boolean acceptsSource(@Nullable CommandSource source);
+  /**
+   * Returns whether this parameter is allowed for the current
+   * command source. Example: radius parameter only for Player.
+   *
+   * @param source CommandSource of current parameter.
+   * @return boolean Whether this command source may use this parameter.
+   */
+  boolean acceptsSource(@Nullable CommandSource source);
 
-    /**
-     * Returns whether the given value(s) for the handler
-     * are acceptable.
-     *
-     * @param value String Value/input for the parameter
-     * @return boolean Whether this value is legal for this parameter.
-     */
-    boolean acceptsValue(String value);
+  /**
+   * Returns whether the given value(s) for the handler
+   * are acceptable.
+   *
+   * @param value String Value/input for the parameter
+   * @return boolean Whether this value is legal for this parameter.
+   */
+  boolean acceptsValue(String value);
 
-    /**
-     * Get all parameter aliases this handler applies to.
-     *
-     * @return List of aliases.
-     */
-    ImmutableList<String> getAliases();
+  /**
+   * Get all parameter aliases this handler applies to.
+   *
+   * @return List of aliases.
+   */
+  ImmutableList<String> getAliases();
 
-    /**
-     * Returns whether this handler responds to the given alias.
-     *
-     * @param alias String Alias to check against
-     * @return boolean Whether this handler responds to an alias.
-     */
-    boolean handles(String alias);
+  /**
+   * Returns whether this handler responds to the given alias.
+   *
+   * @param alias String Alias to check against
+   * @return boolean Whether this handler responds to an alias.
+   */
+  boolean handles(String alias);
 
-    /**
-     * Processes the given value into conditions which are then
-     * appended to the query.
-     *
-     * @param session Current Query Session
-     * @param parameter String parameter used
-     * @param value String value(s) given with parameter
-     * @param query Query Current query object
-     */
-    Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query);
+  /**
+   * Processes the given value into conditions which are then
+   * appended to the query.
+   *
+   * @param session   Current Query Session
+   * @param parameter String parameter used
+   * @param value     String value(s) given with parameter
+   * @param query     Query Current query object
+   */
+  Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query);
 
-    /**
-     * Called when this handler's aliases were not defined.
-     *
-     * @param session QuerySession
-     */
-    default Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
-        return Optional.empty();
-    }
+  /**
+   * Called when this handler's aliases were not defined.
+   *
+   * @param session QuerySession
+   */
+  default Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
+    return Optional.empty();
+  }
 }

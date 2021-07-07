@@ -393,11 +393,6 @@ public final class SpongeGriefAlert extends GriefAlert {
   private final RecordingQueueManager recordingQueueManager = new RecordingQueueManager();
 
   @Listener
-  public void onConstruction(GameConstructionEvent event) {
-
-  }
-
-  @Listener
   public void onPreInitialization(GamePreInitializationEvent event) {
     getConfiguration().loadConfiguration();
   }
@@ -480,14 +475,6 @@ public final class SpongeGriefAlert extends GriefAlert {
       // Shutdown storage
       getStorageAdapter().close();
     }
-  }
-
-  public PluginContainer getPluginContainer() {
-    return pluginContainer;
-  }
-
-  public Logger getLogger() {
-    return logger;
   }
 
   public Configuration getConfiguration() {
