@@ -26,7 +26,7 @@ publishing {
 repositories {
 	mavenCentral()
     google()
-    maven { url "http://maven.sk89q.com/repo/" }
+    maven { url "https://maven.enginehub.org/repo/" }
     maven { url "https://jitpack.io" }
     jcenter()
     flatDir {
