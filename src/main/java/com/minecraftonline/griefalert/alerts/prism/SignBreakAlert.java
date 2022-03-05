@@ -35,7 +35,7 @@ import java.util.Optional;
 /**
  * An alert caused by breaking a sign.
  */
-public class SignBreakAlert extends PrismAlert {
+public class SignBreakAlert extends BreakAlert {
 
   /**
    * Default constructor for a sign break alert. This add all the 'extra'
